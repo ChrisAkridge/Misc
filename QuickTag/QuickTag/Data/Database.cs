@@ -73,6 +73,13 @@ namespace QuickTag.Data
 			return null;
 		}
 
+		public void UpdateFolder(string folderPath)
+		{
+			Folder folder = this.folders.Where(f => f.Path == folderPath).FirstOrDefault();
+			if (folder == null) return;
+			folder.Update();
+		}
+
 		public void PopulateTreeView(TreeView view)
 		{
 			view.Nodes.Clear();

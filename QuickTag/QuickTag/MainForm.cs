@@ -173,18 +173,7 @@ namespace QuickTag
 				// when this event handler is called.
 
 				// Construct the full path using the parents of the current node.
-				StringBuilder pathBuilder = new StringBuilder();
-				TreeNode selectedNode = this.TreeViewFiles.SelectedNode;
-				pathBuilder.Append("\\" + selectedNode.Text); // this should be optimized to a Concat call
-
-				TreeNode parent = selectedNode.Parent;
-				while (parent != null)
-				{
-					pathBuilder.Insert(0, "\\" + parent.Text);
-					parent = parent.Parent; // yo dawg
-				}
-
-				string path = pathBuilder.ToString().Substring(1);
+				string path = this.GetSelectedNodePath();
 				// Check that the file exists - if not, we probably selected a folder or disk.
 				if (!File.Exists(path)) { return; }
 
@@ -196,6 +185,23 @@ namespace QuickTag
 			{
 				imageSelectedByArrowKeys = false;
 			}
+		}
+
+		private string GetSelectedNodePath()
+		{
+			StringBuilder pathBuilder = new StringBuilder();
+			TreeNode selectedNode = this.TreeViewFiles.SelectedNode;
+			if (selectedNode == null) return null;
+			pathBuilder.Append("\\" + selectedNode.Text); // this should be optimized to a Concat call
+
+			TreeNode parent = selectedNode.Parent;
+			while (parent != null)
+			{
+				pathBuilder.Insert(0, "\\" + parent.Text);
+				parent = parent.Parent; // yo dawg
+			}
+
+			return pathBuilder.ToString().Substring(1);
 		}
 
 		private void TreeViewTags_AfterSelect(object sender, TreeViewEventArgs e)
@@ -210,6 +216,20 @@ namespace QuickTag
 				this.TextBoxImageTags.Text = this.database.GetTags(path);
 				this.imageSelectedByArrowKeys = false;
 			}
+		}
+
+		private void ButtonUpdate_Click(object sender, EventArgs e)
+		{
+			string selectedPath = this.GetSelectedNodePath();
+			if (selectedPath == null || !Directory.Exists(selectedPath))
+			{
+				this.ToolTip.Show("Please select a folder to update.", this.ButtonUpdate, 4000);
+				return;
+			}
+
+			this.database.UpdateFolder(selectedPath);
+			this.database.PopulateTreeView(this.TreeViewFiles);
+			this.database.PopulateTagTreeView(this.TreeViewTags);
 		}
 	}
 }

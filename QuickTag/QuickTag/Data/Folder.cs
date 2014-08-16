@@ -111,6 +111,33 @@ namespace QuickTag.Data
 			return matches.FirstOrDefault();
 		}
 
+		public void Update()
+		{
+			var extensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase){ ".bmp", ".jpg", ".jpeg", ".gif", ".png", ".tiff", ".svg", ".webm" };
+
+			var currentFileNames = this.images.Select(i => i.ImagePath);
+			var newFileNames = Directory.EnumerateFiles(this.Path, "*", SearchOption.AllDirectories).Where(f => extensions.Contains(System.IO.Path.GetExtension(f)));
+			var newFilesInFolder = currentFileNames.Intersect(newFileNames); // all existing files are already in currentFileNames
+			var deletedFiles = currentFileNames.Union(newFileNames); // all deleted files are not in newFileNames
+			var deletedImageData = this.images.Where(i => deletedFiles.Contains(i.ImagePath));
+
+			// Where you left off: newFilesInFolder needs to be all the items in newFileNames NOT in currentFileNames
+			// deletedFiles needs to be all the items in currentFileNames NOT in newFileNames
+			// you could probably use Enumerable.Except();
+
+			// Add the new files to the folder.
+			foreach (string newFile in newFilesInFolder)
+			{
+				this.images.Add(new ImageData(newFile));
+			}
+
+			// Remove the deleted files from the folder.
+			foreach (ImageData data in deletedImageData)
+			{
+				this.Remove(data);
+			}
+		}
+
 		public Dictionary<string, int> GetTags()
 		{
 			if (this.images.Count == 0)

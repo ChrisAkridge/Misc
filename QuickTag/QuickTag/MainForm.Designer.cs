@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.ButtonAddFolders = new System.Windows.Forms.Button();
 			this.TreeViewFiles = new System.Windows.Forms.TreeView();
 			this.StaticLabelFolders = new System.Windows.Forms.Label();
@@ -38,6 +39,9 @@
 			this.TextBoxImageTags = new System.Windows.Forms.TextBox();
 			this.ButtonSaveAndClose = new System.Windows.Forms.Button();
 			this.ButtonSetTags = new System.Windows.Forms.Button();
+			this.ButtonUpdate = new System.Windows.Forms.Button();
+			this.ButtonRemove = new System.Windows.Forms.Button();
+			this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
 			((System.ComponentModel.ISupportInitialize)(this.PictureBox)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -45,9 +49,9 @@
 			// 
 			this.ButtonAddFolders.Location = new System.Drawing.Point(12, 13);
 			this.ButtonAddFolders.Name = "ButtonAddFolders";
-			this.ButtonAddFolders.Size = new System.Drawing.Size(181, 23);
+			this.ButtonAddFolders.Size = new System.Drawing.Size(48, 23);
 			this.ButtonAddFolders.TabIndex = 0;
-			this.ButtonAddFolders.Text = "&Add Folders...";
+			this.ButtonAddFolders.Text = "&Add...";
 			this.ButtonAddFolders.UseVisualStyleBackColor = true;
 			this.ButtonAddFolders.Click += new System.EventHandler(this.ButtonAddFolders_Click);
 			// 
@@ -145,11 +149,32 @@
 			this.ButtonSetTags.UseVisualStyleBackColor = true;
 			this.ButtonSetTags.Click += new System.EventHandler(this.ButtonSetTags_Click);
 			// 
+			// ButtonUpdate
+			// 
+			this.ButtonUpdate.Location = new System.Drawing.Point(66, 13);
+			this.ButtonUpdate.Name = "ButtonUpdate";
+			this.ButtonUpdate.Size = new System.Drawing.Size(59, 23);
+			this.ButtonUpdate.TabIndex = 10;
+			this.ButtonUpdate.Text = "&Update";
+			this.ButtonUpdate.UseVisualStyleBackColor = true;
+			this.ButtonUpdate.Click += new System.EventHandler(this.ButtonUpdate_Click);
+			// 
+			// ButtonRemove
+			// 
+			this.ButtonRemove.Location = new System.Drawing.Point(131, 13);
+			this.ButtonRemove.Name = "ButtonRemove";
+			this.ButtonRemove.Size = new System.Drawing.Size(62, 23);
+			this.ButtonRemove.TabIndex = 11;
+			this.ButtonRemove.Text = "&Remove";
+			this.ButtonRemove.UseVisualStyleBackColor = true;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1008, 729);
+			this.Controls.Add(this.ButtonRemove);
+			this.Controls.Add(this.ButtonUpdate);
 			this.Controls.Add(this.ButtonSetTags);
 			this.Controls.Add(this.ButtonSaveAndClose);
 			this.Controls.Add(this.TextBoxImageTags);
@@ -183,5 +208,8 @@
 		private System.Windows.Forms.TextBox TextBoxImageTags;
 		private System.Windows.Forms.Button ButtonSaveAndClose;
 		private System.Windows.Forms.Button ButtonSetTags;
+		private System.Windows.Forms.Button ButtonUpdate;
+		private System.Windows.Forms.Button ButtonRemove;
+		private System.Windows.Forms.ToolTip ToolTip;
 	}
 }
