@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ConsoleScratchpad
@@ -10,13 +11,28 @@ namespace ConsoleScratchpad
 	{
 		static unsafe void Main(string[] args)
 		{
-			int i = 5;
-			int* j = &i;
-			int** k = &j;
-			int*** l = &k;
-			int**** m = &l;
+			Worker workerObject = new Worker();
+			Thread workerThread = new Thread(() => workerObject.DoWork("worker"));
 
-			****m = 137;
+
+			workerObject.Queue = new System.Collections.Concurrent.ConcurrentQueue<string>();
+			workerThread.Start();
+			Console.WriteLine("Main thread: starting work...");
+
+			while (workerObject.Queue == null) { }
+
+			for (int i = 0; i < 10000; i++)
+			{
+				workerObject.Queue.Enqueue(i.ToString());
+				Thread.Sleep(1);
+			}
+
+			Console.WriteLine("{0} objects remaining enqueued", workerObject.Queue.Count);
+
+			workerObject.RequestStop();
+			workerThread.Join();
+			Console.WriteLine("Main thread: worker thread has terminated");
+			Console.ReadLine();
 		}
 
 		private static unsafe void* GetPointer<T>(T item) where T : class
