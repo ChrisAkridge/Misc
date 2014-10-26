@@ -72,16 +72,7 @@ namespace SupermarketSimulator
 			}
 		}
 
-		public double IncomePerSecond
-		{
-			get
-			{
-				double spentPerSecond = this.ProductsStockedPerSecond * ProductPrice;
-				double madePerSecond = this.TransactionsPerSecond * this.ProductsPerCustomer * (ProductPrice + (ProductPrice * ProductMarkup));
-
-				return madePerSecond - spentPerSecond;
-			}
-		}
+		public double IncomePerSecond { get; private set; }
 
 		public Game(double framesPerSecond, double initialBank)
 		{
@@ -94,6 +85,7 @@ namespace SupermarketSimulator
 		public void Update()
 		{
 			double delta = 1d / this.framesPerSecond;
+			this.IncomePerSecond = 0d;
 
 			this.UpdateProductsStocked(delta);
 			this.UpdateCarts(delta);
@@ -107,6 +99,7 @@ namespace SupermarketSimulator
 			double priceOfProducts = ProductPrice * productsStockedThisFrame;
 			this.ProductsStocked += productsStockedThisFrame;
 			this.Bank -= priceOfProducts;
+			this.IncomePerSecond -= (priceOfProducts * this.framesPerSecond);
 		}
 
 		private void UpdateCarts(double delta)
@@ -147,11 +140,12 @@ namespace SupermarketSimulator
 
 			this.CustomersInStore -= customerCheckoutsThisFrame;
 			this.Bank += spentThisFrame;
+			this.IncomePerSecond += (spentThisFrame * this.framesPerSecond);
 		}
 
 		private void RecalculateCustomersPerSecond()
 		{
-			this.CustomersPerSecond = (this.ProductsStockedPerSecond * 0.2d) + (this.CartsPerSecond * 0.1d) * (this.TransactionsPerSecond * 0.25d);
+			this.CustomersPerSecond = (this.ProductsStockedPerSecond * 0.2d) + (this.CartsPerSecond * 0.1d) * (this.TransactionsPerSecond * 0.85d);
 		}
 
 		public void HireStocker()
