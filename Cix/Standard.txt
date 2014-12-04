@@ -1,0 +1,51 @@
+Cix Standard
+Written by Chris Akridge (Celarix)
+September 5, 2014
+
+1. What is Cix?
+	1.1 Cix (pronouced "six") is a dialect of the C programming language aimed to create a simpler,
+	easier-to-parse variant. Cix lacks header files and advanced preprocessing and uses a multiple-
+	pass parser that can more easily generate an abstract syntax tree.
+	
+	1.2 This document defines the standard for the language and its grammar structures, as well as
+	an specification for the Abstract Syntax Tree and its elements.
+	
+2. Creation and Storage of Cix Data
+	2.1 Cix source files are plaintext files encoded in either ASCII or some variant of Unicode,
+	such as UTF-8 or UTF-16. The extension of Cix files in the file system is "cix". Each statement
+	in a Cix file is separated in one of the following ways:
+		- A newline character or character set.
+		- A semicolon character followed by a whitespace and another statement.
+		- An opening brace followed by either a statement or closing brace.
+		- A closing brace followed by a newline character or character set, an opening brace, or
+		  a whitespace and another statement.
+
+3. Statements
+	3.1 Statements in the Cix language take the following forms:
+		- Preprocessor directive: A statement beginning in a hash symbol #, followed by a series of
+		 case-insensitive letters corresponding to one of the following strings: DEFINE, UNDEFINE,
+		 IFDEF, IFNDEF, ELSEIF, ENDIF, followed by a whitespace and a sequence of characters
+		 corresponding to the directive's required characters.
+		- Scope opener: A single open brace.
+		- Scope closer. A single close brace.
+		- Function declaration: A sequence of case-insensitive letters and/or numbers that name a
+		 specific data type serving as the functions return type, followed by a whitespace and
+		 another sequence of case-insensitive letters and/or numbers that provide the function's
+		 name, followed by an open parentheses, a list of zero or more comma-delimited parameters
+		 and a close parentheses. Each parameter consists of a data type name providing the type of
+		 the parameter, a whitespace, and a name for the parameter. Two or more arguments are
+		 separated by a comma and whitespace.
+		- Structure declaration: The string "struct", followed by a whitespace and a name for the
+		 structure.
+		- Structure member declaration: The name of a data type, a whitespace, and the name of the
+		 member. An optional number in brackets is the member offset, defining the position of the
+		 member in the structure.
+		- Function variable declaration: The name of a data type, a whitespace, and the name of the
+		 variable.
+		- Function variable declaration with initializer:
+		- Function variable assignment:
+		- Operation on function variable:
+		- Function variable assignment with operator-assign operators: (<<=, for instance)
+		- Conditional statement:
+		- While-loop statement:
+		- For-loop statement:
