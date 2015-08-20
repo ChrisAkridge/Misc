@@ -1,38 +1,100 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using static System.Console;
+
 namespace ConsoleScratchpad
 {
+	
+	[StructLayout(LayoutKind.Sequential)]
+	public struct Structure
+	{
+		public int x;
+		public int y;
+		public int z;
+	}
+
 	class Program
 	{
 		static unsafe void Main(string[] args)
+        {
+			int i = 1;
+			int* pi = &i;
+			int** ppi = &pi;
+			int*** pppi = &ppi;
+
+			int x = *(*(*(pppi))) + 1;
+
+			*(*(*(pppi))) = x;
+        }
+
+		private static void DoNothing(int i) { }
+
+        private static void StringInterpolationTest()
+        {
+            string world = "World!";
+            int num = 137;
+            int numPadding = 2456;
+            uint numHex = 0xDEADBEEF;
+            float decimalNum = 3.14159f;
+            DateTime dateTime = DateTime.Now;
+
+            WriteLine($"Hello, {world}!");
+            WriteLine($"Tonight's lucky number is {num}!");
+            WriteLine($"I like zeroes, so have {numPadding:D12}");
+            WriteLine($"Hex is nice, wouldn't you say so, Mr. {numHex:X8}?");
+            WriteLine($"Mmm. Non-floor pie. {decimalNum:F3}");
+            WriteLine($"It's currently {dateTime}.");
+            WriteLine($"Expressions? {((dateTime.Second < 30) ? "After 30s" : "Before 30s")}! You bet!");
+            WriteLine($"Method calls? {GenString()} Sure! Why not?");
+            WriteLine($"Most expressions supported. {((3 + 5 < 12) ? 8 : 4)}");
+
+            ReadKey(intercept: true);
+        }
+
+        private static string GenString()
+        {
+            Random random = new Random();
+            return $"{random.Next()}, {random.Next()}";
+        }
+
+        private static unsafe void ThreadWork()
+        {
+            Worker workerObject = new Worker();
+            Thread workerThread = new Thread(() => workerObject.DoWork("worker"));
+
+
+            workerObject.Queue = new System.Collections.Concurrent.ConcurrentQueue<string>();
+            workerThread.Start();
+            Console.WriteLine("Main thread: starting work...");
+
+            while (workerObject.Queue == null) { }
+
+            for (int i = 0; i < 10000; i++)
+            {
+                workerObject.Queue.Enqueue(i.ToString());
+                Thread.Sleep(1);
+            }
+
+            Console.WriteLine("{0} objects remaining enqueued", workerObject.Queue.Count);
+
+            workerObject.RequestStop();
+            workerThread.Join();
+            Console.WriteLine("Main thread: worker thread has terminated");
+            Console.ReadLine();
+        }
+
+        private static unsafe void DoStuff()
 		{
-			Worker workerObject = new Worker();
-			Thread workerThread = new Thread(() => workerObject.DoWork("worker"));
-
-
-			workerObject.Queue = new System.Collections.Concurrent.ConcurrentQueue<string>();
-			workerThread.Start();
-			Console.WriteLine("Main thread: starting work...");
-
-			while (workerObject.Queue == null) { }
-
-			for (int i = 0; i < 10000; i++)
+			for (int i = 0; i < 10; i++)
 			{
-				workerObject.Queue.Enqueue(i.ToString());
-				Thread.Sleep(1);
+				Console.WriteLine("Hello World #{0}!", i);
 			}
-
-			Console.WriteLine("{0} objects remaining enqueued", workerObject.Queue.Count);
-
-			workerObject.RequestStop();
-			workerThread.Join();
-			Console.WriteLine("Main thread: worker thread has terminated");
-			Console.ReadLine();
 		}
 
 		private static unsafe void* GetPointer<T>(T item) where T : class
@@ -91,6 +153,8 @@ namespace ConsoleScratchpad
 				Console.WriteLine(string.Format("{0}: {1} == {2}", memoryAddress, byteValue, asciiValue));
 				pb++;
 			}
+
+			ReadKey(intercept: true);
 		}
 
 		private static unsafe string ChangeStringLength(string s, int length)

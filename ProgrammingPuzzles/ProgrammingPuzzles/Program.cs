@@ -55,7 +55,7 @@ namespace ProgrammingPuzzles
 		{
 			foreach (var puzzle in puzzles)
 			{
-				Console.WriteLine("{0}: {1}", puzzle.Key, puzzle.Value.Description);
+				Console.WriteLine($"{puzzle.Key}: {puzzle.Value.Description}");
 			}
 		}
 	}

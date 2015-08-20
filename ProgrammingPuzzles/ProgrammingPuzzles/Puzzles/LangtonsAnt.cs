@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Diagnostics.Contracts;
 
 namespace ProgrammingPuzzles.Puzzles
 {
@@ -69,6 +70,9 @@ namespace ProgrammingPuzzles.Puzzles
 
 		public Board(int width, int height, Tuple<int, Color>[] colors)
 		{
+			Contract.Requires<ArgumentNullException>(colors != null, "The array of colors must not be null.");
+			Contract.Requires<ArgumentException>(colors.Any(), "The array of colors must have at least one element.");
+
 			this.colorMap = new Dictionary<int, Color>();
 			this.board = new Grid<int>(width, height);
 

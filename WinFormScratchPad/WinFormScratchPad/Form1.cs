@@ -14,6 +14,9 @@ namespace WinFormScratchPad
 {
     public partial class Form1 : Form
     {
+		private double basePrice = 2.55e18;
+		private int owned = 25;
+
         public Form1()
         {
             InitializeComponent();
@@ -35,6 +38,48 @@ namespace WinFormScratchPad
 		[DllImport("user32.dll")]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, SetWindowPosFlags uFlags);
+
+		private void button1_Click(object sender, EventArgs e)
+		{
+			this.basePrice = CalculatePrice(this.basePrice, 0.15d, 1);
+			this.owned++;
+			this.label1.Text = NumberToString(this.basePrice) + string.Format(" ({0} owned)", owned);
+		}
+
+		private void button2_Click(object sender, EventArgs e)
+		{
+			this.basePrice = CalculatePrice(this.basePrice, 0.15d, double.Parse(this.textBox1.Text));
+			this.owned += (int)double.Parse(this.textBox1.Text);
+			this.label1.Text = NumberToString(this.basePrice) + string.Format(" ({0} owned)", owned);
+		}
+
+		private double CalculatePrice(double basePrice, double increaseAmount, double purchaseAmount)
+		{
+			return basePrice * Math.Pow(1 + increaseAmount, purchaseAmount);
+		}
+
+		private string NumberToString(double number)
+		{
+			string[] numberNames = {"", "thousand", "million", "billion", "trillion", "quadrillion", "quintillion",
+									"sextillion", "septillion", "octillion", "nonillion", "decillion", "undecillion",
+									"duodecillion", "tredecillion", "quattourdecillion", "quindecillion", "sexdecillion",
+									"septendecillion", "octodecillion", "novemdecillion", "vigintillion"};
+			int level = 0;
+			while (number > 1000d && level < numberNames.Length - 1)
+			{
+				number /= 1000d;
+				level++;
+			}
+
+			if (number > 1000d)
+			{
+				return NumberToString(number) + " " + numberNames[level];
+			}
+			else
+			{
+				return number.ToString("#.000") + " " + numberNames[level];
+			}
+		}
     }
 
 	public enum SetWindowPosFlags

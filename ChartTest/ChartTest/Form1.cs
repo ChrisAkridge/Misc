@@ -41,10 +41,17 @@ namespace ChartTest
 
 			this.chart1.Series[0].Points.Clear();
 			StringBuilder builder = new StringBuilder();
-			foreach (double average in averages)
+			for (int i = 0; i < averages.Count; i++)
 			{
-				this.chart1.Series[0].Points.Add(average);
-				builder.Append(average);
+				double last = (i > 0) ? averages[i - 1] : 0d;
+				this.chart1.Series[0].Points.Add(averages[i]);
+				builder.Append(averages[i]);
+				builder.Append(" (");
+				
+				if (averages[i] - last > 0) { builder.Append("+"); }
+				builder.Append(averages[i] - last);
+				builder.Append(")");
+
 				builder.Append(Environment.NewLine);
 			}
 

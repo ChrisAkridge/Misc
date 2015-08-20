@@ -34,6 +34,8 @@
 			this.StaticLabelBuyingOptions = new System.Windows.Forms.Label();
 			this.ListBoxBuyingOptions = new System.Windows.Forms.ListBox();
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
+			this.label1 = new System.Windows.Forms.Label();
+			this.ListBoxUpgrades = new System.Windows.Forms.ListBox();
 			this.SuspendLayout();
 			// 
 			// StaticLabelGameInformation
@@ -66,13 +68,9 @@
 			// ListBoxBuyingOptions
 			// 
 			this.ListBoxBuyingOptions.FormattingEnabled = true;
-			this.ListBoxBuyingOptions.Items.AddRange(new object[] {
-            "Stocker (0)",
-            "Cashier (0)",
-            "Cart Pusher (0)"});
 			this.ListBoxBuyingOptions.Location = new System.Drawing.Point(10, 356);
 			this.ListBoxBuyingOptions.Name = "ListBoxBuyingOptions";
-			this.ListBoxBuyingOptions.Size = new System.Drawing.Size(359, 95);
+			this.ListBoxBuyingOptions.Size = new System.Drawing.Size(196, 95);
 			this.ListBoxBuyingOptions.TabIndex = 3;
 			this.ListBoxBuyingOptions.SelectedIndexChanged += new System.EventHandler(this.ListBoxBuyingOptions_SelectedIndexChanged);
 			// 
@@ -82,11 +80,30 @@
 			this.timer1.Interval = 33;
 			this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
 			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(211, 339);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(60, 13);
+			this.label1.TabIndex = 4;
+			this.label1.Text = "Upgrades:";
+			// 
+			// ListBoxUpgrades
+			// 
+			this.ListBoxUpgrades.FormattingEnabled = true;
+			this.ListBoxUpgrades.Location = new System.Drawing.Point(214, 356);
+			this.ListBoxUpgrades.Name = "ListBoxUpgrades";
+			this.ListBoxUpgrades.Size = new System.Drawing.Size(158, 95);
+			this.ListBoxUpgrades.TabIndex = 5;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(384, 461);
+			this.Controls.Add(this.ListBoxUpgrades);
+			this.Controls.Add(this.label1);
 			this.Controls.Add(this.ListBoxBuyingOptions);
 			this.Controls.Add(this.StaticLabelBuyingOptions);
 			this.Controls.Add(this.TextBoxGameInformation);
@@ -108,6 +125,8 @@
 		private System.Windows.Forms.Label StaticLabelBuyingOptions;
 		private System.Windows.Forms.ListBox ListBoxBuyingOptions;
 		private System.Windows.Forms.Timer timer1;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.ListBox ListBoxUpgrades;
 	}
 }
 
