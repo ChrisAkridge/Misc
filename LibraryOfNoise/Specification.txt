@@ -1,0 +1,19 @@
+Charset:
+abcdefghijklmnopqrstuvwxyz (26)
+0123456789 (10)
+ ,.!? (5)
+
+41 characters
+
+1024 characters per page																					~
+256 pages per book (262144 characters)																		8 bits
+128 books per shelf (33,554,432 characters)																	7 bits
+16 shelves per aisle (536,870,912 characters)																4 bits
+16 aisles per section (8,589,934,592 characters)    														4 bits
+512 sections per library (4,398,046,511,104 characters)														9 bits
+65536 libraries per nation (288,230,376,151,711,744 characters)												16 bits
+65536 nations per planet (18,889,465,931,478,580,854,784 characters)										16 bits
+18 quintillion planets per set (348,449,143,727,040,986,586,495,598,010,130,648,530,944 characters)			64 bits
+
+Each page is made by creating 1024 numbers between 0 and 40. Each number is translated to a character by a lookup table.
+There are two RNGs, both seeded by a combination of all the page/book/shelf/aisle/etc numbers. A ulong is created by bit-shifting the values together. The set number is chosen by the user and is not considered by the RNG seeding. The ulong seed is divided into two uints and bitwise-cast to two ints, and then used to seed the RNGs.
