@@ -1,35 +1,50 @@
 # The Standard Programming Specification
-This document specifies a standard for which all software development projects shall follow. This standard is designed for consistency, reliability, and simplicity of the software developed. This document defines universal project requirements, specification requirements and format, code formatting and naming conventions, coding paradigms, and the usage of test-driven development in projects. Ultimately, the goal of this document is to ensure that future programming projects are consistently well-defined, well-formatted, well-named, well-tested, and, most importantly of all, correct.
 
-I'll do my level best to make this document as general, platform-agnostic, and language agnostic as I can, but ultimately this will reflect my desire for consistent C# software developed in Windows. You might do better to fork this document and modify it as you see fit.
+## Project Phases
 
-## Table of Contents
-1. Defining Specifications
-	1. Why Write Specifications?
-	2. Specifications are Living Documentation
-	3. The Basic Format and Layout of Specifications
-	4. Answering the Key Questions: What, How, and Why?
-	5. Specifying the Logic
-2. Project Code Layout
-	1. What is a Code Layout?
-	2. Writing a Code Layout
-3. Development Conventions and Best Practices ([see also](http://msdn.microsoft.com/en-us/library/ms184412(v=vs.110).aspx))
-	~ (this section will be completed once I read the above links)
-4. Test-Driven Development
-	1. The TDD Cycle
-	2. What Measure is a Feature?
-	3. Refactoring
+### Phase 1: Specification
+The first phase involves writing a specification describing, in general, the problem to be solved, and how the software will solve it. The specification need not be complex or rigourous; it merely needs to define the software and how it should work, as well as what technologies (language, framework, IDE) will be used by the software. Avoid specifying the structure of the actual code too deeply; that will be specified more in-depth in the next phase. Complex data structures can be defined here if needed.
 
-## Section 1: Defining Specifications
-### Part 1: Why Write Specifications
+### Phase 2: Code Map
+The second phase involves producing a high-level overview of what the code will be composed of (namespaces, classes, methods, etc). This overview generally maps required functionality listed in the specification to a certain class or method. Each element in a code map should describe information about itself. Methods that perform particularly tricky operations might be described in the code map with psuedocode implementations.
 
-1.1.1 Many aspects of life are subjective and not always easy to define. Programming, despite its seeming complexity, is not one of those things. Because of its roots in math, programming and design is a concept that can be more clearly defined than many other aspects of life. Despite the unpredictability of users, their computers, the networks, the Internet, the hardware, or everything else, programs themselves can be well defined.
+For C# projects, a code map may take the following form:
 
-1.1.2 However, writing specifications is an often-forgotten aspect of programming. Joel Spolsky once likened it to flossing: everyone knows they should, but no one does ([source](http://www.joelonsoftware.com/articles/fog0000000036.html)). People might think writing specifications is too difficult or too time-consuming. Time is money, indeed, so why should we waste time on specifications? Let's just dive into our favorite editors and start hacking away! That is, until a few months later, where the code is a unfactored mess of different conventions, paradigms, and horrid intercoupled logic that can turn any elegant language feature into looking like a monkey wrote it.
+* Assembly (name, description)
+  * Namespace (name, description)
+    * Class (name, access level, static/instance, abstract/sealed, inherits from, implements interface, description)
+	   * Constant (name, type, value, access level)
+	   * Field (name, type, static/instance, readonly/mutable, description)
+	   * Property (name, type, access level, static/instance, virtual/abstract/sealed, has getter/setter, getter/setter access level, description)
+	   * Autoproperty (name, type, access level, static/instance, virtual/abstract/sealed, has setter, getter/setter access level, description)
+	   * Event (name, event handler delegate type, access level, description)
+	   * Constructor (access level, arguments, static/instance, calls base constructor?, description)
+	   * Method (name, access level, arguments, return type, static/instance, abstract/virtual/sealed, description)
+	   * Generic Method (name, access level, generic type parameters, generic type constraints, arguments, static/instance, abstract/virtual/sealed, description)
+	* Generic Class (name, access level, generic type parameters, generic type constraints, static/instance, abstract/sealed, inherits from, implements interface, description)
+	* Delegate Type (name, access level, return type, arguments, description)
+	* Struct (name, access level, implements interface, description)
+	* Generic Struct (name, access level, generic type parameters, generic type constraints, implements interface, description).
+	* Enumeration (name, access level, type of member, description)
+		* Enumeration Member (name, value, description)
+	* Interface (name, access level, implements interface, description)
+	* Generic Interface (name, access level, generic type parameters, generic type constraints, implements interface, description)
+	
+An example partial class map from the SMLimitless project is show below:
+* assembly "SMLimitless.exe"
+  * namespace SMLimitless.Graphics
+    * public class StaticGraphicsObject : IGraphicsObject: A graphics object made of a single texture
+	  * private bool isLoaded: A flag set when the object's data is loaded.
+	  * private bool isContentLoaded: A flag set when the object's texture is loaded.
+	  * private string filePath: Path to the texture's image.
+	  * private Texture2D texture: The texture of the object.
+	  * public StaticGraphicsObject()
+	  * internal Rectangle CgoSourceRect {get; set;}
+	  * internal ComplexGraphicsObject CgoOwner {get; set;}
+	  * public void Load(string filePath)
+	  * public void Load(string filePath, DataReader config)
+	  * public void LoadContent()
+	  * public void Update()
+...
 
-1.1.3 Specifications are important. They tell you what the software does. Not in a vague, "well, this software reticulates these splines" or the buzzwordy "Our software combines NoSQL and jQuery with Mono to deliver an crowd-sourced, synergistic experience". It tells you exactly what the software does and how, with what data structures and methods. Specifications define the what, how, and why of software, and state it goals - the reason anybody would want to use it.
-
-1.1.4 Writing specifications stills sounds like a lot of hard work, and it is. But it saves you time and trouble in the long run. Writing a specification - what the software does and, more importantly, **how** it does it - forces you to think through how the software will actually work before you even write a line of code. Fixing the design problems is also much easier here, and it's also a good time to give some thought into which libraries and tools you'd like to use.
-
-### Section 2: Specifications Are Living Documentation
-1.2.1 A specification can and should change as development progresses. A living specification is useful not only to the developers but to users and other developers. It can demonstrate how to use the software and provide examples. As the software becomes more and more complete, the specification slowly becomes documentation. The specification will not always be the best design at first and there will be problems that will arise with the design as the software is developed. The specification should be changed (with revisions or version control, of course) as the software's design changes.
+The class map may be as concise or as general as necessary.
