@@ -128,24 +128,29 @@ namespace FileTools
 
 		public void WriteToDisk(string path)
 		{
+			WriteToDisk(path, Data, compressionDictionary, utf8Cache, keyLength);
+		}
+
+		internal static void WriteToDisk(string path, string data, Dictionary<int, string> argCompressionDictionary, byte[] argUTF8Cache, int argKeyLength)
+		{
 			using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Create)))
 			{
-				writer.Write((uint)utf8Cache.Length);
-				writer.Write(utf8Cache);
-				writer.Write((byte)keyLength);
+				writer.Write((uint)argUTF8Cache.Length);
+				writer.Write(argUTF8Cache);
+				writer.Write((byte)argKeyLength);
 
 				writer.Write(new char[] { 'D', 'I', 'C', 'T' }, 0, 4);
-				foreach (var entry in compressionDictionary)
+				foreach (var entry in argCompressionDictionary)
 				{
-					if (keyLength == 1) { writer.Write((byte)entry.Key); }
-					else if (keyLength == 2) { writer.Write((ushort)entry.Key); }
-					else if (keyLength == 3)
+					if (argKeyLength == 1) { writer.Write((byte)entry.Key); }
+					else if (argKeyLength == 2) { writer.Write((ushort)entry.Key); }
+					else if (argKeyLength == 3)
 					{
 						writer.Write((byte)((entry.Key & 0xFF0000) >> 16));
 						writer.Write((byte)((entry.Key & 0xFF00) >> 8));
 						writer.Write((byte)(entry.Key & 0xFF));
 					}
-					else if (keyLength == 4) { writer.Write((uint)entry.Key); }
+					else if (argKeyLength == 4) { writer.Write((uint)entry.Key); }
 
 					writer.Write((byte)entry.Value.Length);
 					writer.Write(Encoding.UTF8.GetBytes(entry.Value));
@@ -243,7 +248,7 @@ namespace FileTools
 			utf8Cache = Encoding.UTF8.GetBytes(Data);
 		}
 
-		private string GetKeyText(int key)
+		internal static string GetKeyText(int key, int argKeyLength)
 		{
 			char a = (char)((key & 0xFF000000) >> 24);
 			char b = (char)((key & 0x00FF0000) >> 16);
@@ -251,7 +256,12 @@ namespace FileTools
 			char d = (char)(key & 0x000000FF);
 
 			string entireKey = new string(new char[] { a, b, c, d });
-			return entireKey.Substring((4 - keyLength), keyLength);
+			return entireKey.Substring((4 - argKeyLength), argKeyLength);
+		}
+
+		private string GetKeyText(int key)
+		{
+			return GetKeyText(key, keyLength);
 		}
 
 		private int GetNextKey()

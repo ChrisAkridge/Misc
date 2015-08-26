@@ -74,6 +74,11 @@ namespace FileTools
 					compressor.Compress();
 					compressor.WriteToDisk(outputFilePath);
 					break;
+				case "-fc":
+					FastCompressor fastCompressor = new FastCompressor(File.ReadAllText(inputFilePath), 16);
+					fastCompressor.Compress();
+					fastCompressor.WriteToDisk(outputFilePath);
+					break;
 				default:
 					break;
 			}
