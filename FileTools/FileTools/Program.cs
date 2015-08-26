@@ -70,7 +70,9 @@ namespace FileTools
 					WriteText(outputFilePath, BaseWriter.BytesToBase64String(File.ReadAllBytes(inputFilePath)));
 					break;
 				case "-c":
-					new Compressor(File.ReadAllBytes(inputFilePath));
+					StringCompressor compressor = new StringCompressor(File.ReadAllText(inputFilePath), 4);
+					compressor.Compress();
+					compressor.WriteToDisk(outputFilePath);
 					break;
 				default:
 					break;
