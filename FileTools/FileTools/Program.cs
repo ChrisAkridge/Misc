@@ -74,6 +74,14 @@ namespace FileTools
 					compressor.Compress();
 					compressor.WriteToDisk(outputFilePath);
 					break;
+				case "-lzf":
+					LZF lzf = new LZF();
+					byte[] buffer = new byte[inputFileLength + 1024];
+					int outputLength = lzf.Compress(File.ReadAllBytes(inputFilePath), (int)inputFileLength, buffer, (int)(inputFileLength + 1024));
+					byte[] output = new byte[outputLength];
+					Array.Copy(buffer, output, outputLength);
+					File.WriteAllBytes(outputFilePath, output);
+					break;
 				default:
 					break;
 			}

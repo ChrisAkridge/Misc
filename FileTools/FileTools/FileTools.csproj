@@ -45,7 +45,9 @@
   <ItemGroup>
     <Compile Include="BaseWriter.cs" />
     <Compile Include="Compressor.cs" />
+    <Compile Include="CSharpWriter.cs" />
     <Compile Include="FastArrayTools.cs" />
+    <Compile Include="LZF.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
