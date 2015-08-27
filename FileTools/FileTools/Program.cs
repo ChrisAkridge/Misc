@@ -81,6 +81,10 @@ namespace FileTools
 					byte[] output = new byte[outputLength];
 					Array.Copy(buffer, output, outputLength);
 					File.WriteAllBytes(outputFilePath, output);
+				case "-fc":
+					FastCompressor fastCompressor = new FastCompressor(File.ReadAllText(inputFilePath), 16);
+					fastCompressor.Compress();
+					fastCompressor.WriteToDisk(outputFilePath);
 					break;
 				default:
 					break;
