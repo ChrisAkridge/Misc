@@ -52,11 +52,11 @@ namespace FileTools
 					WriteText(outputFilePath, BaseWriter.BytesToBinaryString(File.ReadAllBytes(inputFilePath)));
 					break;
 				case "-o":
-					Console.WriteLine($"Converting input file ({GetFriendlyFileSize(inputFileLength)}) into octal string ({GetFriendlyFileSize((long)(inputFileLength * 1.3333))}");
+					Console.WriteLine($"Converting input file ({GetFriendlyFileSize(inputFileLength)}) into octal string ({GetFriendlyFileSize((long)(inputFileLength * 1.3333))})");
 					WriteText(outputFilePath, BaseWriter.BytesToOctalString(File.ReadAllBytes(inputFilePath)));
 					break;
 				case "-d":
-					Console.WriteLine($"Converting input file ({GetFriendlyFileSize(inputFileLength)} into decimal string");
+					Console.WriteLine($"Converting input file ({GetFriendlyFileSize(inputFileLength)}) into decimal string");
 					WriteText(outputFilePath, BaseWriter.BytesToDecimalString(File.ReadAllBytes(inputFilePath)));
 					break;
 				case "-h":
@@ -81,14 +81,97 @@ namespace FileTools
 					byte[] output = new byte[outputLength];
 					Array.Copy(buffer, output, outputLength);
 					File.WriteAllBytes(outputFilePath, output);
+					break;
 				case "-fc":
 					FastCompressor fastCompressor = new FastCompressor(File.ReadAllText(inputFilePath), 16);
 					fastCompressor.Compress();
 					fastCompressor.WriteToDisk(outputFilePath);
 					break;
+				case "-c1":
+					var bitCount = SequenceCounter.CountBits(File.ReadAllBytes(inputFilePath));
+					float clearBitPercentage = bitCount.Item1 / (float)(bitCount.Item1 + bitCount.Item2) * 100f;
+					float setBitPercentage = 100f - clearBitPercentage;
+					Console.WriteLine("Clear bits: {0} ({1:F2}%)", bitCount.Item1, clearBitPercentage);
+					Console.WriteLine("Set bits: {0} ({1:F2}%)", bitCount.Item2, setBitPercentage);
+					Console.ReadKey(intercept: true);
+					break;
+				case "-c2":
+					var bitPairCount = SequenceCounter.CountBitPairs(File.ReadAllBytes(inputFilePath));
+					long sumc2 = bitPairCount.Sum();
+					for (int i = 0; i <= 3; i++)
+					{
+						float percentage = bitPairCount[i] / (float)sumc2 * 100f;
+						Console.WriteLine("Bit pair {0}: {1} ({2:F2}%)", Convert.ToString(i, 2).PadLeft(2, '0'), bitPairCount[i], percentage);
+					}
+					Console.ReadKey(intercept: true);
+					break;
+				case "-c4":
+					var nybbleCount = SequenceCounter.CountNybbles(File.ReadAllBytes(inputFilePath));
+					long sumc4 = nybbleCount.Sum();
+					for (int i = 0; i <= 15; i++)
+					{
+						float percentage = nybbleCount[i] / (float)sumc4 * 100f;
+						Console.WriteLine("Nybble {0}: {1} ({2:F2}%)", Convert.ToString(i, 16), nybbleCount[i], percentage);
+					}
+					Console.ReadKey(intercept: true);
+					break;
+				case "-c8":
+					var byteCount = SequenceCounter.CountBytes(File.ReadAllBytes(inputFilePath));
+					long sumc8 = byteCount.Sum();
+					for (int i = 0; i <= 255; i++)
+					{
+						float percentage = byteCount[i] / (float)sumc8 * 100f;
+						Console.WriteLine("Byte {0}: {1} ({2:F2}%)", Convert.ToString(i, 16).PadLeft(2, '0'), byteCount[i], percentage);
+					}
+					Console.ReadKey(intercept: true);
+					break;
+				case "-c16":
+					var wordCount = SequenceCounter.CountWords(File.ReadAllBytes(inputFilePath)).OrderByDescending(kvp => kvp.Value);
+					long sumc16 = wordCount.Sum(w => w.Value);
+					if (File.Exists(outputFilePath)) { File.Delete(outputFilePath); }
+
+					using (var writer = File.CreateText(outputFilePath))
+					{
+						foreach (var word in wordCount)
+						{
+							float percentage = word.Value / (float)sumc16 * 100f;
+							writer.WriteLine($"Word {Convert.ToString(word.Key, 16).PadLeft(4, '0')}: {word.Value}, ({percentage:F6}%)");
+						}
+					}
+					break;
+				case "-c32":
+					var dwordCount = SequenceCounter.CountDWords(File.ReadAllBytes(inputFilePath)).OrderByDescending(kvp => kvp.Value);
+					long sumc32 = dwordCount.Sum(w => w.Value);
+					if (File.Exists(outputFilePath)) { File.Delete(outputFilePath); }
+
+					using (var writer = File.CreateText(outputFilePath))
+					{
+						foreach (var word in dwordCount)
+						{
+							float percentage = word.Value / (float)sumc32 * 100f;
+							writer.WriteLine($"DWord {Convert.ToString(word.Key, 16).PadLeft(8, '0')}: {word.Value}, ({percentage:F6}%)");
+						}
+					}
+					break;
+				case "-c64":
+					var qwordCount = SequenceCounter.CountQWords(File.ReadAllBytes(inputFilePath)).OrderByDescending(kvp => kvp.Value);
+					long sumc64 = qwordCount.Sum(w => w.Value);
+					if (File.Exists(outputFilePath)) { File.Delete(outputFilePath); }
+
+					using (var writer = File.CreateText(outputFilePath))
+					{
+						foreach (var word in qwordCount)
+						{
+							float percentage = word.Value / (float)sumc64 * 100f;
+							writer.WriteLine($"QWord {Convert.ToString(unchecked((long)word.Key), 16).PadLeft(16, '0')}: {word.Value}, ({percentage:F6}%)");
+						}
+					}
+					break;
 				default:
 					break;
 			}
+
+			System.Threading.Thread.Sleep(1000);
 		}
 
 		private static void WriteUsage()
