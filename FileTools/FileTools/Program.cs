@@ -9,6 +9,7 @@ namespace FileTools
 {
 	class Program
 	{
+		[STAThread]
 		public static void Main(string[] args)
 		{
 			// Usage: FileTools -i "path//to/file.ext"
@@ -26,6 +27,11 @@ namespace FileTools
 			// -c16 Count the number of distinct 16-bit integers in the file
 			// -c32 Count the number of distinct 32-bit integers in the file
 			// -c64 Count the number of distinct 64-bit integers in the file
+
+			if (args[0] == "-g")
+			{
+				new CompressorGUI().ShowDialog();
+			}
 
 			if (args.Length != 5 || args[0] != "-i" || args[2] != "-o")
 			{

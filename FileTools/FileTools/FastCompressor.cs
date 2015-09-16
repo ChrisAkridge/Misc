@@ -20,6 +20,7 @@ namespace FileTools
 		private Dictionary<int, string> compressionDictionary = new Dictionary<int, string>();
 		private bool fullyCompressed = false;
 		private int compressionStep;
+		public event DictionaryEntryAdded DictionaryEntryAddedEvent;
 
 		private string initialData;
 		public string CurrentKey
@@ -113,7 +114,11 @@ namespace FileTools
 			UpdateUTF8Cache();
 
 			// Add keys used to our compression dictionary.
-			compressionKeysUsed.ForEach(k => compressionDictionary.Add(k, localCompressionDictionary[k]));
+			foreach (var key in compressionKeysUsed)
+			{
+				compressionDictionary.Add(key, localCompressionDictionary[key]);
+				if (DictionaryEntryAddedEvent != null) DictionaryEntryAddedEvent(this, new KeyValuePair<int, string>(key, localCompressionDictionary[key]));
+			}
 
 		printCompressionStep:
 			compressionStep++;
@@ -249,4 +254,6 @@ namespace FileTools
 			utf8Cache = Encoding.UTF8.GetBytes(Data);
 		}
 	}
+
+	public delegate void DictionaryEntryAdded(object sender, KeyValuePair<int, string> newEntry);
 }

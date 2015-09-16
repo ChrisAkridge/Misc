@@ -17,11 +17,12 @@ namespace FileTools
 		private byte[] utf8Cache;
 		private int currentKey = -1;    // a dictonary entry is written to disk as {key}, {length of value}, {value}. The {length of value} is always one byte.
 
-		private int keyLength;
+		public int KeyLength { get; private set; }
 		private bool keyLengthExpansionPerformed = false;
 		private int maxValueLength;
 		private Dictionary<int, string> compressionDictionary;
 		private bool fullyCompressed = false;
+		public event DictionaryEntryAdded DictionaryEntryAddedEvent;
 
 		private int compressionStep;
 
@@ -63,7 +64,7 @@ namespace FileTools
 			UpdateUTF8Cache();
 			compressionDictionary = new Dictionary<int, string>();
 			maxValueLength = cMaxValueLength;
-			keyLength = cKeyLength;
+			KeyLength = cKeyLength;
 		}
 
 		public StringCompressor(string initialData, int cMaxValueLength = 64) : this(initialData, cMaxValueLength, 1) { }
@@ -84,9 +85,9 @@ namespace FileTools
 			}
 		}
 
-		public void PerformCompressionStep()
+		public bool PerformCompressionStep()
 		{
-			if (fullyCompressed) return;
+			if (fullyCompressed) return true;
 
 			string bestPattern = FindBestPattern();
 
@@ -101,6 +102,7 @@ namespace FileTools
 
 			compressionStep++;
 			Console.WriteLine($"Compression step {compressionStep} has completed. Current size: {utf8Cache.Length} bytes ({((decimal)utf8Cache.Length / (decimal)initialData.Length * 100m)}%). Dictionary has {compressionDictionary.Count} entries.");
+			return fullyCompressed;
 		}
 
 		public void PerformBatchCompressionStep()
@@ -128,7 +130,7 @@ namespace FileTools
 
 		public void WriteToDisk(string path)
 		{
-			WriteToDisk(path, Data, compressionDictionary, utf8Cache, keyLength);
+			WriteToDisk(path, Data, compressionDictionary, utf8Cache, KeyLength);
 		}
 
 		internal static void WriteToDisk(string path, string data, Dictionary<int, string> argCompressionDictionary, byte[] argUTF8Cache, int argKeyLength)
@@ -161,7 +163,7 @@ namespace FileTools
 		private string FindBestPattern()
 		{
 			var substringOccurrences = new Dictionary<string, int>();
-			int minValueLength = keyLength + 1;
+			int minValueLength = KeyLength + 1;
 
 			for (int length = minValueLength; length <= maxValueLength; length++)
 			{
@@ -185,7 +187,7 @@ namespace FileTools
 		private List<string> FindBestPatterns()
 		{
 			var substringOccurrences = new Dictionary<string, int>();
-			int minValueLength = keyLength + 1;
+			int minValueLength = KeyLength + 1;
 
 			for (int length = minValueLength; length <= maxValueLength; length++)
 			{
@@ -223,6 +225,7 @@ namespace FileTools
 			}
 
 			compressionDictionary.Add(currentKey, pattern);
+			if (DictionaryEntryAddedEvent != null) DictionaryEntryAddedEvent(this, new KeyValuePair<int, string>(currentKey, pattern));
 			Data = Data.Replace(pattern, CurrentKey);
 			UpdateUTF8Cache();
 		}
@@ -237,8 +240,8 @@ namespace FileTools
 
 		private int GetSubstitutionSavings(int patternLength, int occurrences)
 		{
-			int substitutionSavings = (patternLength * occurrences) + (occurrences * keyLength);
-			int dictionaryCost = keyLength + DictionaryValueLengthSize + patternLength;
+			int substitutionSavings = (patternLength * occurrences) + (occurrences * KeyLength);
+			int dictionaryCost = KeyLength + DictionaryValueLengthSize + patternLength;
 
 			return substitutionSavings - dictionaryCost;
 		}
@@ -261,7 +264,7 @@ namespace FileTools
 
 		private string GetKeyText(int key)
 		{
-			return GetKeyText(key, keyLength);
+			return GetKeyText(key, KeyLength);
 		}
 
 		private int GetNextKey()
@@ -284,19 +287,19 @@ namespace FileTools
 
 		private bool ContainsKey(int key)
 		{
-			if (keyLength == 1)
+			if (KeyLength == 1)
 			{
 				return FastArrayTools.FastContains8(utf8Cache, unchecked((byte)key));
 			}
-			else if (keyLength == 2)
+			else if (KeyLength == 2)
 			{
 				return FastArrayTools.FastContains16(utf8Cache, unchecked((ushort)key));
 			}
-			else if (keyLength == 3)
+			else if (KeyLength == 3)
 			{
 				return FastArrayTools.FastContains24(utf8Cache, unchecked((uint)key));
 			}
-			else if (keyLength == 4)
+			else if (KeyLength == 4)
 			{
 				return FastArrayTools.FastContains32(utf8Cache, unchecked((uint)key));
 			}
@@ -308,23 +311,23 @@ namespace FileTools
 
 		private bool KeyWithinRange(int key)
 		{
-			if (keyLength == 1 && key <= 255) return true;
-			else if (keyLength == 2 && key <= 65535) return true;
-			else if (keyLength == 3 && key <= 1677215) return true;
-			else if (keyLength == 4 && key <= int.MaxValue) return true;
+			if (KeyLength == 1 && key <= 255) return true;
+			else if (KeyLength == 2 && key <= 65535) return true;
+			else if (KeyLength == 3 && key <= 1677215) return true;
+			else if (KeyLength == 4 && key <= int.MaxValue) return true;
 
 			return false;
 		}
 
 		private void ExpandKeySize()
 		{
-			if (keyLength == 4) { throw new OverflowException($"Your file required more than ${compressionDictionary.Count} keys. We've ran out of key space!");  }
+			if (KeyLength == 4) { throw new OverflowException($"Your file required more than ${compressionDictionary.Count} keys. We've ran out of key space!");  }
 
 			Data = initialData;
 			UpdateUTF8Cache();
 			compressionDictionary.Clear();
 			currentKey = 0;
-			keyLength++;
+			KeyLength++;
 			keyLengthExpansionPerformed = true;
 			OnKeyLengthExpansionOccurred();
 		}

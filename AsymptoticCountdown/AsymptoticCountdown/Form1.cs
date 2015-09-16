@@ -38,9 +38,15 @@ namespace AsymptoticCountdown
 			double asymptoticProgress = GetAsymptoticYears(progress);
 			double rate = (asymptoticProgress - lastYears) * 60d;
 			lastYears = asymptoticProgress;
+			DateTime? dateInPast = null;
+
+			if (asymptoticProgress < 415d)
+			{
+				dateInPast = (DateTime.Now - new TimeSpan((long)(asymptoticProgress * 365.25d * 24d * 60d * 60d * 1000d * 1000d * 10d)));
+			}
 
 			LabelProgress.Text = string.Format("Progress: {0:F8}%", progress * 100d);
-			LabelAsymptoticProgress.Text = string.Format("{0} ago ({1:F2} per second)", FormatYear(asymptoticProgress), rate);
+			LabelAsymptoticProgress.Text = $"{FormatYear(asymptoticProgress)} ago ({((dateInPast.HasValue) ? dateInPast.Value.ToString() : "")})";
 
 			double adjustedProgress = progress * 10000d;
 
