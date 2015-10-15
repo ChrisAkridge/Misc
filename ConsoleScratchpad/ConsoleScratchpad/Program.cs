@@ -75,7 +75,7 @@ namespace ConsoleScratchpad
 
             while (workerObject.Queue == null) { }
 
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0;i < 10000;i++)
             {
                 workerObject.Queue.Enqueue(i.ToString());
                 Thread.Sleep(1);
@@ -91,7 +91,7 @@ namespace ConsoleScratchpad
 
         private static unsafe void DoStuff()
 		{
-			for (int i = 0; i < 10; i++)
+			for (int i = 0;i < 10;i++)
 			{
 				Console.WriteLine("Hello World #{0}!", i);
 			}
@@ -144,7 +144,7 @@ namespace ConsoleScratchpad
 		{
 			byte* pb = (byte*)ptr;
 
-			for (int i = 0; i < length; i++)
+			for (int i = 0;i < length;i++)
 			{
 				string memoryAddress = string.Format("0x{0:X8}", (int)pb);
 				string byteValue = string.Format("{0:X2}", *pb);

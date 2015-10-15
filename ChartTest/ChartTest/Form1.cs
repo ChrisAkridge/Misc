@@ -41,7 +41,6 @@ namespace ChartTest
 
 			this.chart1.Series[0].Points.Clear();
 			StringBuilder builder = new StringBuilder();
-<<<<<<< HEAD
 			for (int i = 0; i < averages.Count; i++)
 			{
 				double last = (i > 0) ? averages[i - 1] : 0d;
@@ -52,17 +51,7 @@ namespace ChartTest
 				if (averages[i] - last > 0) { builder.Append("+"); }
 				builder.Append(averages[i] - last);
 				builder.Append(")");
-
-=======
-			int k = 1;
-			foreach (double average in averages)
-			{
-				this.chart1.Series[0].Points.Add(average);
-				builder.Append(string.Format("{0}. ", k));
-				builder.Append(average);
->>>>>>> origin/master
 				builder.Append(Environment.NewLine);
-				k++;
 			}
 
 			this.textBox1.Text = builder.ToString();
@@ -80,10 +69,10 @@ namespace ChartTest
 		private void button2_Click(object sender, EventArgs e)
 		{
 			this.chart1.Series[0].Points.Clear();
-			for (int i = -128; i <= 127; i++)
+			for (int i = -32768; i <= 32768; i++)
 			{
 				int y = ~i;
-				this.chart1.Series[0].Points.Add(y);
+				chart1.Series[0].Points.Add(y);
 			}
 		}
 	}

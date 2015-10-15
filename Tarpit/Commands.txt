@@ -1,0 +1,24 @@
+Tarpit Commands:
+
++ Increment cell
+- Decrement cell
+< Shift cell pointer left
+> Shift cell pointer right
+[ Begin loop if cell is nonzero
+{ Begin loop if cell is zero
+]} End loop
+. Print cell as ASCII character
+, Take character as ASCII character
+
+! Allocate temporary cell
+@ Free temporary cell
+( Shift temporary pointer left
+) Shift temporary pointer right
+# Increment temporary cell
+$ Decrement temporary cell
+
+^ Lift cell into temporary cell
+v Deposit temporary cell into cell
+' Begin/end loop if temporary cell is nonzero
+" Begin/end loop if temporary cell is zero
+
