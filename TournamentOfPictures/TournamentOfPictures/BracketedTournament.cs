@@ -28,26 +28,26 @@ namespace TournamentOfPictures
         {
             this.teams = teams;
 			this.teams.ForEach(t => standings.Add(t, 0));
-            this.currentRoundNumber = 0;
-            this.ShuffleTeams();
+			currentRoundNumber = 0;
+			ShuffleTeams();
         }
 
         public void AddToTop(T item)
         {
-            this.teams.Insert(0, item);
+			teams.Insert(0, item);
         }
 
         public void AddToBottom(T item)
         {
-            this.teams.Add(item);
+			teams.Add(item);
         }
 
         public T RemoveFromTop()
         {
-            if (this.teams.Any())
+            if (teams.Any())
             {
-                T result = this.teams[0];
-                this.teams.RemoveAt(0);
+                T result = teams[0];
+				teams.RemoveAt(0);
                 return result;
             }
             else
@@ -58,11 +58,11 @@ namespace TournamentOfPictures
 
         public T RemoveFromBottom()
         {
-            if (this.teams.Any())
+            if (teams.Any())
             {
-                int index = this.teams.Count - 1;
-                T result = this.teams[index];
-                this.teams.RemoveAt(index);
+                int index = teams.Count - 1;
+                T result = teams[index];
+				teams.RemoveAt(index);
                 return result;
             }
             else
@@ -73,12 +73,12 @@ namespace TournamentOfPictures
 
 		public T RemoveRandomly()
 		{
-			if (this.teams.Any())
+			if (teams.Any())
 			{
 				Random random = new Random();
-				int index = random.Next(0, this.teams.Count);
-				T result = this.teams[index];
-				this.teams.RemoveAt(index);
+				int index = random.Next(0, teams.Count);
+				T result = teams[index];
+				teams.RemoveAt(index);
 				return result;
 			}
 			else
@@ -89,12 +89,12 @@ namespace TournamentOfPictures
 
 		public T RemoveAndInsertRandomly(ref T item)
 		{
-			if (this.teams.Any())
+			if (teams.Any())
 			{
 				Random random = new Random();
-				int index = random.Next(0, this.teams.Count);
-				T result = this.teams[index];
-				this.teams[index] = item;
+				int index = random.Next(0, teams.Count);
+				T result = teams[index];
+				teams[index] = item;
 				item = result;
 				return result;
 			}
@@ -107,42 +107,42 @@ namespace TournamentOfPictures
         public void ShuffleTeams()
         {
             Random random = new Random(DateTime.Now.Minute * DateTime.Now.Second * DateTime.Now.Millisecond);
-            int n = this.teams.Count;
+            int n = teams.Count;
 
             while (n > 1)
             {
                 n--;
                 int k = random.Next(n + 1);
-                T value = this.teams[k];
-                this.teams[k] = this.teams[n];
-                this.teams[n] = value;
+                T value = teams[k];
+				teams[k] = teams[n];
+				teams[n] = value;
             }
         }
 
         public void StartRound()
         {
             var newRound = new BracketedTournamentRound<T>(this);
-            this.currentRound = newRound;
-            this.currentRoundNumber++;
+			currentRound = newRound;
+			currentRoundNumber++;
         }
 
         public void GetRoundWinners(List<T> winners)
         {
-            this.teams = winners;
-			winners.ForEach(w => this.standings[w]++); // increase the wins by one
-            this.currentRound = null;
+			teams = winners;
+			winners.ForEach(w => standings[w]++); // increase the wins by one
+			currentRound = null;
 
-            if (winners.Count == 1 && this.OverflowItem == null)
+            if (winners.Count == 1 && OverflowItem == null)
             {
-                this.OnWinnerChosen(winners[0], this.GetFinalStandings());
+				OnWinnerChosen(winners[0], GetFinalStandings());
             }
         }
 
         public void OnWinnerChosen(T winner, string standings)
         {
-            if (this.WinnerChosenEvent != null)
+            if (WinnerChosenEvent != null)
             {
-                this.WinnerChosenEvent(winner, standings);
+				WinnerChosenEvent(winner, standings);
             }
         }
 
@@ -150,7 +150,7 @@ namespace TournamentOfPictures
 		{
 			StringBuilder result = new StringBuilder();
 			int i = 1;
-			foreach (var value in this.standings.OrderByDescending(key => key.Value))
+			foreach (var value in standings.OrderByDescending(key => key.Value))
 			{
 				result.Append(string.Format("{0}. {1} ({2} win{3}){4}", i, 
 																		value.Key, 
@@ -172,8 +172,8 @@ namespace TournamentOfPictures
 
         public BracketedTournamentRound(BracketedTournament<T> owner)
         {
-            this.matches = new List<BracketedTournamentMatch<T>>();
-            this.winners = new List<T>();
+			matches = new List<BracketedTournamentMatch<T>>();
+			winners = new List<T>();
             this.owner = owner;
 
             if (owner.TeamCount % 2 != 0)
@@ -240,44 +240,44 @@ namespace TournamentOfPictures
             for (int i = 0; i < owner.TeamCount; i += 2)
             {
                 BracketedTournamentMatch<T> match = new BracketedTournamentMatch<T>(owner.teams[i], owner.teams[i + 1], this);
-                this.matches.Add(match);
-                this.matchesRemaining++;
+				matches.Add(match);
+				matchesRemaining++;
             }
         }
 
         public BracketedTournamentMatch<T> GetNextMatch()
         {
-            if (this.matches.Any())
+            if (matches.Any())
             {
-                return this.matches[0];
+                return matches[0];
             }
             else return null;
         }
 
         public void SelectNextMatchWinner(int teamNumber)
         {
-            if (this.matches.Any() && this.matchesRemaining > 0)
+            if (matches.Any() && matchesRemaining > 0)
             {
-                var nextMatch = this.GetNextMatch();
-                this.matches.RemoveAt(0);
-                this.matchesRemaining--;
+                var nextMatch = GetNextMatch();
+				matches.RemoveAt(0);
+				matchesRemaining--;
 
                 if (teamNumber == 1)
                 {
-                    this.winners.Add(nextMatch.team1);
+					winners.Add(nextMatch.team1);
                 }
                 else if (teamNumber == 2)
                 {
-                    this.winners.Add(nextMatch.team2);
+					winners.Add(nextMatch.team2);
                 }
                 else
                 {
                     throw new Exception(string.Format("Invalid team number {0}", teamNumber));
                 }
 
-                if (this.matchesRemaining == 0)
+                if (matchesRemaining == 0)
                 {
-                    this.owner.GetRoundWinners(this.winners);
+					owner.GetRoundWinners(winners);
                 }
             }
         }
@@ -293,9 +293,9 @@ namespace TournamentOfPictures
 
         public BracketedTournamentMatch(T a, T b, BracketedTournamentRound<T> owner)
         {
-            this.team1 = a;
-            this.team2 = b;
-            this.ownerRound = owner;
+			team1 = a;
+			team2 = b;
+			ownerRound = owner;
         }
 
         public void SelectWinner(int teamNumber)
@@ -304,7 +304,7 @@ namespace TournamentOfPictures
             {
                 throw new IndexOutOfRangeException(string.Format("Cannot select team #{0} from two teams", teamNumber));
             }
-            this.Winner = teamNumber;
+			Winner = teamNumber;
         }
     }
 

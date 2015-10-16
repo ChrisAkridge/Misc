@@ -18,28 +18,28 @@ namespace TournamentOfPictures
 
 		private void button3_Click(object sender, EventArgs e)
 		{
-			this.DialogResult = DialogResult.OK;
+			DialogResult = DialogResult.OK;
 		}
 
 		private void button2_Click(object sender, EventArgs e)
 		{
-			this.DialogResult = DialogResult.Cancel;
+			DialogResult = DialogResult.Cancel;
 		}
 
 		private void button1_Click(object sender, EventArgs e)
 		{
 			try
 			{
-				this.folderBrowserDialog1.SelectedPath = this.textBox1.Text;
+				folderBrowserDialog1.SelectedPath = textBox1.Text;
 			}
 			catch
 			{
-				this.folderBrowserDialog1.SelectedPath = "C:\\";
+				folderBrowserDialog1.SelectedPath = "C:\\";
 			}
 
-			if (this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+			if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
 			{
-				this.textBox1.Text = this.folderBrowserDialog1.SelectedPath;
+				textBox1.Text = folderBrowserDialog1.SelectedPath;
 			}
 		}
 	}

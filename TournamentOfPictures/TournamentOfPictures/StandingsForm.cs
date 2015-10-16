@@ -15,7 +15,7 @@ namespace TournamentOfPictures
 		{
 			InitializeComponent();
 
-			this.TextStandings.Text = standings;
+			TextStandings.Text = standings;
 		}
 
 		private void StandingsForm_Load(object sender, EventArgs e)
@@ -25,7 +25,7 @@ namespace TournamentOfPictures
 
 		private void ButtonOK_Click(object sender, EventArgs e)
 		{
-			this.Close();
+			Close();
 		}
 	}
 }

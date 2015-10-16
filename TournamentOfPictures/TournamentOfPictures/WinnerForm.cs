@@ -21,31 +21,31 @@ namespace TournamentOfPictures
 
         public void ShowWinner(string path, string standings)
         {
-            this.filePath = path;
+			filePath = path;
 			this.standings = standings;
-            this.pictureBox1.Image = Image.FromFile(path);
-            if (this.pictureBox1.Image.Width < this.pictureBox1.Width && this.pictureBox1.Image.Height < this.pictureBox1.Height)
+			pictureBox1.Image = Image.FromFile(path);
+            if (pictureBox1.Image.Width < pictureBox1.Width && pictureBox1.Image.Height < pictureBox1.Height)
             {
-                this.pictureBox1.SizeMode = PictureBoxSizeMode.CenterImage;
+				pictureBox1.SizeMode = PictureBoxSizeMode.CenterImage;
             }
             else
             {
-                this.pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+				pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             }
-            this.label2.Text = string.Format("File at {0} (click to open)", path);
+			label2.Text = string.Format("File at {0} (click to open)", path);
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
             Process process = new Process();
             process.StartInfo.FileName = "C:\\Program Files (x86)\\IrfanView\\i_view32.exe";
-            process.StartInfo.Arguments = this.filePath;
+            process.StartInfo.Arguments = filePath;
             process.Start();
         }
 
 		private void LLbViewStandings_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			new StandingsForm(this.standings).ShowDialog();
+			new StandingsForm(standings).ShowDialog();
 		}
     }
 }
