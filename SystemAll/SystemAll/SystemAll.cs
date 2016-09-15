@@ -45,7 +45,8 @@ namespace SystemAll
             // System.AppDomainManager
             Console.WriteLine("System.AppDomainManager");
             AppDomainManager manager = new AppDomainManager();
-            
+			var objectRef = manager.CreateObjRef(typeof(int));
+			Console.WriteLine($"Channel: {objectRef.ChannelInfo.ToString()}\r\nEnvoy: {objectRef.EnvoyInfo.ToString()}");
         }
 
         private void WriteBytes(byte[] bytes)
