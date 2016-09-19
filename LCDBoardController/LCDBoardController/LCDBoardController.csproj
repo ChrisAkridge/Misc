@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BoardText.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="LCDBoard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

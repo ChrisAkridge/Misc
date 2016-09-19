@@ -23,14 +23,18 @@ namespace ConsoleScratchpad
 	{
 		static unsafe void Main(string[] args)
         {
-			int i = 1;
-			int* pi = &i;
-			int** ppi = &pi;
-			int*** pppi = &ppi;
+			HashSet<string> floatStrings = new HashSet<string>();
+			uint ui = 0u;
+			float* pf = (float*)&ui;
 
-			int x = *(*(*(pppi))) + 1;
+			do
+			{
+				floatStrings.Add((*pf).ToString());
+				ui++;
+				if (ui % 100000 == 0) Console.WriteLine(ui);
+			} while (ui != 0u);
 
-			*(*(*(pppi))) = x;
+			Console.WriteLine($"{floatStrings.Count} unique out of {uint.MaxValue} ({(floatStrings.Count / uint.MaxValue) * 100f}%)");
         }
 
 		private static void DoNothing(int i) { }

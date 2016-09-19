@@ -22,23 +22,11 @@ namespace LCDBoardControllerMain
 			bank = new CharacterBank("charbank.bnk");
 			board = new LCDBoard();
 			board.ClearBoard();
+			board.EnableAutoScroll();
 
 			CustomCharacter football = new CustomCharacter(0x04, 0x0E, 0x1B, 0x1B, 0x1B, 0x1B, 0x0E, 0x04);
-			// bank.Add("football", football);
-			// GenerateRandomCharacters();
-			// bank.WriteToFile("charbank.bnk");
 
-			Random random = new Random();
-			for (int i = 0; i < 8; i++)
-			{
-				int index = random.Next(0, 999);
-				var loadBytes = bank[index.ToString()].GenerateLoadBytes(i);
-				board.Send(loadBytes);
-				board.Send(new byte[] {(byte)i});
-				board.SetCursorPosition(i + 1, 1);
-			}
-			
-			Console.ReadKey();
+			board.SetBacklightColor(new Color(0, 0, 255));
 		}
 
 		static void GenerateRandomCharacters()

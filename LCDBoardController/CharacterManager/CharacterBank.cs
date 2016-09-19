@@ -81,5 +81,10 @@ namespace CharacterManager
 				}
 			}
 		}
+
+		public Dictionary<string, CustomCharacter>.Enumerator GetEnumerator()
+		{
+			return characters.GetEnumerator();
+		}
     }
 }

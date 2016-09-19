@@ -12,13 +12,13 @@ namespace TournamentOfPictures
 {
     public partial class Form1 : Form
     {
-		private FolderSelect folderSelect;
-        private BracketedTournament<string> files;
+		private string folderPath;
+		private BracketedTournament<string> files;
 
-        public Form1()
+        public Form1(string folderPath)
         {
             InitializeComponent();
-			folderSelect = new FolderSelect();
+			this.folderPath = folderPath;
         }
 
         private List<string> GetFilesInFolder(string folderPath)
@@ -29,16 +29,9 @@ namespace TournamentOfPictures
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            if (folderSelect.ShowDialog() == DialogResult.OK)
-            {
-				files = new BracketedTournament<string>(GetFilesInFolder(folderSelect.textBox1.Text));
-				files.WinnerChosenEvent += new WinnerChosenEventHandler<string>(files_WinnerChosenEvent);
-				StartRound();
-            }
-            else
-            {
-                Application.Exit();
-            }
+			files = new BracketedTournament<string>(GetFilesInFolder(folderPath));
+			files.WinnerChosenEvent += new WinnerChosenEventHandler<string>(files_WinnerChosenEvent);
+			StartRound();
         }
 
         void files_WinnerChosenEvent(string winner, string standings)
