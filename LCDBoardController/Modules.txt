@@ -1,0 +1,13 @@
+LCD Board Controller
+Modules Idea
+
+- For a sort of news-ticker display, the LCDBoardController will utilize modules, custom assemblies (or maybe just namespaces) that get resources and then display them
+- The Module (name conflict maybe?) abstract class is deriven by these custom assemblies.
+- It has abstract methods UpdateDisplay() and GetResources(). UpdateDisplay() is called four times a second and GetResources() is displayed when the module is loaded
+- Back in LCDBoardController, there's a list of modules that the user can edit through a form. The ordering of these modules determine their display order.
+- Additionally, when a module is loaded into the AppDomain, the abstract method Module.GetPriority() will be called. 
+- Standard priority modules will be displayed as part of the rotation.
+- High priority modules will always be displayed.
+- If multiple modules report high priority, the module that comes first in the rotation wins.
+- Typically, GetPriority() will return Standard except unless certain conditions are met (i.e. a football module returning High if there's a game ongoing)
+- High priority modules have their resources updated once per minute.

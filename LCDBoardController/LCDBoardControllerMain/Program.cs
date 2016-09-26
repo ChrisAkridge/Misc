@@ -18,15 +18,16 @@ namespace LCDBoardControllerMain
 
 		static void Main(string[] args)
 		{
-			timer = new Timer(25d);
+			//timer = new Timer(25d);
 			bank = new CharacterBank("charbank.bnk");
-			board = new LCDBoard();
-			board.ClearBoard();
-			board.EnableAutoScroll();
+			//board = new LCDBoard();
+			//board.ClearBoard();
+			//board.EnableAutoScroll();
 
-			CustomCharacter football = new CustomCharacter(0x04, 0x0E, 0x1B, 0x1B, 0x1B, 0x1B, 0x0E, 0x04);
+			//CustomCharacter football = new CustomCharacter(0x04, 0x0E, 0x1B, 0x1B, 0x1B, 0x1B, 0x0E, 0x04);
 
-			board.SetBacklightColor(new Color(0, 0, 255));
+			//board.SetBacklightColor(new Color(0, 0, 255));
+			var message = new Message("words", bank);
 		}
 
 		static void GenerateRandomCharacters()

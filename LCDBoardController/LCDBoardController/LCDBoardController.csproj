@@ -42,7 +42,14 @@
     <Compile Include="BoardText.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="LCDBoard.cs" />
+    <Compile Include="Message.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CharacterManager\CharacterManager.csproj">
+      <Project>{89DAB490-2A9A-4632-9664-2336124A9584}</Project>
+      <Name>CharacterManager</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
