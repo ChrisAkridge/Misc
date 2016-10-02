@@ -32,6 +32,7 @@
 			this.ButtonLaunchBracketedTournament = new System.Windows.Forms.Button();
 			this.ButtonLaunchRating = new System.Windows.Forms.Button();
 			this.ButtonLaunchRecursiveRating = new System.Windows.Forms.Button();
+			this.ButtonLaunchQuantificationTournament = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// LabelFolderDetails
@@ -80,16 +81,31 @@
 			this.ButtonLaunchRecursiveRating.UseVisualStyleBackColor = true;
 			this.ButtonLaunchRecursiveRating.Click += new System.EventHandler(this.ButtonLaunchRecursiveRating_Click);
 			// 
+			// ButtonLaunchQuantificationTournament
+			// 
+			this.ButtonLaunchQuantificationTournament.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.ButtonLaunchQuantificationTournament.Location = new System.Drawing.Point(16, 171);
+			this.ButtonLaunchQuantificationTournament.Name = "ButtonLaunchQuantificationTournament";
+			this.ButtonLaunchQuantificationTournament.Size = new System.Drawing.Size(425, 23);
+			this.ButtonLaunchQuantificationTournament.TabIndex = 4;
+			this.ButtonLaunchQuantificationTournament.Text = "Launch Quantification Tournament...";
+			this.ButtonLaunchQuantificationTournament.UseVisualStyleBackColor = true;
+			this.ButtonLaunchQuantificationTournament.Click += new System.EventHandler(this.ButtonLaunchQuantificationTournament_Click);
+			// 
 			// LauncherForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(453, 169);
+			this.ClientSize = new System.Drawing.Size(453, 206);
+			this.Controls.Add(this.ButtonLaunchQuantificationTournament);
 			this.Controls.Add(this.ButtonLaunchRecursiveRating);
 			this.Controls.Add(this.ButtonLaunchRating);
 			this.Controls.Add(this.ButtonLaunchBracketedTournament);
 			this.Controls.Add(this.LabelFolderDetails);
 			this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+			this.MaximizeBox = false;
 			this.Name = "LauncherForm";
 			this.Text = "Tournament of Pictures";
 			this.Load += new System.EventHandler(this.LauncherForm_Load);
@@ -104,5 +120,6 @@
 		private System.Windows.Forms.Button ButtonLaunchBracketedTournament;
 		private System.Windows.Forms.Button ButtonLaunchRating;
 		private System.Windows.Forms.Button ButtonLaunchRecursiveRating;
+		private System.Windows.Forms.Button ButtonLaunchQuantificationTournament;
 	}
 }

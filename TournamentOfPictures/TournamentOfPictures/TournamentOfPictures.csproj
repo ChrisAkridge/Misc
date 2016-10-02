@@ -25,6 +25,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -49,6 +50,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BatchSelectionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BatchSelectionForm.Designer.cs">
+      <DependentUpon>BatchSelectionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BatchSelectionTournament.cs" />
     <Compile Include="BracketedTournament.cs" />
     <Compile Include="FolderSelect.cs">
       <SubType>Form</SubType>
@@ -62,6 +70,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="HeuristicSort.cs" />
     <Compile Include="Hierarchy.cs" />
     <Compile Include="LauncherForm.cs">
       <SubType>Form</SubType>
@@ -69,14 +78,23 @@
     <Compile Include="LauncherForm.Designer.cs">
       <DependentUpon>LauncherForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="PictureList.cs" />
     <Compile Include="PictureRatingSelector.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="PictureRatingSelector.Designer.cs">
       <DependentUpon>PictureRatingSelector.cs</DependentUpon>
     </Compile>
+    <Compile Include="PlaylistCreator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuantificationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="QuantificationForm.Designer.cs">
+      <DependentUpon>QuantificationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="QuantificationTournament.cs" />
     <Compile Include="RatingSelector.cs" />
     <Compile Include="RecursiveRatingSelector.cs" />
     <Compile Include="StandingsForm.cs">
@@ -85,12 +103,21 @@
     <Compile Include="StandingsForm.Designer.cs">
       <DependentUpon>StandingsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ViewerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ViewerForm.Designer.cs">
+      <DependentUpon>ViewerForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="WinnerForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="WinnerForm.Designer.cs">
       <DependentUpon>WinnerForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="BatchSelectionForm.resx">
+      <DependentUpon>BatchSelectionForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FolderSelect.resx">
       <DependentUpon>FolderSelect.cs</DependentUpon>
     </EmbeddedResource>
@@ -113,8 +140,14 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="QuantificationForm.resx">
+      <DependentUpon>QuantificationForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="StandingsForm.resx">
       <DependentUpon>StandingsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ViewerForm.resx">
+      <DependentUpon>ViewerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="WinnerForm.resx">
       <DependentUpon>WinnerForm.cs</DependentUpon>

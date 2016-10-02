@@ -138,7 +138,7 @@ namespace TournamentOfPictures
             }
         }
 
-        public void OnWinnerChosen(T winner, string standings)
+        public void OnWinnerChosen(T winner, IEnumerable<ScoredItem<T>> standings)
         {
             if (WinnerChosenEvent != null)
             {
@@ -146,20 +146,14 @@ namespace TournamentOfPictures
             }
         }
 
-		public string GetFinalStandings()
+		public IEnumerable<ScoredItem<T>> GetFinalStandings()
 		{
-			StringBuilder result = new StringBuilder();
-			int i = 1;
-			foreach (var value in standings.OrderByDescending(key => key.Value))
+			return standings.Select(kvp =>
 			{
-				result.Append(string.Format("{0}. {1} ({2} win{3}){4}", i, 
-																		value.Key, 
-																		value.Value, 
-																		(value.Value != 1) ? "s" : "", 
-																		Environment.NewLine));
-				i++;
-			}
-			return result.ToString();
+				ScoredItem<T> item = new ScoredItem<T>(kvp.Key);
+				item.AddScore(kvp.Value);
+				return item;
+			});
 		}
     }
 
@@ -315,5 +309,5 @@ namespace TournamentOfPictures
 		RemoveRandomly
     }
 
-    public delegate void WinnerChosenEventHandler<T>(T winner, string standings);
+    public delegate void WinnerChosenEventHandler<T>(T winner, IEnumerable<ScoredItem<T>> standings) where T : class;
 }

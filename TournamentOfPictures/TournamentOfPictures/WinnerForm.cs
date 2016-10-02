@@ -13,16 +13,16 @@ namespace TournamentOfPictures
     public partial class WinnerForm : Form
     {
         private string filePath;
-		private string standings;
+		private List<ScoredItem<string>> standings;
         public WinnerForm()
         {
             InitializeComponent();
         }
 
-        public void ShowWinner(string path, string standings)
+        public void ShowWinner(string path, IEnumerable<ScoredItem<string>> standings)
         {
 			filePath = path;
-			this.standings = standings;
+			this.standings = standings.OrderByDescending(i => i.Score).ToList();
 			pictureBox1.Image = Image.FromFile(path);
             if (pictureBox1.Image.Width < pictureBox1.Width && pictureBox1.Image.Height < pictureBox1.Height)
             {

@@ -66,5 +66,13 @@ namespace TournamentOfPictures
 			Hide();
 			selectorForm.Show();
 		}
+
+		private void ButtonLaunchQuantificationTournament_Click(object sender, EventArgs e)
+		{
+			QuantificationForm quantificationForm = new QuantificationForm(folderPath);
+			quantificationForm.FormClosed += (s, args) => Close();
+			Hide();
+			quantificationForm.Show();
+		}
 	}
 }

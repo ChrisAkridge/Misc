@@ -30,19 +30,19 @@ namespace TournamentOfPictures
         private void Form1_Load(object sender, EventArgs e)
         {
 			files = new BracketedTournament<string>(GetFilesInFolder(folderPath));
-			files.WinnerChosenEvent += new WinnerChosenEventHandler<string>(files_WinnerChosenEvent);
+			files.WinnerChosenEvent += Files_WinnerChosenEvent;
 			StartRound();
         }
 
-        void files_WinnerChosenEvent(string winner, string standings)
-        {
-            var winnerForm = new WinnerForm();
-            winnerForm.ShowWinner(winner, standings);
-            winnerForm.ShowDialog();
-            Application.Exit();
-        }
+		private void Files_WinnerChosenEvent(string winner, IEnumerable<ScoredItem<string>> standings)
+		{
+			var winnerForm = new WinnerForm();
+			winnerForm.ShowWinner(winner, standings);
+			winnerForm.ShowDialog();
+			Application.Exit();
+		}
 
-        private void DisplayPictures(string picture1, string picture2)
+		private void DisplayPictures(string picture1, string picture2)
         {
 			button1.Image = Image.FromFile(picture1);
 			button2.Image = Image.FromFile(picture2);

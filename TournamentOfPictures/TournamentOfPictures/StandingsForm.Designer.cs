@@ -31,6 +31,8 @@
 			this.StaticLabelStandings = new System.Windows.Forms.Label();
 			this.TextStandings = new System.Windows.Forms.TextBox();
 			this.ButtonOK = new System.Windows.Forms.Button();
+			this.ButtonSavePlaylist = new System.Windows.Forms.Button();
+			this.SFDSavePlaylist = new System.Windows.Forms.SaveFileDialog();
 			this.SuspendLayout();
 			// 
 			// StaticLabelStandings
@@ -67,11 +69,28 @@
 			this.ButtonOK.UseVisualStyleBackColor = true;
 			this.ButtonOK.Click += new System.EventHandler(this.ButtonOK_Click);
 			// 
+			// ButtonSavePlaylist
+			// 
+			this.ButtonSavePlaylist.Location = new System.Drawing.Point(405, 333);
+			this.ButtonSavePlaylist.Name = "ButtonSavePlaylist";
+			this.ButtonSavePlaylist.Size = new System.Drawing.Size(86, 23);
+			this.ButtonSavePlaylist.TabIndex = 3;
+			this.ButtonSavePlaylist.Text = "&Save Playlist...";
+			this.ButtonSavePlaylist.UseVisualStyleBackColor = true;
+			this.ButtonSavePlaylist.Click += new System.EventHandler(this.ButtonSavePlaylist_Click);
+			// 
+			// SFDSavePlaylist
+			// 
+			this.SFDSavePlaylist.DefaultExt = "ivpl";
+			this.SFDSavePlaylist.Filter = "ImageView Playlists (*.ivpl)|*.ivpl|All files|*.*";
+			this.SFDSavePlaylist.Title = "Tournament of Pictures";
+			// 
 			// StandingsForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(584, 361);
+			this.Controls.Add(this.ButtonSavePlaylist);
 			this.Controls.Add(this.ButtonOK);
 			this.Controls.Add(this.TextStandings);
 			this.Controls.Add(this.StaticLabelStandings);
@@ -91,5 +110,7 @@
 		private System.Windows.Forms.Label StaticLabelStandings;
 		private System.Windows.Forms.TextBox TextStandings;
 		private System.Windows.Forms.Button ButtonOK;
+		private System.Windows.Forms.Button ButtonSavePlaylist;
+		private System.Windows.Forms.SaveFileDialog SFDSavePlaylist;
 	}
 }
