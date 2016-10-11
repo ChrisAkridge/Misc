@@ -13,6 +13,11 @@ namespace MeijerStatAnalyzer
 	{
 		static void Main(string[] args)
 		{
+			var stats = Parser.Parse();
+		}
+
+		static void OldMain()
+		{
 			Console.WriteLine("Meijer Statistics Analyzer");
 			Console.WriteLine();
 			Console.WriteLine("Press a key to perform an action. Press H for help.");
@@ -21,7 +26,7 @@ namespace MeijerStatAnalyzer
 			while (shouldContinue)
 			{
 				var key = Console.ReadKey(true).KeyChar;
-				
+
 				switch (char.ToLowerInvariant(key))
 				{
 					case 'h':
