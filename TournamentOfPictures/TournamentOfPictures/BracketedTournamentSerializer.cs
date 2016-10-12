@@ -41,6 +41,7 @@ namespace TournamentOfPictures
 			}
 
 			result.SerializationSetCurrentRound(DeserializeRound(result, currentRoundObject));
+			result.OverflowItem = (string)obj["overflowItem"];
 			return result;
 		}
 

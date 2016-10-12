@@ -35,9 +35,18 @@ namespace TournamentOfPictures
 
         private void Form1_Load(object sender, EventArgs e)
         {
-			if (files == null) { files = new BracketedTournament<string>(GetFilesInFolder(folderPath)); }
+			if (files == null) 
+			{ 
+				files = new BracketedTournament<string>(GetFilesInFolder(folderPath));
+				StartRound();
+			}
+			else
+			{
+				DisplayPictures(files.CurrentRound.CurrentMatch.Team1, files.CurrentRound.CurrentMatch.Team2);
+				UpdateLabel();
+				SetProgress();
+			}
 			files.WinnerChosenEvent += Files_WinnerChosenEvent;
-			StartRound();
         }
 
 		private void Files_WinnerChosenEvent(string winner, IEnumerable<ScoredItem<string>> standings)

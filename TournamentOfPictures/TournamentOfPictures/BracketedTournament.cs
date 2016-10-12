@@ -203,7 +203,8 @@ namespace TournamentOfPictures
 				currentRoundNumber = CurrentRoundNumber,
 				standings = standingsObjects,
 				previousRounds = previousRoundsObjects,
-				currentRound = CurrentRound.GetSerializableObjects()
+				currentRound = CurrentRound.GetSerializableObjects(),
+				overflowItem = OverflowItem
 			};
 		}
 
@@ -291,6 +292,7 @@ namespace TournamentOfPictures
 		{
 			this.owner = owner;
 			this.matches = matches.ToList();
+			this.winners = matches.Where(m => m.WinnerIndex != 0).Select(m => (m.WinnerIndex == 1) ? m.Team1 : m.Team2).ToList();
 
 			int indexOfFirstUnselectedMatch = this.matches.FindIndex(m => m.WinnerIndex == 0);
 			if (indexOfFirstUnselectedMatch >= 0)
