@@ -32,6 +32,14 @@ namespace TournamentOfPictures
 				folderPath = folderSelect.textBox1.Text;
 				SetFolderDetails();
 			}
+			else if (result == DialogResult.Yes)
+			{
+				Form1 tournamentForm = new Form1(BracketedTournamentSerializer.FromFile(folderSelect.textBox1.Text));
+				tournamentForm.FormClosed += (s, args) => Close();
+				tournamentForm.Show();
+				tournamentForm.ButtonUndo.Enabled = true;
+				BeginInvoke(new MethodInvoker(delegate { Hide(); }));
+			}
 		}
 
 		private void SetFolderDetails()

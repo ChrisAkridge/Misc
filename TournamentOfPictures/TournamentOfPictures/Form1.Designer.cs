@@ -28,28 +28,38 @@
         /// </summary>
         private void InitializeComponent()
         {
-			this.label1 = new System.Windows.Forms.Label();
+			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
 			this.label2 = new System.Windows.Forms.Label();
 			this.progressBar1 = new System.Windows.Forms.ProgressBar();
+			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.button1 = new System.Windows.Forms.PictureBox();
 			this.button2 = new System.Windows.Forms.PictureBox();
-			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+			this.label1 = new System.Windows.Forms.Label();
+			this.ButtonSaveClose = new System.Windows.Forms.Button();
+			this.ButtonSave = new System.Windows.Forms.Button();
+			this.ButtonUndo = new System.Windows.Forms.Button();
+			this.SFDSaveTournament = new System.Windows.Forms.SaveFileDialog();
+			this.tableLayoutPanel2.SuspendLayout();
+			this.tableLayoutPanel1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.button1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.button2)).BeginInit();
-			this.tableLayoutPanel1.SuspendLayout();
-			this.tableLayoutPanel2.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// label1
+			// tableLayoutPanel2
 			// 
-			this.label1.AutoSize = true;
-			this.label1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label1.Location = new System.Drawing.Point(315, 13);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(88, 13);
-			this.label1.TabIndex = 0;
-			this.label1.Text = "Select a picture:";
+			this.tableLayoutPanel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tableLayoutPanel2.ColumnCount = 2;
+			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.tableLayoutPanel2.Controls.Add(this.label2, 0, 0);
+			this.tableLayoutPanel2.Controls.Add(this.progressBar1, 1, 0);
+			this.tableLayoutPanel2.Location = new System.Drawing.Point(12, 272);
+			this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+			this.tableLayoutPanel2.RowCount = 1;
+			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.tableLayoutPanel2.Size = new System.Drawing.Size(662, 30);
+			this.tableLayoutPanel2.TabIndex = 11;
 			// 
 			// label2
 			// 
@@ -69,6 +79,23 @@
 			this.progressBar1.Name = "progressBar1";
 			this.progressBar1.Size = new System.Drawing.Size(325, 23);
 			this.progressBar1.TabIndex = 4;
+			// 
+			// tableLayoutPanel1
+			// 
+			this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tableLayoutPanel1.ColumnCount = 2;
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.tableLayoutPanel1.Controls.Add(this.button1, 0, 0);
+			this.tableLayoutPanel1.Controls.Add(this.button2, 1, 0);
+			this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 24);
+			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+			this.tableLayoutPanel1.RowCount = 1;
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.tableLayoutPanel1.Size = new System.Drawing.Size(665, 242);
+			this.tableLayoutPanel1.TabIndex = 10;
 			// 
 			// button1
 			// 
@@ -96,44 +123,67 @@
 			this.button2.TabStop = false;
 			this.button2.Click += new System.EventHandler(this.button2_Click_1);
 			// 
-			// tableLayoutPanel1
+			// label1
 			// 
-			this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.tableLayoutPanel1.ColumnCount = 2;
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel1.Controls.Add(this.button1, 0, 0);
-			this.tableLayoutPanel1.Controls.Add(this.button2, 1, 0);
-			this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 28);
-			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 1;
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(665, 242);
-			this.tableLayoutPanel1.TabIndex = 7;
+			this.label1.AutoSize = true;
+			this.label1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label1.Location = new System.Drawing.Point(315, 9);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(88, 13);
+			this.label1.TabIndex = 9;
+			this.label1.Text = "Select a picture:";
 			// 
-			// tableLayoutPanel2
+			// ButtonSaveClose
 			// 
-			this.tableLayoutPanel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.tableLayoutPanel2.ColumnCount = 2;
-			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel2.Controls.Add(this.label2, 0, 0);
-			this.tableLayoutPanel2.Controls.Add(this.progressBar1, 1, 0);
-			this.tableLayoutPanel2.Location = new System.Drawing.Point(12, 276);
-			this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-			this.tableLayoutPanel2.RowCount = 1;
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel2.Size = new System.Drawing.Size(662, 30);
-			this.tableLayoutPanel2.TabIndex = 8;
+			this.ButtonSaveClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.ButtonSaveClose.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.ButtonSaveClose.Location = new System.Drawing.Point(580, 308);
+			this.ButtonSaveClose.Name = "ButtonSaveClose";
+			this.ButtonSaveClose.Size = new System.Drawing.Size(94, 23);
+			this.ButtonSaveClose.TabIndex = 12;
+			this.ButtonSaveClose.Text = "S&ave and Close";
+			this.ButtonSaveClose.UseVisualStyleBackColor = true;
+			this.ButtonSaveClose.Click += new System.EventHandler(this.ButtonSaveClose_Click);
+			// 
+			// ButtonSave
+			// 
+			this.ButtonSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.ButtonSave.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.ButtonSave.Location = new System.Drawing.Point(480, 308);
+			this.ButtonSave.Name = "ButtonSave";
+			this.ButtonSave.Size = new System.Drawing.Size(94, 23);
+			this.ButtonSave.TabIndex = 13;
+			this.ButtonSave.Text = "S&ave";
+			this.ButtonSave.UseVisualStyleBackColor = true;
+			this.ButtonSave.Click += new System.EventHandler(this.ButtonSave_Click);
+			// 
+			// ButtonUndo
+			// 
+			this.ButtonUndo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.ButtonUndo.Enabled = false;
+			this.ButtonUndo.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.ButtonUndo.Location = new System.Drawing.Point(380, 308);
+			this.ButtonUndo.Name = "ButtonUndo";
+			this.ButtonUndo.Size = new System.Drawing.Size(94, 23);
+			this.ButtonUndo.TabIndex = 14;
+			this.ButtonUndo.Text = "&Undo";
+			this.ButtonUndo.UseVisualStyleBackColor = true;
+			this.ButtonUndo.Click += new System.EventHandler(this.ButtonUndo_Click);
+			// 
+			// SFDSaveTournament
+			// 
+			this.SFDSaveTournament.DefaultExt = "tourn";
+			this.SFDSaveTournament.Filter = "Tournaments (*.tourn)|*.tourn|All files|*.*";
+			this.SFDSaveTournament.Title = "Tournament of Pictures";
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(689, 311);
+			this.ClientSize = new System.Drawing.Size(689, 341);
+			this.Controls.Add(this.ButtonUndo);
+			this.Controls.Add(this.ButtonSave);
+			this.Controls.Add(this.ButtonSaveClose);
 			this.Controls.Add(this.tableLayoutPanel2);
 			this.Controls.Add(this.tableLayoutPanel1);
 			this.Controls.Add(this.label1);
@@ -142,25 +192,29 @@
 			this.ShowIcon = false;
 			this.Text = "Tournament of Pictures";
 			this.Load += new System.EventHandler(this.Form1_Load);
-			((System.ComponentModel.ISupportInitialize)(this.button1)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.button2)).EndInit();
-			this.tableLayoutPanel1.ResumeLayout(false);
 			this.tableLayoutPanel2.ResumeLayout(false);
 			this.tableLayoutPanel2.PerformLayout();
+			this.tableLayoutPanel1.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.button1)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.button2)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
         }
 
-        #endregion
+		#endregion
 
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ProgressBar progressBar1;
-        private System.Windows.Forms.PictureBox button1;
-        private System.Windows.Forms.PictureBox button2;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.ProgressBar progressBar1;
+		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+		private System.Windows.Forms.PictureBox button1;
+		private System.Windows.Forms.PictureBox button2;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Button ButtonSaveClose;
+		private System.Windows.Forms.Button ButtonSave;
+		public System.Windows.Forms.Button ButtonUndo;
+		private System.Windows.Forms.SaveFileDialog SFDSaveTournament;
 	}
 }
 

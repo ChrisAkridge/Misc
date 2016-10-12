@@ -71,6 +71,7 @@
 			// 
 			// ButtonSavePlaylist
 			// 
+			this.ButtonSavePlaylist.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.ButtonSavePlaylist.Location = new System.Drawing.Point(405, 333);
 			this.ButtonSavePlaylist.Name = "ButtonSavePlaylist";
 			this.ButtonSavePlaylist.Size = new System.Drawing.Size(86, 23);

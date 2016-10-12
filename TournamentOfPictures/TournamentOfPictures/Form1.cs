@@ -21,6 +21,12 @@ namespace TournamentOfPictures
 			this.folderPath = folderPath;
         }
 
+		public Form1(BracketedTournament<string> tournament)
+		{
+			InitializeComponent();
+			files = tournament;
+		}
+
         private List<string> GetFilesInFolder(string folderPath)
         {
 			var result = Directory.GetFiles(folderPath, "*", SearchOption.AllDirectories).Where(f => (f.ToLower().EndsWith(".png") || f.ToLower().EndsWith(".jpg") || f.ToLower().EndsWith(".gif") || f.ToLower().EndsWith(".bmp") || f.ToLower().EndsWith(".jpeg"))).ToList();
@@ -29,7 +35,7 @@ namespace TournamentOfPictures
 
         private void Form1_Load(object sender, EventArgs e)
         {
-			files = new BracketedTournament<string>(GetFilesInFolder(folderPath));
+			if (files == null) { files = new BracketedTournament<string>(GetFilesInFolder(folderPath)); }
 			files.WinnerChosenEvent += Files_WinnerChosenEvent;
 			StartRound();
         }
@@ -44,12 +50,18 @@ namespace TournamentOfPictures
 
 		private void DisplayPictures(string picture1, string picture2)
         {
-			button1.Image = Image.FromFile(picture1);
-			button2.Image = Image.FromFile(picture2);
+			var oldImage1 = button1.Image;
+			var oldImage2 = button2.Image;
+
+			button1.Image = Image.FromStream(new MemoryStream(File.ReadAllBytes(picture1)));
+			button2.Image = Image.FromStream(new MemoryStream(File.ReadAllBytes(picture2)));
+
+			oldImage1?.Dispose();
+			oldImage2?.Dispose();
 
             if (button1.Image.Width < button1.Width && button1.Image.Height < button1.Height) 
             {
-                button1.SizeMode = PictureBoxSizeMode.CenterImage; 
+                button1.SizeMode = PictureBoxSizeMode.CenterImage;
             }
             else 
             {
@@ -74,46 +86,102 @@ namespace TournamentOfPictures
             }
 
 			files.StartRound();
-            if (files.currentRoundNumber == 1)
+            if (files.CurrentRoundNumber == 1)
             {
                 ////this.files.ShuffleTeams();
             }
-			label2.Text = string.Format("Round {0} ({1} matches remaining)", files.currentRoundNumber, files.currentRound.matchesRemaining);
-			progressBar1.Maximum = files.currentRound.matchesRemaining;
-			progressBar1.Value = 0;
+			UpdateLabel();
+			SetProgress();
 
-            var nextMatch = files.currentRound.GetNextMatch();
-			DisplayPictures(nextMatch.team1, nextMatch.team2);
+            var match = files.CurrentRound.CurrentMatch;
+			DisplayPictures(match.Team1, match.Team2);
         }
 
         private void SelectWinner(int teamNumber)
         {
-			files.currentRound.SelectNextMatchWinner(teamNumber);
-			progressBar1.Value++;
-			label2.Text = string.Format("Round {0} ({1} matches remaining)", files.currentRoundNumber, (files.currentRound != null) ? files.currentRound.matchesRemaining : 0);
+			files.CurrentRound.SelectMatchWinner(teamNumber);
+			UpdateLabel();
 
-            if (files.currentRound == null)
+            if (files.CurrentRound == null)
             {
 				// The round has concluded, load the next one
 				files.StartRound();
-				progressBar1.Maximum = files.currentRound.matchesRemaining;
-				progressBar1.Value = 0;
-				label2.Text = string.Format("Round {0} ({1} matches remaining)", files.currentRoundNumber, (files.currentRound != null) ? files.currentRound.matchesRemaining : 0);
+				UpdateLabel();
             }
+			SetProgress();
 
-            var nextMatch = files.currentRound.GetNextMatch();
-            if (nextMatch == null) return;
-			DisplayPictures(nextMatch.team1, nextMatch.team2);
+            var match = files.CurrentRound.CurrentMatch;
+            if (match == null) return;
+			DisplayPictures(match.Team1, match.Team2);
         }
 
         private void button1_Click_1(object sender, EventArgs e)
         {
 			SelectWinner(1);
+			ButtonUndo.Enabled = true;
         }
 
         private void button2_Click_1(object sender, EventArgs e)
         {
 			SelectWinner(2);
+			ButtonUndo.Enabled = true;
         }
-    }
+
+		private void SetProgress()
+		{
+			var currentRound = files.CurrentRound;
+			if (currentRound.TotalMatches == 0) { return; }
+			progressBar1.Maximum = currentRound.TotalMatches - 1;
+			if (currentRound.CurrentMatchIndex != -1)
+			{
+				progressBar1.Value = currentRound.CurrentMatchIndex;
+			}
+		}
+
+		private void Save(bool exit)
+		{
+			if (SFDSaveTournament.ShowDialog() == DialogResult.OK)
+			{
+				string filePath = SFDSaveTournament.FileName;
+				File.WriteAllText(filePath, BracketedTournamentSerializer.SerializeString(files));
+
+				if (exit) { Application.Exit(); }
+			}
+		}
+
+		private void ButtonSaveClose_Click(object sender, EventArgs e)
+		{
+			Save(true);
+		}
+
+		private void ButtonSave_Click(object sender, EventArgs e)
+		{
+			Save(false);
+		}
+
+		private void ButtonUndo_Click(object sender, EventArgs e)
+		{
+			files.Undo();
+			var match = files.CurrentRound.CurrentMatch;
+			DisplayPictures(match.Team1, match.Team2);
+			SetProgress();
+			UpdateLabel();
+			ButtonUndo.Enabled = files.CanUndo;
+		}
+
+		private void UpdateLabel()
+		{
+			if (files.CurrentRound == null)
+			{
+				label2.Text = "Null";
+				return;
+			}
+		
+			int currentRoundNumber = files.CurrentRoundNumber;
+			int totalMatches = files.CurrentRound.TotalMatches;
+			int matchesRemaining = totalMatches - files.CurrentRound.CurrentMatchIndex;
+
+			label2.Text = $"Round {currentRoundNumber} ({matchesRemaining} matches remaining)";
+		}
+	}
 }

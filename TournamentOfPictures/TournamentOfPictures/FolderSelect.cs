@@ -42,5 +42,14 @@ namespace TournamentOfPictures
 				textBox1.Text = folderBrowserDialog1.SelectedPath;
 			}
 		}
+
+		private void ButtonOpenTournament_Click(object sender, EventArgs e)
+		{
+			if (OFDOpenTournament.ShowDialog() == DialogResult.OK)
+			{
+				DialogResult = DialogResult.Yes;
+				textBox1.Text = OFDOpenTournament.FileName;
+			}
+		}
 	}
 }

@@ -34,6 +34,8 @@
 			this.button2 = new System.Windows.Forms.Button();
 			this.button3 = new System.Windows.Forms.Button();
 			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+			this.ButtonOpenTournament = new System.Windows.Forms.Button();
+			this.OFDOpenTournament = new System.Windows.Forms.OpenFileDialog();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -83,6 +85,21 @@
 			this.button3.UseVisualStyleBackColor = true;
 			this.button3.Click += new System.EventHandler(this.button3_Click);
 			// 
+			// ButtonOpenTournament
+			// 
+			this.ButtonOpenTournament.Location = new System.Drawing.Point(16, 38);
+			this.ButtonOpenTournament.Name = "ButtonOpenTournament";
+			this.ButtonOpenTournament.Size = new System.Drawing.Size(75, 23);
+			this.ButtonOpenTournament.TabIndex = 5;
+			this.ButtonOpenTournament.Text = "&Open...";
+			this.ButtonOpenTournament.UseVisualStyleBackColor = true;
+			this.ButtonOpenTournament.Click += new System.EventHandler(this.ButtonOpenTournament_Click);
+			// 
+			// OFDOpenTournament
+			// 
+			this.OFDOpenTournament.DefaultExt = "tourn";
+			this.OFDOpenTournament.Filter = "Tournaments (*.tourn)|*.tourn|All files|*.*";
+			// 
 			// FolderSelect
 			// 
 			this.AcceptButton = this.button3;
@@ -90,6 +107,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.button2;
 			this.ClientSize = new System.Drawing.Size(396, 63);
+			this.Controls.Add(this.ButtonOpenTournament);
 			this.Controls.Add(this.button3);
 			this.Controls.Add(this.button2);
 			this.Controls.Add(this.button1);
@@ -114,5 +132,7 @@
 		private System.Windows.Forms.Button button3;
 		private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
 		public System.Windows.Forms.TextBox textBox1;
+		private System.Windows.Forms.Button ButtonOpenTournament;
+		private System.Windows.Forms.OpenFileDialog OFDOpenTournament;
 	}
 }
