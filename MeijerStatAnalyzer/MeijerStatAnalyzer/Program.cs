@@ -14,6 +14,8 @@ namespace MeijerStatAnalyzer
 		static void Main(string[] args)
 		{
 			var stats = Parser.Parse();
+			Queries.RunQuery(stats);
+			Console.ReadKey(intercept: true);
 		}
 
 		static void OldMain()

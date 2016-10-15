@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MeijerStatAnalyzer
 {
-	public struct SecondsAfterMidnight
+	public struct SecondsAfterMidnight : IComparable<SecondsAfterMidnight>
 	{
 		private int seconds;
 
@@ -56,5 +56,37 @@ namespace MeijerStatAnalyzer
 		{
 			return ToDateTime().ToLongTimeString();
 		}
+
+		public override string ToString()
+		{
+			return $"{ToDateTime().ToShortTimeString()}";
+		}
+
+		public override int GetHashCode()
+		{
+			return seconds;
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (!(obj is SecondsAfterMidnight)) { return false; }
+			else
+			{
+				var that = (SecondsAfterMidnight)obj;
+				return seconds == that.seconds;
+			}
+		}
+
+		public int CompareTo(SecondsAfterMidnight other)
+		{
+			return seconds.CompareTo(other.seconds);
+		}
+
+		public static bool operator ==(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.seconds == b.seconds;
+		public static bool operator !=(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.seconds != b.seconds;
+		public static bool operator <(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.seconds < b.seconds;
+		public static bool operator >(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.seconds > b.seconds;
+		public static bool operator <=(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.seconds <= b.seconds;
+		public static bool operator >=(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.seconds >= b.seconds;
 	}
 }

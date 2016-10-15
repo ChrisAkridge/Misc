@@ -10,9 +10,11 @@ namespace MeijerStatAnalyzer
 	{
 		private List<Day> days = new List<Day>();
 		private List<Week> weeks;
+		private List<Series> series;
 
 		public IReadOnlyList<Day> Days => days.AsReadOnly();
 		public IReadOnlyList<Week> Weeks => weeks.AsReadOnly();
+		public IReadOnlyList<Series> Series => series.AsReadOnly();
 
 		public double TotalWorkingDays => Weeks.Sum(w => w.WorkingDays);
 		public double TotalDaysOff => Weeks.Sum(w => w.DaysOff);
@@ -62,6 +64,26 @@ namespace MeijerStatAnalyzer
 			TotalPaidHours = shifts.Sum(s => s.PaidHours);
 			TotalUnpaidHours = shifts.Sum(s => s.UnpaidHours);
 			TotalPay = shifts.Sum(s => s.EstimatedFinalPay);
+
+			series = MakeSeries(days);
+		}
+
+		private static List<Series> MakeSeries(IEnumerable<Day> days)
+		{
+			List<Day> daysTaken = new List<Day>();
+			List<Series> result = new List<Series>();
+
+			foreach (Day day in days)
+			{
+				if (day.Shift != null) { daysTaken.Add(day); }
+				else if (daysTaken.Any())
+				{
+					result.Add(new Series(daysTaken));
+					daysTaken = new List<Day>();
+				}
+			}
+
+			return result;
 		}
 	}
 }

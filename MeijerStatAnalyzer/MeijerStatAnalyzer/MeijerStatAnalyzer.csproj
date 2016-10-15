@@ -49,6 +49,7 @@
     <Compile Include="Parser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries.cs" />
     <Compile Include="SecondsAfterMidnight.cs" />
     <Compile Include="Series.cs" />
     <Compile Include="Shift.cs" />
