@@ -14,6 +14,7 @@ namespace TournamentOfPictures
     {
 		private string folderPath;
 		private BracketedTournament<string> files;
+		private int roundsCompleted;
 
         public Form1(string folderPath)
         {
@@ -117,6 +118,7 @@ namespace TournamentOfPictures
 				files.StartRound();
 				UpdateLabel();
             }
+			roundsCompleted++;
 			SetProgress();
 
             var match = files.CurrentRound.CurrentMatch;
@@ -145,6 +147,7 @@ namespace TournamentOfPictures
 			{
 				progressBar1.Value = currentRound.CurrentMatchIndex;
 			}
+			label1.Text = $"{roundsCompleted} rounds complete. Select a picture:";
 		}
 
 		private void Save(bool exit)
