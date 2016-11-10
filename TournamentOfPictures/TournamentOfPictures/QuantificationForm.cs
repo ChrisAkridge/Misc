@@ -28,7 +28,7 @@ namespace TournamentOfPictures
 			tournament.WinnerSelected += (winner, standings) =>
 			{
 				var winnerForm = new WinnerForm();
-				winnerForm.ShowWinner(winner.Item, standings);
+				winnerForm.ShowWinner(winner.Item, standings, standings.Select(s => s.Item));
 				winnerForm.ShowDialog();
 				Application.Exit();
 			};

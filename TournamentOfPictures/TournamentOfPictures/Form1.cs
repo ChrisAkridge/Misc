@@ -53,7 +53,7 @@ namespace TournamentOfPictures
 		private void Files_WinnerChosenEvent(string winner, IEnumerable<ScoredItem<string>> standings)
 		{
 			var winnerForm = new WinnerForm();
-			winnerForm.ShowWinner(winner, standings);
+			winnerForm.ShowWinner(winner, standings, files.GetPlaylistOrder());
 			winnerForm.ShowDialog();
 			Application.Exit();
 		}

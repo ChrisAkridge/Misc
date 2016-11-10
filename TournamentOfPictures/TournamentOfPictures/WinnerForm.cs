@@ -14,15 +14,18 @@ namespace TournamentOfPictures
     {
         private string filePath;
 		private List<ScoredItem<string>> standings;
+		private List<string> playlistOrder;
+
         public WinnerForm()
         {
             InitializeComponent();
         }
 
-        public void ShowWinner(string path, IEnumerable<ScoredItem<string>> standings)
+        public void ShowWinner(string path, IEnumerable<ScoredItem<string>> standings, IEnumerable<string> playlistOrder)
         {
 			filePath = path;
 			this.standings = standings.OrderByDescending(i => i.Score).ToList();
+			this.playlistOrder = playlistOrder.ToList();
 			pictureBox1.Image = Image.FromFile(path);
             if (pictureBox1.Image.Width < pictureBox1.Width && pictureBox1.Image.Height < pictureBox1.Height)
             {
@@ -45,7 +48,7 @@ namespace TournamentOfPictures
 
 		private void LLbViewStandings_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			new StandingsForm(standings).ShowDialog();
+			new StandingsForm(standings, playlistOrder).ShowDialog();
 		}
     }
 }

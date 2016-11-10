@@ -223,6 +223,11 @@ namespace TournamentOfPictures
 			CurrentRound = round;
 			Teams = CurrentRound.GetTeamsForUndo();
 		}
+
+		internal List<T> GetPlaylistOrder()
+		{
+			return standings.OrderByDescending(s => s.Value).Select(s => s.Key).ToList();
+		}
 	}
 
 	public sealed class BracketedTournamentRound<T> where T : class
@@ -241,6 +246,8 @@ namespace TournamentOfPictures
 				return null;
 			}
 		}
+
+		public IReadOnlyList<BracketedTournamentMatch<T>> Matches => matches?.AsReadOnly();
 		
 		public int MatchesRemaining { get; private set; }
 
@@ -396,6 +403,16 @@ namespace TournamentOfPictures
 				if (WinnerIndex == 0) { return null; }
 				else if (WinnerIndex == 1) { return Team1; }
 				else { return Team2; }
+			}
+		}
+
+		public T Loser
+		{
+			get
+			{
+				if (WinnerIndex == 0) { return null; }
+				else if (WinnerIndex == 1) { return Team2; }
+				else { return Team1; }
 			}
 		}
 

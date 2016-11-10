@@ -82,5 +82,13 @@ namespace TournamentOfPictures
 			Hide();
 			quantificationForm.Show();
 		}
+
+		private void ButtonLaunchQuickSort_Click(object sender, EventArgs e)
+		{
+			QuickSortForm quickSortForm = new QuickSortForm(folderPath);
+			quickSortForm.FormClosed += (s, args) => Close();
+			Hide();
+			quickSortForm.Show();
+		}
 	}
 }

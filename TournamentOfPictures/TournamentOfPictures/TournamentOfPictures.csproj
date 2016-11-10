@@ -100,6 +100,13 @@
       <DependentUpon>QuantificationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="QuantificationTournament.cs" />
+    <Compile Include="QuickSort.cs" />
+    <Compile Include="QuickSortForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="QuickSortForm.Designer.cs">
+      <DependentUpon>QuickSortForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="RatingSelector.cs" />
     <Compile Include="RecursiveRatingSelector.cs" />
     <Compile Include="StandingsForm.cs">
@@ -147,6 +154,9 @@
     </Compile>
     <EmbeddedResource Include="QuantificationForm.resx">
       <DependentUpon>QuantificationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="QuickSortForm.resx">
+      <DependentUpon>QuickSortForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="StandingsForm.resx">
       <DependentUpon>StandingsForm.cs</DependentUpon>

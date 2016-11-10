@@ -33,6 +33,7 @@
 			this.ButtonLaunchRating = new System.Windows.Forms.Button();
 			this.ButtonLaunchRecursiveRating = new System.Windows.Forms.Button();
 			this.ButtonLaunchQuantificationTournament = new System.Windows.Forms.Button();
+			this.ButtonLaunchQuickSort = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// LabelFolderDetails
@@ -93,11 +94,22 @@
 			this.ButtonLaunchQuantificationTournament.UseVisualStyleBackColor = true;
 			this.ButtonLaunchQuantificationTournament.Click += new System.EventHandler(this.ButtonLaunchQuantificationTournament_Click);
 			// 
+			// ButtonLaunchQuickSort
+			// 
+			this.ButtonLaunchQuickSort.Location = new System.Drawing.Point(16, 201);
+			this.ButtonLaunchQuickSort.Name = "ButtonLaunchQuickSort";
+			this.ButtonLaunchQuickSort.Size = new System.Drawing.Size(425, 23);
+			this.ButtonLaunchQuickSort.TabIndex = 5;
+			this.ButtonLaunchQuickSort.Text = "Launch QuickSort";
+			this.ButtonLaunchQuickSort.UseVisualStyleBackColor = true;
+			this.ButtonLaunchQuickSort.Click += new System.EventHandler(this.ButtonLaunchQuickSort_Click);
+			// 
 			// LauncherForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(453, 206);
+			this.ClientSize = new System.Drawing.Size(453, 236);
+			this.Controls.Add(this.ButtonLaunchQuickSort);
 			this.Controls.Add(this.ButtonLaunchQuantificationTournament);
 			this.Controls.Add(this.ButtonLaunchRecursiveRating);
 			this.Controls.Add(this.ButtonLaunchRating);
@@ -121,5 +133,6 @@
 		private System.Windows.Forms.Button ButtonLaunchRating;
 		private System.Windows.Forms.Button ButtonLaunchRecursiveRating;
 		private System.Windows.Forms.Button ButtonLaunchQuantificationTournament;
+		private System.Windows.Forms.Button ButtonLaunchQuickSort;
 	}
 }
