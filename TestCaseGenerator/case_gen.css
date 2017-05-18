@@ -1,0 +1,32 @@
+h1, h3 {
+	font-family: Verdana, sans-serif;
+}
+
+#intro {
+	font-family: Verdana, sans-serif;
+	font-weight: bold;
+	font-size: 11pt;
+	display: block;
+	margin-bottom: 1px;
+}
+
+#body {
+	font-family: Verdana, sans-serif;
+	font-size: 11pt;
+	display: block;
+	margin-bottom: 1px;
+}
+
+#textareaHeader {
+	font-family: Verdana, sans-serif;
+	font-size: 11pt;
+}
+
+#code {
+	font-family: Consolas, Courier New, monospace;
+	background-color: #dfdfdf;
+}
+
+#indent {
+	padding-left: 20px;
+}

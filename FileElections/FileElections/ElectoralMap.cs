@@ -46,6 +46,14 @@ namespace FileElections
 			}
 			return result.Select(kvp => kvp);
 		}
+
+		public IEnumerable<State> States()
+		{
+			foreach (var state in states)
+			{
+				yield return state;
+			}
+		}
 	}
 
 	internal class State
@@ -93,6 +101,14 @@ namespace FileElections
 			}
 			return result.Select(kvp => kvp);
 		}
+
+		public IEnumerable<County> Counties()
+		{
+			foreach (var county in counties)
+			{
+				yield return county;
+			}
+		}
 	}
 
 	internal class County
@@ -119,6 +135,21 @@ namespace FileElections
 			foreach (var kvp in populationByParty)
 			{
 				yield return kvp;
+			}
+		}
+
+		public string VoteSingle(Random random, List<string> parties, double largestPartyOdds)
+		{
+			if (parties.Count == 1) { return parties[0]; }
+
+			if (random.NextDouble() < largestPartyOdds)
+			{
+				return parties[0];
+			}
+			else
+			{
+				int index = random.Next(1, parties.Count);
+				return parties[index];
 			}
 		}
 	}

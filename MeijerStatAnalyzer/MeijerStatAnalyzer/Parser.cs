@@ -107,7 +107,7 @@ namespace MeijerStatAnalyzer
 			double workingHours = (double)ws.Cells[$"G{rowNumber}"].Value;
 			double waitingHours = (double)ws.Cells[$"I{rowNumber}"].Value;
 			double paidHours = (double)ws.Cells[$"J{rowNumber}"].Value;
-			double payRate = (double)ws.Cells[$"L{rowNumber}"].Value / paidHours;
+			double payRate = double.Parse(ws.Cells[$"L{rowNumber}"].Value.ToString()) / paidHours;
 
 			return new Shift(start, end, workingHours, waitingHours, paidHours, payRate);
 		}

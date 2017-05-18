@@ -19,13 +19,7 @@ namespace ChartTest
 
 		private void button1_Click(object sender, EventArgs e)
 		{
-			string[] lines = this.textBox1.Text.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-			List<double> values = new List<double>(lines.Length);
-
-			foreach (string line in lines)
-			{
-				values.Add(double.Parse(line));
-			}
+			List<double> values = ReadDoublesFromTextBox();
 
 			List<double> averages = new List<double>(values.Count);
 			for (int i = 0; i < values.Count; i++)
@@ -47,7 +41,7 @@ namespace ChartTest
 				this.chart1.Series[0].Points.Add(averages[i]);
 				builder.Append(averages[i]);
 				builder.Append(" (");
-				
+
 				if (averages[i] - last > 0) { builder.Append("+"); }
 				builder.Append(averages[i] - last);
 				builder.Append(")");
@@ -58,12 +52,25 @@ namespace ChartTest
 
 			double high = averages.OrderByDescending(a => a).First();
 			double low = averages.OrderBy(a => a).First();
-			
+
 			double averagesAverage = 0d;
 			averages.ForEach(a => averagesAverage += a);
 			averagesAverage /= averages.Count;
 
 			MessageBox.Show(string.Format("High: {0}{1}Low: {2}{1}Average: {3}", high, Environment.NewLine, low, averagesAverage));
+		}
+
+		private List<double> ReadDoublesFromTextBox()
+		{
+			string[] lines = this.textBox1.Text.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+			List<double> values = new List<double>(lines.Length);
+
+			foreach (string line in lines)
+			{
+				values.Add(double.Parse(line));
+			}
+
+			return values;
 		}
 
 		private void button2_Click(object sender, EventArgs e)
@@ -73,6 +80,20 @@ namespace ChartTest
 			{
 				int y = ~i;
 				chart1.Series[0].Points.Add(y);
+			}
+		}
+
+		private void button4_Click(object sender, EventArgs e)
+		{
+			var values = ReadDoublesFromTextBox();
+
+			double sum = 0d;
+			chart1.Series[0].Points.Clear();
+
+			foreach (var value in values)
+			{
+				sum += value;
+				chart1.Series[0].Points.Add(sum);
 			}
 		}
 	}

@@ -1,0 +1,22 @@
+Filesystem Polls:
+
+Nation: Drive Root
+States: First-Level Folders
+Counties: All Nested Folders
+
+1 member of population = 1,000 bytes
+1 kilobyte = 1,000 bytes = 1 member of population
+1 megabyte = 1,000,000 bytes = 1,000 members of population
+1 gigabyte = 1,000,000,000 bytes = 1,000,000 members of population
+1 terabyte = 1 trillion bytes = 1,000,000,000 members of population
+
+Parties
+	Each filetype gets a party "CS Party, GIF Party, etc."
+
+Congress Apportionment
+	Exactly 733,103 members of population (733.103 megabytes) per House member
+	2 Senators per State
+
+Electoral College
+	One vote for each member of the House + one vote for each senator
+	Majority in a state wins all electoral votes for that party

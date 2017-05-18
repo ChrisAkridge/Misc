@@ -8,13 +8,55 @@ namespace MeijerStatAnalyzer
 {
 	internal static class Queries
 	{
-		// Query: a static method acception a StatsByDay instance that runs
+		// Query: a static method accepting a StatsByDay instance that runs
 		// some LINQ. Put your calls in RunQuery().
 
 		public static void RunQuery(StatsByDay stats)
 		{
-			Console.WriteLine(GetAverageWeek(stats));
-		}
+            DateTime cutoff = new DateTime(2016, 6, 1);
+            var subset = stats.Days.Where(d => d.Date >= cutoff);
+
+            int averageOpenSeconds = 0;
+            int averageMidSeconds = 0;
+            int averageCloseSeconds = 0;
+
+            int opens = 0;
+            int mids = 0;
+            int closes = 0;
+
+            foreach (var day in subset)
+            {
+                if (day.Shift == null) { continue; }
+                Shift shift = day.Shift;
+                switch (shift.ShiftTime)
+                {
+                    case ShiftTime.Open:
+                        averageOpenSeconds += shift.StartTime.Seconds;
+                        opens++;
+                        break;
+                    case ShiftTime.Midshift:
+                        averageMidSeconds += shift.StartTime.Seconds;
+                        mids++;
+                        break;
+                    case ShiftTime.Close:
+                        averageCloseSeconds += shift.StartTime.Seconds;
+                        closes++;
+                        break;
+                    case ShiftTime.ThirdShift:
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            var averageOpen = new SecondsAfterMidnight(averageOpenSeconds / opens);
+            var averageMid = new SecondsAfterMidnight(averageMidSeconds / mids);
+            var averageClose = new SecondsAfterMidnight(averageCloseSeconds / closes);
+
+            Console.WriteLine($"Average of {opens} opens: {averageOpen.ToString()}");
+            Console.WriteLine($"Average of {mids} midshifts: {averageMid.ToString()}");
+            Console.WriteLine($"Average of {closes} closes: {averageClose.ToString()}");
+        }
 
 		private static void PrintShiftCount(StatsByDay stats)
 		{
@@ -109,6 +151,18 @@ namespace MeijerStatAnalyzer
 			return new Tuple<double, double>(workingAverage, offAverage);
 		}
 
+		private static string GetAverageStartTime(StatsByDay stats)
+		{
+			var startTimes = stats.Days.Where(d => d.Shift != null).Select(d => d.Shift.StartTime);
+			return new SecondsAfterMidnight((startTimes.Sum(s => s.Seconds) / startTimes.Count())).ToTimeString();
+		}
+
+		private static string GetAverageEndTime(StatsByDay stats)
+		{
+			var endTimes = stats.Days.Where(d => d.Shift != null).Select(d => d.Shift.EndTime);
+			return new SecondsAfterMidnight((endTimes.Sum(e => e.Seconds) / endTimes.Count())).ToTimeString();
+		}
+
 		// Shift info
 		private static ShiftType GetShiftType(Shift shift)
 		{
@@ -158,6 +212,11 @@ namespace MeijerStatAnalyzer
 		{
 			SecondsAfterMidnight waitStart = new SecondsAfterMidnight(shift.StartTime.Seconds - (int)(shift.WaitHours * 3600d));
 			return new SecondsAfterMidnight(waitStart.Seconds - 3600);
+		}
+
+		private static IEnumerable<T> SortSeriesBy<T>(StatsByDay stats, Func<Series, T> selector) where T : IComparable<T>
+		{
+			return stats.Series.OrderBy(selector).Select(selector);
 		}
 
 		// Hour info

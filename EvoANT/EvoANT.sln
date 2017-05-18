@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EvoANTFrontend", "EvoANTFrontend.csproj", "{1111053C-A4A7-48C3-90AB-CC1698B6028E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EvoANTCore", "..\EvoANTCore\EvoANTCore.csproj", "{F12E904A-5B93-4299-B883-09860CEDA21D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1111053C-A4A7-48C3-90AB-CC1698B6028E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1111053C-A4A7-48C3-90AB-CC1698B6028E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1111053C-A4A7-48C3-90AB-CC1698B6028E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1111053C-A4A7-48C3-90AB-CC1698B6028E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F12E904A-5B93-4299-B883-09860CEDA21D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F12E904A-5B93-4299-B883-09860CEDA21D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F12E904A-5B93-4299-B883-09860CEDA21D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F12E904A-5B93-4299-B883-09860CEDA21D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

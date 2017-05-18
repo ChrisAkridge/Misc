@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Unit Test Case Generator</title>
+		<link rel="stylesheet" type="text/css" href="case_gen.css">
+		<script src="case_gen.js"></script>
+	</head>
+	<body>
+		<h1>The Unit Test Case Generator</h1>
+		<span id="intro">Did you ever have a bunch of unit tests that have exactly the same logic but different inputs and outputs? Do you hate having to write and re-write exactly the same code over and over again? Well, you're in luck!</span>
+		<br />
+		<span id="body">The Unit Test Case Generator takes two blocks of text: the code for your logic, or whatever you want to duplicate with modifiable portions. For any substitutions you want to make, just write a identifier without spaces between two dollar signs, like $this$. Then, in the second box, write a line containing each substitution label, followed by a space, followed by the thing you want to replace it with, then another identifier, as many as necessary.</span>
+		<br />
+		<span id="textareaHeader">Test Method:</span>
+		<br />
+		<textarea name="TestMethod" cols="85" rows="6"></textarea>
+		<br />
+		<span id="textareaHeader">Test Cases:</span>
+		<br />
+		<textarea name="TestCases" cols="85" rows="6"></textarea>
+		<br />
+		<button type="button" onclick="generateCases()">Generate Cases</button>
+		<h3>Tips</h3>
+		<ul id="body">
+			<li>Substitutions must look like this: <code>$identifier$</code>. They must not have spaces, line breaks, or any other whitespace.</li>
+			<li>Each line in the Test Cases textbox is one test case. Each substitution present in the Test Method textbox must appear once (although not necessarily in order), separated by spaces. See the Example below.</li>
+			<li>Here's a list of escapes that work in both the Test Method textbox and the Test Cases textbox:</li>
+			<ul>
+				<li><code>%dollar</span> becomes <code>$</code></li>
+				<li><code>%percent</span> becomes <code>%</code></li>
+			</ul>
+		</ul>
+		<h3>Example</h3>
+		<span id="body">Test Method</span>
+		<br />
+		<code>
+			[TestCase]
+			<br />
+			public void IsLeapYear_$Name$()
+			<br />
+			{
+			<br />
+			<span id="indent">int year = $Year$</span>
+			<br />
+			<span id="indent">bool value = IsLeapYear(year);</span>
+			<br />
+			<span id="indent">Assert.Equals(value, $Expected$);</span>
+			<br />
+			}
+		</span>
+		<br />
+		<span id="body">Test Cases</span>
+		<br />
+		<code>
+		$Name$ BeforeLeapYears $Year$ 1750 $Expected$ false
+		<br />
+		$Name$ Mod4 $Year$ 2012 $Expected$ true
+		<br />
+		$Name$ NotMod100 $Year$ 1900 $Expected$ false
+		<br />
+		$Name$ ButMod400 $Year$ 2000 $Expected$ true
+		</span>
+	</body>
+</html>

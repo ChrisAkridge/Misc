@@ -1,0 +1,70 @@
+Countdown
+Functional Specification
+
+1. Description
+Countdown is a program that counts down to events set by the user. Each event has, fundamentally, a name and an end time (which is the time the countdown reads zero). Events may also have start times (which allow things like progress display) and may recur.
+
+The main window displays the names and countdown timers of all events set by the user, in order of how close their end time is. Events that reach their end time will linger at the top of the screen for a user defined period of time, displaying "{event name} is here!". Once the event's linger period is complete, it will be removed from the main window and archived in the program's data file. Recurring events will start over.
+
+A button on the main window allows the user to cycle between various forms of displaying the time left in events. These forms are:
+	- Default: "1y2w3d 17:23:46"
+	- Remaining Seconds: "33,067,426 seconds"
+	- Remaining Minutes: "551,123.77 minutes"
+	- Remaining Hours: "9,185.40 hours"
+	- Remaining Days: "382.72 days"
+	- Remaining Weeks: "54.67 weeks"
+	- Remaining Years: "1.05 years"
+	- Decibels-Seconds: "75.19 dBsec" (equation: 10 * log_10(s) where s is the number of seconds left)
+	- XKCD 1017 Equation: "Fri 2016-11-25 7:45:23am" (requires start time to be set, see https://xkcd.com/1017/. For times before the range of the time library, displays "1,000,000 years ago")
+	
+Two more buttons allow the user to increase or decrease the number of decimal places in the time left display, along with a label that states the number of decimal places displayed. These are only enabled if the form is not Default or Remaining Seconds.
+
+The main window updates once per second.
+
+Clicking on an event opens a detail window for that specific event. Here, the user can see the event's name and the large form countdown timer, as well as the start and end times and recurrence. A progress bar, along with a percentage calculator, is visible. An "Edit" button allows the user to edit the event (see below). A second tab on the detail window displays the time left in all the forms listed above. The event window updates 30 times per second. Additionally, the default form is rendered with milliseconds - "1y2w3d 17:23:46.789".
+
+The Edit Event window is shown when creating or editing an event. The first tab lets the user type the name of the event, select its end time, and enable and select the start time, if they desire. A label will inform the user that start time is required for progress and XKCD 1017 Equation display mode.
+
+The second tab of the Edit Event window is the recurring event selector. A checkbox enables recurrence. All recurring events have a start time equal to the end time of the last recurrence plus one day (the start time of the Christmas 2016 countdown is December 26, 2015 at midnight). The end time is the one set by the user in the first tab, but only the time portion is used. The user can select between the following recurrence modes:
+	- Daily: The event will occur once every n days.
+	- Weekly: The event will occur on 1 to 7 weekdays as specified by the user.
+	- Monthly: The event will occur on a specific day of the month, or on the nth weekday of a month.
+	- Yearly: The event will occur on a specific day of the year.
+	
+2. Milestones and Notifications
+Each event has a set of milestones defined by a data file for the program. Each milestone is defined as a time left value (i.e. one week or two hours) and text to display to the user (i.e. "One week until (event)"). These milestones will appear in the notification tray, along with the time left in a form selected by the user.
+
+3. Settings
+The user can change the following settings:
+	- Allow Notifications
+	- Notification Time Left Form
+		- Default...
+		
+4. JSON File Format
+	- settings
+		- notificationsEnabled
+		- timeLeftForm
+		- decimalPlaces
+	- events
+		- event
+			- name
+			- startTimeEnabled
+			- startTime
+			- endTime
+			- recurrenceEnabled
+			- recurrence
+
+For daily recurrence:
+	- repeatEveryNDays
+
+For weekly recurrence:
+	- weekdayFlags (seven letters, E for enabled, D for disabled, starts on Sunday)
+
+For monthly recurrence:
+	- occursOnDayNumber (-1 for disabled)
+	- occursOnNthWeekday (-1 for disabled)
+	- weekday (0-6 = Sunday-Saturday, -1 for disabled)
+
+For yearly recurrence:
+	- month
+	- day

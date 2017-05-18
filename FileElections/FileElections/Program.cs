@@ -10,6 +10,8 @@ namespace FileElections
 	{
 		static void Main(string[] args)
 		{
+			Console.SetBufferSize(80, 1000);
+
 			Console.WriteLine("File Election Simulator:");
 			Console.WriteLine();
 			Console.WriteLine("Building tree:");
@@ -28,6 +30,9 @@ namespace FileElections
 			{
 				Console.WriteLine($"{party.Key}, {party.Value.ToString("N0")}");
 			}
+
+			Console.WriteLine();
+			ElectionSimulator.SimulateElection(map);
 
 			Console.ReadKey(intercept: true);
 		}

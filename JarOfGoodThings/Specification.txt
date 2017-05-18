@@ -1,0 +1,7 @@
+Jar of Good Things
+
+A simple C#/WinForms app. The user inputs a line of text containing a good thing that happened to them into a textbox and then clicks a button labelled "Submit". Each new entry is written to the bottom of a text file. At the end of the year, six hours before midnight, the app will notify the user that they can open the file and see all the good things that happened in the year, along with a link that opens Notepad to that file. The app then starts a new file.
+
+The file format is very simple: Each entry the user input on its own line prefixed with the date it was recorded. The file is saved to the %appdata%/JarOfGoodThings/ folder with the name {YYYY}.txt where YYYY is the current year.
+
+The form will also display the number of good things (file line count).
