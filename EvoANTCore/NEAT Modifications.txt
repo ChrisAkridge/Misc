@@ -1,0 +1,197 @@
+Modifications to EvoANT:
+
+Ants:
+	- Each ant is now a member of a NEAT-style population of organisms.
+	- Each ant contains one neural network that has the same seven inputs and six outputs.
+	- The fitness of each ant is still determined by its total lifespan.
+
+Neurons and their Networks:
+	- Neural networks are still composed of neurons on an input layer, a hidden layer, and an output layer.
+	- Each neuron still fires with a certain energy and outbound connections will still fire if the sum of their inbound connections is over their firing threshold.
+	- Connections between neurons now have weights - real numbers that are multiplied by the signal strength as it passes through.
+
+Evolving Networks:
+	- A NEAT-style method of network topology evolution is introduced to faciliate emergent behavior.
+	
+Genomes:
+	- A network is considered a genome - a collection of genes.
+	- Each gene is either a neuron or a connection between neurons. This allows networks to be represented one-dimensionally.
+	- Each genome keeps track of the number of changes to its genes in a version or "innovation number" field.
+	- Each time a new gene is added, or an existing gene has a property changed, the innovation number increments and is assigned to the gene.
+	- No two genes should ever have the same innovation number.
+	- When a network is created, each addition of an input and output neuron will increment the innovation number field and store it in the genes.
+
+Genome Pairs:
+	- Given two genomes, two lists can be made where each gene is assigned the index equal to its innovation number.
+	- There may be holes in this list where one genome has a gene with a certain innovation number but the other does not.
+	- Such holes are either disjoint (no matching gene in the other parent, but the other parent has genes with higher innovation numbers) or excess (has a higher innovation number than any gene in the other parent).
+
+Mutation:
+	- Mutations can occur any time a new child is created.
+	- The odds of a mutation is a specific constant value.
+	- Any mutation may create, destroy, or modify genes. Any new gene, or modified gene, gets the next innovation number for that individual.
+	- There are four kinds of major mutation:
+		- Add connection: A connection from an input neuron to a hidden neuron, or a hidden neuron to an output neuron, is created.
+		- Add neuron: A connection is split in two and a new neuron is placed between them.
+		- Remove connection: An existing connection is severed.
+		- Remove neuron: A neuron and all of its connections, both inbound and outbound, are removed.
+
+Speciation:
+	- Each individual ant will be grouped into species.
+	- The program will hold a list of species, where each species holds a list of individuals and a representative from that species, which is swapped out every generation for the best performer of a generation.
+	- To determine if an ant is within a species, a calculated compatibility distance (see NEAT notes) must be less than a given threshold.
+	- From an idea in MarI/O, each species will be given a staleness value. The staleness value increments if no member of the species did better than the best recorded fitness. It goes to zero if a member breaks the fitness record.
+	- Each ant is placed within the first species where it is compatible with the representative. If it isn't compatible with anything, it is added to a new species with itself as the sole member and representative.
+	- In order to keep one species from dominating, the fitness of each individual is modified to better fit in with all the other members of the species (see the modified fitness equation in the NEAT notes).
+	- **After evaluation, sum up the modified fitness values and divide it by the average fitness of the last generation. This results in a multiplier which is then applied to the size of the species for the next generation.**
+
+Breeding:
+	Inspired heavily by the MarI/O method of starting a new generation [values used are in brackets]:
+		1. Sort the ants in each species by their fitness, then remove the bottom half.	[Ant.Fitness]
+		2. Rank all ants across the entire population by their fitness, storing it in a GlobalRanking property.	[Ant.GlobalRanking]
+		3. Take the highest performing ant in each species and make it the representative.	[Ant.Fitness]
+		4. Remove stale species by removing any species whose staleness is over a certain value and modifying the staleness values of all species.	[Species.Staleness]
+		5. Rerank all ants again.	[Ant.GlobalRanking]
+		6. Recalculate the average fitness for all species.	[Species.AverageFitness]
+		7. Get the total average for each species.	[local: totalAverageFitness]
+		8. For each species,
+			a. The number of individuals to breed is ((species.AverageFitness / totalAverageFitness) * Population) - 1.	[Species.AverageFitness]
+			b. Breed a child of the species and add it to a list of children:
+				i. If a random number in the range 0..1 is less than the crossover chance,
+					1. Pick two random genomes (networks) in the species, g1 and g2.
+					2. The child is the crossover of the two gemones:
+						a. Swap g1 and g2 if g2 has higher fitness to ensure that g1 is always the higher-fitness one.	[Network.Fitness]
+						b. Create an array of genes with length equal to the highest innovation number on g2's genes.	[Network.Genes.Count]
+						c. Clone gene from g2 into the array, at the index equal to its innovation number.
+						d. For each gene in g1,
+							i. Get the gene in g2 with the same innovation number as the gene in g1.
+							ii. If g2 has that gene, and a coin toss is heads, then clone g2's gene, otherwise, clone g1's gene.
+						e. Return the crossover.
+				ii. Otherwise, select a random genome in the species and copy it to the child:
+					1. Clone all genes onto the child.
+					2. Return the child.
+				iii. Mutate the child.
+					1. If a random number in the range 0..1 is less than the mutation chance,
+						a. Pick a random number between 0 and 3 inclusive. If the number is 0, the mutation to occur is a connection addition:
+							i. Pick any pair of non-output neurons.
+							ii. Add a new connection between them. The connection gene gets the next innovation number of the individual.
+						b. If the number is 1, the mutation will add a neuron.
+							i. Pick any connection and remove it, while keeping track of the From, To, and Weight properties.
+							ii. Create a new neuron and add it to the network. (and innovation number)
+							iii. Create a connection from the From neuron and to the new neuron.
+							iv. Create a connection from the new neuron to the To neuron. The weights of both connections should be the same as the old connection.
+						c. If the number is 2, the mutation will remove a connection.
+							i. Pick any connection.
+							ii. Remove it.
+						d. If the number is 3, the mutation will remove a neuron.
+							i. Pick any hidden layer neuron.
+							ii. Find all connections from or to the neuron.
+							iii. Delete them all.
+				iv. Return the child.
+		9. Remove all members of all species.
+		10. Breed children from random species until the population fills out.
+		11. Find the species to put each child in (or create a new one if it doesn't match any).
+		12. Increment the generation number.
+
+Classes and Properties:
+	// Genetic Layer
+	interface IGene
+	{
+		int InnovationNumber { get; set; }
+		GeneType Type { get; }	// one of { Normal, Disjoint, Excess }
+	}
+	
+	class NeuronGene : IGene
+	{
+		int InnovationNumber;
+		GeneType Type;
+		int Index;
+		NeuronType Type;	// one of { Input, Hidden, Output }
+		string SpecialName;
+		Action OnFire;
+		
+		double FiringStrength;
+		double FiringRequirement;
+		double FatigueIncrease;
+		double FatigueDecrease;
+	}
+	
+	class ConnectionGene : IGene
+	{
+		int InnovationNumber;
+		GeneType Type;
+		
+		int FromIndex;
+		int ToIndex;
+		double Weight;
+	}
+	
+	class Genome
+	{
+		int InnovationNumber;
+		int GlobalRank;
+		double Fitness;
+		List<IGene> Genes;
+		
+		IGene[] InnovationIndexedGenes();
+		double GetCompatibilityDistance(Genome);
+	}
+	
+	class Species
+	{
+		int Index;
+		Genome Representative;
+		int Staleness;
+		double AverageFitness { get; }
+	}
+	
+	class Population
+	{
+		List<Species> Species;
+		int HighestSpeciesIndex;
+		double TotalAverageFitness { get; }
+		
+		void AssignGlobalRanks();
+	}
+	
+	// Evaluation Layer
+	class Neuron
+	{
+		NeuronGene Gene;
+		// strength, fire requirement, etc.
+		
+		List<Connection> OutboundConnections;
+		
+		// fire, etc.
+	}
+	
+	class Connection
+	{
+		ConnectionGene Gene;
+		double Weight;
+		
+		Neuron From;
+		Neuron To;
+	}
+	
+	class NeuralNetwork
+	{
+		Genome Genome;
+		List<Neuron> Neurons;
+		double Fitness;
+		
+		Neuron LookupBySpecialName(string);
+	}
+	
+	class Ant : IWorldObject
+	{
+		// IWorldObject members
+	
+		void WireInputsAndOutputs();
+	}
+	
+	// Conversion Layer
+	static class GenomeConverter
+	{
+		NeuralNetwork CreateNetwork(Genome);
+	}

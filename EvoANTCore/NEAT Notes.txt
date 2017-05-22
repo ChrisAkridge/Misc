@@ -1,0 +1,87 @@
+- The innovation number is like BCL collections' version field - it goes up by one each time a network is changed
+- When a new gene (new node/connection) is created, a global innovation number increments and is assigned to that gene in the representation below
+- Connections have weights, which act like multipliers
+- For instance, if a connects to b, and that connection has a weight of 0.88, if a fires with strength 10, b receives a signal of strength 8.8
+- For mating, a network is converted to the following representation:
+	- A list of nodes, each with properties { index, type } where type is one of { input, output, hidden }
+	- A list of connections, each with properties { from index, to index, weight, enabled, innovation number }
+- During mating, given parents a and b:
+	- Each gene (node/connection) has an innovation number (version)
+	- Most of the time, both parents have genes with the same innovation number - the child inherits either a's or b's gene at random
+	- A gene is disjoint if there is no matching gene in the other parent, but the other parent has genes with higher innovation numbers:
+		a: 1 2 3 4 5 6
+		b: 1 2 3   5 6  (a's 4 is disjoint)
+	- A gene is excess if it occurs after the last gene in the other parents:
+		a: 1 2 3
+		b: 1 2   (a's 3 is excess)
+	- Disjoint and excess genes are inherited iff they are present from the parent with higher fitness.
+- Speciation allows networks with similar topologies to evolve amongst each other.
+- To find the number of disjoint/excess genes, just count pairings on the two genomes - any genome that doesn't have a second is disjoint/excess
+- The more disjoint two networks are ((a,b) => sum of disjoint/excess genes of a with respect to b, I guess), the less compatible they are
+- The compatibility distance of two networks is equal to
+	double CompatDistance(Network a, Network b)
+	{
+		double c1, c2, c3 = /* black magic */
+		double e = // excess genes
+		double d = // disjoint genes
+		double w = // average weight differences of matching genes Average((g1, g2) => g2.Weight - g1.Weight) - ignore disjoint/excess
+		double n = // number of genes in the larger genome
+		double _1 = (c1 * e) / n;
+		double _2 = (c2 * d) / n;
+		return _1 + _2 + c3 * w;
+	}
+- Given a compatibility threshold, you can use the compatibility distance function to speciate genomes.
+- Each species is placed in an ordered list. Each species also has a representative, which is selected randomly from each generation during breeding and kept into the next one.
+- MarI/O adds a staleness value for a species: it goes up by one on each generation where no member of the species did better than the best recorded fitness. It goes to zero if a member does better than the best recorded fitness. Once a species goes over a certain staleness, it is removed from the population.
+- Also, keep track of the average modified fitness of all members of a species. Be sure to recalculate it after every generation.
+- For each new genome (network), a genome is placed within the first species where it is compatible with the representative (compability less than threshold)
+- If the genome is not compatible with any species, it is placed within a new species with itself as a representative
+- In order to keep one species from dominating, the fitness of each individual is modified to better fit in with all the other members of the species as such:
+	double ModifiedFitness(double fitness)
+	{
+		double sum = 0d;
+		for (int j = 1; j < entirePopulation.Individuals.Count; j++)
+		{
+			double c = CompatDistance(thisIndividual, entirePopulation.Individuals[j]);
+			if (c > CompatThreshold) { c = 0; }
+			sum += c;
+		}
+		return fitness / sum;
+	}
+- The above function takes a fitness value and divides it by the sum of all compatibility distances of all members of the same species (even ones that may not have been properly classified).
+- For every member of a species, sum up the modified fitness values and (Celarian) divide it by the average fitness of the last generation. You should get a multiplier which you can apply to the size of the species for the next generation.
+- MarI/O new generation algorithm:
+	1. Remove the bottom half of species, sorted by fitness
+	2. Rank all genomes (networks) across the entire population (you can do this by keeping a GlobalRanking property in the genome's class)
+	3. Remove stale species:
+		a. See "staleness" note above
+	4. Rerank every genome
+	5. Recalculate the average fitness for each species
+	6. Remove weak species:
+		a. Get the total average fitness by summing the average fitness of each species
+		b. For each species, the species will survive if the Math.Floor((species.AverageFitness / totalAverageFitness) * Population) is positive
+		c. Remove any species that haven't survived
+	7. Get the total average fitness for all species.
+	8. For each species,
+		a. The number of organisms to breed is Math.Floor((species.AverageFitness / totalAverageFitness) * Population) - 1.
+		b. Breed a child of the species and add it to a list of children:
+			i. If a random number in the range 0..1 is less than the crossover chance,
+				1. Pick two random genomes (networks) in the species g1 and g2.
+				2. The child is the crossover of the two genomes:
+					a. Ensure that, in the crossover function, g1 is always the more fit genome.
+					b. Find the highest innovation number on the genes in g2 and create an array with that many elements.
+					c. Move each gene in g2 to the index of its innovation number.
+					d. For each gene in g1,
+						i. Get the gene in g2 with the same innovation number using g1's innovation number.
+						ii. If present, and a coin flip is heads, and the gene on g2 is enabled, then copy g2's gene onto the child, otherwise, copy g1's gene:
+							1. Deep clone the gene.
+					e. Return the crossover.
+			ii. Otherwise, select a random genome in the species and copy it to the child:
+				1. Copy all genes onto the child.
+				2. Return the child.
+			iii. Mutate the child (we'll get to that).
+			iv. Return the child.
+	9. Remove all members of all species except the topmost performing member (this may be the representative).
+	10. Breed more children from random species until the number of children plus the number of species equals the maximum population allowed.
+	11. Find the species to put each child in.
+	12. Increment the generation number.
