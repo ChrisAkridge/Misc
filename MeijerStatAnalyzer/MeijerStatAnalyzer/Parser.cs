@@ -12,15 +12,15 @@ namespace MeijerStatAnalyzer
 {
 	public static class Parser
 	{
-		private static string XlsxFilePath = @"C:\Users\Chris\Documents\Documents\Meijer - Employment Statistics 2.0.xlsx";
-		private static readonly DateTime fileLastSavedDate = new DateTime(2016, 10, 7);
+		private static string XlsxFilePath = @"C:\Users\Chris\Documents\Documents\Microsoft Office\Excel\Meijer - Employment Statistics 2.0.xlsx";
+		private static readonly DateTime fileLastSavedDate = new DateTime(2018, 4, 10);
 
 		public static StatsByDay Parse()
 		{
 			var result = new StatsByDay();
 
 			var package = new ExcelPackage(new FileInfo(XlsxFilePath));
-			var ws = package.Workbook.Worksheets["Stats"];
+			ExcelWorksheet ws = package.Workbook.Worksheets["Stats"];
 
 			int currentRow = 8;
 			bool valueExists = (ws.Cells[$"B{currentRow}"].Value != null);
@@ -53,9 +53,8 @@ namespace MeijerStatAnalyzer
 			object scheduleValue = ws.Cells[$"D{rowNumber}"].Value;
 			if (scheduleValue != null)
 			{
-				bool wasSchedule = false;
-				schedule = ParseScheduleString((string)scheduleValue, out wasSchedule);
-				
+				schedule = ParseScheduleString((string)scheduleValue, out bool wasSchedule);
+
 				if (!wasSchedule)
 				{
 					dayNote = (string)scheduleValue;
@@ -75,13 +74,13 @@ namespace MeijerStatAnalyzer
 				else if (dayNote.StartsWith("(")) { dayNote = null; }
 			}
 
-			var dateComment = ws.Cells[$"C{rowNumber}"].Comment;
+			ExcelComment dateComment = ws.Cells[$"C{rowNumber}"].Comment;
 			if (dateComment != null)
 			{
 				dateNote = dateComment.Text;
 			}
 
-			var timeComment = ws.Cells[$"D{rowNumber}"].Comment;
+			ExcelComment timeComment = ws.Cells[$"D{rowNumber}"].Comment;
 			if (timeComment != null)
 			{
 				timeNote = timeComment.Text;
@@ -104,12 +103,13 @@ namespace MeijerStatAnalyzer
 
 		private static Shift ParseShift(SecondsAfterMidnight start, SecondsAfterMidnight end, ExcelWorksheet ws, int rowNumber)
 		{
+			DateTime date = (DateTime)ws.Cells[$"C{rowNumber}"].Value;
 			double workingHours = (double)ws.Cells[$"G{rowNumber}"].Value;
 			double waitingHours = (double)ws.Cells[$"I{rowNumber}"].Value;
 			double paidHours = (double)ws.Cells[$"J{rowNumber}"].Value;
 			double payRate = double.Parse(ws.Cells[$"L{rowNumber}"].Value.ToString()) / paidHours;
 
-			return new Shift(start, end, workingHours, waitingHours, paidHours, payRate);
+			return new Shift(date, start, end, workingHours, waitingHours, paidHours, payRate);
 		}
 
 		private static Tuple<SecondsAfterMidnight, SecondsAfterMidnight> ParseScheduleString(string schedule, out bool wasSchedule)

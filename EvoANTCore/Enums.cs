@@ -13,4 +13,26 @@ namespace EvoANTCore
 		Left,
 		Right
 	}
+
+	public enum NeuronType
+	{
+		Input,
+		Hidden,
+		Output
+	}
+
+	public enum GeneComparisonType
+	{
+		Matched,
+		Disjoint,
+		Excess
+	}
+
+	public enum MutationType
+	{
+		AddConnection,
+		AddNeuron,
+		RemoveConnection,
+		RemoveNeuron
+	}
 }

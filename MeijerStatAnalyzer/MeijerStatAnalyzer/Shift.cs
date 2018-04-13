@@ -8,8 +8,9 @@ namespace MeijerStatAnalyzer
 {
 	public sealed class Shift
 	{
-		private const double AfterTaxAmount = 0.74d;
+		private double AfterTaxAmount => (Date < new DateTime(2018, 2, 4)) ? 0.74d : 0.77d;
 
+		public DateTime Date { get; }
 		public SecondsAfterMidnight StartTime { get; }
 		public SecondsAfterMidnight EndTime { get; }
 		public double WorkedHours { get; }
@@ -50,9 +51,10 @@ namespace MeijerStatAnalyzer
 
 		public TimeSpan ShiftLength => (TimeSpan.FromSeconds(EndTime.Seconds) - TimeSpan.FromSeconds(StartTime.Seconds));
 
-		public Shift(SecondsAfterMidnight start, SecondsAfterMidnight end,
+		public Shift(DateTime date, SecondsAfterMidnight start, SecondsAfterMidnight end,
 		 double hours, double wait, double paidHours, double payRate)
 		{
+			Date = date;
 			StartTime = start;
 			EndTime = end;
 			WorkedHours = hours;

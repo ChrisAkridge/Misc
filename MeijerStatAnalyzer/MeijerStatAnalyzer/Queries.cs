@@ -13,54 +13,12 @@ namespace MeijerStatAnalyzer
 
 		public static void RunQuery(StatsByDay stats)
 		{
-            DateTime cutoff = new DateTime(2016, 6, 1);
-            var subset = stats.Days.Where(d => d.Date >= cutoff);
-
-            int averageOpenSeconds = 0;
-            int averageMidSeconds = 0;
-            int averageCloseSeconds = 0;
-
-            int opens = 0;
-            int mids = 0;
-            int closes = 0;
-
-            foreach (var day in subset)
-            {
-                if (day.Shift == null) { continue; }
-                Shift shift = day.Shift;
-                switch (shift.ShiftTime)
-                {
-                    case ShiftTime.Open:
-                        averageOpenSeconds += shift.StartTime.Seconds;
-                        opens++;
-                        break;
-                    case ShiftTime.Midshift:
-                        averageMidSeconds += shift.StartTime.Seconds;
-                        mids++;
-                        break;
-                    case ShiftTime.Close:
-                        averageCloseSeconds += shift.StartTime.Seconds;
-                        closes++;
-                        break;
-                    case ShiftTime.ThirdShift:
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            var averageOpen = new SecondsAfterMidnight(averageOpenSeconds / opens);
-            var averageMid = new SecondsAfterMidnight(averageMidSeconds / mids);
-            var averageClose = new SecondsAfterMidnight(averageCloseSeconds / closes);
-
-            Console.WriteLine($"Average of {opens} opens: {averageOpen.ToString()}");
-            Console.WriteLine($"Average of {mids} midshifts: {averageMid.ToString()}");
-            Console.WriteLine($"Average of {closes} closes: {averageClose.ToString()}");
+			Console.WriteLine(GetAverageEndTime(stats));
         }
 
 		private static void PrintShiftCount(StatsByDay stats)
 		{
-			var shifts = stats.Days.Where(d => d.Shift != null).Select(d => d.Shift);
+			IEnumerable<Shift> shifts = stats.Days.Where(d => d.Shift != null).Select(d => d.Shift);
 			int openCount = shifts.Where(s => IsOpeningShift(s)).Count();
 			int midCount = shifts.Where(s => IsMidshift(s)).Count();
 			int closeCount = shifts.Where(s => IsClosingShift(s)).Count();
@@ -79,7 +37,7 @@ namespace MeijerStatAnalyzer
 		{
 			var groupedDays = stats.Days.GroupBy(selector).OrderBy(g => g.Key).ToDictionary(g => g.Key);
 
-			foreach (var kvp in groupedDays)
+			foreach (KeyValuePair<T, IGrouping<T, Day>> kvp in groupedDays)
 			{
 				PrintSingleDayInfo(kvp.Key, kvp.Value);
 			}
@@ -97,6 +55,94 @@ namespace MeijerStatAnalyzer
 
 			Console.WriteLine($"{key.ToString()}: Worked {workingCount} of {totalCount} ({GetPercent(workingCount, totalCount)})");
 			Console.WriteLine($"\t{open} opens ({GetPercent(open, workingCount)}), {mid} midshifts ({GetPercent(mid, workingCount)}), {close} closes ({GetPercent(close, workingCount)})");
+		}
+
+		private static void PrintAverageShiftStarts(StatsByDay stats)
+		{
+			DateTime cutoff = new DateTime(2013, 9, 17);
+			IEnumerable<Day> subset = stats.Days.Where(d => d.Date >= cutoff);
+
+			int averageOpenSeconds = 0;
+			int averageMidSeconds = 0;
+			int averageCloseSeconds = 0;
+
+			int opens = 0;
+			int mids = 0;
+			int closes = 0;
+
+			foreach (Day day in subset)
+			{
+				if (day.Shift == null) { continue; }
+				Shift shift = day.Shift;
+
+				if (IsOpeningShift(shift))
+				{
+					averageOpenSeconds += shift.StartTime.Seconds;
+					opens++;
+				}
+				if (IsMidshift(shift))
+				{
+					averageMidSeconds += shift.StartTime.Seconds;
+					mids++;
+				}
+				if (IsClosingShift(shift))
+				{
+					averageCloseSeconds += shift.StartTime.Seconds;
+					closes++;
+				}
+			}
+
+			var averageOpen = new SecondsAfterMidnight(averageOpenSeconds / opens);
+			var averageMid = new SecondsAfterMidnight(averageMidSeconds / mids);
+			var averageClose = new SecondsAfterMidnight(averageCloseSeconds / closes);
+
+			Console.WriteLine($"Average of {opens} opens: {averageOpen.ToString()}");
+			Console.WriteLine($"Average of {mids} midshifts: {averageMid.ToString()}");
+			Console.WriteLine($"Average of {closes} closes: {averageClose.ToString()}");
+		}
+
+		private static void PrintAverageShiftEnds(StatsByDay stats)
+		{
+			DateTime cutoff = new DateTime(2013, 9, 17);
+			IEnumerable<Day> subset = stats.Days.Where(d => d.Date >= cutoff);
+
+			int averageOpenSeconds = 0;
+			int averageMidSeconds = 0;
+			int averageCloseSeconds = 0;
+
+			int opens = 0;
+			int mids = 0;
+			int closes = 0;
+
+			foreach (Day day in subset)
+			{
+				if (day.Shift == null) { continue; }
+				Shift shift = day.Shift;
+
+				if (IsOpeningShift(shift))
+				{
+					averageOpenSeconds += shift.EndTime.Seconds;
+					opens++;
+				}
+				if (IsMidshift(shift))
+				{
+					averageMidSeconds += shift.EndTime.Seconds;
+					mids++;
+				}
+				if (IsClosingShift(shift))
+				{
+					averageCloseSeconds += shift.EndTime.Seconds;
+					closes++;
+				}
+			}
+
+			var averageOpen = new SecondsAfterMidnight(averageOpenSeconds / opens);
+			var averageMid = new SecondsAfterMidnight(averageMidSeconds / mids);
+			var averageClose = new SecondsAfterMidnight(averageCloseSeconds / closes);
+
+			Console.WriteLine($"Average of {opens} opens: {averageOpen.ToString()}");
+			Console.WriteLine($"Average of {mids} midshifts: {averageMid.ToString()}");
+			Console.WriteLine($"Average of {closes} closes: {averageClose.ToString()}");
 		}
 
 		private static string ProduceHourByHourInfo(StatsByDay stats)
@@ -153,13 +199,13 @@ namespace MeijerStatAnalyzer
 
 		private static string GetAverageStartTime(StatsByDay stats)
 		{
-			var startTimes = stats.Days.Where(d => d.Shift != null).Select(d => d.Shift.StartTime);
+			IEnumerable<SecondsAfterMidnight> startTimes = stats.Days.Where(d => d.Shift != null).Select(d => d.Shift.StartTime);
 			return new SecondsAfterMidnight((startTimes.Sum(s => s.Seconds) / startTimes.Count())).ToTimeString();
 		}
 
 		private static string GetAverageEndTime(StatsByDay stats)
 		{
-			var endTimes = stats.Days.Where(d => d.Shift != null).Select(d => d.Shift.EndTime);
+			IEnumerable<SecondsAfterMidnight> endTimes = stats.Days.Where(d => d.Shift != null).Select(d => d.Shift.EndTime);
 			return new SecondsAfterMidnight((endTimes.Sum(e => e.Seconds) / endTimes.Count())).ToTimeString();
 		}
 
@@ -174,22 +220,46 @@ namespace MeijerStatAnalyzer
 		private static bool IsOpeningShift(Shift shift)
 		{
 			// Opening shift: starts between 5am and 8am
-			// or, if it starts after 8am, ends before 3:30pm
+			// or, if it's on 2014-01-17, it's not an opening shift
+			// or, after 2017-05-09, starts between 5am and 10am
 
 			SecondsAfterMidnight fiveAM = new SecondsAfterMidnight(5, 0, 0);
 			SecondsAfterMidnight eightAM = new SecondsAfterMidnight(8, 0, 0);
+			SecondsAfterMidnight tenAM = new SecondsAfterMidnight(10, 0, 0);
 			SecondsAfterMidnight threeThirtyPM = new SecondsAfterMidnight(15, 30, 0);
 
-			return (shift.StartTime >= fiveAM && shift.StartTime <= eightAM) || (shift.EndTime < threeThirtyPM);
+			if (shift.Date == new DateTime(2014, 01, 17)) { return false; }
+
+			if (shift.Date < new DateTime(2017, 5, 9))
+			{
+				return (shift.StartTime >= fiveAM && shift.StartTime <= eightAM);
+			}
+			else
+			{
+				return (shift.StartTime >= fiveAM && shift.StartTime <= tenAM);
+			}
 		}
 
 		private static bool IsMidshift(Shift shift)
 		{
-			// Midshift: ends on or before 8pm
+			// Midshift: starts after 8am ends on or before 8pm
+			// or, if it's on 2014-01-17, it's a midshift
+			// or, after 2017-05-09, starts after 10am
 
+			SecondsAfterMidnight eightAM = new SecondsAfterMidnight(8, 0, 0);
+			SecondsAfterMidnight tenAM = new SecondsAfterMidnight(10, 0, 0);
 			SecondsAfterMidnight eightPM = new SecondsAfterMidnight(20, 0, 0);
 
-			return (shift.EndTime <= eightPM);
+			if (shift.Date == new DateTime(2014, 01, 17)) { return true; }
+
+			if (shift.Date < new DateTime(2017, 5, 9))
+			{
+				return (shift.StartTime > eightAM) && (shift.EndTime <= eightPM);
+			}
+			else
+			{
+				return (shift.StartTime > tenAM) && (shift.EndTime <= eightPM); 
+			}
 		}
 
 		private static bool IsClosingShift(Shift shift)
@@ -199,7 +269,7 @@ namespace MeijerStatAnalyzer
 			SecondsAfterMidnight eightPM = new SecondsAfterMidnight(20, 0, 0);
 			SecondsAfterMidnight secondBeforeMidnight = new SecondsAfterMidnight(86399);
 
-			return (shift.EndTime >= eightPM && shift.EndTime <= secondBeforeMidnight);
+			return (shift.EndTime > eightPM && shift.EndTime <= secondBeforeMidnight);
 		}
 
 		private static bool ShiftRequiredEarlyRise(Shift shift)
@@ -218,7 +288,6 @@ namespace MeijerStatAnalyzer
 		{
 			return stats.Series.OrderBy(selector).Select(selector);
 		}
-
 		// Hour info
 		private static HourType GetHourType(Day day, int hour)
 		{
@@ -238,7 +307,6 @@ namespace MeijerStatAnalyzer
 				else { return HourType.Off; }
 			}
 		}
-
 		// Formatters
 		private static string GetPercent(double a, double b)
 		{

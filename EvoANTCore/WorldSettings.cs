@@ -8,11 +8,17 @@ namespace EvoANTCore
 {
 	public sealed class WorldSettings
 	{
+		public const double CompatibilityThreshold = 3d;
+		public const int MaximumSpeciesStaleness = 10;
+		public const int DefaultGenerationSize = 50;
+		public const double CrossoverOdds = 0.25d;
+		public const double MutationOdds = 0.25d;
+
 		public int GenerationSize { get; set; }
 		public int InitialAntLifespan { get; set; }
 		public int AdditionalLifespanFromFood { get; set; }
 		public int TopNAntsSelectedForBreeding { get; set; }
-		public double MutationOdds { get; set; }
+		public double _MutationOdds { get; set; }
 
 		public double WallSpawnOdds { get; set; }
 		public double FoodSpawnOdds { get; set; }
@@ -30,7 +36,7 @@ namespace EvoANTCore
 			InitialAntLifespan = 10;
 			AdditionalLifespanFromFood = 10;
 			TopNAntsSelectedForBreeding = 6;
-			MutationOdds = 0.01d;
+			_MutationOdds = 0.01d;
 
 			WallSpawnOdds = 0.1d;
 			FoodSpawnOdds = 0.25d;

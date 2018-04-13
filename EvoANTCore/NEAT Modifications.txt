@@ -62,7 +62,7 @@ Breeding:
 					2. The child is the crossover of the two gemones:
 						a. Swap g1 and g2 if g2 has higher fitness to ensure that g1 is always the higher-fitness one.	[Network.Fitness]
 						b. Create an array of genes with length equal to the highest innovation number on g2's genes.	[Network.Genes.Count]
-						c. Clone gene from g2 into the array, at the index equal to its innovation number.
+						c. Clone genes from g2 into the array, at the index equal to its innovation number.
 						d. For each gene in g1,
 							i. Get the gene in g2 with the same innovation number as the gene in g1.
 							ii. If g2 has that gene, and a coin toss is heads, then clone g2's gene, otherwise, clone g1's gene.
@@ -89,22 +89,23 @@ Breeding:
 							iii. Delete them all.
 				iv. Return the child.
 		9. Remove all members of all species.
-		10. Breed children from random species until the population fills out.
+		10. Breed children from random species' representatives until the population fills out.
 		11. Find the species to put each child in (or create a new one if it doesn't match any).
-		12. Increment the generation number.
+		12. Remove any species with no members.
+		13. Increment the generation number.
 
 Classes and Properties:
 	// Genetic Layer
 	interface IGene
 	{
 		int InnovationNumber { get; set; }
-		GeneType Type { get; }	// one of { Normal, Disjoint, Excess }
 	}
+	
+	enum GeneComparisonType { Matched, Disjoint, Excess }
 	
 	class NeuronGene : IGene
 	{
 		int InnovationNumber;
-		GeneType Type;
 		int Index;
 		NeuronType Type;	// one of { Input, Hidden, Output }
 		string SpecialName;
@@ -119,7 +120,6 @@ Classes and Properties:
 	class ConnectionGene : IGene
 	{
 		int InnovationNumber;
-		GeneType Type;
 		
 		int FromIndex;
 		int ToIndex;
@@ -134,6 +134,7 @@ Classes and Properties:
 		List<IGene> Genes;
 		
 		IGene[] InnovationIndexedGenes();
+		GeneComparisonType CompareGenes(Genome, int);
 		double GetCompatibilityDistance(Genome);
 	}
 	

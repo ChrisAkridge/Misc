@@ -13,7 +13,7 @@ namespace MeijerStatAnalyzer
 	{
 		static void Main(string[] args)
 		{
-			var stats = Parser.Parse();
+			StatsByDay stats = Parser.Parse();
 			Queries.RunQuery(stats);
 			Console.ReadKey(intercept: true);
 		}
@@ -27,7 +27,7 @@ namespace MeijerStatAnalyzer
 			bool shouldContinue = true;
 			while (shouldContinue)
 			{
-				var key = Console.ReadKey(true).KeyChar;
+				char key = Console.ReadKey(true).KeyChar;
 
 				switch (char.ToLowerInvariant(key))
 				{
@@ -68,7 +68,7 @@ namespace MeijerStatAnalyzer
 		private static void ListShiftCounts()
 		{
 			string path = string.Concat(Directory.GetCurrentDirectory(), @"\0.txt");
-			var textArray = File.ReadAllLines(path);
+			string[] textArray = File.ReadAllLines(path);
 
 			// OKAY SO APPARENTLY THE BELOW MIND-BENDING LINQ IS MISTAKENLY MAKING 744 DAYS OUT OF 300-ODD
 			// MAYBE DUPLICATING?
@@ -80,7 +80,7 @@ namespace MeijerStatAnalyzer
 			int close = 0;		// Ends from 9pm-11pm
 			int third = 0;		// Starts from 9pm-5am
 
-			foreach (var shift in schedules)
+			foreach (string shift in schedules)
 			{
 				string[] times = shift.Split('-');
 

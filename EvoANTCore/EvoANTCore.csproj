@@ -42,11 +42,22 @@
   <ItemGroup>
     <Compile Include="Ant.cs" />
     <Compile Include="AntCreator.cs" />
+    <Compile Include="Connection.cs" />
+    <Compile Include="ConnectionGene.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Food.cs" />
+    <Compile Include="Genome.cs" />
+    <Compile Include="GenomeConverter.cs" />
+    <Compile Include="GlobalRandom.cs" />
+    <Compile Include="IGene.cs" />
+    <Compile Include="NeuralNetwork.cs" />
     <Compile Include="Neuron.cs" />
+    <Compile Include="NeuronGene.cs" />
     <Compile Include="NeuronLayer.cs" />
     <Compile Include="Pheromone.cs" />
+    <Compile Include="Population.cs" />
+    <Compile Include="Reproduction.cs" />
+    <Compile Include="Species.cs" />
     <Compile Include="Wall.cs" />
     <Compile Include="IWorldObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
