@@ -34,9 +34,8 @@ namespace MeijerStatAnalyzer
                 // 9:00am to 4:00pm
                 else if (StartTime.Seconds >= 32400 && StartTime.Seconds < 57600)
                 {
-                    // Before 8:00pm
-                    if (EndTime.Seconds < 72000) { return ShiftTime.Midshift; }
-                    else { return ShiftTime.Close; }
+	                // Before 8:00pm
+	                return EndTime.Seconds < 72000 ? ShiftTime.Midshift : ShiftTime.Close;
                 }
                 // 4:00pm to 8:00pm
                 else if (StartTime.Seconds >= 57600 && StartTime.Seconds < 72000)
@@ -62,7 +61,18 @@ namespace MeijerStatAnalyzer
 			PaidHours = paidHours;
 			UnpaidHours = WorkedHours - PaidHours;
 			PayRatePerHour = payRate;
+
+			if (start.Seconds == 0 && end.Seconds == 21600)
+			{
+				// Paid days off are recorded to start at midnight (0 seconds after midnight) and
+				// end at 6:00am (21,600 seconds after midnight). This erroneously records -6 as
+				// the unpaid hours, so we'll manually set it to 0.
+				UnpaidHours = 0;
+			}
 		}
+
+		public override string ToString()
+			=> $"{StartTime.ToTimeString()}-{EndTime.ToTimeString()} | {WorkedHours:F1}h worked | {UnpaidHours:F1}h unpaid | {PaidHours:F1}h@{PayRatePerHour:C} = {Pay:C}";
 	}
 
     public enum ShiftTime

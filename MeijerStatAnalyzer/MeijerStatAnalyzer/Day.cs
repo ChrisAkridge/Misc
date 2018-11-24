@@ -18,10 +18,10 @@ namespace MeijerStatAnalyzer
 		public int DayNumber => (int)(Date - SeniorityDate).TotalDays;
 		public Shift Shift { get; }
 		public DayType Type { get; }
-		public int DayNumberOfType { get; }
+		public int DayNumberOfType { get; set; }
 
 		public Day(DateTime date, string note, string dateNote, string timeNote, 
-		 Shift shift, DayType type, int dayNumberOfType)
+			Shift shift, DayType type)
 		{
 			Date = date;
 			Note = note;
@@ -29,7 +29,12 @@ namespace MeijerStatAnalyzer
 			TimeNote = timeNote;
 			Shift = shift;
 			Type = type;
-			DayNumberOfType = dayNumberOfType;
+		}
+
+		public override string ToString()
+		{
+			string shiftInfo = (Shift != null) ? Shift.ToString() : "Off";
+			return $"{Date.ToShortDateString()} | {DayNumber}/{Type.Prefix()}{DayNumber} | {shiftInfo}";
 		}
 	}
 

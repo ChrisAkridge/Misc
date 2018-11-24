@@ -30,25 +30,24 @@ namespace TournamentOfPictures
 			public Batch(int batchSize, int batchLevel, IEnumerable<ScoredItem<TItem>> items)
 			{
 				int expectedItemCount = (int)Math.Pow(batchSize, batchLevel + 1);
-				this.Items = items.ToList();
-				if (this.Items.Count > expectedItemCount)
+				Items = items.ToList();
+				if (Items.Count > expectedItemCount)
 				{
-					throw new ArgumentException($"Too many items for batch. Expected {expectedItemCount}, got {this.Items.Count}.");
+					throw new ArgumentException($"Too many items for batch. Expected {expectedItemCount}, got {Items.Count}.");
 				}
 			}
 
 			public void AddScore(int amount)
 			{
-				foreach (var item in Items)
+				foreach (ScoredItem<TItem> item in Items)
 				{
 					item.AddScore(amount);
 				}
-			}
-		
+			}	
 		}
 		
 		private readonly int BatchSize;
-		private List<ScoredItem<T>> items;
+		private readonly List<ScoredItem<T>> items;
 
 		private int roundNumber = -1;
 		private List<Batch<T>> roundBatches;
@@ -93,7 +92,7 @@ namespace TournamentOfPictures
 				itemsByScore = batchesByScore.SelectMany(b => b.Items.OrderByDescending(i => i.Score));
 			}
 
-			List<Batch<T>> newBatches = new List<Batch<T>>();
+			var newBatches = new List<Batch<T>>();
 
 			int remainingItems = items.Count;
 			int itemsTaken = 0;
@@ -102,7 +101,7 @@ namespace TournamentOfPictures
 				IEnumerable<ScoredItem<T>> newBatchItems = itemsByScore.Skip(itemsTaken).Take(newBatchSize);
 				remainingItems -= newBatchItems.Count();
 				itemsTaken += newBatchItems.Count();
-				Batch<T> newBatch = new Batch<T>(BatchSize, roundNumber, newBatchItems);
+				var newBatch = new Batch<T>(BatchSize, roundNumber, newBatchItems);
 				newBatches.Add(newBatch);
 			}
 
@@ -152,8 +151,8 @@ namespace TournamentOfPictures
 
 		private void OnWinnerSelected()
 		{
-			IEnumerable<ScoredItem<T>> items = roundBatches.SelectMany(b => b.Items);
-			IOrderedEnumerable<T> order = (IOrderedEnumerable<T>)items.OrderByDescending(i => i.Score).Select(i => i.Item);
+			IEnumerable<ScoredItem<T>> allItems = roundBatches.SelectMany(b => b.Items);
+			var order = (IOrderedEnumerable<T>)allItems.OrderByDescending(i => i.Score).Select(i => i.Item);
 
 			WinnerSelectedEvent?.Invoke(order.First(), order);
 		}
@@ -161,7 +160,7 @@ namespace TournamentOfPictures
 
 	public sealed class ScoredItem<T> where T : class 
 	{
-		public T Item { get; private set; }
+		public T Item { get; }
 		public int Score { get; private set; }
 
 		public ScoredItem(T item)
@@ -172,12 +171,10 @@ namespace TournamentOfPictures
 
 		public int AddScore(int amount) => Score += amount;
 
-		public override string ToString()
-		{
-			return $"{Score} points, {Item.ToString()}";
-		}
+		public override string ToString() => $"{Score} points, {Item.ToString()}";
 	}
 
 	public delegate void NewBatchEventHandler<T>(BatchSelectionTournament<T>.Batch<T> newBatch) where T : class;
+
 	public delegate void WinnerSelectedEventHandler<T>(T winner, IOrderedEnumerable<T> order);
 }

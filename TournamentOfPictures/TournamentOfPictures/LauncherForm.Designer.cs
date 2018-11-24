@@ -34,6 +34,10 @@
 			this.ButtonLaunchRecursiveRating = new System.Windows.Forms.Button();
 			this.ButtonLaunchQuantificationTournament = new System.Windows.Forms.Button();
 			this.ButtonLaunchQuickSort = new System.Windows.Forms.Button();
+			this.GroupTeamOrder = new System.Windows.Forms.GroupBox();
+			this.RadioSequentialOrder = new System.Windows.Forms.RadioButton();
+			this.RadioRandomOrder = new System.Windows.Forms.RadioButton();
+			this.GroupTeamOrder.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// LabelFolderDetails
@@ -104,11 +108,45 @@
 			this.ButtonLaunchQuickSort.UseVisualStyleBackColor = true;
 			this.ButtonLaunchQuickSort.Click += new System.EventHandler(this.ButtonLaunchQuickSort_Click);
 			// 
+			// GroupTeamOrder
+			// 
+			this.GroupTeamOrder.Controls.Add(this.RadioRandomOrder);
+			this.GroupTeamOrder.Controls.Add(this.RadioSequentialOrder);
+			this.GroupTeamOrder.Location = new System.Drawing.Point(265, 13);
+			this.GroupTeamOrder.Name = "GroupTeamOrder";
+			this.GroupTeamOrder.Size = new System.Drawing.Size(176, 46);
+			this.GroupTeamOrder.TabIndex = 6;
+			this.GroupTeamOrder.TabStop = false;
+			this.GroupTeamOrder.Text = "Initial Team Order";
+			// 
+			// RadioSequentialOrder
+			// 
+			this.RadioSequentialOrder.AutoSize = true;
+			this.RadioSequentialOrder.Location = new System.Drawing.Point(7, 22);
+			this.RadioSequentialOrder.Name = "RadioSequentialOrder";
+			this.RadioSequentialOrder.Size = new System.Drawing.Size(80, 17);
+			this.RadioSequentialOrder.TabIndex = 0;
+			this.RadioSequentialOrder.Text = "Sequential";
+			this.RadioSequentialOrder.UseVisualStyleBackColor = true;
+			// 
+			// RadioRandomOrder
+			// 
+			this.RadioRandomOrder.AutoSize = true;
+			this.RadioRandomOrder.Checked = true;
+			this.RadioRandomOrder.Location = new System.Drawing.Point(94, 22);
+			this.RadioRandomOrder.Name = "RadioRandomOrder";
+			this.RadioRandomOrder.Size = new System.Drawing.Size(68, 17);
+			this.RadioRandomOrder.TabIndex = 1;
+			this.RadioRandomOrder.TabStop = true;
+			this.RadioRandomOrder.Text = "Random";
+			this.RadioRandomOrder.UseVisualStyleBackColor = true;
+			// 
 			// LauncherForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(453, 236);
+			this.Controls.Add(this.GroupTeamOrder);
 			this.Controls.Add(this.ButtonLaunchQuickSort);
 			this.Controls.Add(this.ButtonLaunchQuantificationTournament);
 			this.Controls.Add(this.ButtonLaunchRecursiveRating);
@@ -121,6 +159,8 @@
 			this.Name = "LauncherForm";
 			this.Text = "Tournament of Pictures";
 			this.Load += new System.EventHandler(this.LauncherForm_Load);
+			this.GroupTeamOrder.ResumeLayout(false);
+			this.GroupTeamOrder.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -134,5 +174,8 @@
 		private System.Windows.Forms.Button ButtonLaunchRecursiveRating;
 		private System.Windows.Forms.Button ButtonLaunchQuantificationTournament;
 		private System.Windows.Forms.Button ButtonLaunchQuickSort;
+		private System.Windows.Forms.GroupBox GroupTeamOrder;
+		private System.Windows.Forms.RadioButton RadioRandomOrder;
+		private System.Windows.Forms.RadioButton RadioSequentialOrder;
 	}
 }

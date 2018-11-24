@@ -45,8 +45,8 @@ namespace TournamentOfPictures
 
 			if (newBatch.Items.Count == 4)
 			{
-				var panels = new[] { PanelTopLeft, PanelTopRight, PanelBottomLeft, PanelBottomRight };
-				var items = newBatch.Items.OrderByDescending(i => i.Score).ToList();
+				Panel[] panels = new[] { PanelTopLeft, PanelTopRight, PanelBottomLeft, PanelBottomRight };
+				List<ScoredItem<string>> items = newBatch.Items.OrderByDescending(i => i.Score).ToList();
 				while (items.Count < 4) { items.Add(new ScoredItem<string>(null)); }
 				for (int i = 0; i < 4; i++)
 				{
@@ -56,14 +56,15 @@ namespace TournamentOfPictures
 			else
 			{
 				int quarterBatch = (int)Math.Ceiling(newBatch.Items.Count / 4f);
-				List<List<ScoredItem<string>>> displayBuckets = new List<List<ScoredItem<string>>>(4);
-				List<ScoredItem<string>> displayBucket = new List<ScoredItem<string>>(quarterBatch);
+				var displayBuckets = new List<List<ScoredItem<string>>>(4);
+				var displayBucket = new List<ScoredItem<string>>(quarterBatch);
 				int itemsLeftInBucket = quarterBatch;
-				IEnumerator<ScoredItem<string>> batchEnumerator = newBatch.Items.OrderByDescending(i => i.Score).GetEnumerator();
+				IEnumerator<ScoredItem<string>> batchEnumerator =
+					newBatch.Items.OrderByDescending(i => i.Score).GetEnumerator();
 				
 				while (batchEnumerator.MoveNext())
 				{
-					var current = batchEnumerator.Current;
+					ScoredItem<string> current = batchEnumerator.Current;
 					displayBucket.Add(current);
 					itemsLeftInBucket--;
 
@@ -83,17 +84,19 @@ namespace TournamentOfPictures
 				CreateBatchInfoControls(PanelTopRight, displayBuckets[1]);
 				CreateBatchInfoControls(PanelBottomLeft, displayBuckets[2]);
 				CreateBatchInfoControls(PanelBottomRight, displayBuckets[3]);
+
+				batchEnumerator.Dispose();
 			}
 		}
 
-		private void Tournament_WinnerSelectedEvent(string winner, IOrderedEnumerable<string> order)
+		private static void Tournament_WinnerSelectedEvent(string winner, IOrderedEnumerable<string> order)
 		{
 			throw new NotImplementedException();
 		}
 
-		private void Select(Panel panel)
+		private void Select(Control control)
 		{
-			Color newBackColor = Color.Black;
+			Color newBackColor;
 			switch (selectionLevel)
 			{
 				case 3:
@@ -112,7 +115,7 @@ namespace TournamentOfPictures
 					return;
 			}
 
-			panel.BackColor = newBackColor;
+			control.BackColor = newBackColor;
 			selectionLevel--;
 		}
 
@@ -121,30 +124,38 @@ namespace TournamentOfPictures
 			Select((Panel)sender);
 		}
 
-		private void CreatePictureBox(Panel panel, string path)
+		private void CreatePictureBox(Control control, string path)
 		{
-			PictureBox box = new PictureBox();
-			box.SizeMode = PictureBoxSizeMode.Zoom;
-			box.Dock = DockStyle.Fill;
-			if (path != null) { box.Image = Image.FromFile(path); }
-			box.Click += (sender, e) => Select(panel);
+			var box = new PictureBox
+			{
+				SizeMode = PictureBoxSizeMode.Zoom,
+				Dock = DockStyle.Fill
+			};
 
-			panel.Controls.Clear();
-			panel.Controls.Add(box);
+			if (path != null) { box.Image = Image.FromFile(path); }
+			box.Click += (sender, e) => Select(control);
+
+			control.Controls.Clear();
+			control.Controls.Add(box);
 		}
 
-		private void CreateBatchInfoControls(Panel panel, IEnumerable<ScoredItem<string>> items)
+		private static void CreateBatchInfoControls(Control control, IEnumerable<ScoredItem<string>> items)
 		{
-			panel.Controls.Clear();
+			control.Controls.Clear();
 
-			Label label = new Label();
-			label.Text = $"Batch of {items.Count()} pictures.";
-			label.Location = new Point(4, 4);
-			panel.Controls.Add(label);
+			var label = new Label
+			{
+				Text = $"Batch of {items.Count()} pictures.",
+				Location = new Point(4, 4)
+			};
+			control.Controls.Add(label);
 
-			Button button = new Button();
-			button.Text = "View Pictures...";
-			button.Location = new Point(4, 20);
+			Button button = new Button
+			{
+				Text = "View Pictures...",
+				Location = new Point(4, 20)
+			};
+
 			if (!items.Any()) { button.Enabled = false; }
 			button.Click += (sender, e) =>
 			{
@@ -159,7 +170,5 @@ namespace TournamentOfPictures
 			selectionLevel = 3;
 			PanelTopLeft.BackColor = PanelTopRight.BackColor = PanelBottomLeft.BackColor = PanelBottomRight.BackColor = DefaultBackColor;
 		}
-
-
 	}
 }

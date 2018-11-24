@@ -6,19 +6,111 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OfficeOpenXml;
 
 namespace MeijerStatAnalyzer
 {
-	class Program
+	internal class Program
 	{
-		static void Main(string[] args)
+		private static void Main(string[] args)
 		{
-			StatsByDay stats = Parser.Parse();
-			Queries.RunQuery(stats);
+			Queries.RunQuery(Parser.Parse());
 			Console.ReadKey(intercept: true);
 		}
 
-		static void OldMain()
+		private static void MatchDayNumbersToLabels()
+		{
+			StatsByDay stats = Parser.Parse();
+
+			var package = new ExcelPackage(new FileInfo(@"C:\Users\Chris\Documents\Documents\Microsoft Office\Excel\Meijer - Employment Statistics Final.xlsx"));
+			ExcelWorksheet ws = package.Workbook.Worksheets["Stats"];
+
+			var workingDays = stats.Days.Where(d => d.Type == DayType.Working);
+			var daysOff = stats.Days.Where(d => d.Type == DayType.Off);
+			var paidDaysOff = stats.Days.Where(d => d.Type == DayType.PaidTimeOff);
+			var unpaidDaysOff = stats.Days.Where(d => d.Type == DayType.UnpaidTimeOff);
+
+			var dayLabels = Enumerable.Range(8, 1706).Select(d => ((int rowNumber, string label))(d, ws.Cells[$"F{d}"].Value));
+			var workingDayLabels = dayLabels.Where(l => l.label.StartsWith("W"));
+			var daysOffLabels = dayLabels.Where(l => l.label.StartsWith("N") && !l.label.StartsWith("NV"));
+			var paidDaysOffLabels = dayLabels.Where(l => l.label.StartsWith("PV"));
+			var unpaidDaysOffLabels = dayLabels.Where(l => l.label.StartsWith("NV"));
+
+			var builder = new StringBuilder();
+			var workingDayEnumerator = paidDaysOff.GetEnumerator();
+			var workingDayLabelEnumerator = paidDaysOffLabels.GetEnumerator();
+			workingDayLabelEnumerator.MoveNext();
+
+			var daysOffWithNoLabel = new List<Day>();
+			while (workingDayEnumerator.MoveNext())
+			{
+				int dayNumber = workingDayEnumerator.Current.DayNumberOfType;
+				builder.Append($"{workingDayEnumerator.Current.Date.ToShortDateString()} {dayNumber} ");
+				if (!workingDayLabelEnumerator.Current.Equals(default(ValueTuple<int, string>)))
+				{
+					builder.Append($"| {ws.Cells[$"C{workingDayLabelEnumerator.Current.rowNumber}"].Value} ");
+					builder.Append($"{workingDayLabelEnumerator.Current.label}");
+
+					int labelNumber = int.Parse(Parser.GetNumberFromEndOfString(workingDayLabelEnumerator.Current.label));
+					if (labelNumber != dayNumber)
+					{
+						builder.Append($" {labelNumber - dayNumber}");
+					}
+
+					builder.Append("\r\n");
+					workingDayLabelEnumerator.MoveNext();
+				}
+				else
+				{
+					daysOffWithNoLabel.Add(workingDayEnumerator.Current);
+					builder.Append("\r\n");
+				}
+			}
+
+			File.WriteAllText(@"C:\Users\Chris\Documents\meijerDaysExport.txt", builder.ToString());
+
+			Console.WriteLine("Done.");
+		}
+
+		private static void ExportStatsToTextFile()
+		{
+			Console.WriteLine("Parsing stats...");
+			StatsByDay stats = Parser.Parse();
+
+			Console.WriteLine("Creating export file...");
+			var builder = new StringBuilder();
+			int dayNumber = 1;
+
+			foreach (Day day in stats.Days)
+			{
+				builder.Append($"{dayNumber}:{day.Date.ToShortDateString()} | ");
+				builder.Append(
+					$"{day.Date.DayOfWeek.ToString().Substring(0, 3)}/{day.Type.Prefix()}{day.DayNumberOfType} | ");
+
+				if (day.Shift != null)
+				{
+					Shift shift = day.Shift;
+					builder.Append($"{shift.StartTime.ToTimeString()}-{shift.EndTime.ToTimeString()} | ");
+					builder.Append($"{shift.WorkedHours:F1} hours | {shift.PaidHours:F1} hours paid | {shift.UnpaidHours:F1} hours unpaid | ");
+					builder.Append($"{shift.WaitHours:F1} hours waited | ${shift.PayRatePerHour:F2}/hour | ");
+					builder.Append($"${shift.Pay:F2} paid | ${shift.EstimatedFinalPay} est. aftertax\r\n");
+				}
+				else
+				{
+					builder.Append("No shift.\r\n");
+				}
+
+				dayNumber++;
+			}
+
+			string exportFile = builder.ToString();
+			Console.WriteLine($"Created export file (length {exportFile.Length}).");
+			Console.WriteLine($"Exporting file...");
+			File.WriteAllText(@"C:\Users\Chris\Documents\meijerStatsExport.txt", exportFile);
+			Console.WriteLine("Export complete.");
+		}
+
+		private static void OldMain()
 		{
 			Console.WriteLine("Meijer Statistics Analyzer");
 			Console.WriteLine();

@@ -16,6 +16,8 @@ namespace TournamentOfPictures
 		private BracketedTournament<string> files;
 		private int roundsCompleted;
 
+		public InitialTeamOrder TeamOrder { get; set; }
+
         public Form1(string folderPath)
         {
             InitializeComponent();
@@ -30,15 +32,15 @@ namespace TournamentOfPictures
 
         private List<string> GetFilesInFolder(string folderPath)
         {
-			var result = Directory.GetFiles(folderPath, "*", SearchOption.AllDirectories).Where(f => (f.ToLower().EndsWith(".png") || f.ToLower().EndsWith(".jpg") || f.ToLower().EndsWith(".gif") || f.ToLower().EndsWith(".bmp") || f.ToLower().EndsWith(".jpeg"))).ToList();
+			var result = Directory.GetFiles(folderPath, "*", SearchOption.TopDirectoryOnly).Where(f => (f.ToLower().EndsWith(".png") || f.ToLower().EndsWith(".jpg") || f.ToLower().EndsWith(".gif") || f.ToLower().EndsWith(".bmp") || f.ToLower().EndsWith(".jpeg"))).ToList();
             return result;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-			if (files == null) 
+			if (files == null)
 			{ 
-				files = new BracketedTournament<string>(GetFilesInFolder(folderPath));
+				files = new BracketedTournament<string>(GetFilesInFolder(folderPath), TeamOrder);
 				StartRound();
 			}
 			else

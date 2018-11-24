@@ -10,33 +10,32 @@ namespace TournamentOfPictures
 {
 	internal static class BracketedTournamentSerializer
 	{
-		public static string SerializeString(BracketedTournament<string> tournament)
-		{
-			return JObject.FromObject(tournament.GetSerializableObjects()).ToString();
-		}
+		public static string SerializeString(BracketedTournament<string> tournament) => JObject.FromObject(tournament.GetSerializableObjects()).ToString();
 
 		public static BracketedTournament<string> Deserialize(string json)
 		{
-			JObject obj = JObject.Parse(json);
+			var obj = JObject.Parse(json);
 
-			JArray standingsArray = (JArray)obj["standings"];
-			JArray previousRoundsArray = (JArray)obj["previousRounds"];
-			JObject currentRoundObject = (JObject)obj["currentRound"];
+			var standingsArray = (JArray)obj["standings"];
+			var previousRoundsArray = (JArray)obj["previousRounds"];
+			var currentRoundObject = (JObject)obj["currentRound"];
 
-			BracketedTournament<string> result = new BracketedTournament<string>();
-			Dictionary<string, int> standings = new Dictionary<string, int>();
+			var result = new BracketedTournament<string>();
+			var standings = new Dictionary<string, int>();
 			result.CurrentRoundNumber = (int)obj["currentRoundNumber"];
 			
-			foreach (JObject standingsObject in standingsArray)
+			foreach (var jToken in standingsArray)
 			{
+				var standingsObject = (JObject)jToken;
 				string key = (string)standingsObject["team"];
 				int value = (int)standingsObject["wins"];
 				standings.Add(key, value);
 			}
 			result.SerializationSetStandings(standings);
 
-			foreach (JObject previousRoundObject in previousRoundsArray)
+			foreach (var jToken in previousRoundsArray)
 			{
+				var previousRoundObject = (JObject)jToken;
 				result.SerializationAddPreviousRound(DeserializeRound(result, previousRoundObject));
 			}
 
@@ -45,17 +44,14 @@ namespace TournamentOfPictures
 			return result;
 		}
 
-		public static BracketedTournament<string> FromFile(string filePath)
-		{
-			return Deserialize(File.ReadAllText(filePath));
-		}
-		
+		public static BracketedTournament<string> FromFile(string filePath) => Deserialize(File.ReadAllText(filePath));
+
 		private static BracketedTournamentRound<string> DeserializeRound(BracketedTournament<string> tournament, JObject obj)
 		{
-			List<BracketedTournamentMatch<string>> matches = new List<BracketedTournamentMatch<string>>();
-			JArray matchArray = (JArray)obj["matches"];
+			var matches = new List<BracketedTournamentMatch<string>>();
+			var matchArray = (JArray)obj["matches"];
 
-			foreach (var matchObj in matchArray)
+			foreach (JToken matchObj in matchArray)
 			{
 				matches.Add(DeserializeMatch((JObject)matchObj));
 			}

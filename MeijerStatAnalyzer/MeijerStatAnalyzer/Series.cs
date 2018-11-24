@@ -8,7 +8,7 @@ namespace MeijerStatAnalyzer
 {
 	public sealed class Series
 	{
-		private List<Day> days;
+		private readonly List<Day> days;
 
 		public int SeriesNumber { get; }
 		public int DaysInSeries => days.Count;

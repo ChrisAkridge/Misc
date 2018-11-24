@@ -8,7 +8,7 @@ namespace MeijerStatAnalyzer
 {
 	public sealed class Week
 	{
-		private List<Day> days;
+		private readonly List<Day> days;
 		
 		public DateTime SundayDate { get; }
 		public DateTime SaturdayDate => SundayDate.AddDays(6d);
@@ -30,14 +30,7 @@ namespace MeijerStatAnalyzer
 		 Day wednesday, Day thursday, Day friday, Day saturday)
 		{
 			if (sundayDate.DayOfWeek != DayOfWeek.Sunday) { throw new ArgumentException(); }
-			days = new List<Day>();
-			days.Add(sunday);
-			days.Add(monday);
-			days.Add(tuesday);
-			days.Add(wednesday);
-			days.Add(thursday);
-			days.Add(friday);
-			days.Add(saturday);
+			days = new List<Day> {sunday, monday, tuesday, wednesday, thursday, friday, saturday};
 		}
 	}
 }

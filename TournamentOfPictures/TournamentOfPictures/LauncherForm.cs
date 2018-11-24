@@ -53,7 +53,11 @@ namespace TournamentOfPictures
 
 		private void ButtonLaunchBracketedTournament_Click(object sender, EventArgs e)
 		{
-			Form1 tournamentForm = new Form1(folderPath);
+			var tournamentForm = new Form1(folderPath)
+			{
+				TeamOrder = RadioRandomOrder.Checked ? InitialTeamOrder.Random : InitialTeamOrder.Sequential
+			};
+
 			tournamentForm.FormClosed += (s, args) => Close();
 			Hide();
 			tournamentForm.Show();

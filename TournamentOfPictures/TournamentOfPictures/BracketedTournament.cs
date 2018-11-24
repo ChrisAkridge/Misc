@@ -8,22 +8,24 @@ namespace TournamentOfPictures
 	public sealed class BracketedTournament<T> where T : class
 	{
 		private Dictionary<T, int> standings = new Dictionary<T, int>();
-		private List<BracketedTournamentRound<T>> previousRounds = new List<BracketedTournamentRound<T>>();
-		internal T overflowItem = null;
+		private readonly List<BracketedTournamentRound<T>> previousRounds = new List<BracketedTournamentRound<T>>();
+		internal T overflowItem;
 
 		public event WinnerChosenEventHandler<T> WinnerChosenEvent;
 
-		public OddTeamCountBehavior Behavior { get; private set; } = OddTeamCountBehavior.RemoveRandomly;
+		public OddTeamCountBehavior Behavior { get; } = OddTeamCountBehavior.RemoveRandomly;
 		public BracketedTournamentRound<T> CurrentRound { get; private set; }
 		public int CurrentRoundNumber { get; internal set; }
+
 		public T OverflowItem
 		{
-			get { return overflowItem; }
-			set { overflowItem = value; }
+			get => overflowItem;
+			set => overflowItem = value;
 		}
+
 		public int TeamCount => Teams.Count;
 		public List<T> Teams { get; set; }
-		public T TournamentWinner { get; internal set; } = null;
+		public T TournamentWinner { get; internal set; }
 
 		public bool CanUndo
 		{
@@ -34,12 +36,12 @@ namespace TournamentOfPictures
 			}
 		}
 
-		public BracketedTournament(List<T> teams)
+		public BracketedTournament(List<T> teams, InitialTeamOrder teamOrder)
 		{
 			Teams = teams;
 			Teams.ForEach(t => standings.Add(t, 0));
 			CurrentRoundNumber = 0;
-			ShuffleTeams();
+			if (teamOrder == InitialTeamOrder.Random) { ShuffleTeams(); }
 		}
 
 		internal BracketedTournament()
@@ -61,7 +63,7 @@ namespace TournamentOfPictures
 		{
 			return standings.Select(kvp =>
 			{
-				ScoredItem<T> item = new ScoredItem<T>(kvp.Key);
+				var item = new ScoredItem<T>(kvp.Key);
 				item.AddScore(kvp.Value);
 				return item;
 			});
@@ -87,9 +89,9 @@ namespace TournamentOfPictures
 
 		public T RemoveAndInsertRandomly(ref T item)
 		{
+			var random = new Random();
 			if (Teams.Any())
 			{
-				Random random = new Random();
 				int index = random.Next(0, Teams.Count);
 				T result = Teams[index];
 				Teams[index] = item;
@@ -130,11 +132,12 @@ namespace TournamentOfPictures
 				throw new Exception("Teams list is empty; cannot return a value");
 			}
 		}
+
 		public T RemoveRandomly()
 		{
+			var random = new Random();
 			if (Teams.Any())
 			{
-				Random random = new Random();
 				int index = random.Next(0, Teams.Count);
 				T result = Teams[index];
 				Teams.RemoveAt(index);
@@ -145,9 +148,10 @@ namespace TournamentOfPictures
 				throw new Exception("Teams list is empty, cannot return result");
 			}
 		}
+
 		public void ShuffleTeams()
 		{
-			Random random = new Random();
+			var random = new Random();
 			int n = Teams.Count;
 
 			while (n > 1)
@@ -174,7 +178,7 @@ namespace TournamentOfPictures
 
 		internal void GoBackToPreviousRound()
 		{
-			var previousRound = previousRounds.Last();
+			BracketedTournamentRound<T> previousRound = previousRounds.Last();
 			previousRounds.Remove(previousRound);
 			CurrentRoundNumber--;
 			CurrentRound = previousRound;
@@ -184,12 +188,12 @@ namespace TournamentOfPictures
 
 		public object GetSerializableObjects()
 		{
-			List<object> previousRoundsObjects = new List<object>();
-			List<object> standingsObjects = new List<object>();
+			var previousRoundsObjects = new List<object>();
+			var standingsObjects = new List<object>();
 
 			previousRounds.ForEach(r => previousRoundsObjects.Add(r.GetSerializableObjects()));
 			
-			foreach (var standing in standings)
+			foreach (KeyValuePair<T, int> standing in standings)
 			{
 				standingsObjects.Add(new
 				{
@@ -232,9 +236,9 @@ namespace TournamentOfPictures
 
 	public sealed class BracketedTournamentRound<T> where T : class
 	{
-		private BracketedTournament<T> owner;
-		private List<BracketedTournamentMatch<T>> matches = new List<BracketedTournamentMatch<T>>();
-		private List<T> winners = new List<T>();
+		private readonly BracketedTournament<T> owner;
+		private readonly List<BracketedTournamentMatch<T>> matches = new List<BracketedTournamentMatch<T>>();
+		public List<T> winners = new List<T>();
 		internal int CurrentMatchIndex { get; private set; } = 0;  // -1 for all matches selected
 		public int TotalMatches => matches.Count;
 
@@ -299,7 +303,7 @@ namespace TournamentOfPictures
 		{
 			this.owner = owner;
 			this.matches = matches.ToList();
-			this.winners = matches.Where(m => m.WinnerIndex != 0).Select(m => (m.WinnerIndex == 1) ? m.Team1 : m.Team2).ToList();
+			winners = matches.Where(m => m.WinnerIndex != 0).Select(m => (m.WinnerIndex == 1) ? m.Team1 : m.Team2).ToList();
 
 			int indexOfFirstUnselectedMatch = this.matches.FindIndex(m => m.WinnerIndex == 0);
 			if (indexOfFirstUnselectedMatch >= 0)
@@ -350,28 +354,35 @@ namespace TournamentOfPictures
 
 		public void Undo()
 		{
-			// Base case: this is the first match and we have to go back
-			if (CurrentMatchIndex == 0)
+			switch (CurrentMatchIndex)
 			{
-				owner.GoBackToPreviousRound();
-			}
-			// We also have to set up the last round
-			else if (CurrentMatchIndex == -1)
-			{
-				CurrentMatchIndex = matches.Count - 1;
-				CurrentMatch.ClearWinner();
-			}
-			else
-			{
-				CurrentMatchIndex--;
-				CurrentMatch.ClearWinner();
+				// Base case: this is the first match and we have to go back
+				// We also have to set up the last round
+				case 0: owner.GoBackToPreviousRound();
+					break;
+				case -1:
+					CurrentMatchIndex = matches.Count - 1;
+					CurrentMatch.ClearWinner();
+					break;
+				default:
+					if (CurrentMatchIndex == -1)
+					{
+						CurrentMatchIndex = matches.Count - 1;
+						CurrentMatch.ClearWinner();
+					}
+					else
+					{
+						CurrentMatchIndex--;
+						CurrentMatch.ClearWinner();
+					}
+					break;
 			}
 		}
 
 		internal List<T> GetTeamsForUndo()
 		{
-			List<T> result = new List<T>();
-			foreach (var match in matches)
+			var result = new List<T>();
+			foreach (BracketedTournamentMatch<T> match in matches)
 			{
 				result.Add(match.Team1);
 				result.Add(match.Team2);
@@ -393,16 +404,20 @@ namespace TournamentOfPictures
 
 	public sealed class BracketedTournamentMatch<T> where T : class
 	{
-		public T Team1 { get; private set; }
-		public T Team2 { get; private set; }
-		public int WinnerIndex { get; private set; } = 0;
+		public T Team1 { get; }
+		public T Team2 { get; }
+		public int WinnerIndex { get; private set; }
+
 		public T Winner
 		{
 			get
 			{
-				if (WinnerIndex == 0) { return null; }
-				else if (WinnerIndex == 1) { return Team1; }
-				else { return Team2; }
+				switch (WinnerIndex)
+				{
+					case 0: return null;
+					case 1: return Team1;
+					default: return Team2;
+				}
 			}
 		}
 
@@ -410,9 +425,12 @@ namespace TournamentOfPictures
 		{
 			get
 			{
-				if (WinnerIndex == 0) { return null; }
-				else if (WinnerIndex == 1) { return Team2; }
-				else { return Team1; }
+				switch (WinnerIndex)
+				{
+					case 0: return null;
+					case 1: return Team2;
+					default: return Team1;
+				}
 			}
 		}
 
@@ -433,7 +451,7 @@ namespace TournamentOfPictures
 		{
 			if (teamNumber < 1 || teamNumber > 2)
 			{
-				throw new IndexOutOfRangeException(string.Format("Cannot select team #{0} from two teams", teamNumber));
+				throw new IndexOutOfRangeException($"Cannot select team #{teamNumber} from two teams");
 			}
 			WinnerIndex = teamNumber;
 		}
@@ -443,18 +461,21 @@ namespace TournamentOfPictures
 			WinnerIndex = 0;
 		}
 
-		public object GetSerializaleObjects()
+		public object GetSerializaleObjects() => new
 		{
-			return new
-			{
-				team1 = Team1,
-				team2 = Team2,
-				winnerIndex = WinnerIndex
-			};
-		}
+			team1 = Team1,
+			team2 = Team2,
+			winnerIndex = WinnerIndex
+		};
 	}
 
 	public delegate void WinnerChosenEventHandler<T>(T winner, IEnumerable<ScoredItem<T>> standings) where T : class;
+
+	public enum InitialTeamOrder
+	{
+		Sequential,
+		Random
+	}
 
 	public enum OddTeamCountBehavior
 	{

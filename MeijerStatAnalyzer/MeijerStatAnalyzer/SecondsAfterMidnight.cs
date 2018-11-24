@@ -8,29 +8,13 @@ namespace MeijerStatAnalyzer
 {
 	public struct SecondsAfterMidnight : IComparable<SecondsAfterMidnight>
 	{
-		private int seconds;
+		public static readonly SecondsAfterMidnight Midnight = new SecondsAfterMidnight(0);
 
-		public int Seconds
-		{
-			get
-			{
-				return seconds;
-			}
-			private set
-			{
-				seconds = value;
-			}
-		}
+		public int Seconds { get; }
 
-		public SecondsAfterMidnight(int seconds)
-		{
-			this.seconds = seconds;
-		}
+		public SecondsAfterMidnight(int seconds) => Seconds = seconds;
 
-		public SecondsAfterMidnight(TimeSpan span)
-		{
-			seconds = (int)span.TotalSeconds;
-		}
+		public SecondsAfterMidnight(TimeSpan span) => Seconds = (int)span.TotalSeconds;
 
 		public SecondsAfterMidnight(DateTime dateTime) : this(dateTime.Hour, dateTime.Minute, dateTime.Second)
 		{
@@ -38,9 +22,9 @@ namespace MeijerStatAnalyzer
 
 		public SecondsAfterMidnight(int hours, int minutes, int seconds)
 		{
-			this.seconds = hours * 3600;
-			this.seconds += minutes * 60;
-			this.seconds += seconds;
+			Seconds = hours * 3600;
+			Seconds += minutes * 60;
+			Seconds += seconds;
 		}
 
 		public DateTime ToDateTime()
@@ -48,24 +32,15 @@ namespace MeijerStatAnalyzer
 			int year = DateTime.Now.Year;
 			int month = DateTime.Now.Month;
 			int day = DateTime.Now.Day;
-			DateTime todayMidnight = new DateTime(year, month, day);
+			var todayMidnight = new DateTime(year, month, day);
 			return todayMidnight + TimeSpan.FromSeconds(Seconds);
 		}
 
-		public string ToTimeString()
-		{
-			return ToDateTime().ToLongTimeString();
-		}
+		public string ToTimeString() => ToDateTime().ToLongTimeString();
 
-		public override string ToString()
-		{
-			return $"{ToDateTime().ToShortTimeString()}";
-		}
+		public override string ToString() => $"{ToDateTime().ToShortTimeString()}";
 
-		public override int GetHashCode()
-		{
-			return seconds;
-		}
+		public override int GetHashCode() => Seconds;
 
 		public override bool Equals(object obj)
 		{
@@ -73,20 +48,17 @@ namespace MeijerStatAnalyzer
 			else
 			{
 				var that = (SecondsAfterMidnight)obj;
-				return seconds == that.seconds;
+				return Seconds == that.Seconds;
 			}
 		}
 
-		public int CompareTo(SecondsAfterMidnight other)
-		{
-			return seconds.CompareTo(other.seconds);
-		}
+		public int CompareTo(SecondsAfterMidnight other) => Seconds.CompareTo(other.Seconds);
 
-		public static bool operator ==(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.seconds == b.seconds;
-		public static bool operator !=(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.seconds != b.seconds;
-		public static bool operator <(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.seconds < b.seconds;
-		public static bool operator >(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.seconds > b.seconds;
-		public static bool operator <=(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.seconds <= b.seconds;
-		public static bool operator >=(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.seconds >= b.seconds;
+		public static bool operator ==(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.Seconds == b.Seconds;
+		public static bool operator !=(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.Seconds != b.Seconds;
+		public static bool operator <(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.Seconds < b.Seconds;
+		public static bool operator >(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.Seconds > b.Seconds;
+		public static bool operator <=(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.Seconds <= b.Seconds;
+		public static bool operator >=(SecondsAfterMidnight a, SecondsAfterMidnight b) => a.Seconds >= b.Seconds;
 	}
 }
