@@ -29,7 +29,7 @@ namespace TournamentOfPictures
 		private void LoadImage(int index)
 		{
 			string path = list[index];
-			Picture.Image = Image.FromFile(path);
+			Picture.Image = ImageLoader.LoadImage(path);
 			LabelInfo.Text = GetInfo(index);
 		}
 

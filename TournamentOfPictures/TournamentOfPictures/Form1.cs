@@ -28,7 +28,8 @@ namespace TournamentOfPictures
 		{
 			InitializeComponent();
 			files = tournament;
-		}
+            roundsCompleted = files.CurrentRound.CurrentMatchIndex;
+        }
 
         private List<string> GetFilesInFolder(string folderPath)
         {
@@ -65,29 +66,23 @@ namespace TournamentOfPictures
 			var oldImage1 = button1.Image;
 			var oldImage2 = button2.Image;
 
-			button1.Image = Image.FromStream(new MemoryStream(File.ReadAllBytes(picture1)));
-			button2.Image = Image.FromStream(new MemoryStream(File.ReadAllBytes(picture2)));
-
+			button1.Image = ImageLoader.LoadImage(picture1);
+			button2.Image = ImageLoader.LoadImage(picture2);
+            
 			oldImage1?.Dispose();
 			oldImage2?.Dispose();
-
-            if (button1.Image.Width < button1.Width && button1.Image.Height < button1.Height) 
+			
+            if (button1.Image.Width < button1.Width && button1.Image.Height < button1.Height)
             {
                 button1.SizeMode = PictureBoxSizeMode.CenterImage;
             }
-            else 
-            {
-                button1.SizeMode = PictureBoxSizeMode.Zoom; 
-            }
+            else { button1.SizeMode = PictureBoxSizeMode.Zoom; }
 
             if (button2.Image.Width < button2.Width && button2.Image.Height < button2.Height)
             {
                 button2.SizeMode = PictureBoxSizeMode.CenterImage;
             }
-            else
-            {
-                button2.SizeMode = PictureBoxSizeMode.Zoom;
-            }
+            else { button2.SizeMode = PictureBoxSizeMode.Zoom; }
         }
 
         private void StartRound()
@@ -193,9 +188,8 @@ namespace TournamentOfPictures
 		
 			int currentRoundNumber = files.CurrentRoundNumber;
 			int totalMatches = files.CurrentRound.TotalMatches;
-			int matchesRemaining = totalMatches - files.CurrentRound.CurrentMatchIndex;
 
-			label2.Text = $"Round {currentRoundNumber} ({matchesRemaining} matches remaining)";
+			label2.Text = $"Round {currentRoundNumber} ({files.CurrentRound.CurrentMatchIndex + 1} of {totalMatches} matches)";
 		}
 	}
 }

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CopyAvoidDuplicateFilenames": {
+      "commandName": "Project",
+      "commandLineArgs": "\"G:\\Documents\\Files\\Pictures\\Photography\\2019\" \"G:\\Documents\\Files\\Pictures\\Photography\\2010s Tournament\\2019\" jpg"
+    }
+  }
+}

@@ -132,7 +132,7 @@ namespace TournamentOfPictures
 				Dock = DockStyle.Fill
 			};
 
-			if (path != null) { box.Image = Image.FromFile(path); }
+			if (path != null) { box.Image = ImageLoader.LoadImage(path); }
 			box.Click += (sender, e) => Select(control);
 
 			control.Controls.Clear();

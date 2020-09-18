@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ConsoleScratchpad.DealReentrancy;
 
 using static System.Console;
 
@@ -21,9 +23,17 @@ namespace ConsoleScratchpad
 
 	class Program
 	{
-		static unsafe void Main(string[] args)
+		static void Main(string[] args)
         {
-			HashSet<string> floatStrings = new HashSet<string>();
+			string[] table = TableMaker.MakeTable();
+			File.WriteAllLines(@"D:\Documents\CarsQuickBuy\13661\completeTable5.csv", table);
+        }
+
+		private static void DoNothing(int i) { }
+
+		private static unsafe void CountUniqueFloats()
+		{
+			var floatStrings = new HashSet<string>();
 			uint ui = 0u;
 			float* pf = (float*)&ui;
 
@@ -35,9 +45,7 @@ namespace ConsoleScratchpad
 			} while (ui != 0u);
 
 			Console.WriteLine($"{floatStrings.Count} unique out of {uint.MaxValue} ({(floatStrings.Count / uint.MaxValue) * 100f}%)");
-        }
-
-		private static void DoNothing(int i) { }
+		}
 
         private static void StringInterpolationTest()
         {

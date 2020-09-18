@@ -113,7 +113,7 @@ namespace TournamentOfPictures
 
 		private void LoadPicture(string picturePath)
 		{
-			Picture.Image = Image.FromFile(picturePath);
+			Picture.Image = ImageLoader.LoadImage(picturePath);
 		}
 
 		private void ButtonRate1_Click(object sender, EventArgs e)

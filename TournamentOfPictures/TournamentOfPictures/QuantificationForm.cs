@@ -39,7 +39,7 @@ namespace TournamentOfPictures
 
 		private void UpdateInfo()
 		{
-			Picture.Image = Image.FromFile(tournament.Current);
+			Picture.Image = ImageLoader.LoadImage(tournament.Current);
 			LabelInfo.Text = $"Picture {tournament.CurrentIndex + 1} of {tournament.Count}.";
 			Progress.Value = tournament.CurrentIndex;
 		}

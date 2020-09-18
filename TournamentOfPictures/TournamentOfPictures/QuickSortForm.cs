@@ -53,8 +53,8 @@ namespace TournamentOfPictures
 			var oldImage1 = PictureLeft.Image;
 			var oldImage2 = PictureRight.Image;
 
-			PictureLeft.Image = Image.FromStream(new MemoryStream(File.ReadAllBytes(picture1)));
-			PictureRight.Image = Image.FromStream(new MemoryStream(File.ReadAllBytes(picture2)));
+			PictureLeft.Image = ImageLoader.LoadImage(picture1);
+			PictureRight.Image = ImageLoader.LoadImage(picture2);
 
 			oldImage1?.Dispose();
 			oldImage2?.Dispose();

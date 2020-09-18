@@ -27,9 +27,16 @@ namespace SortFilesByDate
 				Environment.Exit(0);
 			}
 
-			// Load the info for the files.
+            string today = DateTime.Today.ToString("yyyyMMdd");
+            string inputFileLogPath = $@"G:\Documents\Files\Unclassified Files\SortFilesByDate\{today}_in.txt";
+            string outputFileLogPath = $@"G:\Documents\Files\Unclassified Files\SortFilesByDate\{today}_out.txt";
 
-			Console.WriteLine("Loading files information...");
+            var inputWriter = new StreamWriter(File.OpenWrite(inputFileLogPath));
+            var outputWriter = new StreamWriter(File.OpenWrite(outputFileLogPath));
+
+            // Load the info for the files.
+
+            Console.WriteLine("Loading files information...");
 			string folderPath = args[0];
 			string parentFolder = Directory.GetParent(folderPath).FullName;
 			string folderName = Path.GetFileName(args[0]);
@@ -40,9 +47,11 @@ namespace SortFilesByDate
 			foreach (string filePath in filePaths)
 			{
 				filesInfo.Add(filePath, new FileInfo(filePath));
+                inputWriter.WriteLine($"Found {filePath}");
 			}
 
 			Console.WriteLine("\tLoaded {0} files.", filesInfo.Count);
+            inputWriter.WriteLine();
 
 			// Sort the files by creation date.
 			Console.WriteLine("Sorting by creation date...");
@@ -60,6 +69,7 @@ namespace SortFilesByDate
 				}
 
 				sortedFiles[lastWriteDate].Add(fileInfo.FullName);
+                inputWriter.WriteLine($"Added {fileInfo.FullName} to {lastWriteDate.ToShortDateString()}");
 			}
 
 			Console.WriteLine("\tSorted into {0} days", sortedFiles.Count);
@@ -67,8 +77,13 @@ namespace SortFilesByDate
 			// Copy the files
 			Console.WriteLine("Copying files...");
 
+            int i = 0;
+            foreach (var kvp in sortedFiles) { i += kvp.Value.Count; }
+
 			string tempFolderName = Path.Combine(parentFolder, $"{folderName}_tmp");
 			Directory.CreateDirectory(tempFolderName);
+
+            int copied = 0;
 
 			foreach (var date in sortedFiles.Keys)
 			{
@@ -84,17 +99,28 @@ namespace SortFilesByDate
 					try
 					{
 						File.Copy(file, newPath);
+                        copied++;
+                        outputWriter.WriteLine($"Copied {file} to {newPath}");
 					}
 					catch (IOException exception)
 					{
 						if (exception.Message.Contains("already exists"))
 						{
-							continue;
+                            Console.WriteLine($"File {file} already exists.");
+                            continue;
 						}
 						else
 						{
 							Console.WriteLine($"\tException: {exception.Message}");
-							Environment.Exit(1);
+                            outputWriter.WriteLine($"Exception: {exception.Message}");
+
+                            inputWriter.Close();
+                            outputWriter.Close();
+
+                            inputWriter.Dispose();
+                            outputWriter.Dispose();
+
+                            Environment.Exit(1);
 						}
 					}
 				}
@@ -103,6 +129,13 @@ namespace SortFilesByDate
 			}
 
 			Console.WriteLine("Operation completed.");
+            Console.WriteLine($"Copied {copied} files.");
+
+            inputWriter.Close();
+            outputWriter.Close();
+
+            inputWriter.Dispose();
+            outputWriter.Dispose();
 		}
 
 		private static void ValidateFolders(string v1, string v2)
@@ -110,10 +143,16 @@ namespace SortFilesByDate
 			string[] aFiles = Directory.GetFiles(v1, "*", SearchOption.AllDirectories);
 			string[] bFiles = Directory.GetFiles(v2, "*", SearchOption.AllDirectories);
 
-			HashSet<string> aSet = new HashSet<string>(aFiles.Select(f => Path.GetFileName(f)));
-			HashSet<string> bSet = new HashSet<string>(bFiles.Select(f => Path.GetFileName(f)));
+            IEnumerable<FileInfo> aInfos = aFiles.Select(f => new FileInfo(f));
+            IEnumerable<FileInfo> bInfos = bFiles.Select(f => new FileInfo(f));
 
-			var except = aSet.Except(bSet);
+            var aGroups = aInfos.GroupBy(f => f.Length);
+            var bGroups = bInfos.GroupBy(f => f.Length);
+
+            var aFlattened = aGroups.Select(f => f.First());
+            var bFlattened = bGroups.Select(f => f.First());
+
+			var except = aFlattened.Except(bFlattened);
 
 			if (!except.Any())
 			{
@@ -123,13 +162,25 @@ namespace SortFilesByDate
 			else
 			{
 				Console.WriteLine("Not valid. Some files were not successfully copied.");
-				string tempPath = @"C:\Users\Chris\Documents\Files\Unclassified Files\SortFilesByDate Validation\";
+				string tempPath = @"G:\Documents\Files\Unclassified Files\SortFilesByDate Validation\";
 				Directory.CreateDirectory(tempPath);
 
 				foreach (var intersect in except)
 				{
 					Console.WriteLine($"\t{intersect}");
-					File.Copy(aFiles.First(f => f.Contains(intersect)), Path.Combine(tempPath, intersect), false);
+                    try
+                    {
+                        File.Copy(aFiles.First(f => f.Contains(intersect.Name)), Path.Combine(tempPath, intersect.Name), false);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex.Message.Contains("already exists")) { continue; }
+                        else
+                        {
+                            Console.WriteLine(ex.Message);
+                            break;
+                        }
+                    }
 				}
 
 				Console.ReadKey(intercept: true);

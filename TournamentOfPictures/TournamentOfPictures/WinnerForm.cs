@@ -26,7 +26,7 @@ namespace TournamentOfPictures
 			filePath = path;
 			this.standings = standings.OrderByDescending(i => i.Score).ToList();
 			this.playlistOrder = playlistOrder.ToList();
-			pictureBox1.Image = Image.FromFile(path);
+			pictureBox1.Image = ImageLoader.LoadImage(path);
             if (pictureBox1.Image.Width < pictureBox1.Width && pictureBox1.Image.Height < pictureBox1.Height)
             {
 				pictureBox1.SizeMode = PictureBoxSizeMode.CenterImage;

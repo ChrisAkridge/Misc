@@ -4,229 +4,230 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ImageProcessorCore;
+using SixLabors;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace PictureTilerCLI
 {
-	internal static class Tiler
-	{
-		public static void Test(Options options)
-		{
-			var files = GetFiles(options.InputFolderPath, options.OrderBy);
+    internal static class Tiler
+    {
+        public static void Test(TileOptions tileOptions)
+        {
+            var files = GetFiles(tileOptions.InputFolderPath, tileOptions.OrderBy);
 
-			var canvas = CreateCanvas(files.Count(), new Size(options.Width, options.Height));
-		}
+            var canvas = CreateCanvas(files.Count(), new Size(tileOptions.Width, tileOptions.Height));
+        }
 
-		public static void Tile(Options options)
-		{
-			var files = GetFiles(options.InputFolderPath, options.OrderBy);
-			var imagesOnCanvas = GetPictureCountOnCanvas(files.Count());
-			var canvas = CreateCanvas(files.Count(), new Size(options.Width, options.Height));
-			var aspect = GetAspectRatio(options.Width, options.Height);
+        public static void Tile(TileOptions tileOptions)
+        {
+            var files = GetFiles(tileOptions.InputFolderPath, tileOptions.OrderBy);
+            var imagesOnCanvas = GetPictureCountOnCanvas(files.Count());
+            var canvas = CreateCanvas(files.Count(), new Size(tileOptions.Width, tileOptions.Height));
+            var aspect = GetAspectRatio(tileOptions.Width, tileOptions.Height);
 
-			int x = 0;
-			int y = 0;
-			int widthInImages = imagesOnCanvas.Item1;
-			int processed = 0;
+            int x = 0;
+            int y = 0;
+            int widthInImages = imagesOnCanvas.Item1;
+            int processed = 0;
 
-			foreach (var file in files)
-			{
-				using (FileStream inputStream = File.OpenRead(file))
-				{
-					try
-					{
-						if (processed == 1980) { System.Diagnostics.Debugger.Break();  }
-						var inputImage = new Image(inputStream);
-						var cropRect = GetImageCropRect(inputImage.Width, inputImage.Height, aspect.Item1, aspect.Item2);
-						var cropped = CropImage(inputImage, cropRect);
-						var resized = ResizeImage(cropped, new Size(options.Width, options.Height));
-						Point destination = new Point(x * options.Width, y * options.Height);
-						Console.WriteLine($"Drawing image {processed} at {destination}");
-						CustomBlend.Blend(canvas, resized, destination);
-					}
-					catch (Exception ex) { Console.WriteLine(ex.Message); continue; }
-					processed++;
-				}
+            foreach (var file in files)
+            {
+                using (var inputStream = File.OpenRead(file))
+                {
+                    try
+                    {
+                        if (processed == 1980) { System.Diagnostics.Debugger.Break(); }
 
-				if (x < widthInImages - 1) { x++; }
-				else
-				{
-					x = 0;
-					y++;
-				}
-			}
+                        var inputImage = Image.Load(inputStream);
 
-			using (FileStream outStream = File.OpenWrite(options.OutputFilePath))
-			{
-				switch (options.OutputFileType)
-				{
-					case OutputFileTypes.Default:
-						throw new ArgumentException();
-					case OutputFileTypes.Gif:
-						canvas.SaveAsGif(outStream);
-						break;
-					case OutputFileTypes.Jpeg:
-						canvas.SaveAsJpeg(outStream, 99);
-						break;
-					case OutputFileTypes.Png:
-						canvas.SaveAsPng(outStream);
-						break;
-					default:
-						break;
-				}
-			}
+                        var cropRect = GetImageCropRect(inputImage.Width, inputImage.Height, aspect.Item1,
+                            aspect.Item2);
+                        var cropped = CropImage(inputImage, cropRect);
+                        var resized = ResizeImage(cropped, new Size(tileOptions.Width, tileOptions.Height));
+                        var destination = new Point(x * tileOptions.Width, y * tileOptions.Height);
+                        Console.WriteLine($"Drawing image {processed} at {destination}");
+                        OverlayImage(canvas, resized, destination.X, destination.Y, new Size(tileOptions.Width, tileOptions.Height));
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message); 
+                        continue;
+                    }
+                    processed++;
+                }
 
-			Console.ReadKey(intercept: true);
-		}
-	
-		private static IEnumerable<string> GetFiles(string inputFolderPath, OrderByTypes orderByType)
-		{
-			if (!Directory.Exists(inputFolderPath))
-			{
-				throw new DirectoryNotFoundException($"Invalid path {inputFolderPath}: path does not exist");
-			}
+                if (x < widthInImages - 1) { x++; }
+                else
+                {
+                    x = 0;
+                    y++;
+                }
+            }
 
-			var files = Directory.GetFiles(inputFolderPath, "*", SearchOption.TopDirectoryOnly);
-			var filteredFiles = files.Where(f => f.EndsWith("gif", StringComparison.InvariantCultureIgnoreCase)
-			|| f.EndsWith("jpg", StringComparison.InvariantCultureIgnoreCase)
-			|| f.EndsWith("jpeg", StringComparison.InvariantCultureIgnoreCase)
-			|| f.EndsWith("png", StringComparison.InvariantCultureIgnoreCase));
+            using (var outStream = File.OpenWrite(tileOptions.OutputFilePath))
+            {
+                switch (tileOptions.OutputFileType)
+                {
+                    case OutputFileTypes.Default:
+                        throw new ArgumentException();
+                    case OutputFileTypes.Gif:
+                        canvas.SaveAsGif(outStream);
+                        break;
+                    case OutputFileTypes.Jpeg:
+                        canvas.SaveAsJpeg(outStream);
+                        break;
+                    case OutputFileTypes.Png:
+                        canvas.SaveAsPng(outStream);
+                        break;
+                    default:
+                        break;
+                }
+            }
 
-			switch (orderByType)
-			{
-				case OrderByTypes.Default:
-				case OrderByTypes.Name:
-					return filteredFiles;
-				case OrderByTypes.DateCreated:
-					return filteredFiles.OrderBy(f =>
-					{
-						FileInfo fi = new FileInfo(f);
-						return fi.CreationTime;
-					});
-				case OrderByTypes.Size:
-					return filteredFiles.OrderBy(f =>
-					{
-						FileInfo fi = new FileInfo(f);
-						return fi.Length;
-					});
-				default:
-					return filteredFiles;
-			}
-		}
+            Console.ReadKey(intercept: true);
+        }
+    
+        private static IList<string> GetFiles(string inputFolderPath, OrderByTypes orderByType)
+        {
+            if (!Directory.Exists(inputFolderPath))
+            {
+                throw new DirectoryNotFoundException($"Invalid path {inputFolderPath}: path does not exist");
+            }
 
-		private static Tuple<int, int> GetPictureCountOnCanvas(int pictureCount)
-		{
-			double sqrt = Math.Sqrt(pictureCount);
-			double decimalPart = sqrt - Math.Truncate(sqrt);
-			int intSqrt = (int)Math.Sqrt(pictureCount);
+            var files = Directory.GetFiles(inputFolderPath, "*", SearchOption.TopDirectoryOnly);
+            var filteredFiles = files.Where(f => f.EndsWith("gif", StringComparison.InvariantCultureIgnoreCase)
+                || f.EndsWith("jpg", StringComparison.InvariantCultureIgnoreCase)
+                || f.EndsWith("jpeg", StringComparison.InvariantCultureIgnoreCase)
+                || f.EndsWith("png", StringComparison.InvariantCultureIgnoreCase));
 
-			if (intSqrt * intSqrt == pictureCount) { return new Tuple<int, int>(intSqrt, intSqrt); }
-			else
-			{
-				// Code from ByteView
-				// Used with permission
-				int height = intSqrt;
-				int remainder = pictureCount - (intSqrt * intSqrt);
-				for (int remainderRows = (int)Math.Ceiling((double)remainder / intSqrt); remainderRows > 0; remainderRows--)
-				{
-					height++;
-				}
-				return new Tuple<int, int>(intSqrt, height);
-			}
-		}
+            IEnumerable<string> resultFiles;
 
-		private static Rectangle GetImageCropRect(int imageWidth, int imageHeight, int aspectX, int aspectY)
-		{
-			var imageAspect = GetAspectRatio(imageWidth, imageHeight);
-			int imageAspectX = imageAspect.Item1;
-			int imageAspectY = imageAspect.Item2;
+            switch (orderByType)
+            {
+                case OrderByTypes.DateCreated:
+                    resultFiles = filteredFiles.OrderBy(f =>
+                    {
+                        var fi = new FileInfo(f);
+                        return fi.CreationTime;
+                    });
+                    break;
+                case OrderByTypes.Size:
+                    resultFiles = filteredFiles.OrderBy(f =>
+                    {
+                        var fi = new FileInfo(f);
+                        return fi.Length;
+                    });
+                    break;
+                case OrderByTypes.Default:
+                case OrderByTypes.Name:
+                default:
+                    resultFiles = filteredFiles;
+                    break;
+            }
 
-			if (imageAspectX == aspectX && imageAspectY == aspectY)
-			{
-				return new Rectangle(0, 0, imageWidth, imageHeight);
-			}
-			else
-			{
-				double imageOneByAspect = (double)imageAspectX / imageAspectY;
-				double oneByAspect = (double)aspectX / aspectY;
+            return resultFiles.ToList();
+        }
 
-				Point imageCenter = GetImageCenter(new Size(imageWidth, imageHeight));
+        private static Tuple<int, int> GetPictureCountOnCanvas(int pictureCount)
+        {
+            double sqrt = Math.Sqrt(pictureCount);
+            int intSqrt = (int)Math.Sqrt(pictureCount);
 
-				Size cropSizeBasedOnHeight = new Size((int)(imageHeight * oneByAspect), imageHeight);
-				Size cropSizeBasedOnWidth = new Size(imageWidth, (int)(imageWidth / oneByAspect));
-				Size cropSize = (WillSizeFit(cropSizeBasedOnHeight, new Size(imageWidth, imageHeight))) ? cropSizeBasedOnHeight : cropSizeBasedOnWidth;
-				Point cropTopLeft = new Point(imageCenter.X - (cropSize.Width / 2), imageCenter.Y - (cropSize.Height / 2));
-				return new Rectangle(cropTopLeft.X, cropTopLeft.Y, cropSize.Width, cropSize.Height);
-			}
-		}
+            if (intSqrt * intSqrt == pictureCount) { return new Tuple<int, int>(intSqrt, intSqrt); }
+            else
+            {
+                // Code from ByteView
+                // Used with permission
+                int height = intSqrt;
+                int remainder = pictureCount - (intSqrt * intSqrt);
+                for (int remainderRows = (int)Math.Ceiling((double)remainder / intSqrt); remainderRows > 0; remainderRows--)
+                {
+                    height++;
+                }
+                return new Tuple<int, int>(intSqrt, height);
+            }
+        }
 
-		private static Image<Color, uint> CropImage(Image original, Rectangle cropRect)
-		{
-			return original.Crop(cropRect.Width, cropRect.Height, cropRect);
-		}
+        private static Rectangle GetImageCropRect(int imageWidth, int imageHeight, int aspectX, int aspectY)
+        {
+            var imageAspect = GetAspectRatio(imageWidth, imageHeight);
+            int imageAspectX = imageAspect.Item1;
+            int imageAspectY = imageAspect.Item2;
 
-		private static Image<Color, uint> ResizeImage(Image<Color, uint> image, Size newSize)
-		{
-			return image.Resize(newSize.Width, newSize.Height);
-		}
+            if (imageAspectX == aspectX && imageAspectY == aspectY)
+            {
+                return new Rectangle(0, 0, imageWidth, imageHeight);
+            }
+            else
+            {
+                double imageOneByAspect = (double)imageAspectX / imageAspectY;
+                double oneByAspect = (double)aspectX / aspectY;
 
-		private static Point GetImageCenter(Size imageSize)
-		{
-			return new Point(imageSize.Width / 2, imageSize.Height / 2);
-		}
+                var imageCenter = GetImageCenter(new Size(imageWidth, imageHeight));
 
-		private static Size GetCanvasSize(int imageCount, Size imageSize)
-		{
-			var countOnCanvas = GetPictureCountOnCanvas(imageCount);
-			return new Size(countOnCanvas.Item1 * imageSize.Width, countOnCanvas.Item2 * imageSize.Height);
-		}
+                var cropSizeBasedOnHeight = new Size((int)(imageHeight * oneByAspect), imageHeight);
+                var cropSizeBasedOnWidth = new Size(imageWidth, (int)(imageWidth / oneByAspect));
+                var (width, height) = WillSizeFit(cropSizeBasedOnHeight, new Size(imageWidth, imageHeight)) 
+                    ? cropSizeBasedOnHeight
+                    : cropSizeBasedOnWidth;
+                var (x, y) = new Point(imageCenter.X - (width / 2), imageCenter.Y - (height / 2));
+                return new Rectangle(x, y, width, height);
+            }
+        }
 
-		private static Image CreateCanvas(int imageCount, Size imageSize)
-		{
-			var canvasSize = GetCanvasSize(imageCount, imageSize);
-			Image result = new Image(canvasSize.Width, canvasSize.Height);
-			using (PixelAccessor<Color, uint> pixels = result.Lock())
-			{
-				for (int y = 0; y < imageSize.Height; y++)
-				{
-					for (int x = 0; x < imageSize.Width; x++)
-					{
-						pixels[x, y] = Color.White;
-					}
-				}
-			}
+        private static Image CropImage(Image original, Rectangle cropRect) => original.Clone(i => i.Crop(cropRect));
 
-			return result;
-		}
+        private static Image ResizeImage(Image image, Size newSize) => image.Clone(i => i.Resize(newSize));
 
-		private static void OverlayImage(Image canvas, Image<Color, uint> image, int x, int y, Size imageSize)
-		{
-			Point imageOverlayPosition = new Point(x * imageSize.Width, y * imageSize.Height);
-			canvas.Blend(image, 100, new Rectangle(imageOverlayPosition, imageSize));
-		}
+        private static Point GetImageCenter(Size imageSize) => new Point(imageSize.Width / 2, imageSize.Height / 2);
 
-		private static bool WillSizeFit(Size a, Size b)
-		{
-			return a.Width <= b.Width && a.Height <= b.Height;
-		}
+        private static Size GetCanvasSize(int imageCount, Size imageSize)
+        {
+            var countOnCanvas = GetPictureCountOnCanvas(imageCount);
+            return new Size(countOnCanvas.Item1 * imageSize.Width, countOnCanvas.Item2 * imageSize.Height);
+        }
 
-		private static Tuple<int, int> GetAspectRatio(int width, int height)
-		{
-			int gcd = GetGCD(height, width);
-			int a = height / gcd;
-			int b = width / gcd;
-			return new Tuple<int, int>(b, a);
-		}
+        private static Image CreateCanvas(int imageCount, Size imageSize)
+        {
+            var canvasSize = GetCanvasSize(imageCount, imageSize);
+            return new Image<Rgba32>(imageSize.Width, imageSize.Height, Rgba32.ParseHex("ffffffff"));
+        }
 
-		private static double GetOneByAspectRatio(int width, int height)
-		{
-			return (double)width / height;
-		}
+        private static void OverlayImage(Image canvas, Image image, int x, int y, Size imageSize)
+        {
+            var imageOverlayPosition = new Point(x * imageSize.Width, y * imageSize.Height);
+            canvas.Mutate(c => c.DrawImage(image, imageOverlayPosition, 1f));
+        }
 
-		private static int GetGCD(int a, int b)
-		{
-			// http://stackoverflow.com/a/2565188/2709212
-			return b == 0 ? a : GetGCD(b, a % b);
-		}
-	}
+        private static bool WillSizeFit(Size a, Size b) => a.Width <= b.Width && a.Height <= b.Height;
+
+        private static Tuple<int, int> GetAspectRatio(int width, int height)
+        {
+            int gcd = GetGCD(height, width);
+            int a = height / gcd;
+            int b = width / gcd;
+            return new Tuple<int, int>(b, a);
+        }
+
+        private static double GetOneByAspectRatio(int width, int height) => (double)width / height;
+
+        // http://stackoverflow.com/a/2565188/2709212
+        private static int GetGCD(int a, int b)
+        {
+            while (true)
+            {
+                if (b == 0)
+                {
+                    return a;
+                }
+
+                var c = a;
+                a = b;
+                b = c % b;
+            }
+        }
+    }
 }

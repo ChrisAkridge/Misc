@@ -71,6 +71,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DealReentrancy\InspectorResults.cs" />
+    <Compile Include="DealReentrancy\TableMaker.cs" />
     <Compile Include="IKEAArgument.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
