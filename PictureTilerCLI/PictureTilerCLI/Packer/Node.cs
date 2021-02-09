@@ -20,5 +20,9 @@ namespace PictureTilerCLI.Packer
             Size = size;
             Location = location;
         }
+
+        /// <summary>Returns a string that represents the current object.</summary>
+        /// <returns>A string that represents the current object.</returns>
+        public override string ToString() => $"Node {Size.Width}, {Size.Height} at {Location.X}, {Location.Y} ({(Right == null ? "no right" : $"right at {Right.Location.X}, {Right.Location.Y}")}, {(Down == null ? "no down" : $"Down at {Down.Location.X}, {Down.Location.Y}")})";
     }
 }

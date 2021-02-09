@@ -98,6 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MultiPicture\Divider.cs" />
+    <Compile Include="MultiPicture\ImagePosition.cs" />
     <Compile Include="Packer\Block.cs" />
     <Compile Include="Packer\Node.cs" />
     <Compile Include="Packer\Packer.cs" />

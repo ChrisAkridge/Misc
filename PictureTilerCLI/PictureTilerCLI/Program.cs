@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CommandLine;
 using CommandLine.Text;
 using PictureTilerCLI.Packer;
+using SixLabors.ImageSharp;
 
 namespace PictureTilerCLI
 {
@@ -24,6 +26,8 @@ namespace PictureTilerCLI
 
                     foreach (var error in errors) { Console.WriteLine("\t" + error.Tag); }
                 });
+
+            Console.ReadKey(intercept: true);
         }
     }
 
@@ -75,8 +79,8 @@ namespace PictureTilerCLI
         [Option('i', "input", Required = true, HelpText = "Path to the folder of pictures to pack.")]
         public string InputFolderPath { get; set; }
         
-        [Option('o', "output", Required = true, HelpText = "Path to the image to pack the input pictures into.")]
-        public string OutputFilePath { get; set; }
+        [Option('o', "output", Required = true, HelpText = "Path to the image to pack the input pictures into, or folder to place the tiles into.")]
+        public string OutputPath { get; set; }
         
         [Option('w', "width", Required = false, HelpText = "The desired final aspect ratio width (i.e. 16:9 has a height of 16).")]
         public int AspectRatioWidth { get; set; }
@@ -86,6 +90,9 @@ namespace PictureTilerCLI
         
         [Option('r', "recursive", Required = false, HelpText = "Load pictures recursively.")]
         public bool Recursive { get; set; }
+
+        [Option('m', "multipicture", Required = false, HelpText = "Produces a pyramidal structure of 256x256 tiles in the output folder.")]
+        public bool Multipicture { get; set; }
     }
     
     internal enum OutputFileTypes

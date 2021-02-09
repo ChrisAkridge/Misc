@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PictureTilerCLI.MultiPicture;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -17,14 +18,11 @@ namespace PictureTilerCLI.Packer
             var files = GetFiles(options.InputFolderPath, options.Recursive);
             var filesAndSizes = new Dictionary<string, Size>();
 
-            for (int i = 0; i < files.Count; i++)
+            foreach (string file in files)
             {
-                if (i > 0 && i % 100 == 0)
-                {
-                    Console.WriteLine($"Loaded sizes for {i} files");
-                }
-                
-                filesAndSizes.Add(files[i], GetImageSize(files[i]));
+                var size = GetImageSize(file);
+                filesAndSizes.Add(file, size);
+                Console.WriteLine($"Loaded size for {Path.GetFileName(file)} ({size.Width} by {size.Height})");
             }
 
             var blocks = filesAndSizes.OrderByDescending(kvp => kvp.Value.Width)
@@ -34,10 +32,21 @@ namespace PictureTilerCLI.Packer
                     Size = kvp.Value
                 })
                 .ToList();
-            
+
             var packer = new Packer();
             packer.Fit(blocks);
-            DrawImage(blocks, packer.Root.Size, options.OutputFilePath);
+
+            if (!options.Multipicture) { DrawImage(blocks, packer.Root.Size, options.OutputPath); }
+            else
+            {
+                var images = blocks.Select(b => new PositionedImage
+                {
+                    ImageFilePath = b.ImageFilePath,
+                    Position = b.Fit.Location,
+                    Size = b.Size
+                });
+                Divider.Divide(images, new Size(256, 256), options.OutputPath);
+            }
         }
 
         private static IList<string> GetFiles(string inputFolderPath, bool recursive)
