@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Celarix.IO.FileAnalysis.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "\"D:\\fa\\in\" \"D:\\fa\\out\""
+    }
+  }
+}

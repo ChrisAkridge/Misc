@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Celarix.Imaging" Version="1.0.2" />
+    <PackageReference Include="CSharpLib" Version="3.0.1" />
+    <PackageReference Include="ICSharpCode.Decompiler" Version="7.1.0.6543" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.10.0" />
+    <PackageReference Include="morelinq" Version="3.3.2" />
+    <PackageReference Include="NLog" Version="4.7.10" />
+    <PackageReference Include="Pri.LongPath" Version="2.0.53" />
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SevenZipSharp-dev\SevenZip\SevenZip.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ClientBinaries\objconv.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
