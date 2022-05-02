@@ -1,6 +1,9 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using NLog;
+using NLog.Conditions;
 using NLog.Config;
+using NLog.Filters;
 using NLog.Targets;
 using LongPath = Pri.LongPath.Path;
 
@@ -17,7 +20,13 @@ namespace Celarix.IO.FileAnalysis
             var coloredConsoleTarget = new ColoredConsoleTarget
             {
                 Name = "coloredConsole",
-                Layout = Layout
+                Layout = Layout,
+                RowHighlightingRules =
+                {
+                    new ConsoleRowHighlightingRule(ConditionParser.ParseExpression("contains(\'${message}\', \'estimated\')"),
+                        ConsoleOutputColor.DarkGreen,
+                        ConsoleOutputColor.Black)
+                }
 			};
             config.AddRule(LogLevel.Trace, LogLevel.Fatal, coloredConsoleTarget);
             

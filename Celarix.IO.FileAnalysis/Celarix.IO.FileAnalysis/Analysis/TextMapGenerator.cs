@@ -108,13 +108,10 @@ namespace Celarix.IO.FileAnalysis.Analysis
                     {
                         var nonWhitespaceCharacterIsHere = (x < lineMap.Length) && lineMap[x];
 
-                        if (nonWhitespaceCharacterIsHere) { resultImage[columnDrawX + x, y + headerHeight] = Color.Black; }
-                        else
-                        {
-                            var saturation = (random.Next() % 2 == 0 ? 1 : -1)
-                                + DefaultBackgroundSaturation;
-                            resultImage[columnDrawX + x, y + headerHeight] = HsvToRgb(currentLineHue, saturation, 1d);
-                        }
+                        resultImage[columnDrawX + x, y + headerHeight] = nonWhitespaceCharacterIsHere
+                            ? (Rgb24)Color.Black
+                            : HsvToRgb(currentLineHue,
+                                DefaultBackgroundSaturation, 1d);
                     }
 
                     currentLineHue += hueStep;
