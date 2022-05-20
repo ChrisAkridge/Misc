@@ -173,3 +173,10 @@ UpgradeLog*.htm
 # Microsoft Fakes
 FakesAssemblies/
 *.diagsession
+/Celarix.IO.FileAnalysis/.vs/Celarix.IO.FileAnalysis/FileContentIndex/0207abf5-30b3-4678-a7a4-b4bd8036f2be.vsidx
+/Celarix.IO.FileAnalysis/.vs/Celarix.IO.FileAnalysis/FileContentIndex/read.lock
+/Celarix.IO.FileAnalysis/.vs/Celarix.IO.FileAnalysis/v17/TestStore/0/000.testlog
+/Celarix.IO.FileAnalysis/.vs/Celarix.IO.FileAnalysis/v17/TestStore/0/testlog.manifest
+/Celarix.IO.FileAnalysis/.vs/Celarix.IO.FileAnalysis/v17/.futdcache.v1
+/Celarix.IO.FileAnalysis/.vs/ProjectEvaluation/celarix.io.fileanalysis.metadata.v2
+/Celarix.IO.FileAnalysis/.vs/ProjectEvaluation/celarix.io.fileanalysis.projects.v2
