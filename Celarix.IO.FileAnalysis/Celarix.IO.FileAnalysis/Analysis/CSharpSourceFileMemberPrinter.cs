@@ -49,38 +49,9 @@ namespace Celarix.IO.FileAnalysis.Analysis
             }
         }
 
-        private static bool IsCSharpSourceFile(string sourceFilePath)
-        {
-            using var stream = LongFile.OpenRead(sourceFilePath);
-            var buffer = new byte[65536];
-            int readBytes = stream.Read(buffer, 0, 65536);
-
-            if (readBytes == 0) { return false; }
-
-            var encoding = (buffer[0] == 0)
-                ? Encoding.BigEndianUnicode
-                : (buffer[1] == 0)
-                    ? Encoding.Unicode
-                    : Encoding.UTF8;
-            var text = encoding.GetString(buffer);
-
-            var hasCSharpPunctuation = text.Contains("{")
-                && text.Contains("}")
-                && text.Contains("(")
-                && text.Contains(")")
-                && text.Contains(";");
-
-            var hasCSharpMemberKeywords = text.Contains("namespace")
-                || text.Contains("class")
-                || text.Contains("struct")
-                || text.Contains("interface")
-                || text.Contains("enum")
-                || text.Contains("public")
-                || text.Contains("internal")
-                || text.Contains("using");
-
-            return hasCSharpPunctuation && hasCSharpMemberKeywords;
-        }
+        private static bool IsCSharpSourceFile(string sourceFilePath) =>
+            sourceFilePath.EndsWith(".cs", StringComparison.InvariantCultureIgnoreCase)
+            || sourceFilePath.EndsWith(".cshtml", StringComparison.InvariantCultureIgnoreCase);
 
         private static string GetSavePath(string filePath) =>
             LongPath.Combine(LongPath.GetDirectoryName(filePath),

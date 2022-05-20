@@ -24,9 +24,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
             return job.ToAbsolutePath(FileLocation.Output,
                 LongPath.Combine(LongPath.Combine(SharedConstants.PathFileFolderPath,
-                        guidBytes[0].ToString("X2"),
-                        guidBytes[1].ToString("X2"),
-                        guidBytes[2].ToString("X2")),
+                        guidBytes[0].ToString("X2")),
                     $"{guid}.txt"));
         }
 
@@ -36,9 +34,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
             return job.ToAbsolutePath(FileLocation.Output,
                 LongPath.Combine(LongPath.Combine(SharedConstants.ImagePathFileFolderPath,
-                        guidBytes[0].ToString("X2"),
-                        guidBytes[1].ToString("X2"),
-                        guidBytes[2].ToString("X2")),
+                        guidBytes[0].ToString("X2")),
                     $"{guid}.txt"));
         }
 
@@ -53,6 +49,12 @@ namespace Celarix.IO.FileAnalysis.Analysis
                 //logger.Fatal($"A binary drawing file or text map has been added to the list of files to process! At {filePath}");
                 //logger.Fatal(Environment.StackTrace);
                 //Environment.Exit(-1);
+            }
+            
+            if (string.IsNullOrEmpty(filePath))
+            {
+                logger.Warn("Attempted to write a path file that was empty.");
+                return;
             }
             
             var pathFilePath = GetPathFilePath(job, Guid.NewGuid());

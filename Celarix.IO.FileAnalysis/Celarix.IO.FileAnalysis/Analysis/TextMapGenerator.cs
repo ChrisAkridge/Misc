@@ -22,10 +22,8 @@ namespace Celarix.IO.FileAnalysis.Analysis
 	public static class TextMapGenerator
     {
         private const double DefaultBackgroundSaturation = 0.15d;
-        private const double BackgroundSaturationVariation = 0.08d;
         private const string TextMapPath = "textMap.png";
-
-        private static readonly Random random = new Random();
+        
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         public static void GenerateMapForTextFile(string filePath)

@@ -28,6 +28,15 @@ namespace Celarix.IO.FileAnalysis.Analysis
                 {
                     var pathFilePath = pathFileEnumerator.Current;
                     var fileToAnalyzePath = LongFile.ReadAllText(pathFilePath);
+
+                    if (string.IsNullOrEmpty(fileToAnalyzePath))
+                    {
+                        logger.Warn("Path file had no path in it.");
+                        DeletePathFile(pathFilePath);
+                        AnalysisJob.EstimatedRemainingFiles = Math.Max(0, AnalysisJob.EstimatedRemainingFiles - 1);
+                        logger.Info($"An estimated {AnalysisJob.EstimatedRemainingFiles:N0} files remain.");
+                        continue;
+                    }
                     
                     logger.Info($"Analyzing {fileToAnalyzePath}...");
 
@@ -84,8 +93,6 @@ namespace Celarix.IO.FileAnalysis.Analysis
         private void DeletePathFile(string pathFilePath)
         {
             var parentFolder = LongPath.GetDirectoryName(pathFilePath);
-            var parentParentFolder = LongPath.GetDirectoryName(parentFolder);
-            var parentParentParentFolder = LongPath.GetDirectoryName(parentParentFolder);
             
             logger.Info($"Deleting path file at {pathFilePath}");
             LongFile.Delete(pathFilePath);
@@ -94,18 +101,6 @@ namespace Celarix.IO.FileAnalysis.Analysis
             {
                 logger.Info($"{parentFolder} is empty, deleting...");
                 LongDirectory.Delete(parentFolder);
-            }
-
-            if (LongDirectory.GetDirectories(parentParentFolder, "*", SearchOption.TopDirectoryOnly).Length == 0)
-            {
-                logger.Info($"{parentParentFolder} is empty, deleting...");
-                LongDirectory.Delete(parentParentFolder);
-            }
-
-            if (LongDirectory.GetDirectories(parentParentParentFolder, "*", SearchOption.TopDirectoryOnly).Length == 0)
-            {
-                logger.Info($"{parentParentParentFolder} is empty, deleting...");
-                LongDirectory.Delete(parentParentParentFolder);
             }
         }
     }
