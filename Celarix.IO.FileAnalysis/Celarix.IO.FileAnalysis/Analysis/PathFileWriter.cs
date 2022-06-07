@@ -40,10 +40,10 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
         public static void WritePathFile(AnalysisJob job, string filePath)
         {
-            if (filePath.Contains("\\bytes\\") || filePath.Contains("textMap") || filePath.Contains("bytes.png"))
+            if (filePath.Contains("\\bytes\\") || filePath.Contains("textMap") || filePath.Contains("bytes.png") || filePath.Contains("members.cs"))
             {
                 logger.Warn(
-                    $"Attempted to add a binary drawing file or text map to the list of files. At {filePath}");
+                    $"Attempted to add a binary drawing file, text map, or C# member list to the list of files. At {filePath}");
                 return;
 
                 //logger.Fatal($"A binary drawing file or text map has been added to the list of files to process! At {filePath}");
