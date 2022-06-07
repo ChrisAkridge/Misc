@@ -55,7 +55,10 @@ namespace Celarix.IO.FileAnalysis.Analysis
                         PathFileWriter.WriteImagePathFile(job, fileToAnalyzePath);
                     }
 
-                    BinaryDrawer.CreateBinaryImage(fileToAnalyzePath);
+                    // 2022-05-26: Disable this to save time and diskspace. I'd
+                    // rather use ByteView's LFP and output as video instead of
+                    // ballooning with so many small files.
+                    // BinaryDrawer.CreateBinaryImage(fileToAnalyzePath);
 
                     if (Utilities.Utilities.IsTextFile(fileToAnalyzePath))
                     {
