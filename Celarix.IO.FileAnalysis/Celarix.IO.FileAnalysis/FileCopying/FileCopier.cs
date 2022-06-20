@@ -117,7 +117,7 @@ namespace Celarix.IO.FileAnalysis.FileCopying
 
         private void CopyFiles()
         {
-            logger.Info($"Copying files from input to output...");
+            logger.Info("Copying files from input to output...");
             
             var fileListPaths = LongDirectory
                 .EnumerateFiles(AnalysisJob.ToAbsolutePath(FileLocation.Output,

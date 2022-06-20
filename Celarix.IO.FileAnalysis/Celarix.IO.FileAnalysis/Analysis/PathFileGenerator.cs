@@ -31,10 +31,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
             {
                 logger.Info($"Writing path file for {outputFilePath}");
                 PathFileWriter.WritePathFile(job, outputFilePath);
-                AnalysisJob.EstimatedRemainingFiles += 1;
             }
-            
-            logger.Info($"Generated {AnalysisJob.EstimatedRemainingFiles} path files for output files");
         }
     }
 }
