@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Celarix.IO.FileAnalysis.Extensions;
+using Celarix.IO.FileAnalysis.Utilities;
 using MoreLinq;
 using NLog;
 using SixLabors.Fonts;
@@ -29,6 +30,14 @@ namespace Celarix.IO.FileAnalysis.Analysis
         public static void GenerateMapForTextFile(string filePath)
         {
             logger.Info($"Writing text map for {filePath}...");
+
+            var mapSavePath = GetSavePath(filePath);
+
+            if (LongFile.Exists(mapSavePath))
+            {
+                logger.Warn($"The text map for the file at {filePath} already exists! Skipping...");
+                return;
+            }
 
             using var stream = new StreamReader(LongFile.OpenRead(filePath));
             var lineMaps = new List<BitArray>();
@@ -74,16 +83,16 @@ namespace Celarix.IO.FileAnalysis.Analysis
             const int headerHeight = 24;
             var resultImage = new Image<Rgb24>(totalImageWidth, linesPerColumn + headerHeight);
             var columnDrawX = 0;
-
-            var font = SystemFonts.CreateFont("Consolas", 14f);
+            
             var shortenedPath = filePath;
-
+            var font = SystemFonts.CreateFont("Consolas", 14f);
+            
             while (TextMeasurer.Measure(shortenedPath, new RendererOptions(font)).Width > resultImage.Width)
             {
                 if (!Utilities.Utilities.TryShortenFilePath(shortenedPath, out shortenedPath)) { break; }
             }
 
-            resultImage.Mutate(ctx => ctx.DrawText(filePath, font, Color.White, PointF.Empty));
+            CharacterCache.DrawString(resultImage, shortenedPath, Point.Empty);
 
             for (var i = 0; i < columnMaps.Length; i++)
             {
@@ -117,8 +126,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
                 columnDrawX += columnWidth;
             }
-
-            var mapSavePath = GetSavePath(filePath);
+            
             new LongDirectoryInfo(LongPath.GetDirectoryName(mapSavePath)).Create();
             resultImage.SaveAsPng(mapSavePath);
         }

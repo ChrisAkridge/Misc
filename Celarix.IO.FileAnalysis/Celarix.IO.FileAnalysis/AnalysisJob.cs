@@ -9,6 +9,7 @@ using Celarix.IO.FileAnalysis.Analysis;
 using Celarix.IO.FileAnalysis.Deduplication;
 using Celarix.IO.FileAnalysis.FileCopying;
 using Celarix.IO.FileAnalysis.StatisticCSVs;
+using Celarix.IO.FileAnalysis.Utilities;
 using NLog;
 using LongFile = Pri.LongPath.File;
 using LongPath = Pri.LongPath.Path;
@@ -89,6 +90,9 @@ namespace Celarix.IO.FileAnalysis
         public void StartOrResume()
         {
             LoggingConfigurer.ConfigureLogging(OutputFolderPath);
+
+            logger.Info("Building character cache...");
+            CharacterCache.Build();
 
             while (CurrentPhaseIndex < phases.Length)
             {

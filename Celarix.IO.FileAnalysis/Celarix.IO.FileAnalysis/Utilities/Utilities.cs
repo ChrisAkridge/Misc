@@ -71,6 +71,11 @@ namespace Celarix.IO.FileAnalysis.Utilities
             string fileName = parts[^1];
             parts.RemoveAt(parts.Count - 1);
 
+            if (parts.Count > 1)
+            {
+                parts.RemoveAll(p => p == "...");
+            }
+
             string longestPart = parts.OrderByDescending(p => p.Length).First();
 
             if (longestPart.Length == 3)

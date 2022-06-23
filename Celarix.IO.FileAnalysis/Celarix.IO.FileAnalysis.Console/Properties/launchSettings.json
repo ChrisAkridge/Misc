@@ -2,7 +2,7 @@
   "profiles": {
     "Celarix.IO.FileAnalysis.Console": {
       "commandName": "Project",
-      "commandLineArgs": "\"H:\\fa_tests\" \"H:\\fa_tests\\out\""
+      "commandLineArgs": "\"H:\\ProgramData_TakeTwo\" \"H:\\fa\\ProgramData_TakeTwo\""
     }
   }
 }
