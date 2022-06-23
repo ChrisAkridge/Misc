@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Celarix.IO.FileAnalysis.Extensions;
@@ -10,6 +11,7 @@ using ICSharpCode.Decompiler.Metadata;
 using NLog;
 using LongPath = Pri.LongPath.Path;
 using LongDirectoryInfo = Pri.LongPath.DirectoryInfo;
+using LongDirectory = Pri.LongPath.Directory;
 
 namespace Celarix.IO.FileAnalysis.Analysis.Clients
 {
@@ -120,6 +122,13 @@ namespace Celarix.IO.FileAnalysis.Analysis.Clients
                 // Based on https://github.com/icsharpcode/ILSpy/blob/8eafbb3d901938c58c14b8cee258bf1c1dd8255f/ICSharpCode.Decompiler.Console/IlspyCmdProgram.cs#L185
                 var outputFolderPath = GetOutputFolderPath(filePath);
                 new LongDirectoryInfo(outputFolderPath).Create();
+
+                if (LongDirectory.EnumerateFiles(outputFolderPath, "*", SearchOption.TopDirectoryOnly)
+                    .Any(f => f.Contains("csproj")))
+                {
+                    logger.Warn($"The assembly at {filePath} has already been decompiled! Skipping...");
+                    return true;
+                }
 
                 var module = new PEFile(filePath);
                 var resolver = new UniversalAssemblyResolver(filePath, throwOnError: false, module.Reader.DetectTargetFrameworkId());

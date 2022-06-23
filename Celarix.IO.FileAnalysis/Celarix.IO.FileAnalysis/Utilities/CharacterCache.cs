@@ -41,19 +41,13 @@ namespace Celarix.IO.FileAnalysis.Utilities
         public static void DrawString(Image<Rgb24> image, string text, Point location)
         {
             var currentLocation = location;
-            foreach (var cachedCharacter in text.Select(c => cache[c - 0x20]))
+            foreach (var cachedCharacter in text.Select(c => c is >= ' ' and <= '~'
+                         ? cache[c - 0x20]
+                         : cache['?']).TakeWhile(_ => currentLocation.X + 7 < image.Width))
             {
-                if (currentLocation.X + 7 >= image.Width)
-                {
-                    break;
-                }
-                
                 for (var y = 0; y < 24; y++)
                 {
-                    for (var x = 0; x < 7; x++)
-                    {
-                        image[x + currentLocation.X, y + currentLocation.Y] = cachedCharacter[x, y];
-                    }
+                    for (var x = 0; x < 7; x++) { image[x + currentLocation.X, y + currentLocation.Y] = cachedCharacter[x, y]; }
                 }
                 currentLocation = new Point(currentLocation.X + 7, currentLocation.Y);
             }

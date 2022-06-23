@@ -4,6 +4,7 @@ using Celarix.IO.FileAnalysis.Extensions;
 using NLog;
 using SevenZip;
 using LongPath = Pri.LongPath.Path;
+using LongDirectory = Pri.LongPath.Directory;
 
 namespace Celarix.IO.FileAnalysis.Analysis.Clients
 {
@@ -18,6 +19,13 @@ namespace Celarix.IO.FileAnalysis.Analysis.Clients
                 logger.Trace($"Attempting to extract {filePath}...");
                 
                 var outputFolder = GetExtractionPathForFile(filePath);
+
+                if (LongDirectory.Exists(outputFolder))
+                {
+                    logger.Warn($"The archive at {filePath} was already extracted! Skipping...");
+                    return new ExtractResult(true, 0);
+                }
+                
                 using var reader = new SevenZipExtractor(filePath);
 
                 reader.ExtractArchive(outputFolder);

@@ -5,6 +5,7 @@ using Celarix.IO.FileAnalysis.Extensions;
 using NLog;
 using LongDirectory = Pri.LongPath.Directory;
 using LongPath = Pri.LongPath.Path;
+using LongFile = Pri.LongPath.File;
 
 namespace Celarix.IO.FileAnalysis.Analysis.Clients
 {
@@ -24,6 +25,12 @@ namespace Celarix.IO.FileAnalysis.Analysis.Clients
 
             var disassemblyPath = LongPath.Combine(disassemblyDirectoryPath,
                 LongPath.GetFileNameWithoutExtension(filePath) + ".asm");
+
+            if (LongFile.Exists(disassemblyPath))
+            {
+                logger.Warn($"The file at {filePath} has already been disassembled! Skipping...");
+                return true;
+            }
 
             var startInfo = new ProcessStartInfo(ObjConvPath, $"-fnasm \"{filePath}\" \"{disassemblyPath}\"")
             {
