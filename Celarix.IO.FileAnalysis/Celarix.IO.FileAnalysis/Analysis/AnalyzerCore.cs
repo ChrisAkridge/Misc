@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using NLog;
 using LongPath = Pri.LongPath.Path;
 using LongFile = Pri.LongPath.File;
@@ -38,17 +39,17 @@ namespace Celarix.IO.FileAnalysis.Analysis
                         continue;
                     }
                     
-                    logger.Info($"Analyzing {fileToAnalyzePath}...");
+                    logger.Trace($"Analyzing {fileToAnalyzePath}...");
 
                     var clientGeneratedFiles = clientAnalyzer.TryAnalyzeWithClients(fileToAnalyzePath);
-                    
-                    if (clientGeneratedFiles.Count > 0)
+
+                    if (clientGeneratedFiles.Any())
                     {
-                        AnalysisJob.EstimatedRemainingFiles += clientGeneratedFiles.Count;
-                        logger.Info($"Analysis added {clientGeneratedFiles.Count:N0} additional files for a new total of {AnalysisJob.EstimatedRemainingFiles:#,###} files.");
+                        var addedFileCount = PathFileWriter.WritePathFiles(job, clientGeneratedFiles);
+                        AnalysisJob.EstimatedRemainingFiles += addedFileCount;
+                        logger.Info(
+                            $"Analysis added {addedFileCount:N0} additional files for a new total of {AnalysisJob.EstimatedRemainingFiles:#,###} files.");
                     }
-                    
-                    PathFileWriter.WritePathFiles(job, clientGeneratedFiles);
 
                     if (ImageIdentifier.IsValidImageFile(fileToAnalyzePath))
                     {
@@ -97,12 +98,12 @@ namespace Celarix.IO.FileAnalysis.Analysis
         {
             var parentFolder = LongPath.GetDirectoryName(pathFilePath);
             
-            logger.Info($"Deleting path file at {pathFilePath}");
+            logger.Trace($"Deleting path file at {pathFilePath}");
             LongFile.Delete(pathFilePath);
 
             if (LongDirectory.GetFiles(parentFolder, "*", SearchOption.TopDirectoryOnly).Length == 0)
             {
-                logger.Info($"{parentFolder} is empty, deleting...");
+                logger.Trace($"{parentFolder} is empty, deleting...");
                 LongDirectory.Delete(parentFolder);
             }
         }

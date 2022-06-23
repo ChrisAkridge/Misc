@@ -29,7 +29,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
         public static void GenerateMapForTextFile(string filePath)
         {
-            logger.Info($"Writing text map for {filePath}...");
+            logger.Trace($"Writing text map for {filePath}...");
 
             var mapSavePath = GetSavePath(filePath);
 
@@ -58,11 +58,11 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
             if (!lineMaps.Any() || totalImagePixels == 0)
             {
-                logger.Info("File was empty");
+                logger.Trace("File was empty");
                 return;
             }
 
-            logger.Info($"File has {lineMaps.Count} lines");
+            logger.Trace($"File has {lineMaps.Count} lines");
 
             var hueStep = 360d / lineMaps.Count;
             var linesPerColumn = (int)Math.Min(Math.Floor(Math.Sqrt(totalImagePixels)), lineMaps.Count);
@@ -76,7 +76,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
             if (totalImageWidth > 16384)
             {
-                logger.Info($"Whoa! This text map is {totalImageWidth} pixels wide! That's too big.");
+                logger.Trace($"Whoa! This text map is {totalImageWidth} pixels wide! That's too big.");
                 return;
             }
 
@@ -98,11 +98,11 @@ namespace Celarix.IO.FileAnalysis.Analysis
             {
                 var columnMap = columnMaps[i];
                 var columnWidth = columnWidths[i];
-                logger.Info($"Drawing column {i + 1}...");
+                logger.Trace($"Drawing column {i + 1}...");
                 
                 if (columnWidth > 20000)
                 {
-                    logger.Info(
+                    logger.Trace(
                         "Whoa! This file has some really long lines! This is likely a minified file, skipping...");
                     return;
                 }

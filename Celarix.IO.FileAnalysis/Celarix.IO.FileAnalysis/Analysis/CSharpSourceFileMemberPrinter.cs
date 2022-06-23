@@ -25,7 +25,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
         public static bool TryPrintSourceFileMembers(string sourceFilePath)
         {
-            logger.Info($"Printing members of C# source file at {sourceFilePath}...");
+            logger.Trace($"Printing members of C# source file at {sourceFilePath}...");
 
             try
             {
@@ -43,7 +43,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
             }
             catch
             {
-                logger.Info($"{sourceFilePath} was a text file but likely not a C# source file");
+                logger.Trace($"{sourceFilePath} was a text file but likely not a C# source file");
 
                 return false;
             }

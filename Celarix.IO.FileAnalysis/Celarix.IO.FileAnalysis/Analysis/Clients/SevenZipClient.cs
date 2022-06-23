@@ -15,13 +15,13 @@ namespace Celarix.IO.FileAnalysis.Analysis.Clients
         {
             try
             {
-                logger.Info($"Attempting to extract {filePath}...");
+                logger.Trace($"Attempting to extract {filePath}...");
                 
                 var outputFolder = GetExtractionPathForFile(filePath);
                 using var reader = new SevenZipExtractor(filePath);
 
                 reader.ExtractArchive(outputFolder);
-                logger.Info($"Extracted {reader.FilesCount} file(s) from {filePath}");
+                logger.Trace($"Extracted {reader.FilesCount} file(s) from {filePath}");
                 return new ExtractResult(true, (int)reader.FilesCount);
             }
             catch (Exception ex)
@@ -39,13 +39,13 @@ namespace Celarix.IO.FileAnalysis.Analysis.Clients
                 using var reader = new SevenZipExtractor(filePath);
 
                 var isArchive = reader.FilesCount > 0;
-                logger.Info($"{filePath} {(isArchive ? "is" : "is not")} an archive");
+                logger.Trace($"{filePath} {(isArchive ? "is" : "is not")} an archive");
 
                 return isArchive;
             }
             catch (Exception)
             {
-                logger.Info($"{filePath} is not an archive.");
+                logger.Trace($"{filePath} is not an archive.");
                 return false;
             }
         }

@@ -16,7 +16,7 @@ namespace Celarix.IO.FileAnalysis.Analysis.Clients
 
         public static bool TryDisassemble(string filePath)
         {
-            logger.Info($"Attempting to disassemble {filePath}...");
+            logger.Trace($"Attempting to disassemble {filePath}...");
 
             var disassemblyDirectoryPath = GetDisassemblyFolderPathForFile(filePath);
 

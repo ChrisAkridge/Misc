@@ -113,7 +113,7 @@ namespace Celarix.IO.FileAnalysis.Analysis.Clients
 
         public static bool TryDecompile(string filePath)
         {
-            logger.Info($"Attempting to decompile {filePath} as a managed assembly...");
+            logger.Trace($"Attempting to decompile {filePath} as a managed assembly...");
 
             try
             {

@@ -14,6 +14,6 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
         /// <summary>Reports a progress update.</summary>
         /// <param name="value">The value of the updated progress.</param>
-        public void Report(string value) { logger.Info(value); }
+        public void Report(string value) { logger.Trace(value); }
     }
 }

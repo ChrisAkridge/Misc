@@ -38,29 +38,26 @@ namespace Celarix.IO.FileAnalysis.Analysis
                     $"{guid}.txt"));
         }
 
-        public static void WritePathFile(AnalysisJob job, string filePath)
+        public static bool WritePathFile(AnalysisJob job, string filePath)
         {
             if (filePath.Contains("\\bytes\\") || filePath.Contains("textMap") || filePath.Contains("bytes.png") || filePath.Contains("members.cs"))
             {
                 logger.Warn(
                     $"Attempted to add a binary drawing file, text map, or C# member list to the list of files. At {filePath}");
-                return;
-
-                //logger.Fatal($"A binary drawing file or text map has been added to the list of files to process! At {filePath}");
-                //logger.Fatal(Environment.StackTrace);
-                //Environment.Exit(-1);
+                return false;
             }
             
             if (string.IsNullOrEmpty(filePath))
             {
                 logger.Warn("Attempted to write a path file that was empty.");
-                return;
+                return false;
             }
             
             var pathFilePath = GetPathFilePath(job, Guid.NewGuid());
             var pathFileFolderInfo = new LongDirectoryInfo(LongPath.GetDirectoryName(pathFilePath));
             pathFileFolderInfo.Create();
             LongFile.WriteAllText(pathFilePath, filePath);
+            return true;
         }
 
         public static void WriteImagePathFile(AnalysisJob job, string imageFilePath)
@@ -71,12 +68,9 @@ namespace Celarix.IO.FileAnalysis.Analysis
             LongFile.WriteAllText(imagePathFilePath, imageFilePath);
         }
 
-        public static void WritePathFiles(AnalysisJob job, IEnumerable<string> filePaths)
+        public static int WritePathFiles(AnalysisJob job, IEnumerable<string> filePaths)
         {
-            foreach (var filePath in filePaths)
-            {
-                WritePathFile(job, filePath);
-            }
+            return filePaths.Select(p => WritePathFile(job, p)).Count(fileWasAdded => fileWasAdded);
         }
 
         public static void WriteImagePathsToFile(AnalysisJob job)

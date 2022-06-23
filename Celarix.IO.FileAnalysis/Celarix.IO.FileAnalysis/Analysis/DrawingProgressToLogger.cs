@@ -16,7 +16,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
         /// <param name="value">The value of the updated progress.</param>
         public void Report(DrawingProgress value)
         {
-            logger.Info($"Drawn {value.DrawnPixels:#,###} of {value.TotalPixels:#,###}");
+            logger.Trace($"Drawn {value.DrawnPixels:#,###} of {value.TotalPixels:#,###}");
         }
     }
 }

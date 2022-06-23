@@ -44,7 +44,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
             if (isExecutable && !isAssembly)
             {
                 var success = ObjConvClient.TryDisassemble(filePath);
-                logger.Info($"{(success ? "Disassembled" : "Failed to disassemble")} {filePath}");
+                logger.Trace($"{(success ? "Disassembled" : "Failed to disassemble")} {filePath}");
                 
                 generatedFilePaths.AddRange(LongDirectory.GetFiles(ObjConvClient.GetDisassemblyFolderPathForFile(filePath), "*", SearchOption.AllDirectories));
             }
@@ -52,7 +52,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
             if (isAssembly)
             {
                 var success = ILSpyClient.TryDecompile(filePath);
-                logger.Info($"{(success ? "Decompiled" : "Failed to decompile")} {filePath}");
+                logger.Trace($"{(success ? "Decompiled" : "Failed to decompile")} {filePath}");
                 
                 generatedFilePaths.AddRange(LongDirectory.GetFiles(ILSpyClient.GetOutputFolderPath(filePath), "*", SearchOption.AllDirectories));
             }
@@ -66,7 +66,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
             if (extension == ".exe" || extension == ".dll")
             {
-                logger.Info($"{filePath} is a Windows PE file");
+                logger.Trace($"{filePath} is a Windows PE file");
 
                 return true;
             }
@@ -78,7 +78,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
             var isExecutable = firstChunkAsASCII.StartsWith("MZ", StringComparison.Ordinal)
                 && firstChunkAsASCII.Contains("This program cannot be run in DOS mode.");
-            logger.Info($"{filePath} {(isExecutable ? "is" : "is not")} a Windows PE file");
+            logger.Trace($"{filePath} {(isExecutable ? "is" : "is not")} a Windows PE file");
 
             return isExecutable;
         }
@@ -92,7 +92,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
             catch (FileLoadException) { isAssembly = false; }
             catch (OutOfMemoryException) { isAssembly = false; }
 
-            logger.Info($"{filePath} {(isAssembly ? "is" : "is not")} a .NET assembly");
+            logger.Trace($"{filePath} {(isAssembly ? "is" : "is not")} a .NET assembly");
 
             return isAssembly;
         }

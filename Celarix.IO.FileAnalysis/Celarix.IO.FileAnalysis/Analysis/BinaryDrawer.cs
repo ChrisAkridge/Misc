@@ -26,18 +26,18 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
         public static void CreateBinaryImage(string filePath)
         {
-            logger.Info($"Writing binary images for {filePath}");
+            logger.Trace($"Writing binary images for {filePath}");
             
             var imageWidth = GetImageWidthForFile(filePath);
 
             if (imageWidth <= MakeZoomableCanvasIfWiderThan)
             {
-                logger.Info($"{filePath} will have an image of {imageWidth} pixels wide, drawing as single image...");
+                logger.Trace($"{filePath} will have an image of {imageWidth} pixels wide, drawing as single image...");
                 CreateSingleImage(filePath);
             }
             else
             {
-                logger.Info($"{filePath} will have an image of {imageWidth} pixels wide, drawing as zoomable canvas...");
+                logger.Trace($"{filePath} will have an image of {imageWidth} pixels wide, drawing as zoomable canvas...");
                 CreateZoomableCanvas(filePath);
             }
         }

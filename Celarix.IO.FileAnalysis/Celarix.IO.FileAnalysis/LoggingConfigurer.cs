@@ -28,7 +28,7 @@ namespace Celarix.IO.FileAnalysis
                         ConsoleOutputColor.Black)
                 }
 			};
-            config.AddRule(LogLevel.Trace, LogLevel.Fatal, coloredConsoleTarget);
+            config.AddRule(LogLevel.Info, LogLevel.Fatal, coloredConsoleTarget);
             
             var fileTarget = new FileTarget
             {
