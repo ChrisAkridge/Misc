@@ -27,9 +27,6 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             var textMaps = FindAllTextMapsInFolder(folderPath);
             logger.Info($"Found {textMaps.Count:N0} text maps in {folderPath}.");
 
-            var index = 0;
-            var digits = (int)Math.Ceiling(Math.Log10(textMaps.Count));
-
             LongDirectory.CreateDirectory(LongPath.Combine(folderPath, TextMapPath));
             LongDirectory.CreateDirectory(LongPath.Combine(folderPath, TextMapPath, DefaultTextMapPath));
             LongDirectory.CreateDirectory(LongPath.Combine(folderPath, TextMapPath, AssemblyFileTextMapPath));
@@ -44,12 +41,11 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                     TextMapKind.CSharpSourceFile => LongPath.Combine(folderPath, TextMapPath, CSharpSourceFileTextMapPath),
                     _ => throw new ArgumentOutOfRangeException()
                 };
-                var destinationFileName = index.ToString($"D{digits}") + ".png";
+                var destinationFileName = $"{Guid.NewGuid()}.png";
                 var destinationPath = LongPath.Combine(destinationFolderPath, destinationFileName);
                 
                 LongFile.Move(filePath, destinationPath);
                 logger.Info($"Moved {filePath} to {destinationPath}");
-                index += 1;
             }
             
             logger.Info("Moved all text maps.");
