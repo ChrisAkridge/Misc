@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Celarix.Imaging;
 using Celarix.IO.FileAnalysis.Analysis;
+using Celarix.IO.FileAnalysis.PostProcessing;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -23,12 +24,21 @@ namespace Celarix.IO.FileAnalysis.Console
                 BinaryDrawingReportsProgressEveryNPixels = 1048576,
                 ZoomableCanvasTileEdgeLength = 1024
             };
-            
-            var inputFolderPath = args[0];
-            var outputFolderPath = args[1];
 
-            var job = AnalysisJob.CreateOrLoad(inputFolderPath, outputFolderPath);
-            job.StartOrResume();
+            if (!args[0].Equals("-postprocess", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var inputFolderPath = args[0];
+                var outputFolderPath = args[1];
+
+                var job = AnalysisJob.CreateOrLoad(inputFolderPath, outputFolderPath);
+                job.StartOrResume();
+            }
+            else
+            {
+                var folderPath = args[1];
+                
+                PostProcessor.PostProcess(folderPath);
+            }
         }
     }
 }

@@ -45,5 +45,18 @@ namespace Celarix.IO.FileAnalysis
 
             LogManager.Configuration = config;
         }
+
+        public static void ConfigurePostProcessingLogging()
+        {
+            var config = new LoggingConfiguration();
+            var coloredConsoleTarget = new ColoredConsoleTarget
+            {
+                Name = "coloredConsole",
+                Layout = Layout
+            };
+            config.AddRule(LogLevel.Trace, LogLevel.Fatal, coloredConsoleTarget);
+
+            LogManager.Configuration = config;
+        }
     }
 }

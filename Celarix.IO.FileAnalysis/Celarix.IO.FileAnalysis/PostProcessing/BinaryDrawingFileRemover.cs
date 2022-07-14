@@ -19,6 +19,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
         {
             logger.Info($"Removing all binary drawing files from {folderPath}...");
             var binaryDrawingFilesToRemove = FindAllBinaryDrawingFilesInFolder(folderPath);
+            logger.Info($"Found {binaryDrawingFilesToRemove.Count:N0} files to remove.");
 
             foreach (var filePath in binaryDrawingFilesToRemove)
             {
@@ -49,7 +50,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 }
             }
             
-            logger.Info($"Folder {folderPath} has {binaryDrawingFilePaths.Count:#,###} binary drawing files.");
+            logger.Info($"Folder {folderPath} has {binaryDrawingFilePaths.Count:N0} binary drawing files.");
             return binaryDrawingFilePaths;
         }
     }

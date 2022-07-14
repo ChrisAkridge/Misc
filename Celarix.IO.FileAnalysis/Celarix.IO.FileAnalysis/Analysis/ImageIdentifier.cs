@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Celarix.IO.FileAnalysis.Extensions;
 using NLog;
 
@@ -66,8 +65,8 @@ namespace Celarix.IO.FileAnalysis.Analysis
         /// <returns>true if valid file signature (magic number/header marker) is found</returns>
         public static bool IsValidImageFile(string filePath)
         {
-            if (filePath.EndsWith("bytes.png", StringComparison.OrdinalIgnoreCase) ||
-                filePath.EndsWith("textMap.png", StringComparison.OrdinalIgnoreCase))
+            if (filePath.EndsWith("bytes.png", StringComparison.OrdinalIgnoreCase)
+                || filePath.EndsWith("textMap.png", StringComparison.OrdinalIgnoreCase))
             {
                 // Ignore files we generated.
                 return false;
@@ -75,7 +74,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
             try
             {
-                using (var fs = new System.IO.FileStream(filePath, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+                using (var fs = Pri.LongPath.File.Open(filePath, FileMode.Open, FileAccess.Read))
                 {
                     if (fs.Length > buffer.Length)
                     {

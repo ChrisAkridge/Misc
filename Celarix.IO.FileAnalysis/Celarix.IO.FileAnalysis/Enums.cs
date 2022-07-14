@@ -24,4 +24,11 @@ namespace Celarix.IO.FileAnalysis
         Input,
         Output
     }
+
+    public enum TextMapKind
+    {
+        Default,
+        AssemblyFile,
+        CSharpSourceFile
+    }
 }
