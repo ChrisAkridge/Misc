@@ -19,6 +19,9 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             BinaryDrawingFileRemover.RemoveAllBinaryDrawingFiles(folderPath);
             TextMapMover.MoveAllTextMaps(folderPath);
             CSharpMemberFileConcatenator.ConcatenateCSharpMemberFiles(folderPath);
+            
+            // Always do this last
+            EmptyFolderRemover.RemoveAllEmptyFolders(folderPath);
         }
     }
 }
