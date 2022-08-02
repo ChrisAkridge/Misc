@@ -20,8 +20,8 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             TextMapMover.MoveAllTextMaps(folderPath);
             CSharpMemberFileConcatenator.ConcatenateCSharpMemberFiles(folderPath);
             
-            // Always do this last
             EmptyFolderRemover.RemoveAllEmptyFolders(folderPath);
+            FolderTreePrinter.PrintFolderTreeForFolder(folderPath);
         }
     }
 }
