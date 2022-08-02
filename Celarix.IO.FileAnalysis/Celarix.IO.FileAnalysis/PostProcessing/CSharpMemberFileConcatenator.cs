@@ -22,7 +22,8 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             logger.Info("Writing C# member files to single file...");
             
             var cSharpMemberFilePaths = FindAllCSharpMemberFilesInFolder(folderPath)
-                .OrderBy(f => f);
+                .OrderBy(f => f)
+                .ToList();
             using var fileStream = new StreamWriter(
                 LongFile.OpenWrite(LongPath.Combine(folderPath, ConcatenatedMemberFileName)));
 
@@ -31,6 +32,13 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 .SelectMany(l => l))
             {
                 fileStream.WriteLine(line);
+            }
+            
+            fileStream.Close();
+
+            foreach (var filePath in cSharpMemberFilePaths)
+            {
+                LongFile.Delete(filePath);
             }
         }
 
