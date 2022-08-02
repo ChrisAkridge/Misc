@@ -43,10 +43,13 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
             if (isExecutable && !isAssembly)
             {
-                var success = ObjConvClient.TryDisassemble(filePath);
+                var success = ObjConvClient.TryDisassemble(filePath, out string disassemblyPath);
                 logger.Trace($"{(success ? "Disassembled" : "Failed to disassemble")} {filePath}");
-                
-                generatedFilePaths.AddRange(LongDirectory.GetFiles(ObjConvClient.GetDisassemblyFolderPathForFile(filePath), "*", SearchOption.AllDirectories));
+
+                if (success)
+                {
+                    generatedFilePaths.Add(disassemblyPath);
+                }
             }
 
             if (isAssembly)

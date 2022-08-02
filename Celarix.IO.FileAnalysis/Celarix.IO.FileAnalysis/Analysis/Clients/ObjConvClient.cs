@@ -15,7 +15,7 @@ namespace Celarix.IO.FileAnalysis.Analysis.Clients
         private const string DisassemblyFolderName = "disasm";
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        public static bool TryDisassemble(string filePath)
+        public static bool TryDisassemble(string filePath, out string disassemblyPath)
         {
             logger.Trace($"Attempting to disassemble {filePath}...");
 
@@ -23,7 +23,7 @@ namespace Celarix.IO.FileAnalysis.Analysis.Clients
 
             LongDirectory.CreateDirectory(disassemblyDirectoryPath);
 
-            var disassemblyPath = LongPath.Combine(disassemblyDirectoryPath,
+            disassemblyPath = LongPath.Combine(disassemblyDirectoryPath,
                 LongPath.GetFileNameWithoutExtension(filePath) + ".asm");
 
             if (LongFile.Exists(disassemblyPath))
