@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using MetadataExtractor;
+using MetadataExtractor.Formats.Exif;
+using Directory = System.IO.Directory;
 
 namespace SortFilesByDate
 {
@@ -53,23 +56,37 @@ namespace SortFilesByDate
 			Console.WriteLine("\tLoaded {0} files.", filesInfo.Count);
             inputWriter.WriteLine();
 
-			// Sort the files by creation date.
-			Console.WriteLine("Sorting by creation date...");
+			// Sort the files by date taken.
+			Console.WriteLine("Sorting by date taken...");
 
 			Dictionary<DateTime, List<string>> sortedFiles = new Dictionary<DateTime, List<string>>();
 
 			foreach (FileInfo fileInfo in filesInfo.Values)
-			{
-				DateTime lastWriteDateTime = fileInfo.LastWriteTime;
-				DateTime lastWriteDate = new DateTime(lastWriteDateTime.Year, lastWriteDateTime.Month, lastWriteDateTime.Day);
+            {
+				// https://stackoverflow.com/a/39839380/2709212
+				var metadataDirectories = ImageMetadataReader.ReadMetadata(fileInfo.FullName);
+                var subIfdDirectory = metadataDirectories.OfType<ExifSubIfdDirectory>().FirstOrDefault();
+                DateTime dateTaken;
 
-				if (!sortedFiles.ContainsKey(lastWriteDate))
+                try
+                {
+                    dateTaken = subIfdDirectory?.GetDateTime(ExifDirectoryBase.TagDateTimeOriginal)
+                        ?? fileInfo.CreationTime;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Warning! File at {fileInfo.FullName} could not have its \"date taken\" read!");
+                    Console.WriteLine(ex);
+                    dateTaken = fileInfo.CreationTime;
+                }
+
+                if (!sortedFiles.ContainsKey(dateTaken))
 				{
-					sortedFiles.Add(lastWriteDate, new List<string>());
+					sortedFiles.Add(dateTaken, new List<string>());
 				}
 
-				sortedFiles[lastWriteDate].Add(fileInfo.FullName);
-                inputWriter.WriteLine($"Added {fileInfo.FullName} to {lastWriteDate.ToShortDateString()}");
+				sortedFiles[dateTaken].Add(fileInfo.FullName);
+                inputWriter.WriteLine($"Added {fileInfo.FullName} to {dateTaken.ToShortDateString()}");
 			}
 
 			Console.WriteLine("\tSorted into {0} days", sortedFiles.Count);
