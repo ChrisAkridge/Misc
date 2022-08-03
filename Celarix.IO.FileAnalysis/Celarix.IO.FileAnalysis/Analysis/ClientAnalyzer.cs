@@ -48,7 +48,14 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
                 if (success)
                 {
-                    generatedFilePaths.Add(disassemblyPath);
+                    if (LongFile.Exists(disassemblyPath))
+                    {
+                        generatedFilePaths.Add(disassemblyPath);
+                    }
+                    else
+                    {
+                        logger.Warn($"Assembly file {disassemblyPath} was thought to be created but wasn't!");
+                    }
                 }
             }
 
@@ -73,7 +80,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
                 return true;
             }
-
+            
             using var stream = File.OpenRead(filePath);
 
             stream.Read(executableFirstBytes, 0, 128);

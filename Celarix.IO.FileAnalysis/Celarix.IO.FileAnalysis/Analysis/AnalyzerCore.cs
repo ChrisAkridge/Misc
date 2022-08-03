@@ -38,6 +38,16 @@ namespace Celarix.IO.FileAnalysis.Analysis
                         logger.Info($"An estimated {AnalysisJob.EstimatedRemainingFiles:N0} files remain.");
                         continue;
                     }
+
+                    if (!LongFile.Exists(fileToAnalyzePath))
+                    {
+                        logger.Warn(
+                            $"Could not find file {fileToAnalyzePath} for analysis; path file written for non-existent file!");
+                        DeletePathFile(pathFilePath);
+                        AnalysisJob.EstimatedRemainingFiles = Math.Max(0, AnalysisJob.EstimatedRemainingFiles - 1);
+                        logger.Info($"An estimated {AnalysisJob.EstimatedRemainingFiles:N0} files remain.");
+                        continue;
+                    }
                     
                     logger.Trace($"Analyzing {fileToAnalyzePath}...");
 
