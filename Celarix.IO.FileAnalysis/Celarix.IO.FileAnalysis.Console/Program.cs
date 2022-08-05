@@ -25,19 +25,26 @@ namespace Celarix.IO.FileAnalysis.Console
                 ZoomableCanvasTileEdgeLength = 1024
             };
 
-            if (!args[0].Equals("-postprocess", StringComparison.InvariantCultureIgnoreCase))
+            if (args[0].Equals("-postprocess", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var folderPath = args[1];
+
+                PostProcessor.PostProcess(folderPath);
+            }
+            else if (args[0].Equals("-draw", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var folderPath = args[1];
+                var outputFolderPath = args[2];
+                
+                BinaryFrameDrawer.DrawFramesForFolder(folderPath, outputFolderPath);
+            }
+            else
             {
                 var inputFolderPath = args[0];
                 var outputFolderPath = args[1];
 
                 var job = AnalysisJob.CreateOrLoad(inputFolderPath, outputFolderPath);
                 job.StartOrResume();
-            }
-            else
-            {
-                var folderPath = args[1];
-                
-                PostProcessor.PostProcess(folderPath);
             }
         }
     }
