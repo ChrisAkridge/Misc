@@ -11,12 +11,15 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         
-        public static void PostProcess(string folderPath)
+        public static void PostProcess(string folderPath, bool deleteBinaryDrawingFiles)
         {
             LoggingConfigurer.ConfigurePostProcessingLogging();
             logger.Info($"Performing post-processing on {folderPath}...");
-            
-            BinaryDrawingFileRemover.RemoveAllBinaryDrawingFiles(folderPath);
+
+            if (deleteBinaryDrawingFiles)
+            {
+                BinaryDrawingFileRemover.RemoveAllBinaryDrawingFiles(folderPath);
+            }
             TextMapMover.MoveAllTextMaps(folderPath);
             CSharpMemberFileConcatenator.ConcatenateCSharpMemberFiles(folderPath);
             

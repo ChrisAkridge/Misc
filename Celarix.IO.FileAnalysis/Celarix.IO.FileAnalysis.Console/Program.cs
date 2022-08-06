@@ -29,7 +29,7 @@ namespace Celarix.IO.FileAnalysis.Console
             {
                 var folderPath = args[1];
 
-                PostProcessor.PostProcess(folderPath);
+                PostProcessor.PostProcess(folderPath, args.Length == 3 && args[2].Equals("-deleteBinaryDrawingFiles", StringComparison.InvariantCultureIgnoreCase));
             }
             else if (args[0].Equals("-draw", StringComparison.InvariantCultureIgnoreCase))
             {
