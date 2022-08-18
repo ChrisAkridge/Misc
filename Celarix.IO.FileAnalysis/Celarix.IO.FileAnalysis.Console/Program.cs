@@ -38,6 +38,12 @@ namespace Celarix.IO.FileAnalysis.Console
                 
                 BinaryFrameDrawer.DrawFramesForFolder(folderPath, outputFolderPath);
             }
+            else if (args[0].Equals("-analyzelogs", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var folderPath = args[1];
+                
+                LogAnalyzer.AnalyzeLogsToCSVs(folderPath);
+            }
             else
             {
                 var inputFolderPath = args[0];
