@@ -2,7 +2,7 @@
   "profiles": {
     "Celarix.IO.FileAnalysis.Console": {
       "commandName": "Project",
-      "commandLineArgs": "-analyzelogs \"H:\\job_csvs\\job\\log\""
+      "commandLineArgs": "-drawtextmapcanvas \"H:\\chromedriver.asm\" \"H:\\chromedriver\""
     }
   }
 }

@@ -44,6 +44,13 @@ namespace Celarix.IO.FileAnalysis.Console
                 
                 LogAnalyzer.AnalyzeLogsToCSVs(folderPath);
             }
+            else if (args[0].Equals("-drawtextmapcanvas", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var filePath = args[1];
+                var outputFolderPath = args[2];
+                
+                TextMapCanvasGenerator.GenerateTextMapCanvasForFile(filePath, outputFolderPath);
+            }
             else
             {
                 var inputFolderPath = args[0];

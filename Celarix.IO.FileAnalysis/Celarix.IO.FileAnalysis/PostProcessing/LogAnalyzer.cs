@@ -23,7 +23,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
         // Log file name format:
         // YYYY-MM-DD_.#.log
         // # starts at 1 and increases (no zero padding)
-        // File with date followed by _ is first file in folder
+        // File with date followed by _ is first file in folder for date
         // File with just date is always last file in folder for date
         private sealed class LogFilePathComparer : IComparer<string>
         {
@@ -87,9 +87,11 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             logger.Info($"Found {logFilePaths.Length:N0} logs in {folderPath}");
 
             LongDirectory.CreateDirectory(LongPath.Combine(folderPath, "stats"));
-            var fileCountCSVPath = LongPath.Combine(folderPath, "stats", "fileCount.csv");
-            using var fileCountCSVStream = new StreamWriter(LongFile.OpenWrite(fileCountCSVPath));
+            var writtenCSVFiles = 0;
+            var fileCountCSVPath = LongPath.Combine(folderPath, "stats", "fileCount_0.csv");
+            var fileCountCSVStream = new StreamWriter(LongFile.OpenWrite(fileCountCSVPath));
             fileCountCSVStream.WriteLine("timestamp,remaining");
+            var writtenCSVLines = 1;
 
             var logLines = GetAllLogLines(logFilePaths);
             var lineCount = 0L;
@@ -132,21 +134,21 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             {
                 { 1, 0L }, // 100 μs
                 { 5, 0L }, // 500 μs
-                { 10, 0L }, // 1 ms
-                { 50, 0L }, // 5 ms
-                { 100, 0L }, // 10 ms
-                { 500, 0L }, // 50 ms
-                { 1000, 0L }, // 100 ms
-                { 5000, 0L }, // 500 ms
-                { 10000, 0L }, // 1 sec
-                { 50000, 0L }, // 5 sec
-                { 100000, 0L }, // 10 sec
-                { 300000, 0L }, // 30 sec
-                { 6000000, 0L }, // 1 min
-                { 30000000, 0L }, // 5 min
-                { 60000000, 0L }, // 10 min
-                { 180000000, 0L }, // 30 min
-                { 360000000, 0L }, // 60 min
+                { 1 * 10, 0L }, // 1 ms
+                { 5 * 10, 0L }, // 5 ms
+                { 10 * 10, 0L }, // 10 ms
+                { 50 * 10, 0L }, // 50 ms
+                { 100 * 10, 0L }, // 100 ms
+                { 500 * 10, 0L }, // 500 ms
+                { 1000 * 10, 0L }, // 1 sec
+                { 5 * 1000 * 10, 0L }, // 5 sec
+                { 10 * 1000 * 10, 0L }, // 10 sec
+                { 30 * 1000 * 10, 0L }, // 30 sec
+                { 60 * 1000 * 10, 0L }, // 1 min
+                { 5 * 60 * 1000 * 10, 0L }, // 5 min
+                { 10 * 60 * 1000 * 10, 0L }, // 10 min
+                { 30 * 60 * 1000 * 10, 0L }, // 30 min
+                { 60 * 60 * 1000 * 10, 0L }, // 60 min
                 { int.MaxValue, 0L } // Longer
             };
 
@@ -199,10 +201,23 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 if (messageType == MessageType.EstimatedFileCount)
                 {
                     fileCountCSVStream.WriteLine($"{timeStamp:yyyy_MM_dd}T{timeStamp:HH:mm:ss.ffff},{GetEstimateFileCountFromMessage(message)}");
+                    writtenCSVLines += 1;
+                    if (writtenCSVLines == 1048576)
+                    {
+                        writtenCSVFiles += 1;
+                        fileCountCSVStream.Close();
+                        fileCountCSVStream.Dispose();
+
+                        fileCountCSVPath = LongPath.Combine(folderPath, "stats", $"fileCount_{writtenCSVFiles}.csv");
+                        fileCountCSVStream = new StreamWriter(LongFile.OpenWrite(fileCountCSVPath));
+                        fileCountCSVStream.WriteLine("timestamp,remaining");
+                        writtenCSVLines = 1;
+                    }
                 }
             }
             
             fileCountCSVStream.Close();
+            fileCountCSVStream.Dispose();
 
             var finalStatsBuilder = new StringBuilder();
             finalStatsBuilder.AppendLine("interval,count");
