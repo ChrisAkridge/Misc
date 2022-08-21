@@ -38,6 +38,8 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 : LongFile.ReadAllLines(filePathFilePath).ToList();
             logger.Info($"Drawing binary frames for {filePaths.Count:N0} files...");
 
+            File.WriteAllLines(filePathFilePath, filePaths);
+            
             var multiStream = new NamedMultiStream(filePaths);
             var totalMegabytes = multiStream.Length / 1048576d;
             logger.Info($"Total size of all files is {totalMegabytes:N2} megabytes.");
@@ -63,7 +65,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                     progress);
                 var imageFilePath = LongPath.Combine(outputFolderPath, $"{i:D8}.png");
                 image.SaveAsPng(imageFilePath);
-                logger.Info($"Drawn image {i + 1} of {totalImages}. Drawn {((i + 1) * bytesPerImage) / 1048576d:N2} MB of {totalMegabytes:N2} MB.");
+                logger.Info($"Drawn image {i + 1} of {totalImages}. Drawn {((i + 1L) * bytesPerImage) / 1048576d:N2} MB of {totalMegabytes:N2} MB.");
             }
             
             logger.Info("Completed binary drawing!");
