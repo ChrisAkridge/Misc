@@ -94,13 +94,12 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             Utilities.Utilities.DrawZoomLevelsForLevel0CanvasTiles(level0TilesPath);
         }
 
-        private static Image<Rgb24> DrawLevel0Tile(List<TextMapColumn> columnMaps, int tileX, int tileY)
+        private static Image<Rgb24> DrawLevel0Tile(IReadOnlyList<TextMapColumn> columnMaps, int tileX, int tileY)
         {
             var leftX = tileX * 1024L;
             var rightX = leftX + 1023L;
             var topY = tileY * 1024L;
-            var bottomY = topY + 1023L;
-            
+
             var leftColumnIndex = GetColumnIndexByXPosition(columnMaps, leftX);
             var rightColumnIndex = GetColumnIndexByXPosition(columnMaps, rightX);
 
