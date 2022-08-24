@@ -2,7 +2,7 @@
   "profiles": {
     "Celarix.IO.FileAnalysis.Console": {
       "commandName": "Project",
-      "commandLineArgs": "-drawtextmapcanvas \"H:\\chromedriver.asm\" \"H:\\chromedriver\""
+      "commandLineArgs": "-draw \"H:\\fa\\Windows\\02\" \"H:\\fa\\Windows\\02_bytes\""
     }
   }
 }

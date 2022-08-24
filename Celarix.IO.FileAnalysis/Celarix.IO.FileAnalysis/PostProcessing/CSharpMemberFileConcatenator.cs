@@ -26,12 +26,19 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 .ToList();
             using var fileStream = new StreamWriter(
                 LongFile.OpenWrite(LongPath.Combine(folderPath, ConcatenatedMemberFileName)));
+            var writtenLines = 0;
 
             foreach (var line in cSharpMemberFilePaths
                 .Select(filePath => LongFile.ReadAllLines(filePath))
                 .SelectMany(l => l))
             {
                 fileStream.WriteLine(line);
+                writtenLines += 1;
+
+                if (writtenLines % 1000 == 0)
+                {
+                    logger.Info($"Wrote {writtenLines} lines");
+                }
             }
             
             fileStream.Close();
