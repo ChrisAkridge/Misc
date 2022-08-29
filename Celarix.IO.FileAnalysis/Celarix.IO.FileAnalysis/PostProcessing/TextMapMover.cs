@@ -32,8 +32,11 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             LongDirectory.CreateDirectory(LongPath.Combine(folderPath, TextMapPath, AssemblyFileTextMapPath));
             LongDirectory.CreateDirectory(LongPath.Combine(folderPath, TextMapPath, CSharpSourceFileTextMapPath));
 
-            foreach (var (filePath, kind) in textMaps)
+            var textMapCount = textMaps.Count;
+            for (int i = 0; i < textMapCount; i++)
             {
+                var (filePath, kind) = textMaps[i];
+
                 var destinationFolderPath = kind switch
                 {
                     TextMapKind.Default => LongPath.Combine(folderPath, TextMapPath, DefaultTextMapPath),
@@ -45,7 +48,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 var destinationPath = LongPath.Combine(destinationFolderPath, destinationFileName);
                 
                 LongFile.Move(filePath, destinationPath);
-                logger.Info($"Moved {filePath} to {destinationPath}");
+                logger.Info($"({i + 1}/{textMapCount}) Moved {filePath} to {destinationPath}");
             }
             
             logger.Info("Moved all text maps.");

@@ -43,9 +43,17 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             
             fileStream.Close();
 
+            var deletedFileCount = 0;
+            var totalFilesToDelete = cSharpMemberFilePaths.Count;
             foreach (var filePath in cSharpMemberFilePaths)
             {
                 LongFile.Delete(filePath);
+
+                deletedFileCount += 1;
+                if (deletedFileCount % 100 == 0)
+                {
+                    logger.Info($"Deleted {deletedFileCount} of {totalFilesToDelete} C# member files");
+                }
             }
         }
 
