@@ -24,6 +24,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
         {
             logger.Info($"Moving all text maps from {folderPath}...");
 
+            var guidBuffer = new byte[16];
             var textMaps = FindAllTextMapsInFolder(folderPath);
             logger.Info($"Found {textMaps.Count:N0} text maps in {folderPath}.");
 
@@ -36,15 +37,23 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             for (int i = 0; i < textMapCount; i++)
             {
                 var (filePath, kind) = textMaps[i];
+                var fileGuid = Guid.NewGuid();
+                var destinationFileName = $"{fileGuid}.png";
 
-                var destinationFolderPath = kind switch
-                {
-                    TextMapKind.Default => LongPath.Combine(folderPath, TextMapPath, DefaultTextMapPath),
-                    TextMapKind.AssemblyFile => LongPath.Combine(folderPath, TextMapPath, AssemblyFileTextMapPath),
-                    TextMapKind.CSharpSourceFile => LongPath.Combine(folderPath, TextMapPath, CSharpSourceFileTextMapPath),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-                var destinationFileName = $"{Guid.NewGuid()}.png";
+                fileGuid.TryWriteBytes(guidBuffer);
+                
+                var destinationFolderPath = LongPath.Combine(kind switch
+                    {
+                        TextMapKind.Default => LongPath.Combine(folderPath, TextMapPath, DefaultTextMapPath),
+                        TextMapKind.AssemblyFile => LongPath.Combine(folderPath, TextMapPath, AssemblyFileTextMapPath),
+                        TextMapKind.CSharpSourceFile => LongPath.Combine(folderPath, TextMapPath,
+                            CSharpSourceFileTextMapPath),
+                        _ => throw new ArgumentOutOfRangeException()
+                    },
+                    guidBuffer[0].ToString(),
+                    guidBuffer[1].ToString());
+
+                LongDirectory.CreateDirectory(destinationFolderPath);
                 var destinationPath = LongPath.Combine(destinationFolderPath, destinationFileName);
                 
                 LongFile.Move(filePath, destinationPath);

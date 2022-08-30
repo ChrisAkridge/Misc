@@ -33,13 +33,21 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             }
             
             var filePathFilePath = LongPath.Combine(outputFolderPath, FilePathFileName);
-            var filePaths = !File.Exists(filePathFilePath)
-                ? GetAllFilePathsInFolder(folderPath)
-                : LongFile.ReadAllLines(filePathFilePath).ToList();
+            List<string> filePaths;
+
+            if (!File.Exists(filePathFilePath))
+            {
+                filePaths = GetAllFilePathsInFolder(folderPath);
+                filePaths.Sort();
+                File.WriteAllLines(filePathFilePath, filePaths);
+            }
+            else
+            {
+                filePaths = LongFile.ReadAllLines(filePathFilePath).ToList();
+            }
+
             logger.Info($"Drawing binary frames for {filePaths.Count:N0} files...");
 
-            File.WriteAllLines(filePathFilePath, filePaths);
-            
             var multiStream = new NamedMultiStream(filePaths);
             var totalMegabytes = multiStream.Length / 1048576d;
             logger.Info($"Total size of all files is {totalMegabytes:N2} megabytes.");
@@ -82,7 +90,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 filePaths.Add(filePath);
                 if (filePaths.Count % 1000 == 0)
                 {
-                    logger.Info($"Search found {filePaths.Count:N0} files.");
+                    logger.Info($"Search found {filePaths.Count:N0} files. Most recent file found is {filePath}.");
                 }
             }
             
