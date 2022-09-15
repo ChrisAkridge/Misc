@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Celarix.IO.FileAnalysis.Utilities;
 using NLog;
 using LongFile = Pri.LongPath.File;
 using LongDirectory = Pri.LongPath.Directory;
@@ -19,6 +20,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
         private const int MessagePart = 2;
         
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private static AdvancedProgress advancedProgress;
         
         // Log file name format:
         // YYYY-MM-DD_.#.log
@@ -85,7 +87,8 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 .ToArray();
             
             logger.Info($"Found {logFilePaths.Length:N0} logs in {folderPath}");
-
+            advancedProgress = new AdvancedProgress(logFilePaths.Length, DateTimeOffset.Now);
+            
             LongDirectory.CreateDirectory(LongPath.Combine(folderPath, "stats"));
             var writtenCSVFiles = 0;
             var fileCountCSVPath = LongPath.Combine(folderPath, "stats", "fileCount_0.csv");
@@ -253,6 +256,9 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 }
                 reader.Close();
                 reader.Dispose();
+
+                advancedProgress.CurrentAmount += 1;
+                logger.Info(advancedProgress.ToString());
             }
         }
 

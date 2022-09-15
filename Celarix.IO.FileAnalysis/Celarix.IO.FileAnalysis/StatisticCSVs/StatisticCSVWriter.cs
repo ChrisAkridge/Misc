@@ -72,6 +72,7 @@ namespace Celarix.IO.FileAnalysis.StatisticCSVs
                     var fileStats = GetStatisticsRowForFile(fileInfo);
                     filesCSVWriter.WriteLine(fileStats);
                     filesWritten += 1;
+                    AnalysisJob.OriginalFileCount += 1;
 
                     if (filesWritten == SharedConstants.DefaultBufferCapacity)
                     {
@@ -84,6 +85,8 @@ namespace Celarix.IO.FileAnalysis.StatisticCSVs
                 }
                 catch (Exception ex) { logger.Error($"Failed to write stats for {filePath}: {JsonSerializer.Serialize(ex)}"); }
             }
+
+            AnalysisJob.SaveJobFile();
         }
 
         private void WriteFolderStatistics(string foldersCSVAbsolutePath)

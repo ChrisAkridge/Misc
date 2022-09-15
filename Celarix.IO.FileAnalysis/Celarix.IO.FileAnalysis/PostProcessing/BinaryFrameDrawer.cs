@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Celarix.Imaging.BinaryDrawing;
 using Celarix.Imaging.IO;
 using Celarix.Imaging.Progress;
+using Celarix.IO.FileAnalysis.Utilities;
 using NLog;
 using SixLabors.ImageSharp;
 using LongDirectory = Pri.LongPath.Directory;
@@ -47,7 +48,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             }
 
             logger.Info($"Drawing binary frames for {filePaths.Count:N0} files...");
-
+            
             var multiStream = new NamedMultiStream(filePaths);
             var totalMegabytes = multiStream.Length / 1048576d;
             logger.Info($"Total size of all files is {totalMegabytes:N2} megabytes.");
@@ -57,7 +58,8 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             const int drawingAreaWidth = 1920;
             const int bytesPerImage = drawingAreaWidth * drawingAreaHeight * 3;
             var totalImages = (int)Math.Ceiling(multiStream.Length / (decimal)bytesPerImage);
-            
+            var imagesProgress = new AdvancedProgress(totalImages, DateTimeOffset.Now);
+
             logger.Info($"There will be {totalImages:N0} images drawn.");
 
             var progress = new Progress<DrawingProgress>();
@@ -73,7 +75,9 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                     progress);
                 var imageFilePath = LongPath.Combine(outputFolderPath, $"{i:D8}.png");
                 image.SaveAsPng(imageFilePath);
-                logger.Info($"Drawn image {i + 1} of {totalImages}. Drawn {((i + 1L) * bytesPerImage) / 1048576d:N2} MB of {totalMegabytes:N2} MB.");
+                imagesProgress.CurrentAmount = i + 1;
+                logger.Info(
+                    $"Drawn image {i + 1} of {totalImages}. Drawn {((i + 1L) * bytesPerImage) / 1048576d:N2} MB of {totalMegabytes:N2} MB. {imagesProgress.AmountPerSecond:F2} FPS. Estimated complete on {imagesProgress.EstimatedCompletionTime:yyyy-MM-dd hh:mm:ss}");
             }
             
             logger.Info("Completed binary drawing!");

@@ -30,23 +30,16 @@ namespace Celarix.IO.FileAnalysis
             (AnalysisPhase.GeneratingPathFiles, typeof(PathFileGenerator)),
             (AnalysisPhase.AnalyzingFiles, typeof(AnalyzerCore))
         };
-
-        private int estimatedRemainingFiles;
         
         public DateTimeOffset JobStartedOn { get; set; }
+        public DateTimeOffset? PhaseStartedOn { get; set; }
         public string InputFolderPath { get; set; }
         public string OutputFolderPath { get; set; }
         public int CurrentPhaseIndex { get; set; }
 
-        public int EstimatedRemainingFiles
-        {
-            get => estimatedRemainingFiles;
-            set
-            {
-                estimatedRemainingFiles = value;
-                SaveJobFile();
-            }
-        }
+        public int EstimatedRemainingFiles { get; set; }
+        public int EstimatedTotalFiles { get; set; }
+        public int OriginalFileCount { get; set; }
 
         [JsonIgnore]
         public AnalysisPhase CurrentPhase
@@ -101,8 +94,10 @@ namespace Celarix.IO.FileAnalysis
 
                 var phaseType = phases[CurrentPhaseIndex].phaseType;
                 var phaseInstance = (JobPhase)Activator.CreateInstance(phaseType);
+                PhaseStartedOn ??= DateTimeOffset.Now;
                 phaseInstance.StartOrResume(this);
 
+                PhaseStartedOn = null;
                 logger.Info($"Finished phase {CurrentPhase}");
                 CurrentPhaseIndex += 1;
             }
@@ -113,7 +108,24 @@ namespace Celarix.IO.FileAnalysis
         public string ToAbsolutePath(FileLocation location, string relativePath) =>
             LongPath.Combine((location == FileLocation.Input) ? InputFolderPath : OutputFolderPath, relativePath);
 
-        private void SaveJobFile()
+        public void IncreaseEstimatedFileCount(int filesFound)
+        {
+            EstimatedRemainingFiles += filesFound;
+            EstimatedTotalFiles += filesFound;
+            SaveJobFile();
+        }
+
+        public void DecreaseEstimatedFileCount(int filesProcessed)
+        {
+            EstimatedRemainingFiles -= filesProcessed;
+            if (EstimatedRemainingFiles < 0)
+            {
+                EstimatedRemainingFiles = 0;
+            }
+            SaveJobFile();
+        }
+        
+        public void SaveJobFile()
         {
             var jobJson = JsonSerializer.Serialize(this);
             var jobAbsolutePath = LongPath.Combine(OutputFolderPath, AnalysisJobPath);

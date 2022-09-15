@@ -34,7 +34,7 @@ namespace Celarix.IO.FileAnalysis.Analysis.Clients
             }
             catch (Exception ex)
             {
-                logger.LogException(ex);
+                logger.Trace($"Failed to extract {filePath} ({ex.Message})");
 
                 return new ExtractResult(false, 0);
             }

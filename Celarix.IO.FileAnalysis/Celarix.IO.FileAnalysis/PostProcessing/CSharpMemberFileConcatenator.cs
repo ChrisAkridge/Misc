@@ -8,6 +8,7 @@ using LongPath = Pri.LongPath.Path;
 using LongFile = Pri.LongPath.File;
 using LongDirectory = Pri.LongPath.Directory;
 using System.IO;
+using Celarix.IO.FileAnalysis.Utilities;
 
 namespace Celarix.IO.FileAnalysis.PostProcessing
 {
@@ -27,32 +28,35 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             using var fileStream = new StreamWriter(
                 LongFile.OpenWrite(LongPath.Combine(folderPath, ConcatenatedMemberFileName)));
             var writtenLines = 0;
+            var fileProgress = new AdvancedProgress(cSharpMemberFilePaths.Count, DateTimeOffset.Now);
 
-            foreach (var line in cSharpMemberFilePaths
-                .Select(filePath => LongFile.ReadAllLines(filePath))
-                .SelectMany(l => l))
+            foreach (var filePath in cSharpMemberFilePaths)
             {
-                fileStream.WriteLine(line);
-                writtenLines += 1;
-
-                if (writtenLines % 1000 == 0)
+                foreach (var line in LongFile.ReadAllLines(filePath))
                 {
-                    logger.Info($"Wrote {writtenLines} lines");
+                    fileStream.WriteLine(line);
+                    writtenLines += 1;
+
+                    if (writtenLines % 1000 == 0) { logger.Info($"Wrote {writtenLines} lines"); }
                 }
+
+                fileProgress.CurrentAmount += 1;
+                logger.Info(fileProgress.ToString());
             }
             
             fileStream.Close();
-
-            var deletedFileCount = 0;
+            
             var totalFilesToDelete = cSharpMemberFilePaths.Count;
+            var deletionProgress = new AdvancedProgress(totalFilesToDelete, DateTimeOffset.Now);
+
             foreach (var filePath in cSharpMemberFilePaths)
             {
                 LongFile.Delete(filePath);
 
-                deletedFileCount += 1;
-                if (deletedFileCount % 100 == 0)
+                deletionProgress.CurrentAmount += 1;
+                if (deletionProgress.CurrentAmount % 100 == 0)
                 {
-                    logger.Info($"Deleted {deletedFileCount} of {totalFilesToDelete} C# member files");
+                    logger.Info(deletionProgress.ToString());
                 }
             }
         }

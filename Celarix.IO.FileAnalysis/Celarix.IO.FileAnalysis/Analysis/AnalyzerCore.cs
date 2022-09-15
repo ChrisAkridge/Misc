@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Celarix.IO.FileAnalysis.Utilities;
 using NLog;
 using LongPath = Pri.LongPath.Path;
 using LongFile = Pri.LongPath.File;
@@ -13,6 +14,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
     {
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
         private IEnumerator<string> pathFileEnumerator;
+        private AdvancedProgress advancedProgress;
 
         public override AnalysisPhase AnalysisPhase => AnalysisPhase.AnalyzingFiles;
 
@@ -22,6 +24,10 @@ namespace Celarix.IO.FileAnalysis.Analysis
             logger.Info("(START NEW PHASE) Beginning file analysis! This may take awhile.");
 
             var clientAnalyzer = new ClientAnalyzer();
+            advancedProgress = new AdvancedProgress(AnalysisJob.EstimatedRemainingFiles, AnalysisJob.PhaseStartedOn)
+            {
+                CurrentAmount = AnalysisJob.EstimatedTotalFiles - AnalysisJob.EstimatedRemainingFiles
+            };
 
             while (CreateEnumeratorForOutputFiles())
             {
@@ -34,7 +40,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
                     {
                         logger.Warn("Path file had no path in it.");
                         DeletePathFile(pathFilePath);
-                        AnalysisJob.EstimatedRemainingFiles = Math.Max(0, AnalysisJob.EstimatedRemainingFiles - 1);
+                        OnFileAnalyzed();
                         logger.Info($"An estimated {AnalysisJob.EstimatedRemainingFiles:N0} files remain.");
                         continue;
                     }
@@ -44,7 +50,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
                         logger.Warn(
                             $"Could not find file {fileToAnalyzePath} for analysis; path file written for non-existent file!");
                         DeletePathFile(pathFilePath);
-                        AnalysisJob.EstimatedRemainingFiles = Math.Max(0, AnalysisJob.EstimatedRemainingFiles - 1);
+                        OnFileAnalyzed();
                         logger.Info($"An estimated {AnalysisJob.EstimatedRemainingFiles:N0} files remain.");
                         continue;
                     }
@@ -56,20 +62,19 @@ namespace Celarix.IO.FileAnalysis.Analysis
                     if (clientGeneratedFiles.Any())
                     {
                         var addedFileCount = PathFileWriter.WritePathFiles(job, clientGeneratedFiles);
-                        AnalysisJob.EstimatedRemainingFiles += addedFileCount;
+                        AnalysisJob.IncreaseEstimatedFileCount(addedFileCount);
+                        advancedProgress.TotalAmount += addedFileCount;
                         logger.Info(
                             $"Analysis added {addedFileCount:N0} additional files for a new total of {AnalysisJob.EstimatedRemainingFiles:#,###} files.");
                     }
-
-                    if (ImageIdentifier.IsValidImageFile(fileToAnalyzePath))
+                    else if (ImageIdentifier.IsValidImageFile(fileToAnalyzePath))
                     {
+                        // Assume that any file that was decompressable, disassemblable
+                        // or decompilable is not an image file. Fixes (?) an issue
+                        // where we were accessing the file too soon and getting
+                        // a "file in use" error.
                         PathFileWriter.WriteImagePathFile(job, fileToAnalyzePath);
                     }
-
-                    // 2022-05-26: Disable this to save time and diskspace. I'd
-                    // rather use ByteView's LFP and output as video instead of
-                    // ballooning with so many small files.
-                    // BinaryDrawer.CreateBinaryImage(fileToAnalyzePath);
 
                     if (Utilities.Utilities.IsTextFile(fileToAnalyzePath))
                     {
@@ -78,13 +83,19 @@ namespace Celarix.IO.FileAnalysis.Analysis
                     }
 
                     DeletePathFile(pathFilePath);
-                    AnalysisJob.EstimatedRemainingFiles = Math.Max(0, AnalysisJob.EstimatedRemainingFiles - 1);
-                    logger.Info($"An estimated {AnalysisJob.EstimatedRemainingFiles:N0} files remain.");
+                    OnFileAnalyzed();
+                    logger.Info($"An estimated {AnalysisJob.EstimatedRemainingFiles:N0} files remain. {advancedProgress}");
                 } while (pathFileEnumerator.MoveNext());
             }
 
             logger.Info("Analysis complete! Copying all image paths into a single file.");
             PathFileWriter.WriteImagePathsToFile(job);
+        }
+
+        private void OnFileAnalyzed()
+        {
+            AnalysisJob.DecreaseEstimatedFileCount(1);
+            advancedProgress.CurrentAmount += 1;
         }
 
         private bool CreateEnumeratorForOutputFiles()

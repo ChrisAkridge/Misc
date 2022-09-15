@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Celarix.IO.FileAnalysis.Extensions;
+using Celarix.IO.FileAnalysis.Utilities;
 using CSharpLib;
 using NLog;
 using LongFile = Pri.LongPath.File;
@@ -16,13 +17,15 @@ namespace Celarix.IO.FileAnalysis.Deduplication
     {
         private const string HashFileSortedTempPath = "job\\deduplicate\\hashes_sorted.txt";
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private AdvancedProgress advancedProgress;
         
         public override AnalysisPhase AnalysisPhase => AnalysisPhase.DeduplicatingFiles;
 
         public override void StartOrResume(AnalysisJob job)
         {
             AnalysisJob = job;
-            
+            advancedProgress = new AdvancedProgress(AnalysisJob.OriginalFileCount, AnalysisJob.PhaseStartedOn);
+
             logger.Info("(START NEW PHASE) Deduplicating files...");
             CallWindowsSort();
             DeduplicateFiles();
@@ -95,13 +98,16 @@ namespace Celarix.IO.FileAnalysis.Deduplication
             }
         }
 
-        private static IEnumerable<(string hash, string filePath)> EnumerateHashes(StreamReader hashFileReader)
+        private IEnumerable<(string hash, string filePath)> EnumerateHashes(StreamReader hashFileReader)
         {
             while (!hashFileReader.EndOfStream)
             {
                 var hashFileLine = hashFileReader.ReadLine();
                 // https://stackoverflow.com/a/21519598/2709212
                 var hashFileComponents = hashFileLine.Split(new[] { ':' }, 2);
+
+                advancedProgress.CurrentAmount += 1;
+                logger.Info(advancedProgress.ToString());
 
                 yield return (hashFileComponents[0].TrimEnd(), hashFileComponents[1].TrimStart());
             }

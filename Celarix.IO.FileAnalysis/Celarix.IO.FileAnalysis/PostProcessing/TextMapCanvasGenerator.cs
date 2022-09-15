@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Celarix.Imaging.ZoomableCanvas;
+using Celarix.IO.FileAnalysis.Utilities;
 using MoreLinq;
 using NLog;
 using SixLabors.ImageSharp;

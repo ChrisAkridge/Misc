@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Celarix.IO.FileAnalysis.Extensions;
+using Celarix.IO.FileAnalysis.Utilities;
 using NLog;
 using LongFile = Pri.LongPath.File;
 using LongPath = Pri.LongPath.Path;
@@ -93,6 +94,7 @@ namespace Celarix.IO.FileAnalysis.FileCopying
             {
                 logger.Info($"Writing hashes for files listed in {fileListPath}...");
                 var filePathsInList = LongFile.ReadAllLines(fileListPath);
+                var advancedProgress = new AdvancedProgress(AnalysisJob.OriginalFileCount, AnalysisJob.PhaseStartedOn);
 
                 foreach (var outputFilePath in filePathsInList)
                 {
@@ -107,6 +109,8 @@ namespace Celarix.IO.FileAnalysis.FileCopying
                     hashWriter.WriteLine($"{hash} : {outputFilePath}");
 
                     hashesWritten += 1;
+                    advancedProgress.CurrentAmount += 1;
+                    logger.Info(advancedProgress.ToString());
                     if (hashesWritten == SharedConstants.DefaultBufferCapacity)
                     {
                         hashWriter.Flush();
@@ -124,6 +128,8 @@ namespace Celarix.IO.FileAnalysis.FileCopying
                     SharedConstants.ListFileFolderPath), "*.txt", SearchOption.TopDirectoryOnly)
                 .OrderBy(p => p);
 
+            var advancedProgress = new AdvancedProgress(AnalysisJob.OriginalFileCount, AnalysisJob.PhaseStartedOn);
+
             foreach (var fileListPath in fileListPaths)
             {
                 logger.Info($"Copying files listed in {fileListPath}");
@@ -136,7 +142,9 @@ namespace Celarix.IO.FileAnalysis.FileCopying
                     try
                     {
                         CopyFileIfNotPresent(inputFilePath);
-                        AnalysisJob.EstimatedRemainingFiles += 1;
+                        AnalysisJob.IncreaseEstimatedFileCount(1);
+                        advancedProgress.CurrentAmount += 1;
+                        logger.Info(advancedProgress.ToString());
                     }
                     catch (Exception ex)
                     {
