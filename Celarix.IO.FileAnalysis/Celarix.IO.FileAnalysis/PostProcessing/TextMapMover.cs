@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Celarix.IO.FileAnalysis.Utilities;
 using NLog;
 using LongPath = Pri.LongPath.Path;
 using LongFile = Pri.LongPath.File;
@@ -27,7 +28,8 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             var guidBuffer = new byte[16];
             var textMaps = FindAllTextMapsInFolder(folderPath);
             logger.Info($"Found {textMaps.Count:N0} text maps in {folderPath}.");
-
+            var advancedProgress = new AdvancedProgress(textMaps.Count, DateTimeOffset.Now);
+                
             LongDirectory.CreateDirectory(LongPath.Combine(folderPath, TextMapPath));
             LongDirectory.CreateDirectory(LongPath.Combine(folderPath, TextMapPath, DefaultTextMapPath));
             LongDirectory.CreateDirectory(LongPath.Combine(folderPath, TextMapPath, AssemblyFileTextMapPath));
@@ -57,7 +59,9 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 var destinationPath = LongPath.Combine(destinationFolderPath, destinationFileName);
                 
                 LongFile.Move(filePath, destinationPath);
-                logger.Info($"({i + 1}/{textMapCount}) Moved {filePath} to {destinationPath}");
+                logger.Info($"Moved {filePath} to {destinationPath}");
+                advancedProgress.CurrentAmount += 1;
+                logger.Info(advancedProgress.ToString());
             }
             
             logger.Info("Moved all text maps.");
