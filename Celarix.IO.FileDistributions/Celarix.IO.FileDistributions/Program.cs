@@ -1,12 +1,20 @@
 ﻿using Celarix.IO.FileDistributions;
+using Celarix.IO.FileDistributions.Distributions;
 
 using var stream = File.OpenRead(@"C:\Users\celarix\Documents\circle_wave.wav");
-var distribution = new UnderlyingDistribution(4);
-int sample;
-while ((sample = stream.ReadByte()) != -1)
+using var binaryStream = new BinaryReader(stream);
+var distribution = new CharDistribution();
+var sampleBits = new int[4];
+try
 {
-    distribution.AddSample8OrFewer((byte)(sample >> 4));
-    distribution.AddSample8OrFewer((byte)(sample & 0x0F));
+    while (true)
+    {
+        var sample = binaryStream.ReadInt16();
+        distribution.AddSample((char)sample);
+    }
+}
+catch (EndOfStreamException)
+{
 }
 
 Console.WriteLine(distribution.GetDataText());
