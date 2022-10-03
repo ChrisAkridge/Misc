@@ -23,7 +23,7 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
         {
             var randomValues = new List<string>();
 
-            for (int i = 1; i <= 100; i++)
+            for (int i = 1; i <= 20; i++)
             {
                 var randomNumber = RandomNumberOfNDigits(i);
                 if (randomNumber.All(c => c == '0') && i >= 3)
@@ -48,7 +48,7 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
             randomValues.Add($"Random Double: {RandomDouble()}");
             randomValues.Add($"Random Decimal: {RandomDecimal()}");
             randomValues.Add($"Random DateTimeOffset: {RandomDateTimeOffset()}");
-            randomValues.Add($"Random Code Point: {RandomCodePointInfo()}");
+            randomValues.Add($"Random Code Point: {RandomCodePoint()}");
             randomValues.Add($"Random String: {RandomString()}");
 
             return randomValues[random.Next(0, randomValues.Count)];
@@ -86,6 +86,26 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
 
         private long RandomInt64() => unchecked((long)RandomUInt64());
 
+        // https://stackoverflow.com/a/13095144
+        private long RandomInt64(long min, long max)
+        {
+            //Working with ulong so that modulo works correctly with values > long.MaxValue
+            ulong uRange = (ulong)(max - min);
+
+            //Prevent a modolo bias; see https://stackoverflow.com/a/10984975/238419
+            //for more information.
+            //In the worst case, the expected number of calls is 2 (though usually it's
+            //much closer to 1) so this loop doesn't really hurt performance at all.
+            ulong ulongRand;
+            do
+            {
+                random.NextBytes(buffer);
+                ulongRand = (ulong)BitConverter.ToInt64(buffer, 0);
+            } while (ulongRand > ulong.MaxValue - (((ulong.MaxValue % uRange) + 1) % uRange));
+
+            return (long)(ulongRand % uRange) + min;
+        }
+        
         private ulong RandomUInt64()
         {
             random.NextBytes(buffer);
@@ -124,12 +144,12 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                 false,
                 0);
 
-        private DateTimeOffset RandomDateTimeOffset() => new DateTimeOffset(RandomInt64() % DateTime.MaxValue.Ticks, TimeSpan.FromHours(random.Next(-12, 15)));
+        private DateTimeOffset RandomDateTimeOffset() => new DateTimeOffset(RandomInt64(DateTimeOffset.MinValue.Ticks, DateTimeOffset.MaxValue.Ticks), TimeSpan.FromHours(random.Next(-12, 15)));
 
-        private string RandomCodePointInfo()
+        private string RandomCodePoint()
         {
             var codePoint = random.Next(0, 0x10FFFF + 1);
-            return $"{char.ConvertFromUtf32(codePoint)} (U+{codePoint:X}, {UnicodeInfo.GetName(codePoint)})";
+            return $"{char.ConvertFromUtf32(codePoint)} (U+{codePoint:X})";
         }
 
         private string RandomString()
@@ -138,7 +158,11 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
             var builder = new StringBuilder();
             for (var i = 0; i < length; i++)
             {
-                var codePoint = random.Next(0, 0x10FFFF + 1);
+                int codePoint;
+                do
+                {
+                    codePoint = random.Next(0, 0x10FFFF + 1);
+                } while (codePoint is >= 0xD800 and <= 0xDFFF);
                 builder.Append(char.ConvertFromUtf32(codePoint));
             }
             return builder.ToString();

@@ -15,7 +15,9 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
             var y = 5;
             presenters = new List<IPresenter>
             {
-                new TimeDisplayPresenter(panel, y, out y)
+                new TimeDisplayPresenter(panel, y, out y),
+                new RandomValuePresenter(panel, y, out y),
+                new StaticURLImagePresenter(panel, y, out y)
             };
         }
 
