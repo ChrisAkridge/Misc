@@ -14,8 +14,4 @@
     <PackageReference Include="UnicodeInformation" Version="2.6.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Presentation\" />
-  </ItemGroup>
-
 </Project>

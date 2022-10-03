@@ -17,7 +17,7 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
         {
             timeZones = new Dictionary<string, DateTimeZone>
             {
-                { "UTC-12", DateTimeZoneProviders.Tzdb["Etc/GMT_12"]},
+                { "UTC-12", DateTimeZoneProviders.Tzdb["Etc/GMT+12"]},
                 { "Hawaii", DateTimeZoneProviders.Tzdb["Pacific/Honolulu"]},
                 { "Alaska", DateTimeZoneProviders.Tzdb["America/Juneau"]},
                 { "Pacific", DateTimeZoneProviders.Tzdb["America/Los_Angeles"]},
@@ -45,7 +45,7 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                 buffer.Add($"{name}: {zdt:ddd yyyy-MM-dd hh:mm:ss tt}");
             }
 
-            var extendedDate = new CelarianExtendedDateTime(DateTimeOffset.Now);
+            var extendedDate = new CelarianExtendedDateTime(DateTimeOffset.UtcNow);
             buffer.Add($"Extended: {extendedDate.ToAmericanLongDateStyleString()}");
             return buffer;
         }
