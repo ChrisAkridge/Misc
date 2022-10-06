@@ -10,11 +10,14 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
     public sealed class TimeDisplayPresenter : IPresenter
     {
         private readonly TimeDisplayProvider provider = new TimeDisplayProvider();
+        private readonly Settings settings;
         
         private readonly Label timeLabel;
 
-        public TimeDisplayPresenter(Panel panel, int startingY, out int endingY)
+        public TimeDisplayPresenter(Panel panel, Settings settings, int startingY, out int endingY)
         {
+            this.settings = settings;
+            
             timeLabel = new Label
             {
                 Location = new Point(5, startingY),

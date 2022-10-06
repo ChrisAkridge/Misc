@@ -6,12 +6,14 @@ namespace Celarix.JustForFun.LunaGalatea
     {
         private readonly PresentationManager presentationManager;
         private int timerTicks;
+        private Settings settings;
         
         public MainForm()
         {
             InitializeComponent();
 
-            presentationManager = new PresentationManager(MainPanel);
+            settings = Settings.LoadOrCreate();
+            presentationManager = new PresentationManager(MainPanel, settings);
         }
 
         private void TimerMain_Tick(object sender, EventArgs e)

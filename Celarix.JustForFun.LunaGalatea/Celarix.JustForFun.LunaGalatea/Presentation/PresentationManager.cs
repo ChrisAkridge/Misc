@@ -10,14 +10,14 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
     {
         private readonly List<IPresenter> presenters;
 
-        public PresentationManager(Panel panel)
+        public PresentationManager(Panel panel, Settings settings)
         {
             var y = 5;
             presenters = new List<IPresenter>
             {
-                new TimeDisplayPresenter(panel, y, out y),
-                new RandomValuePresenter(panel, y, out y),
-                new StaticURLImagePresenter(panel, y, out y)
+                new TimeDisplayPresenter(panel, settings, y, out y),
+                new RandomValuePresenter(panel, settings, y, out y),
+                new StaticURLImagePresenter(panel, settings, y, out y)
             };
         }
 

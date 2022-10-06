@@ -10,11 +10,14 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
     public sealed class StaticURLImagePresenter : IPresenter
     {
         private readonly StaticURLImageProvider provider = new StaticURLImageProvider();
+        private readonly Settings settings;
         private readonly Label label;
         private readonly PictureBox pictureBox;
 
-        public StaticURLImagePresenter(Panel panel, int startingY, out int endingY)
+        public StaticURLImagePresenter(Panel panel, Settings settings, int startingY, out int endingY)
         {
+            this.settings = settings;
+            
             label = new Label
             {
                 Location = new Point(5, startingY),
@@ -54,12 +57,12 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
 
         public void Render(int timerTicks)
         {
-            // TODO: replace constant with value from settings
-            if (timerTicks % 30 == 0)
+            if (timerTicks % settings.StaticURLImagePresenterUpdateTime == 0)
             {
                 var labelAndPath = provider.GetDisplayObject();
                 label.Text = labelAndPath.Key;
                 
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
                 if (labelAndPath.Value != null)
                 {
                     using var stream = File.OpenRead(labelAndPath.Value);

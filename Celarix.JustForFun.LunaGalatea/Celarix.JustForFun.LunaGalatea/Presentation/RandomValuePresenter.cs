@@ -10,10 +10,13 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
     public sealed class RandomValuePresenter : IPresenter
     {
         private readonly RandomValueProvider provider = new RandomValueProvider();
+        private readonly Settings settings;
         private readonly Label valueLabel;
 
-        public RandomValuePresenter(Panel panel, int startingY, out int endingY)
+        public RandomValuePresenter(Panel panel, Settings settings, int startingY, out int endingY)
         {
+            this.settings = settings;
+            
             valueLabel = new Label
             {
                 Location = new Point(5, startingY),
@@ -42,8 +45,7 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
 
         public void Render(int timerTicks)
         {
-            // TODO: replace constant with value from settings
-            if (timerTicks % 30 == 0)
+            if (timerTicks % settings.RandomValueUpdateTime == 0)
             {
                 valueLabel.Text = provider.GetDisplayObject();
             }

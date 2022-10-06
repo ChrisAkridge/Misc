@@ -64,6 +64,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
                         var addedFileCount = PathFileWriter.WritePathFiles(job, clientGeneratedFiles);
                         AnalysisJob.IncreaseEstimatedFileCount(addedFileCount);
                         advancedProgress.TotalAmount += addedFileCount;
+                        AnalysisJob.SaveJobFile();
                         logger.Info(
                             $"Analysis added {addedFileCount:N0} additional files for a new total of {AnalysisJob.EstimatedRemainingFiles:#,###} files.");
                     }
