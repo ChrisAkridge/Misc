@@ -63,6 +63,13 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
 
         private static IEnumerable<string> FindAllCSharpMemberFilesInFolder(string folderPath)
         {
+            if (folderPath.Contains("textMaps/cs", StringComparison.InvariantCultureIgnoreCase)
+                || folderPath.Contains("textMaps/asm", StringComparison.InvariantCultureIgnoreCase)
+                || folderPath.Contains("textMaps/default", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return new List<string>();
+            }
+            
             var cSharpMemberFiles = new List<string>();
 
             var filesInFolder = LongDirectory.GetFiles(folderPath, "*", SearchOption.TopDirectoryOnly);

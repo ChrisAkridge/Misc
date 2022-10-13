@@ -17,6 +17,13 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
         {
             logger.Info($"Removing all empty folders from {folderPath}...");
 
+            if (folderPath.Contains("textMaps/cs", StringComparison.InvariantCultureIgnoreCase)
+                || folderPath.Contains("textMaps/asm", StringComparison.InvariantCultureIgnoreCase)
+                || folderPath.Contains("textMaps/default", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return;
+            }
+
             var foldersInFolder = LongDirectory.GetDirectories(folderPath, "*", SearchOption.TopDirectoryOnly);
             var filesInFolder = LongDirectory.GetFiles(folderPath, "*", SearchOption.TopDirectoryOnly);
 

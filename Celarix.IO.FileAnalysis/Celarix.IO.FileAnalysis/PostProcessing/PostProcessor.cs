@@ -22,7 +22,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             }
             TextMapMover.MoveAllTextMaps(folderPath);
             CSharpMemberFileConcatenator.ConcatenateCSharpMemberFiles(folderPath);
-            
+
             EmptyFolderRemover.RemoveAllEmptyFolders(folderPath);
             FolderTreePrinter.PrintFolderTreeForFolder(folderPath);
         }
