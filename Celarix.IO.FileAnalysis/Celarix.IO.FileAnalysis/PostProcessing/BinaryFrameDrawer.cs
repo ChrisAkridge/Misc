@@ -67,13 +67,21 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
 
             for (var i = 0; i < totalImages; i++)
             {
+                var imageFilePath = LongPath.Combine(outputFolderPath, $"{i:D8}.png");
+
+                if (LongFile.Exists(imageFilePath))
+                {
+                    logger.Info($"Image {i + 1} already exists. Skipping.");
+
+                    continue;
+                }
+                
                 var image = Drawer.DrawFixedSizeWithSourceText(new Size(1920, 1080),
                     multiStream,
                     24,
                     null,
                     CancellationToken.None,
                     progress);
-                var imageFilePath = LongPath.Combine(outputFolderPath, $"{i:D8}.png");
                 image.SaveAsPng(imageFilePath);
                 imagesProgress.CurrentAmount = i + 1;
                 logger.Info(

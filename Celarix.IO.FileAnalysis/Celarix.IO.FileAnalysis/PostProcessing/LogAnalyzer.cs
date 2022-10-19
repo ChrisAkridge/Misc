@@ -306,7 +306,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 return MessageType.WritingPathFile;
             }
 
-            if (message.StartsWith("An estimated", comparison))
+            if (message.Contains("An estimated", comparison))
             {
                 return MessageType.EstimatedFileCount;
             }
