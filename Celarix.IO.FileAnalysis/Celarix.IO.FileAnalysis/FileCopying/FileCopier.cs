@@ -80,7 +80,7 @@ namespace Celarix.IO.FileAnalysis.FileCopying
 
         private void WriteFileHashes()
         {
-            logger.Info($"Writing SHA-256 hashes for all files...");
+            logger.Info("Writing SHA-256 hashes for all files...");
             
             var fileListPaths = LongDirectory
                 .EnumerateFiles(AnalysisJob.ToAbsolutePath(FileLocation.Output,
@@ -181,7 +181,7 @@ namespace Celarix.IO.FileAnalysis.FileCopying
 
         private string GetSourcePath(string filePathFromOutput)
         {
-            var outputFolderLength = AnalysisJob.OutputFolderPath.Length + SharedConstants.OutputFileFolderPath.Length + 2;
+            var outputFolderLength = AnalysisJob.OutputFolderPath.Length + SharedConstants.OutputFileFolderPath.Length + 1;
             var relativeFilePath = filePathFromOutput.Substring(outputFolderLength);
 
             return AnalysisJob.ToAbsolutePath(FileLocation.Input, relativeFilePath);
