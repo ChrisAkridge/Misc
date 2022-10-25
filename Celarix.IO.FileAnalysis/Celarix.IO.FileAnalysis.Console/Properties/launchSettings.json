@@ -2,7 +2,7 @@
   "profiles": {
     "Celarix.IO.FileAnalysis.Console": {
       "commandName": "Project",
-      "commandLineArgs": "\"H:\\fa\\CQBAPI\" \"H:\\fa\\test\""
+      "commandLineArgs": "-draw \"H:\\fa\\3 DATA\\09\""
     }
   }
 }

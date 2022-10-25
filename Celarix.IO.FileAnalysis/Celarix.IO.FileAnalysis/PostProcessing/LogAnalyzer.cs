@@ -167,7 +167,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
 
                 allLineLength += line.Length;
                 
-                var lineParts = line.Split('|');
+                var lineParts = line.Split('|', 3);
 
                 if (lineParts.Length != 3)
                 {
@@ -306,7 +306,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 return MessageType.WritingPathFile;
             }
 
-            if (message.StartsWith("An estimated", comparison))
+            if (message.Contains("estimate", comparison))
             {
                 return MessageType.EstimatedFileCount;
             }
