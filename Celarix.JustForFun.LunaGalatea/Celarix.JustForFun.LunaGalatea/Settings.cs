@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Celarix.JustForFun.LunaGalatea.Logic.FootballSimulatorLite;
+using Celarix.JustForFun.LunaGalatea.Logic.Yahtzee;
 
 namespace Celarix.JustForFun.LunaGalatea
 {
@@ -13,6 +14,7 @@ namespace Celarix.JustForFun.LunaGalatea
         public int RandomValueUpdateTime { get; set; }
         public int StaticURLImagePresenterUpdateTime { get; set; }
         public FootballInfo FootballInfo { get; set; }
+        public YahtzeeInfo YahtzeeInfo { get; set; }
 
         private Settings() { }
         
@@ -26,7 +28,8 @@ namespace Celarix.JustForFun.LunaGalatea
                 {
                     RandomValueUpdateTime = 30,
                     StaticURLImagePresenterUpdateTime = 30,
-                    FootballInfo = GetDefaultFootballInfo()
+                    FootballInfo = GetDefaultFootballInfo(),
+                    YahtzeeInfo = new YahtzeeInfo()
                 };
                 var newSettingsJson = JsonSerializer.Serialize(newSettings);
                 File.WriteAllText(settingsPath, newSettingsJson);
