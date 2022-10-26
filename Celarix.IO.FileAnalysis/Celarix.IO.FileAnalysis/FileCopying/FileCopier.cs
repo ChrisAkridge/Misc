@@ -181,7 +181,7 @@ namespace Celarix.IO.FileAnalysis.FileCopying
 
         private string GetSourcePath(string filePathFromOutput)
         {
-            var outputFolderLength = AnalysisJob.OutputFolderPath.Length + SharedConstants.OutputFileFolderPath.Length + 1;
+            var outputFolderLength = AnalysisJob.OutputFolderPath.Length + SharedConstants.OutputFileFolderPath.Length + 2;
             var relativeFilePath = filePathFromOutput.Substring(outputFolderLength);
 
             return AnalysisJob.ToAbsolutePath(FileLocation.Input, relativeFilePath);
