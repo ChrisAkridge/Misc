@@ -53,7 +53,7 @@ internal static class YahtzeeStrategies
                 ? "Yahtzee"
                 : $"{n} of a Kind",
             CurrentScore = dice.Sum(),
-            MaxScore = bestHoldChoice.Value * 5,
+            MaxScore = bestHoldChoice.Key * 5,
             RemainingDice = Math.Min(0, n - dice.Count(d => d == bestHoldChoice.Value)),
             ResultingHold = hold
         };
@@ -103,13 +103,13 @@ internal static class YahtzeeStrategies
             new KeyValuePair<int, int>(3, 0),
             new KeyValuePair<int, int>(4, 0),
         };
-        var ascendingDiceCount = 1;
-        var lastSeenDie = int.MinValue;
+        var ascendingDiceCount = 0;
+        var lastSeenDie = 0;
 
         for (var i = 0; i < 5; i++)
         {
             var die = sorted[i].Value;
-            ascendingDiceCount = die >= lastSeenDie
+            ascendingDiceCount = die == lastSeenDie + 1
                 ? ascendingDiceCount + 1
                 : 1;
             ascendingStraightLengths[i] = new KeyValuePair<int, int>(ascendingStraightLengths[i].Key, ascendingDiceCount);
@@ -117,8 +117,9 @@ internal static class YahtzeeStrategies
         }
 
         var longestStraightLength = ascendingStraightLengths.MaxBy(kvp => kvp.Value).Value;
-        var endOfLongestStraight = Array.IndexOf(ascendingStraightLengths, longestStraightLength);
+        var endOfLongestStraight = ascendingStraightLengths.IndexOf(kvp => kvp.Value == longestStraightLength);
         var startOfLongestStraight = endOfLongestStraight - (longestStraightLength - 1);
+        // wrong: uses indices from ascendingStraightLengths, not the original indices from the incoming roll
         var holdIndices = ascendingStraightLengths
             .Skip(startOfLongestStraight)
             .Take((endOfLongestStraight - startOfLongestStraight) + 1)
@@ -133,10 +134,10 @@ internal static class YahtzeeStrategies
 
         return new YahtzeeStrategy
         {
-            ScoreName = scoreForStraight switch
+            ScoreName = desiredLength switch
             {
-                3 => "Small Straight",
-                4 => "Large Straight",
+                4 => "Small Straight",
+                5 => "Large Straight",
                 _ => throw new ArgumentOutOfRangeException()
             },
             CurrentScore = longestStraightLength == desiredLength

@@ -11,8 +11,6 @@ namespace Celarix.JustForFun.LunaGalatea.Logic.Yahtzee
     {
         private static readonly Random random;
         
-        public static YahtzeeInfo Info { get; set; }
-        
         public static int CurrentGameNumber { get; set; }
 
         public static int[] LastDiceRoll { get; set; }
@@ -34,7 +32,7 @@ namespace Celarix.JustForFun.LunaGalatea.Logic.Yahtzee
         public static int? YahtzeeScore { get; set; }
         public static int YahtzeeBonusesScore { get; set; }
 
-        public static event EventHandler<YahtzeeInfo> GameOver; 
+        public static event EventHandler<YahtzeeInfo>? GameOver; 
 
         public static int Subtotal =>
             OnesScore ?? 0
@@ -59,9 +57,8 @@ namespace Celarix.JustForFun.LunaGalatea.Logic.Yahtzee
         {
             random = new Random();
             LastDiceRoll = new int[5];
+            RollsLeft = 3;
         }
-
-        public static void Initialize(YahtzeeInfo info) => Info = info;
 
         public static void NextStep()
         {
@@ -77,7 +74,9 @@ namespace Celarix.JustForFun.LunaGalatea.Logic.Yahtzee
                 // for maximizing score.
                 var bestStrategy = GetStrategiesByQuality().First();
 
-                if (bestStrategy.RemainingDice == 0 && TryRecordScore(bestStrategy))
+                if (bestStrategy.RemainingDice == 0
+                    && RollsLeft == 0
+                    && TryRecordScore(bestStrategy))
                 {
                     return;
                 }
@@ -105,11 +104,42 @@ namespace Celarix.JustForFun.LunaGalatea.Logic.Yahtzee
                 {
                     TotalGamesPlayed = 1,
                     TotalPointsScored = Total,
-                    TotalYahtzeeCount = (YahtzeeScore != null ? 1 : 0) + (YahtzeeBonusesScore / 100)
+                    TotalYahtzeeCount = GetYahtzeeCount()
                 });
                 
                 ResetGame();
             }
+        }
+
+        private static int GetYahtzeeCount() => (YahtzeeScore != null ? 1 : 0) + (YahtzeeBonusesScore / 100);
+
+        public static string GetDisplayText()
+        {
+            var diceText = string.Join(' ', LastDiceRoll);
+            var progressText = $@"{new[]
+            {
+                OnesScore,
+                TwosScore,
+                ThreesScore,
+                FoursScore,
+                FivesScore,
+                SixesScore,
+                ThreeOfAKindScore,
+                FourOfAKindScore,
+                FullHouseScore,
+                SmallStraightScore,
+                LargeStraightScore,
+                ChanceScore,
+                YahtzeeScore
+            }.Count(s => s != null)}/13 scores recorded";
+            var scoreText = $"{Total} points ({GetYahtzeeCount()} Yahtzees)";
+
+            return string.Join(Environment.NewLine, new[]
+            {
+                diceText,
+                progressText,
+                scoreText
+            });
         }
 
         private static void ResetDice()
@@ -131,7 +161,7 @@ namespace Celarix.JustForFun.LunaGalatea.Logic.Yahtzee
         {
             for (int i = 0; i < 5; i++)
             {
-                if ((Holds & (0b10000 >> i)) != 0)
+                if ((Holds & (0b10000 >> i)) == 0)
                 {
                     LastDiceRoll[i] = random.Next(1, 7);
                 }
@@ -167,8 +197,8 @@ namespace Celarix.JustForFun.LunaGalatea.Logic.Yahtzee
             strategies.Add(YahtzeeStrategies.NOfAKindStrategy(3, LastDiceRoll));
             strategies.Add(YahtzeeStrategies.NOfAKindStrategy(4, LastDiceRoll));
             strategies.Add(YahtzeeStrategies.FullHouseStrategy(LastDiceRoll));
-            strategies.Add(YahtzeeStrategies.StraightStrategy(3, 30, LastDiceRoll));
-            strategies.Add(YahtzeeStrategies.StraightStrategy(4, 40, LastDiceRoll));
+            strategies.Add(YahtzeeStrategies.StraightStrategy(4, 30, LastDiceRoll));
+            strategies.Add(YahtzeeStrategies.StraightStrategy(5, 40, LastDiceRoll));
             strategies.Add(YahtzeeStrategies.ChanceStrategy(LastDiceRoll));
             strategies.Add(YahtzeeStrategies.NOfAKindStrategy(5, LastDiceRoll));
 

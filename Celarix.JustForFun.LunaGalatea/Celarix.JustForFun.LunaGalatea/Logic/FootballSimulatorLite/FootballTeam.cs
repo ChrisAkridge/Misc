@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Celarix.JustForFun.LunaGalatea.Logic.FootballSimulatorLite
@@ -17,6 +18,7 @@ namespace Celarix.JustForFun.LunaGalatea.Logic.FootballSimulatorLite
         public int PointsScored { get; set; }
         public int PointsAllowed { get; set; }
 
+        [JsonIgnore]
         public double Record
         {
             get
