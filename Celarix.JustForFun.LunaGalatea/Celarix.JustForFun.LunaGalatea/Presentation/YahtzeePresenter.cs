@@ -44,11 +44,11 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
 
         public void Render(int timerTicks)
         {
-            if (timerTicks % updateTime == 0)
-            {
+            //if (timerTicks % updateTime == 0)
+            //{
                 YahtzeePlayer.NextStep();
                 label.Text = YahtzeePlayer.GetDisplayText();
-            }
+            //}
         }
     }
 }
