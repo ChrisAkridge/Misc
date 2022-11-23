@@ -18,6 +18,7 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
                 new TimeDisplayPresenter(panel, settings, y, out y),
                 new RandomValuePresenter(panel, settings, y, out y),
                 new StaticURLImagePresenter(panel, settings, y, out y),
+                new TinyCityscapesPresenter(panel, settings, y, out y),
                 new YahtzeePresenter(panel, settings.YahtzeePlayerUpdateTime, y, out y),
                 new CountdownPresenter(panel, settings, y, out y)
             };

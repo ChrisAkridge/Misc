@@ -144,7 +144,14 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
             return FormatDuration(nextOccurrenceZonedDate.ToInstant() - nowInstant);
         }
 
-        private static string FormatDuration(Duration duration) => duration.ToString("D'd'h'h'm'm's's'", CultureInfo.CurrentCulture);
+        private static string FormatDuration(Duration duration)
+        {
+            var durationString = duration.ToString("D'd'h'h'm'm's's'", CultureInfo.CurrentCulture);
+            var decibelSeconds = (duration.TotalSeconds > 0d)
+                ? (10d * Math.Log10(duration.TotalSeconds)).ToString("F4")
+                : "Right Now!";
+            return $"{durationString} ({decibelSeconds} dBsec)";
+        }
 
         private static int GetSpringEquinoxDay(int year) =>
             year switch

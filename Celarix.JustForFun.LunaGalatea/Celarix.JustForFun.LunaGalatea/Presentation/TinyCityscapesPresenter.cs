@@ -7,22 +7,21 @@ using Celarix.JustForFun.LunaGalatea.Providers;
 
 namespace Celarix.JustForFun.LunaGalatea.Presentation
 {
-    public sealed class TimeDisplayPresenter : IPresenter
+    public sealed class TinyCityscapesPresenter : IPresenter
     {
-        private readonly TimeDisplayProvider provider = new TimeDisplayProvider();
+        private readonly TinyCityscapesProvider provider = new TinyCityscapesProvider();
+        private readonly Label cityscapeLabel;
 
-        private readonly Label timeLabel;
-
-        public TimeDisplayPresenter(Panel panel, Settings settings, int startingY, out int endingY)
+        public TinyCityscapesPresenter(Panel panel, Settings settings, int startingY, out int endingY)
         {
-            timeLabel = new Label
+            cityscapeLabel = new Label
             {
                 Location = new Point(5, startingY),
                 AutoSize = true
             };
-
+            
             Render(0);
-            startingY += TextRenderer.MeasureText(timeLabel.Text, timeLabel.Font).Height + 5;
+            startingY += TextRenderer.MeasureText(cityscapeLabel.Text, cityscapeLabel.Font).Height + 5;
 
             var separatorLabel = new Label
             {
@@ -32,8 +31,8 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
                 BackColor = SystemColors.ControlDark,
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
-            
-            panel.Controls.Add(timeLabel);
+
+            panel.Controls.Add(cityscapeLabel);
             panel.Controls.Add(separatorLabel);
 
             endingY = startingY + separatorLabel.Height + 5;
@@ -41,8 +40,10 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
 
         public void Render(int timerTicks)
         {
-            var timeDisplay = provider.GetDisplayObject();
-            timeLabel.Text = string.Join(Environment.NewLine, timeDisplay);
+            if (timerTicks % 30 == 0)
+            {
+                cityscapeLabel.Text = provider.GetDisplayObject();
+            }
         }
     }
 }

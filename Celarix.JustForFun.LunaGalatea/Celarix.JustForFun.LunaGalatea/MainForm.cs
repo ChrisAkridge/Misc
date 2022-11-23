@@ -21,6 +21,7 @@ namespace Celarix.JustForFun.LunaGalatea
 
         private void YahtzeePlayer_GameOver(object? sender, YahtzeeInfo e)
         {
+            settings.YahtzeeInfo.TotalGamesPlayed += 1;
             settings.YahtzeeInfo.TotalPointsScored += e.TotalGamesPlayed;
             settings.YahtzeeInfo.TotalPointsScored += e.TotalPointsScored;
             settings.YahtzeeInfo.TotalYahtzeeCount += e.TotalYahtzeeCount;
