@@ -7,7 +7,7 @@ namespace Celarix.JustForFun.LunaGalatea
     {
         private readonly PresentationManager presentationManager;
         private int timerTicks;
-        private Settings settings;
+        private readonly Settings settings;
         
         public MainForm()
         {
@@ -36,6 +36,11 @@ namespace Celarix.JustForFun.LunaGalatea
         {
             timerTicks += 1;
             presentationManager.Render(timerTicks);
+        }
+
+        private async void TimerAsync_Tick(object sender, EventArgs e)
+        {
+            await presentationManager.RenderAsync(timerTicks);
         }
     }
 }

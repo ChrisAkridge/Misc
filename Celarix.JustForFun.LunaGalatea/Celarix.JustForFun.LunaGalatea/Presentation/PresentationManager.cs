@@ -9,6 +9,7 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
     public class PresentationManager
     {
         private readonly List<IPresenter> presenters;
+        private readonly List<IAsyncPresenter> asyncPresenters;
 
         public PresentationManager(Panel panel, Settings settings)
         {
@@ -20,8 +21,15 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
                 new StaticURLImagePresenter(panel, settings, y, out y),
                 new TinyCityscapesPresenter(panel, settings, y, out y),
                 new YahtzeePresenter(panel, settings.YahtzeePlayerUpdateTime, y, out y),
-                new CountdownPresenter(panel, settings, y, out y)
+                new CountdownPresenter(panel, y, out y)
             };
+
+            asyncPresenters = new List<IAsyncPresenter>
+            {
+                new StockQuotePresenter(panel, y, out y)
+            };
+            
+            // Add new presenters down here
         }
 
         public void Render(int timerTicks)
@@ -29,6 +37,14 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
             foreach (var presenter in presenters)
             {
                 presenter.Render(timerTicks);
+            }
+        }
+
+        public async Task RenderAsync(int timerTicks)
+        {
+            foreach (var asyncPresenter in asyncPresenters)
+            {
+                await asyncPresenter.Render(timerTicks);
             }
         }
     }

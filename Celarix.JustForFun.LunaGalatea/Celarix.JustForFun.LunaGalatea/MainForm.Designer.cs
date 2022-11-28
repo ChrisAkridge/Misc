@@ -30,8 +30,10 @@ namespace Celarix.JustForFun.LunaGalatea
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.MainPanel = new System.Windows.Forms.Panel();
-            this.TimerMain = new Timer();
+            this.TimerMain = new System.Windows.Forms.Timer(this.components);
+            this.TimerAsync = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // MainPanel
@@ -39,18 +41,24 @@ namespace Celarix.JustForFun.LunaGalatea
             this.MainPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.MainPanel.AutoScroll = true;
+            this.MainPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.MainPanel.Location = new System.Drawing.Point(12, 12);
             this.MainPanel.Name = "MainPanel";
             this.MainPanel.Size = new System.Drawing.Size(554, 720);
             this.MainPanel.TabIndex = 0;
-            this.MainPanel.BorderStyle = BorderStyle.Fixed3D;
-            this.MainPanel.AutoScroll = true;
-            //
+            // 
             // TimerMain
-            //
-            this.TimerMain.Interval = 1000;
+            // 
             this.TimerMain.Enabled = true;
-            this.TimerMain.Tick += TimerMain_Tick;
+            this.TimerMain.Interval = 1000;
+            this.TimerMain.Tick += new System.EventHandler(this.TimerMain_Tick);
+            // 
+            // TimerAsync
+            // 
+            this.TimerAsync.Enabled = true;
+            this.TimerAsync.Interval = 1000;
+            this.TimerAsync.Tick += new System.EventHandler(this.TimerAsync_Tick);
             // 
             // MainForm
             // 
@@ -68,5 +76,6 @@ namespace Celarix.JustForFun.LunaGalatea
 
         private Panel MainPanel;
         private Timer TimerMain;
+        private Timer TimerAsync;
     }
 }
