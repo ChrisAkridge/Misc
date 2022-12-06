@@ -13,10 +13,9 @@ namespace Celarix.JustForFun.LunaGalatea
     {
         public int RandomValueUpdateTime { get; set; }
         public int StaticURLImagePresenterUpdateTime { get; set; }
+        public int YahtzeePlayerUpdateTime { get; set; }
         public FootballInfo FootballInfo { get; set; }
         public YahtzeeInfo YahtzeeInfo { get; set; }
-
-        private Settings() { }
         
         public static Settings LoadOrCreate()
         {
@@ -28,6 +27,7 @@ namespace Celarix.JustForFun.LunaGalatea
                 {
                     RandomValueUpdateTime = 30,
                     StaticURLImagePresenterUpdateTime = 30,
+                    YahtzeePlayerUpdateTime = 30,
                     FootballInfo = GetDefaultFootballInfo(),
                     YahtzeeInfo = new YahtzeeInfo()
                 };
@@ -67,6 +67,7 @@ namespace Celarix.JustForFun.LunaGalatea
                 "Tennessee",
                 "Arizona",
                 "Atlanta",
+                "Carolina",
                 "Chicago",
                 "Dallas",
                 "Detroit",

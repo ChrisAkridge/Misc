@@ -65,8 +65,16 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
                 // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
                 if (labelAndPath.Value != null)
                 {
-                    using var stream = File.OpenRead(labelAndPath.Value);
-                    pictureBox.Image = Image.FromStream(stream);
+                    try
+                    {
+                        using var stream = File.OpenRead(labelAndPath.Value);
+                        pictureBox.Image = Image.FromStream(stream);
+                    }
+                    catch (Exception ex)
+                    {
+                        pictureBox.Image = null;
+                        label.Text = ex.Message;
+                    }
                 }
                 else
                 {

@@ -121,5 +121,89 @@ namespace Celarix.JustForFun.LunaGalatea.Logic
 
         public string ToAmericanLongDateStyleString() =>
             $"{DayOfWeekName}, {MonthName} {Day + 1}, {Year + 1} {HoursInMeridian:D2}:{Minute:D2}:{Second:D2} {Meridian}";
+
+        public string GetDayCulture() =>
+            DayOfWeekName switch
+            {
+                "Themisday" => "Mid-week day off",
+                "Palday" => "Mid-week day off",
+                "Galaday" => "Day off for community",
+                "Kerday" => "Day off for family",
+                "Lunaday" => "Day off for self and partners",
+                _ => "Workday"
+            };
+
+        public string GetTimeCulture() =>
+            DayOfWeekName switch
+            {
+                "Themisday" or "Palday" => Hour switch
+                {
+                    >= 0 and < 3 => "First sleep",
+                    >= 3 and < 6 => "Overnight wakefulness",
+                    >= 6 and < 14 => "Second sleep",
+                    >= 14 and < 16 => "Breakfast",
+                    >= 16 and < 24 => "Chores, homework, errands, maintenance, lunch",
+                    >= 24 and < 25 => "Siesta",
+                    >= 25 and < 27 => "Dinner",
+                    >= 27 and < 33 => "High Leisure",
+                    >= 33 and < 37 => "Low Leisure",
+                    _ => throw new ArgumentOutOfRangeException()
+                },
+                "Galaday" => Hour switch
+                {
+                    >= 0 and < 3 => "First sleep",
+                    >= 3 and < 6 => "Overnight wakefulness",
+                    >= 6 and < 14 => "Second sleep",
+                    >= 14 and < 16 => "Breakfast",
+                    >= 16 and < 22 => "Fellowship with community",
+                    >= 22 and < 24 => "Lunch",
+                    >= 24 and < 26 => "Siesta",
+                    >= 26 and < 32 => "High Leisure",
+                    >= 32 and < 34 => "Dinner",
+                    >= 34 and < 37 => "Low Leisure",
+                    _ => throw new ArgumentOutOfRangeException()
+                },
+                "Kerday" => Hour switch
+                {
+                    >= 0 and < 3 => "First sleep",
+                    >= 3 and < 6 => "Overnight wakefulness",
+                    >= 6 and < 14 => "Second sleep",
+                    >= 14 and < 16 => "Breakfast",
+                    >= 16 and < 22 => "High Leisure",
+                    >= 22 and < 24 => "Lunch",
+                    >= 24 and < 30 => "Family time",
+                    >= 30 and < 32 => "Siesta",
+                    >= 32 and < 34 => "Dinner",
+                    >= 34 and < 37 => "Low Leisure",
+                    _ => throw new ArgumentOutOfRangeException()
+                },
+                "Lunaday" => Hour switch
+                {
+                    >= 0 and < 3 => "First sleep",
+                    >= 3 and < 6 => "Overnight wakefulness",
+                    >= 6 and < 14 => "Second sleep",
+                    >= 14 and < 16 => "Breakfast",
+                    >= 16 and < 20 => "High Leisure",
+                    >= 20 and < 21 => "Lunch",
+                    >= 21 and < 23 => "Siesta",
+                    >= 23 and < 24 => "Dinner",
+                    >= 25 and < 29 => "Low Leisure",
+                    >= 29 and < 37 => "Lover's Time 💖",
+                    _ => throw new ArgumentOutOfRangeException()
+                },
+                _ => Hour switch
+                {
+                    >= 0 and < 3 => "First sleep",
+                    >= 3 and < 6 => "Overnight wakefulness",
+                    >= 6 and < 14 => "Second sleep",
+                    >= 14 and < 16 => "Breakfast",
+                    >= 16 and < 26 => "Work",
+                    >= 26 and < 27 => "Siesta",
+                    >= 27 and < 29 => "Dinner",
+                    >= 29 and < 33 => "Chores, homework, errands, maintenance",
+                    >= 33 and < 37 => "Hobbies, projects, entertainment",
+                    _ => throw new ArgumentOutOfRangeException()
+                }
+            };
     }
 }

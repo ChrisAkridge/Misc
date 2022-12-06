@@ -47,6 +47,7 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
 
             var extendedDate = new CelarianExtendedDateTime(DateTimeOffset.UtcNow);
             buffer.Add($"Extended: {extendedDate.ToAmericanLongDateStyleString()}");
+            buffer.Add($"({extendedDate.GetDayCulture()}, {extendedDate.GetTimeCulture()})");
             return buffer;
         }
     }

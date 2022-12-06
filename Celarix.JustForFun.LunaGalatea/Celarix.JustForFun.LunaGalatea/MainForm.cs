@@ -7,7 +7,7 @@ namespace Celarix.JustForFun.LunaGalatea
     {
         private readonly PresentationManager presentationManager;
         private int timerTicks;
-        private Settings settings;
+        private readonly Settings settings;
         
         public MainForm()
         {
@@ -21,6 +21,7 @@ namespace Celarix.JustForFun.LunaGalatea
 
         private void YahtzeePlayer_GameOver(object? sender, YahtzeeInfo e)
         {
+            settings.YahtzeeInfo.TotalGamesPlayed += 1;
             settings.YahtzeeInfo.TotalPointsScored += e.TotalGamesPlayed;
             settings.YahtzeeInfo.TotalPointsScored += e.TotalPointsScored;
             settings.YahtzeeInfo.TotalYahtzeeCount += e.TotalYahtzeeCount;
@@ -35,6 +36,11 @@ namespace Celarix.JustForFun.LunaGalatea
         {
             timerTicks += 1;
             presentationManager.Render(timerTicks);
+        }
+
+        private async void TimerAsync_Tick(object sender, EventArgs e)
+        {
+            await presentationManager.RenderAsync(timerTicks);
         }
     }
 }
