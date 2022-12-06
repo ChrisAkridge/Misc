@@ -23,7 +23,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
         {
             var generatedFilePaths = new List<string>();
             
-            var isExecutable = IsExecutable(filePath);
+            var isExecutable = IsExecutable(filePath) && LongPath.GetFileName(filePath) != ".bss";
             var isArchive = isExecutable || SevenZipClient.IsArchive(filePath);
             var isAssembly = IsAssembly(filePath);
 
@@ -34,11 +34,12 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
             if (isArchive)
             {
-                SevenZipClient.TryExtract(filePath);
-
-                generatedFilePaths.AddRange(LongDirectory.GetFiles(SevenZipClient.GetExtractionPathForFile(filePath),
+                if (SevenZipClient.TryExtract(filePath).ExtractedFileCount > 0)
+                {
+                    generatedFilePaths.AddRange(LongDirectory.GetFiles(SevenZipClient.GetExtractionPathForFile(filePath),
                         "*",
                         SearchOption.AllDirectories));
+                }
             }
 
             if (isExecutable && !isAssembly)
@@ -82,6 +83,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
             }
             
             using var stream = File.OpenRead(filePath);
+            Array.Clear(executableFirstBytes, 0, executableFirstBytes.Length);
 
             stream.Read(executableFirstBytes, 0, 128);
             string firstChunkAsASCII = Encoding.ASCII.GetString(executableFirstBytes);

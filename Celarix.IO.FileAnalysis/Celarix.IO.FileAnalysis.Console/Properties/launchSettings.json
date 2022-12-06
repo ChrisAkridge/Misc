@@ -2,7 +2,7 @@
   "profiles": {
     "Celarix.IO.FileAnalysis.Console": {
       "commandName": "Project",
-      "commandLineArgs": "-draw \"H:\\fa\\3 DATA\\09\""
+      "commandLineArgs": "\"I:\\fa\\PAVILION-CORE\\04 CELARIX_4TB_A\\17_in\" \"I:\\fa\\PAVILION-CORE\\04 CELARIX_4TB_A\\17\""
     }
   }
 }

@@ -56,8 +56,9 @@ namespace Celarix.IO.FileAnalysis.Utilities
             // Text file heuristic: a file will be treated as text if the first
             // 4,096 bytes fit the following criteria:
             //  - No two consecutive 0x00 bytes
+            //  - File is not empty
 
-            return !HasConsecutiveZeroBytes(buffer, readBytes);
+            return readBytes > 0 && !HasConsecutiveZeroBytes(buffer, readBytes);
         }
 
         public static bool TryShortenFilePath(string text, out string result)
