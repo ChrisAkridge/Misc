@@ -29,7 +29,9 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             logger.Info($"Drawing text map canvas for {filePath}...");
             
             using var stream = new StreamReader(LongFile.OpenRead(filePath));
-            var lineMaps = new List<BitArray>();
+            var lineMapBackingFolderPath = LongPath.Combine(LongPath.GetDirectoryName(filePath), "lineMaps");
+            LongDirectory.CreateDirectory(lineMapBackingFolderPath);
+            var lineMaps = new StorageBackedBitArrayList(lineMapBackingFolderPath);
             var totalImagePixels = 0L;
             var mappedLines = 0L;
 
@@ -53,26 +55,29 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
 
             var hueStep = 360d / lineMaps.Count;
             var linesPerColumn = (int)Math.Min(Math.Floor(Math.Sqrt(totalImagePixels)), lineMaps.Count);
+            var columnWidths = GetLongestLineLengthPerColumn(lineMaps, linesPerColumn);
             var batchedLineMaps = lineMaps
-                .Batch(linesPerColumn)
-                .Select(l => l.ToArray());
+                .BatchWithCount(linesPerColumn);
             var totalImageWidth = 0L;
             var startHue = 0d;
             var columnMaps = new List<TextMapColumn>();
+            var columnIndex = 0;
             foreach (var batch in batchedLineMaps)
             {
-                var columnWidth = batch.Max(l => l.Length);
+                var columnWidth = columnWidths[columnIndex];
                 columnMaps.Add(new TextMapColumn
                 {
                     Width = columnWidth,
                     X = totalImageWidth,
-                    LineMaps = batch,
+                    LineMaps = batch.batch,
                     StartHue = startHue,
-                    EndHue = startHue + (hueStep * linesPerColumn)
+                    EndHue = startHue + (hueStep * linesPerColumn),
+                    LineMapCount = batch.count
                 });
                 startHue += hueStep * linesPerColumn;
 
                 totalImageWidth += columnWidth;
+                columnIndex += 1;
             }
 
             var level0CanvasTileWidth = (int)Math.Ceiling(totalImageWidth / 1024m);
@@ -95,11 +100,35 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             Utilities.Utilities.DrawZoomLevelsForLevel0CanvasTiles(level0TilesPath);
         }
 
+        private static List<int> GetLongestLineLengthPerColumn(IEnumerable<BitArray> lineMaps, int linesPerColumn)
+        {
+            var longestLineLengths = new List<int>();
+            var longestLineLengthSoFar = int.MinValue;
+            var countedLines = 0;
+
+            foreach (var lineMap in lineMaps)
+            {
+                if (lineMap.Length > longestLineLengthSoFar)
+                {
+                    longestLineLengthSoFar = lineMap.Length;
+                }
+
+                countedLines += 1;
+                if (countedLines % linesPerColumn == 0)
+                {
+                    longestLineLengths.Add(longestLineLengthSoFar);
+                    longestLineLengthSoFar = int.MinValue;
+                }
+            }
+
+            return longestLineLengths;
+        }
+
         private static Image<Rgb24> DrawLevel0Tile(IReadOnlyList<TextMapColumn> columnMaps, int tileX, int tileY)
         {
-            var leftX = tileX * 1024L;
-            var rightX = leftX + 1023L;
-            var topY = tileY * 1024L;
+            var leftX = tileX * 1024;
+            var rightX = leftX + 1023;
+            var topY = tileY * 1024;
 
             var leftColumnIndex = GetColumnIndexByXPosition(columnMaps, leftX);
             var rightColumnIndex = GetColumnIndexByXPosition(columnMaps, rightX);
@@ -111,7 +140,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 var columnLeftRelativeToTile = column.X - leftX;
                 var columnRightRelativeToTile = (column.X + column.Width) - leftX;
                 var columnTopRelativeToTile = -topY;
-                var columnBottomRelativeToTile = column.LineMaps.Length - topY;
+                var columnBottomRelativeToTile = column.LineMapCount - topY;
                 
                 var endX = Math.Min(1023, columnRightRelativeToTile);
                 var endY = Math.Min(1023, columnBottomRelativeToTile);
@@ -119,7 +148,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 {
                     var x = (int)Math.Max(0, columnLeftRelativeToTile);
                     var lineMapIndex = y - columnTopRelativeToTile;
-                    if (lineMapIndex >= column.LineMaps.Length)
+                    if (lineMapIndex >= column.LineMapCount)
                     {
                         break;
                     }
