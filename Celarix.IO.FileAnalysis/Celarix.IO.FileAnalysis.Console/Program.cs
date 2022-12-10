@@ -18,7 +18,8 @@ namespace Celarix.IO.FileAnalysis.Console
     {
         private static void Main(string[] args)
         {
-            TextMapCanvasGenerator.GenerateTextMapCanvasForFile(@"C:\Users\celarix\Downloads\Temp\enwik9\enwik9", @"C:\Users\celarix\Downloads\Temp\enwik9\enwik9\textMap");
+            TextMapCanvasGenerator.GenerateTextMapCanvasForFile(@"G:\Documents\Files\Programming\Miscellaneous\Resources\enwik9",
+                @"G:\Documents\Files\Programming\Miscellaneous\Resources\enwik9_map\");
             return;
             
             // TODO: add CommandLine library

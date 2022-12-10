@@ -32,8 +32,9 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 if (bit)
                 {
                     buffer |= (byte)(1 << bufferPosition);
-                    bufferPosition -= 1;
                 }
+
+                bufferPosition -= 1;
 
                 if (bufferPosition == -1)
                 {
@@ -43,13 +44,19 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 }
             }
 
-            public void Flush() => writer.Write(buffer);
+            public void Flush()
+            {
+                if (bufferPosition < 7)
+                {
+                    writer.Write(buffer);
+                }
+            }
         }
 
         public sealed class StorageBackedBitArrayListEnumerator : IEnumerator<BitArray>
         {
             private readonly StorageBackedBitArrayList list;
-            private int currentIndex;
+            private int currentIndex = -1;
 
             /// <summary>Gets the element in the collection at the current position of the enumerator.</summary>
             /// <returns>The element in the collection at the current position of the enumerator.</returns>
@@ -67,7 +74,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             /// <see langword="true" /> if the enumerator was successfully advanced to the next element; <see langword="false" /> if the enumerator has passed the end of the collection.</returns>
             public bool MoveNext()
             {
-                if (currentIndex >= list.Count)
+                if (currentIndex >= list.Count - 1)
                 {
                     return false;
                 }
@@ -104,6 +111,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
         
         private readonly string backingFolderPath;
         private int loadedBatchIndex;
+        private bool loadedBatchModified;
         private readonly List<BitArray> loadedBatch;
 
         private int BatchCount =>
@@ -160,6 +168,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             
             loadedBatch.Add(item);
             Count += 1;
+            loadedBatchModified = true;
         }
 
         /// <summary>Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1" />.</summary>
@@ -174,6 +183,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             loadedBatch.Clear();
             loadedBatchIndex = 0;
             Count = 0;
+            loadedBatchModified = false;
         }
 
         /// <summary>Determines whether the <see cref="T:System.Collections.Generic.ICollection`1" /> contains a specific value.</summary>
@@ -260,7 +270,10 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
 
                 if (batchOffset + batchSize > Count)
                 {
-                    yield return (new StorageBackedBitArrayBatch(this, batchOffset), Count - batchOffset);
+                    if (Count - batchOffset > 0)
+                    {
+                        yield return (new StorageBackedBitArrayBatch(this, batchOffset), Count - batchOffset);
+                    }
 
                     yield break;
                 }
@@ -269,7 +282,10 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
 
         private void SwitchBatch(int newBatchIndex)
         {
-            SaveLoadedBatch();
+            if (loadedBatchModified)
+            {
+                SaveLoadedBatch();
+            }
             loadedBatch.Clear();
             loadedBatchIndex = newBatchIndex;
             
@@ -294,13 +310,10 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                     bitArray[i] = (bytes[i / 8] & (0x80 >> (i % 8))) != 0;
                 }
                 
-                // WYLO: ugh, everything is wrong on the save and the load
-                // we're saving Trues for bits that should be false (whitespace isn't being picked up correctly)
-                // we're writing wrong lengths into the file
-                // maybe not enough padding bits
                 loadedBatch.Add(bitArray);
             }
-            
+
+            loadedBatchModified = false;
             logger.Info($"Loaded bit array batch #{newBatchIndex}");
         }
 
@@ -309,21 +322,19 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             var batchSavePath = LongPath.Combine(backingFolderPath, $"{loadedBatchIndex:X8}.bin");
 
             using var writer = new BinaryWriter(LongFile.Open(batchSavePath, FileMode.Create, FileAccess.Write));
+
             foreach (var bitArray in loadedBatch)
             {
                 var length = (ushort)bitArray.Length;
                 writer.Write(length);
-                
+
                 var bitWriter = new BitWriter(writer);
 
-                for (int i = 0; i < bitArray.Count; i++)
-                {
-                    bitWriter.WriteBit(bitArray[i]);
-                }
+                for (int i = 0; i < bitArray.Count; i++) { bitWriter.WriteBit(bitArray[i]); }
 
                 bitWriter.Flush();
             }
-            
+
             logger.Info($"Saved bit array batch #{loadedBatchIndex} to disk");
         }
 
@@ -348,6 +359,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
 
             var offsetInBatch = bitArrayIndex % BatchSize;
             loadedBatch[offsetInBatch] = value;
+            loadedBatchModified = true;
         }
     }
 }
