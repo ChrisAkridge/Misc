@@ -11,13 +11,14 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
     {
         public int Width { get; set; }
         public long X { get; set; }
-        public BitArray[] LineMaps { get; set; }
+        public StorageBackedBitArrayList.StorageBackedBitArrayBatch LineMaps { get; set; }
         public double StartHue { get; set; }
         public double EndHue { get; set; }
+        public int LineMapCount { get; set; }
 
         public double GetHueForLine(int lineIndex)
         {
-            var hueStep = (EndHue - StartHue) / LineMaps.Length;
+            var hueStep = (EndHue - StartHue) / LineMapCount;
             return StartHue + (lineIndex * hueStep);
         }
     }
