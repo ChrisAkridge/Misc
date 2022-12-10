@@ -25,6 +25,9 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
 
         public static void GenerateTextMapCanvasForFile(string filePath, string outputFolderPath)
         {
+            // TODO: really, really big text files (like 67 GB) are too large to keep the line maps in memory.
+            // We may need another canvas generator that buffers line maps to disk if the final tree/logs are
+            // big enough.
             LoggingConfigurer.ConfigurePostProcessingLogging();
             logger.Info($"Drawing text map canvas for {filePath}...");
             

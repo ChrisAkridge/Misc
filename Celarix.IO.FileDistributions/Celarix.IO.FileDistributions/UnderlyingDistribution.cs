@@ -71,21 +71,23 @@ namespace Celarix.IO.FileDistributions
 
         public double GetMean() => (double)sum / samples;
 
-        public string GetDataText()
+        public string GetDataText(bool useCommaDelimiter = false)
         {
+            var separator = useCommaDelimiter ? "," : ": ";
             var builder = new StringBuilder();
             for (var i = 0; i < buckets.Length; i++)
             {
                 var bucket = buckets[i];
-                builder.AppendLine($"{GetBucketRangeText(i)}: {bucket}");
+                builder.AppendLine($"{GetBucketRangeText(i)}{separator}{bucket}");
             }
 
             builder.AppendLine($"Mean: {GetMean():F4}");
             return builder.ToString();
         }
 
-        public string GetDataText<TBucket>(Func<BigInteger, TBucket> bucketValueFunc, Func<TBucket, string> valueFormatter)
+        public string GetDataText<TBucket>(Func<BigInteger, TBucket> bucketValueFunc, Func<TBucket, string> valueFormatter, bool useCommaDelimiter = false)
         {
+            var separator = useCommaDelimiter ? "," : ": ";
             var builder = new StringBuilder();
             for (var i = 0; i < buckets.Length; i++)
             {
@@ -95,12 +97,12 @@ namespace Celarix.IO.FileDistributions
                 {
                     var bucketValueLow = bucketValueFunc(i * BucketSize);
                     var bucketValueHigh = bucketValueFunc(((i + 1) * BucketSize) - 1);
-                    builder.AppendLine($"{valueFormatter(bucketValueLow)} to {valueFormatter(bucketValueHigh)}: {bucket}");
+                    builder.AppendLine($"{valueFormatter(bucketValueLow)} to {valueFormatter(bucketValueHigh)}{separator}{bucket}");
                 }
                 else
                 {
                     var bucketValue = bucketValueFunc(i);
-                    builder.AppendLine($"{valueFormatter(bucketValue)}: {bucket}");
+                    builder.AppendLine($"{valueFormatter(bucketValue)}{separator}{bucket}");
                 }
             }
 

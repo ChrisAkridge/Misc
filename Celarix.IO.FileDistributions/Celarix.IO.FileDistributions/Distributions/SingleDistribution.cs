@@ -23,6 +23,7 @@ namespace Celarix.IO.FileDistributions.Distributions
 
         public double GetMean() => distribution.GetMean();
 
-        public string GetDataText() => distribution.GetDataText(i => BitConverter.UInt32BitsToSingle((uint)i), s => s.ToString(CultureInfo.InvariantCulture));
+        public string GetDataText(bool useCommaDelimiter = false) =>
+            distribution.GetDataText(i => BitConverter.UInt32BitsToSingle((uint)i), s => s.ToString(CultureInfo.InvariantCulture), useCommaDelimiter);
     }
 }

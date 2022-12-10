@@ -2,7 +2,7 @@
   "profiles": {
     "Celarix.IO.FileAnalysis": {
       "commandName": "Project",
-      "commandLineArgs": "\"H:\\ProgramData_TakeTwo\" \"H:\\fa\\ProgramData_TakeTwo\""
+      "commandLineArgs": "\"I:\\fa\\PAVILION-CORE\\04 CELARIX_4TB_A\\Images\" \"I:\\fa\\PAVILION-CORE\\04 CELARIX_4TB_A\\19\""
     }
   }
 }

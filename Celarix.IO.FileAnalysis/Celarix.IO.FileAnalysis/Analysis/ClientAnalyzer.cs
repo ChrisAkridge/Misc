@@ -62,6 +62,13 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
             if (isAssembly)
             {
+                if (filePath.Contains("WindowsBase"))
+                {
+                    logger.Warn("Cannot decompile WindowsBase as it causes a stack overflow; skipping...");
+
+                    return generatedFilePaths;
+                }
+                
                 var success = ILSpyClient.TryDecompile(filePath);
                 logger.Trace($"{(success ? "Decompiled" : "Failed to decompile")} {filePath}");
                 
