@@ -62,7 +62,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
             if (isAssembly)
             {
-                if (filePath.Contains("WindowsBase"))
+                if (filePath.Contains("WindowsBase", StringComparison.InvariantCultureIgnoreCase))
                 {
                     logger.Warn("Cannot decompile WindowsBase as it causes a stack overflow; skipping...");
 
