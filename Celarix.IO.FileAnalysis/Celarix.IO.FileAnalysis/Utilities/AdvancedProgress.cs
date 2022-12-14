@@ -34,6 +34,6 @@ namespace Celarix.IO.FileAnalysis.Utilities
 
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>
-        public override string ToString() => $"{CurrentAmount}/{TotalAmount} ({Percentage:F2}%) | {AmountPerSecond:F2}/sec | est. {EstimatedCompletionTime:yyyy-MM-dd hh:mm:ss}";
+        public override string ToString() => $"{CurrentAmount}/{TotalAmount} ({Percentage:F2}%) | {AmountPerSecond:F2}/sec | est. {EstimatedCompletionTime:yyyy-MM-dd hh:mm:ss tt}";
     }
 }
