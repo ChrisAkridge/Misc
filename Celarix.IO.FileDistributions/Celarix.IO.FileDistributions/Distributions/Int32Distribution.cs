@@ -18,7 +18,7 @@ namespace Celarix.IO.FileDistributions.Distributions
 
         public double GetMean() => distribution.GetMean();
 
-        public string GetDataText() =>
-            distribution.GetDataText(i => (int)(uint)i, s => s.ToString());
+        public string GetDataText(bool useCommaDelimiter = false) =>
+            distribution.GetDataText(i => (int)(uint)i, s => s.ToString(), useCommaDelimiter);
     }
 }

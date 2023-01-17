@@ -24,7 +24,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
             logger.Info("(START NEW PHASE) Beginning file analysis! This may take awhile.");
 
             var clientAnalyzer = new ClientAnalyzer();
-            advancedProgress = new AdvancedProgress(AnalysisJob.EstimatedRemainingFiles, AnalysisJob.PhaseStartedOn)
+            advancedProgress = new AdvancedProgress(AnalysisJob.EstimatedTotalFiles, AnalysisJob.PhaseStartedOn)
             {
                 CurrentAmount = AnalysisJob.EstimatedTotalFiles - AnalysisJob.EstimatedRemainingFiles
             };

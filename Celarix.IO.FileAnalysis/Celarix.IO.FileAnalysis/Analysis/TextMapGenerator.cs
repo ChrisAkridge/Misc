@@ -17,6 +17,7 @@ using SixLabors.ImageSharp.Processing;
 using LongFile = Pri.LongPath.File;
 using LongPath = Pri.LongPath.Path;
 using LongDirectoryInfo = Pri.LongPath.DirectoryInfo;
+using LongFileInfo = Pri.LongPath.FileInfo;
 
 namespace Celarix.IO.FileAnalysis.Analysis
 {
@@ -36,6 +37,13 @@ namespace Celarix.IO.FileAnalysis.Analysis
             if (LongFile.Exists(mapSavePath))
             {
                 logger.Warn($"The text map for the file at {filePath} already exists! Skipping...");
+                return;
+            }
+
+            if (new LongFileInfo(filePath).Length > 1024L * 1024L * 1024L)
+            {
+                logger.Warn("This file is too big! Skipping...");
+
                 return;
             }
 

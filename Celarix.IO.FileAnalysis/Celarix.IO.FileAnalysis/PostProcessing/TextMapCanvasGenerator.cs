@@ -121,6 +121,10 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 }
             }
 
+            if (longestLineLengthSoFar != int.MinValue)
+            {
+                longestLineLengths.Add(longestLineLengthSoFar);
+            }
             return longestLineLengths;
         }
 
