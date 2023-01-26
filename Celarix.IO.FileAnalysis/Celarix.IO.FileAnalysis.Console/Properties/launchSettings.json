@@ -2,7 +2,7 @@
   "profiles": {
     "Celarix.IO.FileAnalysis.Console": {
       "commandName": "Project",
-      "commandLineArgs": "\"I:\\fa\\PAVILION-CORE\\04 CELARIX_4TB_A\\17_in\" \"I:\\fa\\PAVILION-CORE\\04 CELARIX_4TB_A\\17\""
+      "commandLineArgs": "-postprocess I:\\fa\\PAVILION-CORE\\04 CELARIX_4TB_A\\19\\files"
     }
   }
 }

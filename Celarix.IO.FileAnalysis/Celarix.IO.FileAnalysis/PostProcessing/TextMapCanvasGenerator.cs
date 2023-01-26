@@ -56,6 +56,12 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             var hueStep = 360d / lineMaps.Count;
             var linesPerColumn = (int)Math.Min(Math.Floor(Math.Sqrt(totalImagePixels)), lineMaps.Count);
             var columnWidths = GetLongestLineLengthPerColumn(lineMaps, linesPerColumn);
+            //var columnWidths = LongFile
+            //    .ReadAllText(
+            //        @"I:\fa\PAVILION-CORE\04 CELARIX_4TB_A\19\files\enwiki-20190101-pages-articles-multistream.xml_ext\linesPerColumn.csv")
+            //    .Split(',')
+            //    .Select(s => int.Parse(s))
+            //    .ToArray();
             var batchedLineMaps = lineMaps
                 .BatchWithCount(linesPerColumn);
             var totalImageWidth = 0L;
@@ -90,10 +96,15 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 for (int x = 0; x < level0CanvasTileWidth; x++)
                 {
                     logger.Info($"Drawing level 0 tile ({x}, {y})...");
-                    var tileImage = DrawLevel0Tile(columnMaps, x, y);
                     var tileFolderPath = LongPath.Combine(outputFolderPath, "0", y.ToString());
                     LongDirectory.CreateDirectory(tileFolderPath);
-                    tileImage.SaveAsPng(LongPath.Combine(tileFolderPath, $"{x}.png"));
+                    var tilePath = LongPath.Combine(tileFolderPath, $"{x}.png");
+
+                    if (!LongFile.Exists(tilePath))
+                    {
+                        var tileImage = DrawLevel0Tile(columnMaps, x, y);
+                        tileImage.SaveAsPng(tilePath);
+                    }
                 }
             }
             

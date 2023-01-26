@@ -7,12 +7,11 @@ using System.Threading.Tasks;
 
 namespace Celarix.JustForFun.FootballSimulator.Data.Models
 {
-    public class SeasonRecord
+    public class SimulatorSettings
     {
         [Key]
-        public int SeasonRecordID { get; set; }
-        public int Year { get; set; }
+        public int SimulatorSettingsID { get; set; }
         
-        public List<GameRecord> GameRecords { get; set; }
+        public bool SeedDataInitialized { get; set; }
     }
 }

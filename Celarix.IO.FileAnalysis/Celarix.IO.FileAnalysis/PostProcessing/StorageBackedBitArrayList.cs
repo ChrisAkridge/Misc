@@ -143,7 +143,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
         public StorageBackedBitArrayList(string backingFolderPath)
         {
             this.backingFolderPath = backingFolderPath;
-            this.loadedBatch = new List<BitArray>(BatchSize);
+            loadedBatch = new List<BitArray>(BatchSize);
         }
 
         /// <summary>Returns an enumerator that iterates through the collection.</summary>
@@ -295,7 +295,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
 
             while (reader.BaseStream.Position < reader.BaseStream.Length)
             {
-                var bitArrayLength = reader.ReadUInt16();
+                var bitArrayLength = reader.ReadInt32();
                 var bitArrayLengthInBytes = bitArrayLength >> 3;
                 if (bitArrayLength % 8 != 0)
                 {
@@ -325,8 +325,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
 
             foreach (var bitArray in loadedBatch)
             {
-                var length = (ushort)bitArray.Length;
-                writer.Write(length);
+                writer.Write(bitArray.Length);
 
                 var bitWriter = new BitWriter(writer);
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
 {
     public class TeamDriveRecord
     {
+        [Key]
         public int TeamDriveRecordID { get; set; }
         public int GameRecordID { get; set; }
         public GameRecord GameRecord { get; set; }

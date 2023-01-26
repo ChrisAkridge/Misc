@@ -43,9 +43,9 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 fileProgress.CurrentAmount += 1;
                 logger.Info(fileProgress.ToString());
             }
-            
+
             fileStream.Close();
-            
+
             var totalFilesToDelete = cSharpMemberFilePaths.Count;
             var deletionProgress = new AdvancedProgress(totalFilesToDelete, DateTimeOffset.Now);
 
@@ -63,9 +63,9 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
 
         private static IEnumerable<string> FindAllCSharpMemberFilesInFolder(string folderPath)
         {
-            if (folderPath.Contains("textMaps/cs", StringComparison.InvariantCultureIgnoreCase)
-                || folderPath.Contains("textMaps/asm", StringComparison.InvariantCultureIgnoreCase)
-                || folderPath.Contains("textMaps/default", StringComparison.InvariantCultureIgnoreCase))
+            if (folderPath.Contains("textMaps\\cs", StringComparison.InvariantCultureIgnoreCase)
+                || folderPath.Contains("textMaps\\asm", StringComparison.InvariantCultureIgnoreCase)
+                || folderPath.Contains("textMaps\\default", StringComparison.InvariantCultureIgnoreCase))
             {
                 return new List<string>();
             }

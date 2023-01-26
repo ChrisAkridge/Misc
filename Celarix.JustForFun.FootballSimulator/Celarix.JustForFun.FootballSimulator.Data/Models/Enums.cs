@@ -17,7 +17,8 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         North,
         South,
         East,
-        West
+        West,
+        Extra
     }
     
     public enum TeamDisposition
