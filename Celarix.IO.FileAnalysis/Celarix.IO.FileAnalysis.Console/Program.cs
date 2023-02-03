@@ -53,6 +53,14 @@ namespace Celarix.IO.FileAnalysis.Console
 
                 TextMapCanvasGenerator.GenerateTextMapCanvasForFile(filePath, outputFolderPath);
             }
+            else if (args[0].Equals("-partialpostprocess", StringComparison.InvariantCultureIgnoreCase))
+            {
+                // dammit you're supposed to delete the INPUT folder, not the output folder
+
+                var folderPath = args[1];
+                
+                PostProcessor.PartialPostProcess(folderPath);
+            }
             // add TabInserter option
             else
             {

@@ -26,5 +26,19 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             EmptyFolderRemover.RemoveAllEmptyFolders(folderPath);
             FolderTreePrinter.PrintFolderTreeForFolder(folderPath);
         }
+
+        public static void PartialPostProcess(string folderPath)
+        {
+            LoggingConfigurer.ConfigurePostProcessingLogging();
+            logger.Info($"Perfoming post-processing on non-fully-analyzed folder {folderPath}...");
+            
+            ImageFinder.FindAllImages(folderPath);
+            
+            TextMapMover.MoveAllTextMaps(folderPath);
+            CSharpMemberFileConcatenator.ConcatenateCSharpMemberFiles(folderPath);
+            
+            EmptyFolderRemover.RemoveAllEmptyFolders(folderPath);
+            FolderTreePrinter.PrintFolderTreeForFolder(folderPath);
+        }
     }
 }
