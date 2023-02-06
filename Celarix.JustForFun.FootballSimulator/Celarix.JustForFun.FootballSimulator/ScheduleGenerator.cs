@@ -8,7 +8,7 @@ using Celarix.JustForFun.FootballSimulator.Data.Models;
 
 namespace Celarix.JustForFun.FootballSimulator
 {
-    internal static class ScheduleGenerator
+    /*internal*/ public static class ScheduleGenerator
     {
         // No, this isn't right.
         //
@@ -114,11 +114,11 @@ namespace Celarix.JustForFun.FootballSimulator
         // 8. Finally, we concatenate the two dictionaries of games into one, sort
         //    it by date ascending, build GameRecord objects out of them, then return
         //    that.
-        private struct BasicTeamInfo
+        private readonly struct BasicTeamInfo
         {
-            public string Name { get; set; }
-            public Conference Conference { get; set; }
-            public Division Division { get; set; }
+            public string Name { get; init; }
+            public Conference Conference { get; init; }
+            public Division Division { get; init; }
 
             /// <summary>Indicates whether this instance and a specified object are equal.</summary>
             /// <param name="obj">The object to compare with the current instance.</param>
@@ -129,12 +129,17 @@ namespace Celarix.JustForFun.FootballSimulator
             /// <summary>Returns the hash code for this instance.</summary>
             /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
             public override int GetHashCode() => Name.GetHashCode();
+
+            /// <summary>Returns the fully qualified type name of this instance.</summary>
+            /// <returns>The fully qualified type name.</returns>
+            public override string ToString() => Name;
         }
 
         private sealed class GameMatchup
         {
-            public BasicTeamInfo AwayTeam { get; set; }
-            public BasicTeamInfo HomeTeam { get; set; }
+            public BasicTeamInfo AwayTeam { get; init; }
+            public BasicTeamInfo HomeTeam { get; init; }
+            public int GameType { get; init; }
 
             /// <summary>Indicates whether this instance and a specified object are equal.</summary>
             /// <param name="obj">The object to compare with the current instance.</param>
@@ -150,6 +155,10 @@ namespace Celarix.JustForFun.FootballSimulator
             /// <summary>Returns the hash code for this instance.</summary>
             /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
             public override int GetHashCode() => 17 ^ AwayTeam.GetHashCode() ^ HomeTeam.GetHashCode();
+
+            /// <summary>Returns a string that represents the current object.</summary>
+            /// <returns>A string that represents the current object.</returns>
+            public override string ToString() => $"{AwayTeam} @ {HomeTeam}";
         }
 
         private sealed class GameMatchupComparer : IEqualityComparer<GameMatchup>
@@ -167,7 +176,7 @@ namespace Celarix.JustForFun.FootballSimulator
 
         public static List<GameRecord> GetPreseasonAndRegularSeasonGamesForSeason(int seasonYear,
             List<Team> teams,
-            Dictionary<string, int> previousSeasonTeamPositions)
+            Dictionary<string, int>? previousSeasonTeamPositions)
         {
             var basicTeamInfos = teams
                 .Select(t => new BasicTeamInfo
@@ -190,132 +199,158 @@ namespace Celarix.JustForFun.FootballSimulator
                 .ToList();
         }
 
-        private static Dictionary<BasicTeamInfo, GameMatchup?[]> GetAllRegularSeasonMatchupsForSeasonYear(List<BasicTeamInfo> basicTeamInfos, int seasonYear, Dictionary<string, int> previousSeasonTeamPositions)
+        private static Dictionary<BasicTeamInfo, List<GameMatchup>> GetAllRegularSeasonMatchupsForSeasonYear(List<BasicTeamInfo> basicTeamInfos,
+            int seasonYear,
+            IReadOnlyDictionary<string, int>? previousSeasonTeamPositions)
         {
-            var regularSeasonMatchups = basicTeamInfos.ToDictionary(i => i, i => new GameMatchup?[16]);
-            Random random = new Random();
+            var regularSeasonMatchups = basicTeamInfos.ToDictionary(i => i, _ => new List<GameMatchup>(16));
+            var random = new Random();
 
             foreach (var team in basicTeamInfos)
             {
-                var nextGameIndex = 0;
-
-                // Type I games: teams in this division (6 games)
-                var otherTeamsInDivision = basicTeamInfos
-                    .Where(i => i.Division == team.Division && i.Name != team.Name);
-
-                foreach (var otherDivisionTeam in otherTeamsInDivision)
+                if (regularSeasonMatchups[team].Count(g => g.GameType == 0) < 6)
                 {
-                    AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
-                    {
-                        AwayTeam = otherDivisionTeam, HomeTeam = team
-                    }, nextGameIndex);
+                    // Type I games: teams in this division (6 games)
+                    var otherTeamsInDivision = basicTeamInfos
+                        .Where(i => i.Conference == team.Conference
+                            && i.Division == team.Division
+                            && i.Name != team.Name);
 
-                    AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
+                    foreach (var otherDivisionTeam in otherTeamsInDivision)
                     {
-                        AwayTeam = team, HomeTeam = otherDivisionTeam
-                    }, nextGameIndex + 1);
+                        AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
+                        {
+                            AwayTeam = otherDivisionTeam, HomeTeam = team, GameType = 1
+                        });
 
-                    nextGameIndex += 2;
+                        AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
+                        {
+                            AwayTeam = team, HomeTeam = otherDivisionTeam, GameType = 1
+                        });
+                    }
                 }
 
-                // Type II games: intraconference games (4 games)
                 var typeIIOpponentDivision = GetTypeIIGameOpponentDivision(team.Division, seasonYear);
+                if (regularSeasonMatchups[team].Count(g => g.GameType == 1) < 4)
+                {
+                    // Type II games: intraconference games (4 games)
+                    var typeIIOpponentTeams =
+                        basicTeamInfos
+                            .Where(t => t.Conference == team.Conference
+                                && t.Division == typeIIOpponentDivision
+                                && t.Name != team.Name)
+                            .ToList();
 
-                var typeIIOpponentTeams =
-                    basicTeamInfos
-                        .Where(t => t.Division == typeIIOpponentDivision && t.Name != team.Name)
+                    if (typeIIOpponentTeams.Count == 3) { typeIIOpponentTeams.Add(typeIIOpponentTeams[random.Next(0, 3)]); }
+
+                    for (int i = 0; i < 4; i++)
+                    {
+                        AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
+                        {
+                            AwayTeam = i < 2 ? typeIIOpponentTeams[i] : team, HomeTeam = i < 2 ? team : typeIIOpponentTeams[i], GameType = 2
+                        });
+                    }
+                }
+                
+                if (regularSeasonMatchups[team].Count(g => g.GameType == 3) < 4)
+                {
+                    // Type III games: interconference games (4 games)
+                    var typeIIIOpponentDivision =
+                        GetTypeIIIGameOpponentDivision(team.Conference, team.Division, seasonYear);
+                    var typeIIIOpponentTeams = basicTeamInfos.Where(t => t.Conference
+                            == team.Conference switch
+                            {
+                                Conference.AFC => Conference.NFC,
+                                Conference.NFC => Conference.AFC,
+                                _ => throw new ArgumentOutOfRangeException()
+                            }
+                            && t.Division == typeIIIOpponentDivision)
                         .ToList();
 
-                if (typeIIOpponentTeams.Count == 3) { typeIIOpponentTeams.Add(typeIIOpponentTeams[random.Next(0, 3)]); }
-
-                for (int i = 0; i < 4; i++)
-                {
-                    AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
+                    for (int i = 0; i < 4; i++)
                     {
-                        AwayTeam = i < 2 ? typeIIOpponentTeams[i] : team, HomeTeam = i < 2 ? team : typeIIOpponentTeams[i]
-                    }, nextGameIndex);
-                    nextGameIndex += 1;
-                }
-
-                // Type III games: interconference games (4 games)
-                var typeIIIOpponentDivision =
-                    GetTypeIIIGameOpponentDivision(team.Conference, team.Division, seasonYear);
-
-                var typeIIIOpponentTeams = basicTeamInfos.Where(t => t.Conference
-                        == team.Conference switch
+                        AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
                         {
-                            Conference.AFC => Conference.NFC,
-                            Conference.NFC => Conference.AFC,
-                            _ => throw new ArgumentOutOfRangeException()
-                        }
-                        && t.Division == typeIIIOpponentDivision)
-                    .ToList();
+                            AwayTeam = i < 2 ? typeIIIOpponentTeams[i] : team,
+                            HomeTeam = i < 2 ? team : typeIIIOpponentTeams[i],
+                            GameType = 3
+                        });
+                    }
+                }
 
-                for (int i = 0; i < 4; i++)
+                if (regularSeasonMatchups[team].Count(g => g.GameType == 4) < 4)
                 {
+                    // Type IV games: other divisions based on standings
+                    var typeIVOpponentDivisions = GetTypeIVGameOpponentDivisions(team.Division, typeIIOpponentDivision);
+                    var typeIVOpponentTeams = new BasicTeamInfo[2];
+
+                    if (team.Division == Division.Extra)
+                    {
+                        // Other divisions are accounted for, so Extra, you have to
+                        // play even MORE divisional games!
+                        typeIVOpponentTeams = basicTeamInfos
+                            .Where(t => t.Conference == team.Conference
+                                && t.Division == team.Division
+                                && t.Name != team.Name)
+                            .OrderBy(_ => Guid.NewGuid())
+                            .Take(2)
+                            .ToArray();
+                    }
+                    else if (previousSeasonTeamPositions == null)
+                    {
+                        // No previous season info, choose two teams at random.
+                        typeIVOpponentTeams[0] = basicTeamInfos
+                            .Where(t => t.Conference == team.Conference && t.Division == typeIVOpponentDivisions[0])
+                            .ElementAt(random.Next(0, 4));
+
+                        typeIVOpponentTeams[1] = basicTeamInfos
+                            .Where(t => t.Conference == team.Conference && t.Division == typeIVOpponentDivisions[1])
+                            .ElementAt(random.Next(0, 4));
+                    }
+                    else
+                    {
+                        typeIVOpponentTeams[0] = basicTeamInfos
+                            .Single(t => t.Conference == team.Conference
+                                && t.Division == typeIVOpponentDivisions[0]
+                                && previousSeasonTeamPositions[t.Name] == previousSeasonTeamPositions[team.Name]);
+
+                        typeIVOpponentTeams[1] = basicTeamInfos
+                            .Single(t => t.Conference == team.Conference
+                                && t.Division == typeIVOpponentDivisions[1]
+                                && previousSeasonTeamPositions[t.Name] == previousSeasonTeamPositions[team.Name]);
+                    }
+
+                    // WYLO: Type IV games are all screwed up. They assume that there are only two
+                    // remaining divisions (self and the type II opponent excluded), but with Extra
+                    // and Type II able to play itself, sometimes there are 3 candidates for Type IV
+                    // games. One team chooses two and another team chooses a different two.
+                    //
+                    // Ideally, there'd be some symmetry. Maybe we figure out all division opponents
+                    // first and assign them in the same table format as before. Type I always is self,
+                    // and the others would assign themselves to two table cells at once.
+                    //
+                    // Also, there's likely the same sort of problem with Type II games when a division
+                    // plays itself. One team chooses four others at random, but the four teams it chose
+                    // may randomly try to choose it again, leading to us attempting to add a 5th game.
+                    // This one's fairly easy - when generating a random team, check to see if we aren't
+                    // already playing them.
                     AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
                     {
-                        AwayTeam = i < 2 ? typeIIIOpponentTeams[i] : team, HomeTeam = i < 2 ? team : typeIIIOpponentTeams[i]
-                    }, nextGameIndex);
+                        AwayTeam = typeIVOpponentTeams[0], HomeTeam = team, GameType = 4
+                    });
 
-                    nextGameIndex += 1;
+                    AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
+                    {
+                        AwayTeam = team, HomeTeam = typeIVOpponentTeams[1], GameType = 4
+                    });
                 }
-
-                // Type IV games: other divisions based on standings
-                var typeIVOpponentDivisions = GetTypeIVGameOpponentDivisions(team.Division, typeIIOpponentDivision);
-                var typeIVOpponentTeams = new BasicTeamInfo[2];
-
-                if (team.Division == Division.Extra)
-                {
-                    // Other divisions are accounted for, so Extra, you have to
-                    // play even MORE divisional games!
-                    typeIVOpponentTeams = basicTeamInfos
-                        .Where(t => t.Conference == team.Conference
-                            && t.Division == team.Division
-                            && t.Name != team.Name)
-                        .OrderBy(_ => Guid.NewGuid())
-                        .Take(2)
-                        .ToArray();
-                }
-                else if (previousSeasonTeamPositions == null)
-                {
-                    // No previous season info, choose two teams at random.
-                    typeIVOpponentTeams[0] = basicTeamInfos
-                        .Where(t => t.Conference == team.Conference && t.Division == typeIVOpponentDivisions[0])
-                        .ElementAt(random.Next(0, 4));
-
-                    typeIVOpponentTeams[1] = basicTeamInfos
-                        .Where(t => t.Conference == team.Conference && t.Division == typeIVOpponentDivisions[1])
-                        .ElementAt(random.Next(0, 4));
-                }
-                else
-                {
-                    typeIVOpponentTeams[0] = basicTeamInfos
-                        .Single(t => t.Conference == team.Conference
-                            && t.Division == typeIVOpponentDivisions[0]
-                            && previousSeasonTeamPositions[t.Name] == previousSeasonTeamPositions[team.Name]);
-
-                    typeIVOpponentTeams[1] = basicTeamInfos
-                        .Single(t => t.Conference == team.Conference
-                            && t.Division == typeIVOpponentDivisions[1]
-                            && previousSeasonTeamPositions[t.Name] == previousSeasonTeamPositions[team.Name]);
-                }
-
-                AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
-                {
-                    AwayTeam = typeIVOpponentTeams[0], HomeTeam = team
-                }, nextGameIndex);
-
-                AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
-                {
-                    AwayTeam = team, HomeTeam = typeIVOpponentTeams[1]
-                }, nextGameIndex + 1);
             }
 
             return regularSeasonMatchups;
         }
         
-        private static List<(DateTimeOffset gameTime, GameMatchup game)>[] GetRegularSeasonTimeslotsForGames(int seasonYear, Dictionary<BasicTeamInfo, GameMatchup?[]> regularSeasonMatchups)
+        private static IEnumerable<List<(DateTimeOffset gameTime, GameMatchup game)>> GetRegularSeasonTimeslotsForGames(int seasonYear,
+            Dictionary<BasicTeamInfo, List<GameMatchup>> regularSeasonMatchups)
         {
             var regularSeasonWeeks = new List<(DateTimeOffset gameTime, GameMatchup game)>[17];
             var regularSeasonWeekStartDates = GetRegularSeasonWeekStartDatesForYear(seasonYear);
@@ -359,7 +394,7 @@ namespace Celarix.JustForFun.FootballSimulator
             return regularSeasonWeeks;
         }
 
-        private static List<(DateTimeOffset gameTime, GameMatchup game)>[] GetAllPreseasonMatchupsForSeasonYear(IReadOnlyCollection<BasicTeamInfo> basicTeamInfos,
+        private static IEnumerable<List<(DateTimeOffset gameTime, GameMatchup game)>> GetAllPreseasonMatchupsForSeasonYear(IReadOnlyCollection<BasicTeamInfo> basicTeamInfos,
             IReadOnlyCollection<GameMatchup?> regularSeasonMatchups,
             DateTimeOffset regularSeasonWeek1StartDate)
         {
@@ -403,14 +438,21 @@ namespace Celarix.JustForFun.FootballSimulator
             return preseasonWeeks;
         }
 
-        private static void AssignGameToBothTeams(Dictionary<BasicTeamInfo, GameMatchup?[]> games, GameMatchup game,
-            int index)
+        private static void AssignGameToBothTeams(IReadOnlyDictionary<BasicTeamInfo, List<GameMatchup>> games, GameMatchup game)
         {
-            games[game.AwayTeam][index] ??= game;
-            games[game.HomeTeam][index] ??= new GameMatchup
+            if (!games[game.AwayTeam].Any(g => g.Equals(game)))
             {
-                AwayTeam = game.HomeTeam, HomeTeam = game.AwayTeam
-            };
+                games[game.AwayTeam].Add(game);
+            }
+
+            if (!games[game.HomeTeam].Any(g => g.Equals(game)))
+            {
+                games[game.HomeTeam]
+                    .Add(new GameMatchup
+                    {
+                        AwayTeam = game.AwayTeam, HomeTeam = game.HomeTeam
+                    });
+            }
         }
 
         private static List<DateTimeOffset> GetRegularSeasonWeekStartDatesForYear(int calendarYear)
@@ -509,7 +551,7 @@ namespace Celarix.JustForFun.FootballSimulator
                 {
                     Division.North => Division.Extra,
                     Division.South => Division.West,
-                    Division.East => Division.Extra,
+                    Division.East => Division.East,
                     Division.West => Division.South,
                     Division.Extra => Division.North,
                     _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
@@ -633,60 +675,76 @@ namespace Celarix.JustForFun.FootballSimulator
                 _ => throw new InvalidOperationException()
             };
 
-        private static Division[] GetTypeIVGameOpponentDivisions(Division thisDivision, Division typeIIOpponentDivision) =>
-            new[]
-            {
-                Division.North,
-                Division.South,
-                Division.West,
-                Division.East
-            }.Where(d => d != thisDivision && d != typeIIOpponentDivision)
-            .ToArray();
-
-        private static void RemoveGameFromBothTeams(Dictionary<BasicTeamInfo, GameMatchup?[]> games,
-            BasicTeamInfo firstTeam, int index)
+        private static Division[] GetTypeIVGameOpponentDivisions(Division thisDivision, Division typeIIOpponentDivision)
         {
-            var gameMatchup = games[firstTeam][index]!;
-            var opponentTeam = firstTeam.Equals(gameMatchup.HomeTeam)
-                ? gameMatchup.AwayTeam
-                : gameMatchup.HomeTeam;
+            //if (typeIIOpponentDivision != Division.Extra)
+            //{
+            return new[]
+                {
+                    Division.North, Division.South, Division.West, Division.East
+                }.Where(d => d != thisDivision && d != typeIIOpponentDivision)
+                .Take(2)
+                .ToArray();
+            // }
+            
+            //// If we're playing Extra as Type II, the other 3 divisions aren't.
+            //// Find the 2 that have us as part of their Type IV opponents.
+            //var otherNonExtraDivisions = new[]
+            //{
+            //    Division.North, Division.South, Division.East, Division.West
+            //}.Where(d => d != thisDivision);
+            //var otherDivisionTypeIIOpponents =
+            //    otherNonExtraDivisions.ToDictionary(d => d, d => GetTypeIIGameOpponentDivision(d, seasonYear));
+            //var otherDivisionTypeIVOpponents =
+            //    otherDivisionTypeIIOpponents.ToDictionary(d => d.Key, d => new
+            //    {
+            //        TypeIIOpponent = d.Value,
+            //        TypeIVOpponent = GetTypeIVGameOpponentDivisions(d.Key, d.Value, seasonYear)
+            //    });
 
-            games[firstTeam][index] = null;
-            games[opponentTeam][index] = null;
+            //return otherDivisionTypeIVOpponents
+            //    .Where(kvp => kvp.Value.TypeIVOpponent.Any(o => thisDivision == o))
+            //    .Select(kvp => kvp.Key)
+            //    .ToArray();
         }
 
-        private static GameMatchup FindGameForTimeslot(Dictionary<BasicTeamInfo, GameMatchup?[]> games, Random random)
+        private static void RemoveGameFromBothTeams(Dictionary<BasicTeamInfo, List<GameMatchup>> games,
+            GameMatchup selectedGame)
+        {
+            games[selectedGame.AwayTeam].RemoveAll(g => g.SymmetricallyEquals(selectedGame));
+            games[selectedGame.HomeTeam].RemoveAll(g => g.SymmetricallyEquals(selectedGame));
+        }
+
+        private static GameMatchup FindGameForTimeslot(Dictionary<BasicTeamInfo, List<GameMatchup>> games, Random random)
         {
             GameMatchup? selectedGame = null;
-            var lastSelectedGameIndex = 0;
 
             while (selectedGame == null)
             {
                 var randomTeam = games.ElementAt(random.Next(0, games.Count));
-                lastSelectedGameIndex = random.Next(0, randomTeam.Value.Length);
+                var lastSelectedGameIndex = random.Next(0, randomTeam.Value.Count);
                 selectedGame = randomTeam.Value[lastSelectedGameIndex];
             }
 
-            RemoveGameFromBothTeams(games, selectedGame.HomeTeam, lastSelectedGameIndex);
+            RemoveGameFromBothTeams(games, selectedGame);
             return selectedGame;
         }
 
-        private static List<GameMatchup?> GetAllMatchupsForSeason(Dictionary<BasicTeamInfo, GameMatchup?[]> games)
+        private static List<GameMatchup> GetAllMatchupsForSeason(Dictionary<BasicTeamInfo, List<GameMatchup>> games)
         {
             var comparer = new GameMatchupComparer();
 
             return games
                 .SelectMany(kvp => kvp.Value)
-                .Distinct(comparer!)
+                .Distinct(comparer)
                 .ToList();
         }
 
-        private static IEnumerable<GameRecord> ConvertWeekToGameRecords(List<(DateTimeOffset gameTime, GameMatchup game)> week,
+        private static IEnumerable<GameRecord> ConvertWeekToGameRecords(IEnumerable<(DateTimeOffset gameTime, GameMatchup game)> week,
             IReadOnlyCollection<Team> teams,
             int weekNumber,
-            bool isRegularSeasonWeek)
-        {
-            return week.Select(timeAndGame => new GameRecord
+            bool isRegularSeasonWeek) =>
+            week.Select(timeAndGame => new GameRecord
             {
                 GameType = isRegularSeasonWeek ? GameType.RegularSeason : GameType.Preseason,
                 WeekNumber = weekNumber,
@@ -695,6 +753,5 @@ namespace Celarix.JustForFun.FootballSimulator
                 Stadium = teams.First(t => t.TeamName == timeAndGame.game.HomeTeam.Name).HomeStadium,
                 KickoffTime = timeAndGame.gameTime
             });
-        }
     }
 }

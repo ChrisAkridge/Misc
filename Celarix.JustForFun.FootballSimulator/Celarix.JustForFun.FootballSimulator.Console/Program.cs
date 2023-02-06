@@ -4,10 +4,9 @@ var footballContext = new FootballContext();
 InitializeDatabase(footballContext);
 var teams = footballContext.Teams.ToList();
 
-foreach (var team in teams)
-{
-    Console.WriteLine(team.TeamName);
-}
+var schedule =
+    Celarix.JustForFun.FootballSimulator.ScheduleGenerator
+        .GetPreseasonAndRegularSeasonGamesForSeason(2023, teams, null);
 
 // should probably move this to Celarix.JustForFun.FootballSimulator
 void InitializeDatabase(FootballContext context)
