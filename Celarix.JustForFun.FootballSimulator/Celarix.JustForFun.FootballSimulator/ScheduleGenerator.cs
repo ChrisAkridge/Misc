@@ -334,6 +334,21 @@ namespace Celarix.JustForFun.FootballSimulator
                     // may randomly try to choose it again, leading to us attempting to add a 5th game.
                     // This one's fairly easy - when generating a random team, check to see if we aren't
                     // already playing them.
+                    //
+                    // okay, actually, no, it's not. Since each team only has 3 division rivals, and
+                    // since 4 is not divisble by 3, we're always going to have something of an imbalance.
+                    // How about this: let's say the AFC North is playing itself. That's Bengals, Ravens,
+                    // Steelers, Browns. What would a valid Type II set of games for all four teams be?
+                    //
+                    // Bengals:  Ravens,   Ravens,   Steelers, Browns
+                    // Ravens:   Bengals,  Bengals,  Browns,   Steelers
+                    // Steelers: Browns,   Browns,   Bengals,  Ravens
+                    // Browns:   Steelers, Steelers, Ravens,   Bengals
+                    //
+                    // Okay, this is a valid solution and we'll just use it for every time a division
+                    // faces itself in Type II. If the four teams of a division are A, B, C, and D, the
+                    // pattern is BBCD-AADC-DDAB-CCBA. There are likely other symmetrical solutions, but,
+                    // eh.
                     AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
                     {
                         AwayTeam = typeIVOpponentTeams[0], HomeTeam = team, GameType = 4
