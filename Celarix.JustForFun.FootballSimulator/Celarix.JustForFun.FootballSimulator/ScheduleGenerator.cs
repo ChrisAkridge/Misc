@@ -135,6 +135,25 @@ namespace Celarix.JustForFun.FootballSimulator
             public override string ToString() => Name;
         }
 
+        private readonly struct DivisionMatchupsForSeason
+        {
+            public Division TypeIIOpponentDivision { get; init; }
+            public Division TypeIIIOpponentDivision { get; init; }
+            public Division[] TypeIVOpponentDivisions { get; init; }
+
+            public DivisionMatchupsForSeason(Division typeIIOpponentDivision, Division typeIIIOpponentDivision,
+                Division firstTypeIVOpponentDivision, Division secondTypeIVOpponentDivision)
+            {
+                TypeIIOpponentDivision = typeIIOpponentDivision;
+                TypeIIIOpponentDivision = typeIIIOpponentDivision;
+                TypeIVOpponentDivisions = new[]
+                {
+                    firstTypeIVOpponentDivision,
+                    secondTypeIVOpponentDivision
+                };
+            }
+        }
+        
         private sealed class GameMatchup
         {
             public BasicTeamInfo AwayTeam { get; init; }
@@ -199,11 +218,126 @@ namespace Celarix.JustForFun.FootballSimulator
                 .ToList();
         }
 
+        private static Dictionary<(Conference conference, Division division), DivisionMatchupsForSeason[]> GetDivisionMatchupCycle()
+        {
+            const Division N = Division.North;
+            const Division S = Division.South;
+            const Division E = Division.East;
+            const Division W = Division.West;
+            const Division X = Division.Extra;
+
+            return new Dictionary<(Conference conference, Division division), DivisionMatchupsForSeason[]>
+            {
+                {
+                    (Conference.AFC, N), new[]
+                    {
+                        new DivisionMatchupsForSeason(S, S, X, W),
+                        new DivisionMatchupsForSeason(X, W, S, E),
+                        new DivisionMatchupsForSeason(E, E, W, S),
+                        new DivisionMatchupsForSeason(N, X, E, W),
+                        new DivisionMatchupsForSeason(X, N, E, X)
+                    }
+                },
+                {
+                    (Conference.AFC, S), new[]
+                    {
+                        new DivisionMatchupsForSeason(N, E, W, E),
+                        new DivisionMatchupsForSeason(E, S, N, W),
+                        new DivisionMatchupsForSeason(S, X, N, E),
+                        new DivisionMatchupsForSeason(W, N, E, X),
+                        new DivisionMatchupsForSeason(W, W, E, W)
+                    }
+                },
+                {
+                    (Conference.AFC, E), new[]
+                    {
+                        new DivisionMatchupsForSeason(W, N, S, X),
+                        new DivisionMatchupsForSeason(S, E, N, X),
+                        new DivisionMatchupsForSeason(N, W, S, X),
+                        new DivisionMatchupsForSeason(X, S, N, S),
+                        new DivisionMatchupsForSeason(E, X, N, S)
+                    }
+                },
+                {
+                    (Conference.AFC, W), new[]
+                    {
+                        new DivisionMatchupsForSeason(E, W, N, S),
+                        new DivisionMatchupsForSeason(W, X, S, X),
+                        new DivisionMatchupsForSeason(X, N, N, X),
+                        new DivisionMatchupsForSeason(S, E, N, X),
+                        new DivisionMatchupsForSeason(S, S, X, E)
+                    }
+                },
+                {
+                    (Conference.AFC, X), new[]
+                    {
+                        new DivisionMatchupsForSeason(X, X, N, E),
+                        new DivisionMatchupsForSeason(N, N, E, S),
+                        new DivisionMatchupsForSeason(W, S, E, W),
+                        new DivisionMatchupsForSeason(E, W, S, W),
+                        new DivisionMatchupsForSeason(N, E, N, W)
+                    }
+                },
+                {
+                    (Conference.NFC, N), new[]
+                    {
+                        new DivisionMatchupsForSeason(S, E, X, W),
+                        new DivisionMatchupsForSeason(X, X, S, E),
+                        new DivisionMatchupsForSeason(E, W, W, S),
+                        new DivisionMatchupsForSeason(N, S, E, W),
+                        new DivisionMatchupsForSeason(X, N, E, X)
+                    }
+                },
+                {
+                    (Conference.NFC, S), new[]
+                    {
+                        new DivisionMatchupsForSeason(N, N, W, E),
+                        new DivisionMatchupsForSeason(E, S, N, W),
+                        new DivisionMatchupsForSeason(S, X, N, E),
+                        new DivisionMatchupsForSeason(W, E, E, X),
+                        new DivisionMatchupsForSeason(W, W, E, W)
+                    }
+                },
+                {
+                    (Conference.NFC, E), new[]
+                    {
+                        new DivisionMatchupsForSeason(W, S, S, X),
+                        new DivisionMatchupsForSeason(S, E, N, X),
+                        new DivisionMatchupsForSeason(N, N, S, X),
+                        new DivisionMatchupsForSeason(X, W, N, S),
+                        new DivisionMatchupsForSeason(E, E, N, S)
+                    }
+                },
+                {
+                    (Conference.NFC, W), new[]
+                    {
+                        new DivisionMatchupsForSeason(E, W, N, S),
+                        new DivisionMatchupsForSeason(W, N, S, X),
+                        new DivisionMatchupsForSeason(X, E, N, X),
+                        new DivisionMatchupsForSeason(S, X, N, X),
+                        new DivisionMatchupsForSeason(S, S, X, E)
+                    }
+                },
+                {
+                    (Conference.NFC, X), new[]
+                    {
+                        new DivisionMatchupsForSeason(X, X, N, E),
+                        new DivisionMatchupsForSeason(N, W, E, S),
+                        new DivisionMatchupsForSeason(W, S, E, W),
+                        new DivisionMatchupsForSeason(E, N, S, W),
+                        new DivisionMatchupsForSeason(N, E, N, W)
+                    }
+                },
+            };
+        }
+
         private static Dictionary<BasicTeamInfo, List<GameMatchup>> GetAllRegularSeasonMatchupsForSeasonYear(List<BasicTeamInfo> basicTeamInfos,
             int seasonYear,
             IReadOnlyDictionary<string, int>? previousSeasonTeamPositions)
         {
             var regularSeasonMatchups = basicTeamInfos.ToDictionary(i => i, _ => new List<GameMatchup>(16));
+            var divisionMatchupCycle = GetDivisionMatchupCycle();
+            var cycleYear = seasonYear % 5;
             var random = new Random();
 
             foreach (var team in basicTeamInfos)
@@ -230,7 +364,8 @@ namespace Celarix.JustForFun.FootballSimulator
                     }
                 }
 
-                var typeIIOpponentDivision = GetTypeIIGameOpponentDivision(team.Division, seasonYear);
+                var typeIIOpponentDivision = divisionMatchupCycle[(team.Conference, team.Division)][cycleYear]
+                    .TypeIIOpponentDivision;
                 if (regularSeasonMatchups[team].Count(g => g.GameType == 1) < 4)
                 {
                     // Type II games: intraconference games (4 games)
@@ -241,7 +376,29 @@ namespace Celarix.JustForFun.FootballSimulator
                                 && t.Name != team.Name)
                             .ToList();
 
-                    if (typeIIOpponentTeams.Count == 3) { typeIIOpponentTeams.Add(typeIIOpponentTeams[random.Next(0, 3)]); }
+                    if (typeIIOpponentTeams.Count == 3)
+                    {
+                        // Also, there's likely the same sort of problem with Type II games when a division
+                        // plays itself. One team chooses four others at random, but the four teams it chose
+                        // may randomly try to choose it again, leading to us attempting to add a 5th game.
+                        // This one's fairly easy - when generating a random team, check to see if we aren't
+                        // already playing them.
+                        //
+                        // okay, actually, no, it's not. Since each team only has 3 division rivals, and
+                        // since 4 is not divisble by 3, we're always going to have something of an imbalance.
+                        // How about this: let's say the AFC North is playing itself. That's Bengals, Ravens,
+                        // Steelers, Browns. What would a valid Type II set of games for all four teams be?
+                        //
+                        // Bengals:  Ravens,   Ravens,   Steelers, Browns
+                        // Ravens:   Bengals,  Bengals,  Browns,   Steelers
+                        // Steelers: Browns,   Browns,   Bengals,  Ravens
+                        // Browns:   Steelers, Steelers, Ravens,   Bengals
+                        //
+                        // Okay, this is a valid solution and we'll just use it for every time a division
+                        // faces itself in Type II. If the four teams of a division are A, B, C, and D, the
+                        // pattern is BBCD-AADC-DDAB-CCBA. There are likely other symmetrical solutions, but,
+                        // eh.
+                    }
 
                     for (int i = 0; i < 4; i++)
                     {
@@ -256,7 +413,7 @@ namespace Celarix.JustForFun.FootballSimulator
                 {
                     // Type III games: interconference games (4 games)
                     var typeIIIOpponentDivision =
-                        GetTypeIIIGameOpponentDivision(team.Conference, team.Division, seasonYear);
+                        divisionMatchupCycle[(team.Conference, team.Division)][cycleYear].TypeIIIOpponentDivision;
                     var typeIIIOpponentTeams = basicTeamInfos.Where(t => t.Conference
                             == team.Conference switch
                             {
@@ -281,22 +438,11 @@ namespace Celarix.JustForFun.FootballSimulator
                 if (regularSeasonMatchups[team].Count(g => g.GameType == 4) < 4)
                 {
                     // Type IV games: other divisions based on standings
-                    var typeIVOpponentDivisions = GetTypeIVGameOpponentDivisions(team.Division, typeIIOpponentDivision);
+                    var typeIVOpponentDivisions = divisionMatchupCycle[(team.Conference, team.Division)][cycleYear]
+                        .TypeIVOpponentDivisions;
                     var typeIVOpponentTeams = new BasicTeamInfo[2];
 
-                    if (team.Division == Division.Extra)
-                    {
-                        // Other divisions are accounted for, so Extra, you have to
-                        // play even MORE divisional games!
-                        typeIVOpponentTeams = basicTeamInfos
-                            .Where(t => t.Conference == team.Conference
-                                && t.Division == team.Division
-                                && t.Name != team.Name)
-                            .OrderBy(_ => Guid.NewGuid())
-                            .Take(2)
-                            .ToArray();
-                    }
-                    else if (previousSeasonTeamPositions == null)
+                    if (previousSeasonTeamPositions == null)
                     {
                         // No previous season info, choose two teams at random.
                         typeIVOpponentTeams[0] = basicTeamInfos
@@ -320,35 +466,6 @@ namespace Celarix.JustForFun.FootballSimulator
                                 && previousSeasonTeamPositions[t.Name] == previousSeasonTeamPositions[team.Name]);
                     }
 
-                    // WYLO: Type IV games are all screwed up. They assume that there are only two
-                    // remaining divisions (self and the type II opponent excluded), but with Extra
-                    // and Type II able to play itself, sometimes there are 3 candidates for Type IV
-                    // games. One team chooses two and another team chooses a different two.
-                    //
-                    // Ideally, there'd be some symmetry. Maybe we figure out all division opponents
-                    // first and assign them in the same table format as before. Type I always is self,
-                    // and the others would assign themselves to two table cells at once.
-                    //
-                    // Also, there's likely the same sort of problem with Type II games when a division
-                    // plays itself. One team chooses four others at random, but the four teams it chose
-                    // may randomly try to choose it again, leading to us attempting to add a 5th game.
-                    // This one's fairly easy - when generating a random team, check to see if we aren't
-                    // already playing them.
-                    //
-                    // okay, actually, no, it's not. Since each team only has 3 division rivals, and
-                    // since 4 is not divisble by 3, we're always going to have something of an imbalance.
-                    // How about this: let's say the AFC North is playing itself. That's Bengals, Ravens,
-                    // Steelers, Browns. What would a valid Type II set of games for all four teams be?
-                    //
-                    // Bengals:  Ravens,   Ravens,   Steelers, Browns
-                    // Ravens:   Bengals,  Bengals,  Browns,   Steelers
-                    // Steelers: Browns,   Browns,   Bengals,  Ravens
-                    // Browns:   Steelers, Steelers, Ravens,   Bengals
-                    //
-                    // Okay, this is a valid solution and we'll just use it for every time a division
-                    // faces itself in Type II. If the four teams of a division are A, B, C, and D, the
-                    // pattern is BBCD-AADC-DDAB-CCBA. There are likely other symmetrical solutions, but,
-                    // eh.
                     AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
                     {
                         AwayTeam = typeIVOpponentTeams[0], HomeTeam = team, GameType = 4
@@ -690,38 +807,28 @@ namespace Celarix.JustForFun.FootballSimulator
                 _ => throw new InvalidOperationException()
             };
 
-        private static Division[] GetTypeIVGameOpponentDivisions(Division thisDivision, Division typeIIOpponentDivision)
+        private static Dictionary<Division, Division[]> GetTypeIVDivisionMatchupsForSeason(Dictionary<Division, Division> typeIIOpponentDivisions)
         {
-            //if (typeIIOpponentDivision != Division.Extra)
-            //{
-            return new[]
+            var matchups = new Dictionary<Division, Division[]?>();
+
+            foreach (var division in new[]
+                     {
+                         Division.North, Division.South, Division.West, Division.East, Division.Extra
+                     })
+            {
+                if (matchups[division] != null) { continue; }
+
+                var opponentDivisions = GetTypeIVGameOpponentDivisions(division, typeIIOpponentDivisions[division]).Take(2);
+                matchups[division] =
+            }
+        }
+
+        private static Division[] GetTypeIVGameOpponentDivisions(Division thisDivision, Division typeIIOpponentDivision) =>
+            new[]
                 {
                     Division.North, Division.South, Division.West, Division.East
                 }.Where(d => d != thisDivision && d != typeIIOpponentDivision)
-                .Take(2)
                 .ToArray();
-            // }
-            
-            //// If we're playing Extra as Type II, the other 3 divisions aren't.
-            //// Find the 2 that have us as part of their Type IV opponents.
-            //var otherNonExtraDivisions = new[]
-            //{
-            //    Division.North, Division.South, Division.East, Division.West
-            //}.Where(d => d != thisDivision);
-            //var otherDivisionTypeIIOpponents =
-            //    otherNonExtraDivisions.ToDictionary(d => d, d => GetTypeIIGameOpponentDivision(d, seasonYear));
-            //var otherDivisionTypeIVOpponents =
-            //    otherDivisionTypeIIOpponents.ToDictionary(d => d.Key, d => new
-            //    {
-            //        TypeIIOpponent = d.Value,
-            //        TypeIVOpponent = GetTypeIVGameOpponentDivisions(d.Key, d.Value, seasonYear)
-            //    });
-
-            //return otherDivisionTypeIVOpponents
-            //    .Where(kvp => kvp.Value.TypeIVOpponent.Any(o => thisDivision == o))
-            //    .Select(kvp => kvp.Key)
-            //    .ToArray();
-        }
 
         private static void RemoveGameFromBothTeams(Dictionary<BasicTeamInfo, List<GameMatchup>> games,
             GameMatchup selectedGame)
