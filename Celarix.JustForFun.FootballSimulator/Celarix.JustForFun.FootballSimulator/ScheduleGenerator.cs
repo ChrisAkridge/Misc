@@ -369,14 +369,14 @@ namespace Celarix.JustForFun.FootballSimulator
                 if (regularSeasonMatchups[team].Count(g => g.GameType == 1) < 4)
                 {
                     // Type II games: intraconference games (4 games)
-                    var typeIIOpponentTeams =
+                    var allTypeIIOpponentTeams =
                         basicTeamInfos
                             .Where(t => t.Conference == team.Conference
-                                && t.Division == typeIIOpponentDivision
-                                && t.Name != team.Name)
+                                && t.Division == typeIIOpponentDivision)
                             .ToList();
+                    BasicTeamInfo[] orderedTypeIIOpponentTeams = null;
 
-                    if (typeIIOpponentTeams.Count == 3)
+                    if (typeIIOpponentDivision == team.Division)
                     {
                         // Also, there's likely the same sort of problem with Type II games when a division
                         // plays itself. One team chooses four others at random, but the four teams it chose
@@ -398,13 +398,43 @@ namespace Celarix.JustForFun.FootballSimulator
                         // faces itself in Type II. If the four teams of a division are A, B, C, and D, the
                         // pattern is BBCD-AADC-DDAB-CCBA. There are likely other symmetrical solutions, but,
                         // eh.
+                        allTypeIIOpponentTeams.Sort();
+
+                        int teamIndexInDivision = allTypeIIOpponentTeams.IndexOf(team);
+
+                        orderedTypeIIOpponentTeams = teamIndexInDivision switch
+                        {
+                            0 => new[]
+                            {
+                                allTypeIIOpponentTeams[1], allTypeIIOpponentTeams[1], allTypeIIOpponentTeams[2],
+                                allTypeIIOpponentTeams[3]
+                            },
+                            1 => new[]
+                            {
+                                allTypeIIOpponentTeams[0], allTypeIIOpponentTeams[0], allTypeIIOpponentTeams[3],
+                                allTypeIIOpponentTeams[2]
+                            },
+                            2 => new[]
+                            {
+                                allTypeIIOpponentTeams[3], allTypeIIOpponentTeams[3], allTypeIIOpponentTeams[0],
+                                allTypeIIOpponentTeams[1]
+                            },
+                            3 => new[]
+                            {
+                                allTypeIIOpponentTeams[2], allTypeIIOpponentTeams[2], allTypeIIOpponentTeams[1],
+                                allTypeIIOpponentTeams[0]
+                            },
+                            _ => throw new ArgumentOutOfRangeException()
+                        };
                     }
 
                     for (int i = 0; i < 4; i++)
                     {
                         AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
                         {
-                            AwayTeam = i < 2 ? typeIIOpponentTeams[i] : team, HomeTeam = i < 2 ? team : typeIIOpponentTeams[i], GameType = 2
+                            AwayTeam = i < 2 ? orderedTypeIIOpponentTeams![i] : team,
+                            HomeTeam = i < 2 ? team : orderedTypeIIOpponentTeams![i],
+                            GameType = 2
                         });
                     }
                 }
@@ -446,22 +476,22 @@ namespace Celarix.JustForFun.FootballSimulator
                     {
                         // No previous season info, choose two teams at random.
                         typeIVOpponentTeams[0] = basicTeamInfos
-                            .Where(t => t.Conference == team.Conference && t.Division == typeIVOpponentDivisions[0])
+                            .Where(t => t.Conference != team.Conference && t.Division == typeIVOpponentDivisions[0])
                             .ElementAt(random.Next(0, 4));
 
                         typeIVOpponentTeams[1] = basicTeamInfos
-                            .Where(t => t.Conference == team.Conference && t.Division == typeIVOpponentDivisions[1])
+                            .Where(t => t.Conference != team.Conference && t.Division == typeIVOpponentDivisions[1])
                             .ElementAt(random.Next(0, 4));
                     }
                     else
                     {
                         typeIVOpponentTeams[0] = basicTeamInfos
-                            .Single(t => t.Conference == team.Conference
+                            .Single(t => t.Conference != team.Conference
                                 && t.Division == typeIVOpponentDivisions[0]
                                 && previousSeasonTeamPositions[t.Name] == previousSeasonTeamPositions[team.Name]);
 
                         typeIVOpponentTeams[1] = basicTeamInfos
-                            .Single(t => t.Conference == team.Conference
+                            .Single(t => t.Conference != team.Conference
                                 && t.Division == typeIVOpponentDivisions[1]
                                 && previousSeasonTeamPositions[t.Name] == previousSeasonTeamPositions[team.Name]);
                     }
@@ -806,22 +836,6 @@ namespace Celarix.JustForFun.FootballSimulator
                 },
                 _ => throw new InvalidOperationException()
             };
-
-        private static Dictionary<Division, Division[]> GetTypeIVDivisionMatchupsForSeason(Dictionary<Division, Division> typeIIOpponentDivisions)
-        {
-            var matchups = new Dictionary<Division, Division[]?>();
-
-            foreach (var division in new[]
-                     {
-                         Division.North, Division.South, Division.West, Division.East, Division.Extra
-                     })
-            {
-                if (matchups[division] != null) { continue; }
-
-                var opponentDivisions = GetTypeIVGameOpponentDivisions(division, typeIIOpponentDivisions[division]).Take(2);
-                matchups[division] =
-            }
-        }
 
         private static Division[] GetTypeIVGameOpponentDivisions(Division thisDivision, Division typeIIOpponentDivision) =>
             new[]
