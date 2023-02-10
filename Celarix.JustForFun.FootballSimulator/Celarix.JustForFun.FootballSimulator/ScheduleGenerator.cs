@@ -114,7 +114,7 @@ namespace Celarix.JustForFun.FootballSimulator
         // 8. Finally, we concatenate the two dictionaries of games into one, sort
         //    it by date ascending, build GameRecord objects out of them, then return
         //    that.
-        private readonly struct BasicTeamInfo
+        private readonly struct BasicTeamInfo : IComparable<BasicTeamInfo>
         {
             public string Name { get; init; }
             public Conference Conference { get; init; }
@@ -133,13 +133,19 @@ namespace Celarix.JustForFun.FootballSimulator
             /// <summary>Returns the fully qualified type name of this instance.</summary>
             /// <returns>The fully qualified type name.</returns>
             public override string ToString() => Name;
+
+            /// <summary>Compares the current instance with another object of the same type and returns an integer that indicates whether the current instance precedes, follows, or occurs in the same position in the sort order as the other object.</summary>
+            /// <param name="other">An object to compare with this instance.</param>
+            /// <returns>A value that indicates the relative order of the objects being compared. The return value has these meanings:
+            /// <list type="table"><listheader><term> Value</term><description> Meaning</description></listheader><item><term> Less than zero</term><description> This instance precedes <paramref name="other" /> in the sort order.</description></item><item><term> Zero</term><description> This instance occurs in the same position in the sort order as <paramref name="other" />.</description></item><item><term> Greater than zero</term><description> This instance follows <paramref name="other" /> in the sort order.</description></item></list></returns>
+            public int CompareTo(BasicTeamInfo other) => string.Compare(Name, other.Name, StringComparison.Ordinal);
         }
 
         private readonly struct DivisionMatchupsForSeason
         {
-            public Division TypeIIOpponentDivision { get; init; }
-            public Division TypeIIIOpponentDivision { get; init; }
-            public Division[] TypeIVOpponentDivisions { get; init; }
+            public Division TypeIIOpponentDivision { get; }
+            public Division TypeIIIOpponentDivision { get; }
+            public Division[] TypeIVOpponentDivisions { get; }
 
             public DivisionMatchupsForSeason(Division typeIIOpponentDivision, Division typeIIIOpponentDivision,
                 Division firstTypeIVOpponentDivision, Division secondTypeIVOpponentDivision)
@@ -165,11 +171,12 @@ namespace Celarix.JustForFun.FootballSimulator
             /// <returns>
             /// <see langword="true" /> if <paramref name="obj" /> and this instance are the same type and represent the same value; otherwise, <see langword="false" />.</returns>
             public override bool Equals(object? obj) =>
-                obj is GameMatchup matchup && AwayTeam.Equals(matchup.AwayTeam) && HomeTeam.Equals(matchup.HomeTeam);
+                obj is GameMatchup that && AwayTeam.Equals(that.AwayTeam) && HomeTeam.Equals(that.HomeTeam) && GameType == that.GameType;
 
             public bool SymmetricallyEquals(GameMatchup that) =>
                 (AwayTeam.Equals(that.AwayTeam) || AwayTeam.Equals(that.HomeTeam))
-                && (HomeTeam.Equals(that.HomeTeam) || HomeTeam.Equals(that.AwayTeam));
+                && (HomeTeam.Equals(that.HomeTeam) || HomeTeam.Equals(that.AwayTeam))
+                && (GameType == that.GameType);
 
             /// <summary>Returns the hash code for this instance.</summary>
             /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
@@ -177,7 +184,7 @@ namespace Celarix.JustForFun.FootballSimulator
 
             /// <summary>Returns a string that represents the current object.</summary>
             /// <returns>A string that represents the current object.</returns>
-            public override string ToString() => $"{AwayTeam} @ {HomeTeam}";
+            public override string ToString() => $"{AwayTeam} @ {HomeTeam} (type {GameType})";
         }
 
         private sealed class GameMatchupComparer : IEqualityComparer<GameMatchup>
@@ -337,177 +344,183 @@ namespace Celarix.JustForFun.FootballSimulator
         {
             var regularSeasonMatchups = basicTeamInfos.ToDictionary(i => i, _ => new List<GameMatchup>(16));
             var divisionMatchupCycle = GetDivisionMatchupCycle();
-            var cycleYear = seasonYear % 5;
+            var cycleYear = (seasonYear - 2014) % 5;
             var random = new Random();
 
             foreach (var team in basicTeamInfos)
             {
-                if (regularSeasonMatchups[team].Count(g => g.GameType == 0) < 6)
+                // Type I games: teams in this division (6 games)
+                var otherTeamsInDivision = basicTeamInfos
+                    .Where(i => i.Conference == team.Conference
+                        && i.Division == team.Division
+                        && i.Name != team.Name);
+
+                foreach (var otherDivisionTeam in otherTeamsInDivision)
                 {
-                    // Type I games: teams in this division (6 games)
-                    var otherTeamsInDivision = basicTeamInfos
-                        .Where(i => i.Conference == team.Conference
-                            && i.Division == team.Division
-                            && i.Name != team.Name);
-
-                    foreach (var otherDivisionTeam in otherTeamsInDivision)
+                    AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
                     {
-                        AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
-                        {
-                            AwayTeam = otherDivisionTeam, HomeTeam = team, GameType = 1
-                        });
+                        AwayTeam = otherDivisionTeam,
+                        HomeTeam = team,
+                        GameType = 1
+                    });
 
-                        AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
-                        {
-                            AwayTeam = team, HomeTeam = otherDivisionTeam, GameType = 1
-                        });
-                    }
+                    AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
+                    {
+                        AwayTeam = team,
+                        HomeTeam = otherDivisionTeam,
+                        GameType = 1
+                    });
                 }
 
                 var typeIIOpponentDivision = divisionMatchupCycle[(team.Conference, team.Division)][cycleYear]
                     .TypeIIOpponentDivision;
-                if (regularSeasonMatchups[team].Count(g => g.GameType == 1) < 4)
+                // Type II games: intraconference games (4 games)
+                var allTypeIIOpponentTeams =
+                    basicTeamInfos
+                        .Where(t => t.Conference == team.Conference
+                            && t.Division == typeIIOpponentDivision)
+                        .ToList();
+                var orderedTypeIIOpponentTeams = allTypeIIOpponentTeams.ToArray();
+
+                if (typeIIOpponentDivision == team.Division)
                 {
-                    // Type II games: intraconference games (4 games)
-                    var allTypeIIOpponentTeams =
-                        basicTeamInfos
-                            .Where(t => t.Conference == team.Conference
-                                && t.Division == typeIIOpponentDivision)
-                            .ToList();
-                    BasicTeamInfo[] orderedTypeIIOpponentTeams = null;
+                    // Also, there's likely the same sort of problem with Type II games when a division
+                    // plays itself. One team chooses four others at random, but the four teams it chose
+                    // may randomly try to choose it again, leading to us attempting to add a 5th game.
+                    // This one's fairly easy - when generating a random team, check to see if we aren't
+                    // already playing them.
+                    //
+                    // okay, actually, no, it's not. Since each team only has 3 division rivals, and
+                    // since 4 is not divisble by 3, we're always going to have something of an imbalance.
+                    // How about this: let's say the AFC North is playing itself. That's Bengals, Ravens,
+                    // Steelers, Browns. What would a valid Type II set of games for all four teams be?
+                    //
+                    // Bengals:  Ravens,   Ravens,   Steelers, Browns
+                    // Ravens:   Bengals,  Bengals,  Browns,   Steelers
+                    // Steelers: Browns,   Browns,   Bengals,  Ravens
+                    // Browns:   Steelers, Steelers, Ravens,   Bengals
+                    //
+                    // Okay, this is a valid solution and we'll just use it for every time a division
+                    // faces itself in Type II. If the four teams of a division are A, B, C, and D, the
+                    // pattern is BBCD-AADC-DDAB-CCBA. There are likely other symmetrical solutions, but,
+                    // eh.
+                    allTypeIIOpponentTeams.Sort();
 
-                    if (typeIIOpponentDivision == team.Division)
+                    int teamIndexInDivision = allTypeIIOpponentTeams.IndexOf(team);
+
+                    orderedTypeIIOpponentTeams = teamIndexInDivision switch
                     {
-                        // Also, there's likely the same sort of problem with Type II games when a division
-                        // plays itself. One team chooses four others at random, but the four teams it chose
-                        // may randomly try to choose it again, leading to us attempting to add a 5th game.
-                        // This one's fairly easy - when generating a random team, check to see if we aren't
-                        // already playing them.
-                        //
-                        // okay, actually, no, it's not. Since each team only has 3 division rivals, and
-                        // since 4 is not divisble by 3, we're always going to have something of an imbalance.
-                        // How about this: let's say the AFC North is playing itself. That's Bengals, Ravens,
-                        // Steelers, Browns. What would a valid Type II set of games for all four teams be?
-                        //
-                        // Bengals:  Ravens,   Ravens,   Steelers, Browns
-                        // Ravens:   Bengals,  Bengals,  Browns,   Steelers
-                        // Steelers: Browns,   Browns,   Bengals,  Ravens
-                        // Browns:   Steelers, Steelers, Ravens,   Bengals
-                        //
-                        // Okay, this is a valid solution and we'll just use it for every time a division
-                        // faces itself in Type II. If the four teams of a division are A, B, C, and D, the
-                        // pattern is BBCD-AADC-DDAB-CCBA. There are likely other symmetrical solutions, but,
-                        // eh.
-                        allTypeIIOpponentTeams.Sort();
-
-                        int teamIndexInDivision = allTypeIIOpponentTeams.IndexOf(team);
-
-                        orderedTypeIIOpponentTeams = teamIndexInDivision switch
+                        0 => new[]
                         {
-                            0 => new[]
-                            {
                                 allTypeIIOpponentTeams[1], allTypeIIOpponentTeams[1], allTypeIIOpponentTeams[2],
                                 allTypeIIOpponentTeams[3]
-                            },
-                            1 => new[]
-                            {
-                                allTypeIIOpponentTeams[0], allTypeIIOpponentTeams[0], allTypeIIOpponentTeams[3],
-                                allTypeIIOpponentTeams[2]
-                            },
-                            2 => new[]
-                            {
-                                allTypeIIOpponentTeams[3], allTypeIIOpponentTeams[3], allTypeIIOpponentTeams[0],
-                                allTypeIIOpponentTeams[1]
-                            },
-                            3 => new[]
-                            {
-                                allTypeIIOpponentTeams[2], allTypeIIOpponentTeams[2], allTypeIIOpponentTeams[1],
-                                allTypeIIOpponentTeams[0]
-                            },
+                        },
+                        1 => new[]
+                        {
+                            allTypeIIOpponentTeams[0], allTypeIIOpponentTeams[0], allTypeIIOpponentTeams[3],
+                            allTypeIIOpponentTeams[2]
+                        },
+                        2 => new[]
+                        {
+                            allTypeIIOpponentTeams[3], allTypeIIOpponentTeams[3], allTypeIIOpponentTeams[0],
+                            allTypeIIOpponentTeams[1]
+                        },
+                        3 => new[]
+                        {
+                            allTypeIIOpponentTeams[2], allTypeIIOpponentTeams[2], allTypeIIOpponentTeams[1],
+                            allTypeIIOpponentTeams[0]
+                        },
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+                }
+
+                for (int i = 0; i < 4; i++)
+                {
+                    AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
+                    {
+                        AwayTeam = i < 2 ? orderedTypeIIOpponentTeams![i] : team,
+                        HomeTeam = i < 2 ? team : orderedTypeIIOpponentTeams![i],
+                        GameType = 2
+                    });
+                }
+
+                // Type III games: interconference games (4 games)
+                var typeIIIOpponentDivision =
+                    divisionMatchupCycle[(team.Conference, team.Division)][cycleYear].TypeIIIOpponentDivision;
+
+                var typeIIIOpponentTeams = basicTeamInfos.Where(t => t.Conference
+                        == team.Conference switch
+                        {
+                            Conference.AFC => Conference.NFC,
+                            Conference.NFC => Conference.AFC,
                             _ => throw new ArgumentOutOfRangeException()
-                        };
-                    }
+                        }
+                        && t.Division == typeIIIOpponentDivision)
+                    .ToList();
 
-                    for (int i = 0; i < 4; i++)
-                    {
-                        AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
-                        {
-                            AwayTeam = i < 2 ? orderedTypeIIOpponentTeams![i] : team,
-                            HomeTeam = i < 2 ? team : orderedTypeIIOpponentTeams![i],
-                            GameType = 2
-                        });
-                    }
-                }
-                
-                if (regularSeasonMatchups[team].Count(g => g.GameType == 3) < 4)
+                for (int i = 0; i < 4; i++)
                 {
-                    // Type III games: interconference games (4 games)
-                    var typeIIIOpponentDivision =
-                        divisionMatchupCycle[(team.Conference, team.Division)][cycleYear].TypeIIIOpponentDivision;
-                    var typeIIIOpponentTeams = basicTeamInfos.Where(t => t.Conference
-                            == team.Conference switch
-                            {
-                                Conference.AFC => Conference.NFC,
-                                Conference.NFC => Conference.AFC,
-                                _ => throw new ArgumentOutOfRangeException()
-                            }
-                            && t.Division == typeIIIOpponentDivision)
+                    AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
+                    {
+                        AwayTeam = i < 2 ? typeIIIOpponentTeams[i] : team,
+                        HomeTeam = i < 2 ? team : typeIIIOpponentTeams[i],
+                        GameType = 3
+                    });
+                }
+
+                // Type IV games: other divisions based on standings
+                var typeIVOpponentDivisions = divisionMatchupCycle[(team.Conference, team.Division)][cycleYear]
+                    .TypeIVOpponentDivisions;
+                var typeIVOpponentTeams = new BasicTeamInfo[2];
+
+                if (previousSeasonTeamPositions == null)
+                {
+                    var teamDivisionNames = basicTeamInfos
+                        .Where(t => t.Conference == team.Conference && t.Division == team.Division)
                         .ToList();
+                    teamDivisionNames.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+                    var teamSortedIndex = teamDivisionNames.IndexOf(team);
+                    
+                    // No previous season info, choose two teams at random.
+                    typeIVOpponentTeams[0] = basicTeamInfos
+                        .Where(t => t.Conference != team.Conference && t.Division == typeIVOpponentDivisions[0])
+                        .OrderBy(t => t.Name)
+                        .ElementAt(teamSortedIndex);
 
-                    for (int i = 0; i < 4; i++)
-                    {
-                        AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
-                        {
-                            AwayTeam = i < 2 ? typeIIIOpponentTeams[i] : team,
-                            HomeTeam = i < 2 ? team : typeIIIOpponentTeams[i],
-                            GameType = 3
-                        });
-                    }
+                    typeIVOpponentTeams[1] = basicTeamInfos
+                        .Where(t => t.Conference != team.Conference && t.Division == typeIVOpponentDivisions[1])
+                        .OrderBy(t => t.Name)
+                        .ElementAt(teamSortedIndex);
                 }
-
-                if (regularSeasonMatchups[team].Count(g => g.GameType == 4) < 4)
+                else
                 {
-                    // Type IV games: other divisions based on standings
-                    var typeIVOpponentDivisions = divisionMatchupCycle[(team.Conference, team.Division)][cycleYear]
-                        .TypeIVOpponentDivisions;
-                    var typeIVOpponentTeams = new BasicTeamInfo[2];
+                    typeIVOpponentTeams[0] = basicTeamInfos
+                        .Single(t => t.Conference != team.Conference
+                            && t.Division == typeIVOpponentDivisions[0]
+                            && previousSeasonTeamPositions[t.Name] == previousSeasonTeamPositions[team.Name]);
 
-                    if (previousSeasonTeamPositions == null)
-                    {
-                        // No previous season info, choose two teams at random.
-                        typeIVOpponentTeams[0] = basicTeamInfos
-                            .Where(t => t.Conference != team.Conference && t.Division == typeIVOpponentDivisions[0])
-                            .ElementAt(random.Next(0, 4));
-
-                        typeIVOpponentTeams[1] = basicTeamInfos
-                            .Where(t => t.Conference != team.Conference && t.Division == typeIVOpponentDivisions[1])
-                            .ElementAt(random.Next(0, 4));
-                    }
-                    else
-                    {
-                        typeIVOpponentTeams[0] = basicTeamInfos
-                            .Single(t => t.Conference != team.Conference
-                                && t.Division == typeIVOpponentDivisions[0]
-                                && previousSeasonTeamPositions[t.Name] == previousSeasonTeamPositions[team.Name]);
-
-                        typeIVOpponentTeams[1] = basicTeamInfos
-                            .Single(t => t.Conference != team.Conference
-                                && t.Division == typeIVOpponentDivisions[1]
-                                && previousSeasonTeamPositions[t.Name] == previousSeasonTeamPositions[team.Name]);
-                    }
-
-                    AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
-                    {
-                        AwayTeam = typeIVOpponentTeams[0], HomeTeam = team, GameType = 4
-                    });
-
-                    AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
-                    {
-                        AwayTeam = team, HomeTeam = typeIVOpponentTeams[1], GameType = 4
-                    });
+                    typeIVOpponentTeams[1] = basicTeamInfos
+                        .Single(t => t.Conference != team.Conference
+                            && t.Division == typeIVOpponentDivisions[1]
+                            && previousSeasonTeamPositions[t.Name] == previousSeasonTeamPositions[team.Name]);
                 }
+
+                AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
+                {
+                    AwayTeam = typeIVOpponentTeams[0],
+                    HomeTeam = team,
+                    GameType = 4
+                });
+
+                AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
+                {
+                    AwayTeam = team,
+                    HomeTeam = typeIVOpponentTeams[1],
+                    GameType = 4
+                });
             }
 
+            // WYLO: we're getting there. Some teams get too many games, but we're rapidly approaching 16.
             return regularSeasonMatchups;
         }
         
@@ -602,18 +615,16 @@ namespace Celarix.JustForFun.FootballSimulator
 
         private static void AssignGameToBothTeams(IReadOnlyDictionary<BasicTeamInfo, List<GameMatchup>> games, GameMatchup game)
         {
-            if (!games[game.AwayTeam].Any(g => g.Equals(game)))
+            if (games[game.AwayTeam].All(g => !g.SymmetricallyEquals(game))
+                || (game.GameType == 1 && games[game.AwayTeam].Count(g => g.SymmetricallyEquals(game)) == 1))
             {
                 games[game.AwayTeam].Add(game);
             }
 
-            if (!games[game.HomeTeam].Any(g => g.Equals(game)))
+            if (games[game.HomeTeam].All(g => !g.SymmetricallyEquals(game))
+                || (game.GameType == 1 && games[game.HomeTeam].Count(g => g.SymmetricallyEquals(game)) == 1))
             {
-                games[game.HomeTeam]
-                    .Add(new GameMatchup
-                    {
-                        AwayTeam = game.AwayTeam, HomeTeam = game.HomeTeam
-                    });
+                games[game.HomeTeam].Add(game);
             }
         }
 
@@ -670,185 +681,11 @@ namespace Celarix.JustForFun.FootballSimulator
             return date;
         }
 
-        private static Division GetTypeIIGameOpponentDivision(Division thisDivision, int seasonYear) =>
-            ((seasonYear - 2014) % 5) switch
-            {
-                0 => thisDivision switch
-                {
-                    Division.North => Division.South,
-                    Division.South => Division.North,
-                    Division.East => Division.West,
-                    Division.West => Division.Extra,
-                    Division.Extra => Division.Extra,
-                    _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
-                },
-                1 => thisDivision switch
-                {
-                    Division.North => Division.Extra,
-                    Division.South => Division.East,
-                    Division.East => Division.South,
-                    Division.West => Division.West,
-                    Division.Extra => Division.North,
-                    _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
-                },
-                2 => thisDivision switch
-                {
-                    Division.North => Division.East,
-                    Division.South => Division.South,
-                    Division.East => Division.North,
-                    Division.West => Division.Extra,
-                    Division.Extra => Division.West,
-                    _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
-                },
-                3 => thisDivision switch
-                {
-                    Division.North => Division.North,
-                    Division.South => Division.West,
-                    Division.East => Division.Extra,
-                    Division.West => Division.South,
-                    Division.Extra => Division.Extra,
-                    _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
-                },
-                4 => thisDivision switch
-                {
-                    Division.North => Division.Extra,
-                    Division.South => Division.West,
-                    Division.East => Division.East,
-                    Division.West => Division.South,
-                    Division.Extra => Division.North,
-                    _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
-                },
-                _ => throw new InvalidOperationException()
-            };
-
-        private static Division GetTypeIIIGameOpponentDivision(Conference thisConference, Division thisDivision, int seasonYear) =>
-            ((seasonYear - 2014) % 5) switch
-            {
-                0 => thisConference switch
-                {
-                    Conference.AFC => thisDivision switch
-                    {
-                        Division.North => Division.South,
-                        Division.South => Division.East,
-                        Division.East => Division.North,
-                        Division.West => Division.West,
-                        Division.Extra => Division.Extra,
-                        _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
-                    },
-                    Conference.NFC => thisDivision switch
-                    {
-                        Division.North => Division.East,
-                        Division.South => Division.North,
-                        Division.East => Division.South,
-                        Division.West => Division.West,
-                        Division.Extra => Division.Extra,
-                        _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
-                    },
-                    _ => throw new ArgumentOutOfRangeException(nameof(thisConference), thisConference, null)
-                },
-                1 => thisConference switch
-                {
-                    Conference.AFC => thisDivision switch
-                    {
-                        Division.North => Division.West,
-                        Division.South => Division.South,
-                        Division.East => Division.East,
-                        Division.West => Division.Extra,
-                        Division.Extra => Division.North,
-                        _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
-                    },
-                    Conference.NFC => thisDivision switch
-                    {
-                        Division.North => Division.Extra,
-                        Division.South => Division.South,
-                        Division.East => Division.East,
-                        Division.West => Division.North,
-                        Division.Extra => Division.West,
-                        _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
-                    },
-                    _ => throw new ArgumentOutOfRangeException(nameof(thisConference), thisConference, null)
-                },
-                2 => thisConference switch
-                {
-                    Conference.AFC => thisDivision switch
-                    {
-                        Division.North => Division.East,
-                        Division.South => Division.Extra,
-                        Division.East => Division.West,
-                        Division.West => Division.North,
-                        Division.Extra => Division.South,
-                        _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
-                    },
-                    Conference.NFC => thisDivision switch
-                    {
-                        Division.North => Division.West,
-                        Division.South => Division.Extra,
-                        Division.East => Division.North,
-                        Division.West => Division.East,
-                        Division.Extra => Division.South,
-                        _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
-                    },
-                    _ => throw new ArgumentOutOfRangeException(nameof(thisConference), thisConference, null)
-                },
-                3 => thisConference switch
-                {
-                    Conference.AFC => thisDivision switch
-                    {
-                        Division.North => Division.Extra,
-                        Division.South => Division.North,
-                        Division.East => Division.South,
-                        Division.West => Division.East,
-                        Division.Extra => Division.West,
-                        _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
-                    },
-                    Conference.NFC => thisDivision switch
-                    {
-                        Division.North => Division.South,
-                        Division.South => Division.East,
-                        Division.East => Division.West,
-                        Division.West => Division.Extra,
-                        Division.Extra => Division.North,
-                        _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
-                    },
-                    _ => throw new ArgumentOutOfRangeException(nameof(thisConference), thisConference, null)
-                },
-                4 => thisConference switch
-                {
-                    Conference.AFC => thisDivision switch
-                    {
-                        Division.North => Division.North,
-                        Division.South => Division.West,
-                        Division.East => Division.Extra,
-                        Division.West => Division.South,
-                        Division.Extra => Division.East,
-                        _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
-                    },
-                    Conference.NFC => thisDivision switch
-                    {
-                        Division.North => Division.North,
-                        Division.South => Division.West,
-                        Division.East => Division.Extra,
-                        Division.West => Division.South,
-                        Division.Extra => Division.East,
-                        _ => throw new ArgumentOutOfRangeException(nameof(thisDivision), thisDivision, null)
-                    },
-                    _ => throw new ArgumentOutOfRangeException(nameof(thisConference), thisConference, null)
-                },
-                _ => throw new InvalidOperationException()
-            };
-
-        private static Division[] GetTypeIVGameOpponentDivisions(Division thisDivision, Division typeIIOpponentDivision) =>
-            new[]
-                {
-                    Division.North, Division.South, Division.West, Division.East
-                }.Where(d => d != thisDivision && d != typeIIOpponentDivision)
-                .ToArray();
-
         private static void RemoveGameFromBothTeams(Dictionary<BasicTeamInfo, List<GameMatchup>> games,
             GameMatchup selectedGame)
         {
-            games[selectedGame.AwayTeam].RemoveAll(g => g.SymmetricallyEquals(selectedGame));
-            games[selectedGame.HomeTeam].RemoveAll(g => g.SymmetricallyEquals(selectedGame));
+            games[selectedGame.AwayTeam].RemoveAll(g => g.Equals(selectedGame));
+            games[selectedGame.HomeTeam].RemoveAll(g => g.Equals(selectedGame));
         }
 
         private static GameMatchup FindGameForTimeslot(Dictionary<BasicTeamInfo, List<GameMatchup>> games, Random random)
