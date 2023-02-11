@@ -165,6 +165,7 @@ namespace Celarix.JustForFun.FootballSimulator
             public BasicTeamInfo AwayTeam { get; init; }
             public BasicTeamInfo HomeTeam { get; init; }
             public int GameType { get; init; }
+            public BasicTeamInfo AddedBy { get; init; }
 
             /// <summary>Indicates whether this instance and a specified object are equal.</summary>
             /// <param name="obj">The object to compare with the current instance.</param>
@@ -184,7 +185,7 @@ namespace Celarix.JustForFun.FootballSimulator
 
             /// <summary>Returns a string that represents the current object.</summary>
             /// <returns>A string that represents the current object.</returns>
-            public override string ToString() => $"{AwayTeam} @ {HomeTeam} (type {GameType})";
+            public override string ToString() => $"{AwayTeam} @ {HomeTeam} (type {GameType}, added by {AddedBy})";
         }
 
         private sealed class GameMatchupComparer : IEqualityComparer<GameMatchup>
@@ -262,7 +263,7 @@ namespace Celarix.JustForFun.FootballSimulator
                         new DivisionMatchupsForSeason(S, E, N, X),
                         new DivisionMatchupsForSeason(N, W, S, X),
                         new DivisionMatchupsForSeason(X, S, N, S),
-                        new DivisionMatchupsForSeason(E, X, N, S)
+                        new DivisionMatchupsForSeason(E, X, N, W)
                     }
                 },
                 {
@@ -272,7 +273,7 @@ namespace Celarix.JustForFun.FootballSimulator
                         new DivisionMatchupsForSeason(W, X, S, X),
                         new DivisionMatchupsForSeason(X, N, N, X),
                         new DivisionMatchupsForSeason(S, E, N, X),
-                        new DivisionMatchupsForSeason(S, S, X, E)
+                        new DivisionMatchupsForSeason(S, S, X, S)
                     }
                 },
                 {
@@ -282,7 +283,7 @@ namespace Celarix.JustForFun.FootballSimulator
                         new DivisionMatchupsForSeason(N, N, E, S),
                         new DivisionMatchupsForSeason(W, S, E, W),
                         new DivisionMatchupsForSeason(E, W, S, W),
-                        new DivisionMatchupsForSeason(N, E, N, W)
+                        new DivisionMatchupsForSeason(N, E, N, S)
                     }
                 },
                 {
@@ -302,7 +303,7 @@ namespace Celarix.JustForFun.FootballSimulator
                         new DivisionMatchupsForSeason(E, S, N, W),
                         new DivisionMatchupsForSeason(S, X, N, E),
                         new DivisionMatchupsForSeason(W, E, E, X),
-                        new DivisionMatchupsForSeason(W, W, E, W)
+                        new DivisionMatchupsForSeason(W, W, W, X)
                     }
                 },
                 {
@@ -312,7 +313,7 @@ namespace Celarix.JustForFun.FootballSimulator
                         new DivisionMatchupsForSeason(S, E, N, X),
                         new DivisionMatchupsForSeason(N, N, S, X),
                         new DivisionMatchupsForSeason(X, W, N, S),
-                        new DivisionMatchupsForSeason(E, E, N, S)
+                        new DivisionMatchupsForSeason(E, X, N, S)
                     }
                 },
                 {
@@ -322,7 +323,7 @@ namespace Celarix.JustForFun.FootballSimulator
                         new DivisionMatchupsForSeason(W, N, S, X),
                         new DivisionMatchupsForSeason(X, E, N, X),
                         new DivisionMatchupsForSeason(S, X, N, X),
-                        new DivisionMatchupsForSeason(S, S, X, E)
+                        new DivisionMatchupsForSeason(S, S, S, E)
                     }
                 },
                 {
@@ -345,7 +346,6 @@ namespace Celarix.JustForFun.FootballSimulator
             var regularSeasonMatchups = basicTeamInfos.ToDictionary(i => i, _ => new List<GameMatchup>(16));
             var divisionMatchupCycle = GetDivisionMatchupCycle();
             var cycleYear = (seasonYear - 2014) % 5;
-            var random = new Random();
 
             foreach (var team in basicTeamInfos)
             {
@@ -361,14 +361,16 @@ namespace Celarix.JustForFun.FootballSimulator
                     {
                         AwayTeam = otherDivisionTeam,
                         HomeTeam = team,
-                        GameType = 1
+                        GameType = 1,
+                        AddedBy = team
                     });
 
                     AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
                     {
                         AwayTeam = team,
                         HomeTeam = otherDivisionTeam,
-                        GameType = 1
+                        GameType = 1,
+                        AddedBy = team
                     });
                 }
 
@@ -440,7 +442,8 @@ namespace Celarix.JustForFun.FootballSimulator
                     {
                         AwayTeam = i < 2 ? orderedTypeIIOpponentTeams![i] : team,
                         HomeTeam = i < 2 ? team : orderedTypeIIOpponentTeams![i],
-                        GameType = 2
+                        GameType = 2,
+                        AddedBy = team
                     });
                 }
 
@@ -464,7 +467,8 @@ namespace Celarix.JustForFun.FootballSimulator
                     {
                         AwayTeam = i < 2 ? typeIIIOpponentTeams[i] : team,
                         HomeTeam = i < 2 ? team : typeIIIOpponentTeams[i],
-                        GameType = 3
+                        GameType = 3,
+                        AddedBy = team
                     });
                 }
 
@@ -509,18 +513,20 @@ namespace Celarix.JustForFun.FootballSimulator
                 {
                     AwayTeam = typeIVOpponentTeams[0],
                     HomeTeam = team,
-                    GameType = 4
+                    GameType = 4,
+                    AddedBy = team
                 });
 
                 AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
                 {
                     AwayTeam = team,
                     HomeTeam = typeIVOpponentTeams[1],
-                    GameType = 4
+                    GameType = 4,
+                    AddedBy = team
                 });
             }
 
-            // WYLO: we're getting there. Some teams get too many games, but we're rapidly approaching 16.
+            // WYLO: just 1 game away. Something funky with Type 2 game assignments; check the Dolphins.
             return regularSeasonMatchups;
         }
         
@@ -616,13 +622,15 @@ namespace Celarix.JustForFun.FootballSimulator
         private static void AssignGameToBothTeams(IReadOnlyDictionary<BasicTeamInfo, List<GameMatchup>> games, GameMatchup game)
         {
             if (games[game.AwayTeam].All(g => !g.SymmetricallyEquals(game))
-                || (game.GameType == 1 && games[game.AwayTeam].Count(g => g.SymmetricallyEquals(game)) == 1))
+                || (game.GameType == 1 && games[game.AwayTeam].Count(g => g.SymmetricallyEquals(game)) == 1)
+                || (game.GameType == 2 && games[game.AwayTeam].Count(g => g.GameType == 2) < 4))
             {
                 games[game.AwayTeam].Add(game);
             }
 
             if (games[game.HomeTeam].All(g => !g.SymmetricallyEquals(game))
-                || (game.GameType == 1 && games[game.HomeTeam].Count(g => g.SymmetricallyEquals(game)) == 1))
+                || (game.GameType == 1 && games[game.HomeTeam].Count(g => g.SymmetricallyEquals(game)) == 1)
+                || (game.GameType == 2 && games[game.HomeTeam].Count(g => g.GameType == 2) < 4))
             {
                 games[game.HomeTeam].Add(game);
             }
