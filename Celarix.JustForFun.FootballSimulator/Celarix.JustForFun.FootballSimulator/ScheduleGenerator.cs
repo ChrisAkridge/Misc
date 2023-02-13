@@ -435,16 +435,37 @@ namespace Celarix.JustForFun.FootballSimulator
                         _ => throw new ArgumentOutOfRangeException()
                     };
                 }
-
+                
+                // do you ever get the feeling that this should be way easier?
                 for (int i = 0; i < 4; i++)
                 {
-                    AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
+                    if (i < 2)
                     {
-                        AwayTeam = i < 2 ? orderedTypeIIOpponentTeams![i] : team,
-                        HomeTeam = i < 2 ? team : orderedTypeIIOpponentTeams![i],
-                        GameType = 2,
-                        AddedBy = team
-                    });
+                        // When a division faces itself for type II games, the first 2 games are always
+                        // against the same team.
+                        AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
+                        {
+                            AwayTeam = orderedTypeIIOpponentTeams![i],
+                            HomeTeam = team,
+                            GameType = 2,
+                            AddedBy = team
+                        });
+                    }
+                    else
+                    {
+                        var secondHalfGame = new GameMatchup
+                        {
+                            AwayTeam = team,
+                            HomeTeam = orderedTypeIIOpponentTeams![i],
+                            GameType = 2,
+                            AddedBy = team
+                        };
+
+                        if (!regularSeasonMatchups[team].Any(g => g.SymmetricallyEquals(secondHalfGame)))
+                        {
+                            AssignGameToBothTeams(regularSeasonMatchups, secondHalfGame);
+                        }
+                    }
                 }
 
                 // Type III games: interconference games (4 games)
@@ -535,7 +556,13 @@ namespace Celarix.JustForFun.FootballSimulator
         {
             var regularSeasonWeeks = new List<(DateTimeOffset gameTime, GameMatchup game)>[17];
             var regularSeasonWeekStartDates = GetRegularSeasonWeekStartDatesForYear(seasonYear);
+            var teamsPlayingThisWeek = new List<BasicTeamInfo>();
             var random = new Random();
+
+            for (int i = 0; i < 17; i++)
+            {
+                regularSeasonWeeks[i] = new List<(DateTimeOffset gameTime, GameMatchup game)>();
+            }
 
             for (var weekNumber = 0; weekNumber < regularSeasonWeeks.Length; weekNumber++)
             {
@@ -551,12 +578,15 @@ namespace Celarix.JustForFun.FootballSimulator
                     weekStartDate.AddDays(4).Add(eightThirtyPM)
                 };
 
-                week.AddRange(primetimeGameTimes.Select(t => (t, FindGameForTimeslot(regularSeasonMatchups, random))));
+                foreach (var primetimeGameTime in primetimeGameTimes)
+                {
+                    AddGameToWeek(week, primetimeGameTime, regularSeasonMatchups, random, teamsPlayingThisWeek);
+                }
 
                 // Fill in the 2 4:30pm games.
                 var sundayAtFourThirtyPM = weekStartDate.AddDays(3).Add(new TimeSpan(16, 30, 0));
-                week.Add((sundayAtFourThirtyPM, FindGameForTimeslot(regularSeasonMatchups, random)));
-                week.Add((sundayAtFourThirtyPM, FindGameForTimeslot(regularSeasonMatchups, random)));
+                AddGameToWeek(week, sundayAtFourThirtyPM, regularSeasonMatchups, random, teamsPlayingThisWeek);
+                AddGameToWeek(week, sundayAtFourThirtyPM, regularSeasonMatchups, random, teamsPlayingThisWeek);
 
                 var byeCount = (weekNumber + 1) is <= 4 or >= 14
                     ? 0
@@ -568,11 +598,28 @@ namespace Celarix.JustForFun.FootballSimulator
 
                 for (int j = 0; j < onePMGameCount; j++)
                 {
-                    week.Add((sundayAtOnePM, FindGameForTimeslot(regularSeasonMatchups, random)));
+                    // WYLO: turns out choosing teams at random until we find one that hasn't played
+                    // this week doesn't work. Say we're down to the Broncos and Bears and all other
+                    // 38 teams have been picked. If the Broncos never face the Bears, infinite loop.
+                    AddGameToWeek(week, sundayAtOnePM, regularSeasonMatchups, random, teamsPlayingThisWeek);
                 }
+
+                teamsPlayingThisWeek.Clear();
             }
 
             return regularSeasonWeeks;
+        }
+
+        private static void AddGameToWeek(List<(DateTimeOffset gameTime, GameMatchup game)> week,
+            DateTimeOffset gameTime,
+            Dictionary<BasicTeamInfo, List<GameMatchup>> regularSeasonMatchups,
+            Random random,
+            List<BasicTeamInfo> teamsPlayingThisWeek)
+        {
+            var game = FindGameForTimeslot(regularSeasonMatchups, teamsPlayingThisWeek, random);
+            teamsPlayingThisWeek.Add(game.AwayTeam);
+            teamsPlayingThisWeek.Add(game.HomeTeam);
+            week.Add((gameTime, game));
         }
 
         private static IEnumerable<List<(DateTimeOffset gameTime, GameMatchup game)>> GetAllPreseasonMatchupsForSeasonYear(IReadOnlyCollection<BasicTeamInfo> basicTeamInfos,
@@ -621,21 +668,27 @@ namespace Celarix.JustForFun.FootballSimulator
 
         private static void AssignGameToBothTeams(IReadOnlyDictionary<BasicTeamInfo, List<GameMatchup>> games, GameMatchup game)
         {
-            if (games[game.AwayTeam].All(g => !g.SymmetricallyEquals(game))
-                || (game.GameType == 1 && games[game.AwayTeam].Count(g => g.SymmetricallyEquals(game)) == 1)
-                || (game.GameType == 2 && games[game.AwayTeam].Count(g => g.GameType == 2) < 4))
+            if (GameIsNotAlreadyPresent(games[game.AwayTeam], game))
             {
                 games[game.AwayTeam].Add(game);
             }
 
-            if (games[game.HomeTeam].All(g => !g.SymmetricallyEquals(game))
-                || (game.GameType == 1 && games[game.HomeTeam].Count(g => g.SymmetricallyEquals(game)) == 1)
-                || (game.GameType == 2 && games[game.HomeTeam].Count(g => g.GameType == 2) < 4))
+            if (GameIsNotAlreadyPresent(games[game.HomeTeam], game))
             {
                 games[game.HomeTeam].Add(game);
             }
         }
 
+        private static bool GameIsNotAlreadyPresent(IReadOnlyCollection<GameMatchup> teamGames, GameMatchup gameToAdd)
+        {
+            var noOtherGameIsSymmetricallyEqual = teamGames.All(g => !g.SymmetricallyEquals(gameToAdd));
+            var onlyOneTypeIMatchupBetweenTeams = gameToAdd.GameType == 1 && teamGames.Count(g => g.SymmetricallyEquals(gameToAdd)) == 1;
+            var roomForMoreTypeIIGames = gameToAdd.GameType == 2 && teamGames.Count(g => g.GameType == 2) < 4;
+            var onlyOneTypeIIMatchupBetweenTeams = gameToAdd.GameType == 2 && teamGames.Count(g => g.SymmetricallyEquals(gameToAdd)) == 1;
+
+            return noOtherGameIsSymmetricallyEqual || onlyOneTypeIMatchupBetweenTeams || (roomForMoreTypeIIGames && onlyOneTypeIIMatchupBetweenTeams);
+        }
+        
         private static List<DateTimeOffset> GetRegularSeasonWeekStartDatesForYear(int calendarYear)
         {
             // Week 1 starts on the second Thursday of September
@@ -696,11 +749,13 @@ namespace Celarix.JustForFun.FootballSimulator
             games[selectedGame.HomeTeam].RemoveAll(g => g.Equals(selectedGame));
         }
 
-        private static GameMatchup FindGameForTimeslot(Dictionary<BasicTeamInfo, List<GameMatchup>> games, Random random)
+        private static GameMatchup FindGameForTimeslot(Dictionary<BasicTeamInfo, List<GameMatchup>> games, List<BasicTeamInfo> teamsAlreadyPlaying, Random random)
         {
             GameMatchup? selectedGame = null;
 
-            while (selectedGame == null)
+            while (selectedGame == null
+                   || teamsAlreadyPlaying.Any(t => selectedGame.AwayTeam.Equals(t))
+                   || teamsAlreadyPlaying .Any(t => selectedGame.HomeTeam.Equals(t)))
             {
                 var randomTeam = games.ElementAt(random.Next(0, games.Count));
                 var lastSelectedGameIndex = random.Next(0, randomTeam.Value.Count);
