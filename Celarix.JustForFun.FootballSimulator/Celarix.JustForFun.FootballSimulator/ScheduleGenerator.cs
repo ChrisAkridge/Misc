@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -166,6 +167,7 @@ namespace Celarix.JustForFun.FootballSimulator
             public BasicTeamInfo HomeTeam { get; init; }
             public int GameType { get; init; }
             public BasicTeamInfo AddedBy { get; init; }
+            public bool SelectedForSchedule { get; set; }
 
             /// <summary>Indicates whether this instance and a specified object are equal.</summary>
             /// <param name="obj">The object to compare with the current instance.</param>
@@ -201,6 +203,56 @@ namespace Celarix.JustForFun.FootballSimulator
             public int GetHashCode(GameMatchup obj) => HashCode.Combine(obj.AwayTeam, obj.HomeTeam);
         }
 
+        private sealed class CyclingGameEnumerator : IEnumerator<GameMatchup>
+        {
+            private List<GameMatchup> games;
+            private int currentGameIndex = -1;
+
+            public CyclingGameEnumerator(IEnumerable<GameMatchup> games)
+            {
+                this.games = games.ToList();
+            }
+
+            /// <summary>Gets the element in the collection at the current position of the enumerator.</summary>
+            /// <returns>The element in the collection at the current position of the enumerator.</returns>
+            public GameMatchup Current => games[currentGameIndex];
+
+            /// <summary>Gets the element in the collection at the current position of the enumerator.</summary>
+            /// <returns>The element in the collection at the current position of the enumerator.</returns>
+            object IEnumerator.Current => Current;
+
+            /// <summary>Advances the enumerator to the next element of the collection.</summary>
+            /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+            /// <returns>
+            /// <see langword="true" /> if the enumerator was successfully advanced to the next element; <see langword="false" /> if the enumerator has passed the end of the collection.</returns>
+            public bool MoveNext()
+            {
+                while (Current.SelectedForSchedule)
+                {
+                    currentGameIndex += 1;
+
+                    if (currentGameIndex >= games.Count)
+                    {
+                        if (games.All(g => g.SelectedForSchedule))
+                        {
+                            return false;
+                        }
+
+                        currentGameIndex = 0;
+                    }
+                }
+
+                return true;
+            }
+
+            /// <summary>Sets the enumerator to its initial position, which is before the first element in the collection.</summary>
+            /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+            public void Reset() { throw new NotImplementedException(); }
+
+            /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+            public void Dispose() { }
+        }
+
         public static List<GameRecord> GetPreseasonAndRegularSeasonGamesForSeason(int seasonYear,
             List<Team> teams,
             Dictionary<string, int>? previousSeasonTeamPositions)
@@ -215,7 +267,7 @@ namespace Celarix.JustForFun.FootballSimulator
                 .ToList();
             var regularSeasonMatchups =
                 GetAllRegularSeasonMatchupsForSeasonYear(basicTeamInfos, seasonYear, previousSeasonTeamPositions);
-            var regularSeasonWeeks = GetRegularSeasonTimeslotsForGames(seasonYear, regularSeasonMatchups);
+            var regularSeasonWeeks = GetRegularSeasonTimeslotsForGames(seasonYear, regularSeasonMatchups, basicTeamInfos);
             var preseasonWeeks = GetAllPreseasonMatchupsForSeasonYear(basicTeamInfos, GetAllMatchupsForSeason(regularSeasonMatchups),
                 GetNthWeekdayOfMonth(seasonYear, 9, DayOfWeek.Thursday, 2));
 
@@ -226,6 +278,21 @@ namespace Celarix.JustForFun.FootballSimulator
                 .ToList();
         }
 
+        private static IEnumerable<GameRecord> ConvertWeekToGameRecords(IEnumerable<(DateTimeOffset gameTime, GameMatchup game)> week,
+            IReadOnlyCollection<Team> teams,
+            int weekNumber,
+            bool isRegularSeasonWeek) =>
+            week.Select(timeAndGame => new GameRecord
+            {
+                GameType = isRegularSeasonWeek ? GameType.RegularSeason : GameType.Preseason,
+                WeekNumber = weekNumber,
+                HomeTeam = teams.First(t => t.TeamName == timeAndGame.game.HomeTeam.Name),
+                AwayTeam = teams.First(t => t.TeamName == timeAndGame.game.AwayTeam.Name),
+                Stadium = teams.First(t => t.TeamName == timeAndGame.game.HomeTeam.Name).HomeStadium,
+                KickoffTime = timeAndGame.gameTime
+            });
+
+        #region Matchup Generation
         private static Dictionary<(Conference conference, Division division), DivisionMatchupsForSeason[]> GetDivisionMatchupCycle()
         {
             const Division N = Division.North;
@@ -546,27 +613,47 @@ namespace Celarix.JustForFun.FootballSimulator
                     AddedBy = team
                 });
             }
-
-            // WYLO: just 1 game away. Something funky with Type 2 game assignments; check the Dolphins.
+            
             return regularSeasonMatchups;
         }
-        
-        private static IEnumerable<List<(DateTimeOffset gameTime, GameMatchup game)>> GetRegularSeasonTimeslotsForGames(int seasonYear,
-            Dictionary<BasicTeamInfo, List<GameMatchup>> regularSeasonMatchups)
+
+        private static void AssignGameToBothTeams(IReadOnlyDictionary<BasicTeamInfo, List<GameMatchup>> games,
+            GameMatchup game)
         {
-            var regularSeasonWeeks = new List<(DateTimeOffset gameTime, GameMatchup game)>[17];
+            if (GameIsNotAlreadyPresent(games[game.AwayTeam], game)) { games[game.AwayTeam].Add(game); }
+
+            if (GameIsNotAlreadyPresent(games[game.HomeTeam], game)) { games[game.HomeTeam].Add(game); }
+        }
+
+        private static bool GameIsNotAlreadyPresent(IReadOnlyCollection<GameMatchup> teamGames, GameMatchup gameToAdd)
+        {
+            var noOtherGameIsSymmetricallyEqual = teamGames.All(g => !g.SymmetricallyEquals(gameToAdd));
+
+            var onlyOneTypeIMatchupBetweenTeams =
+                gameToAdd.GameType == 1 && teamGames.Count(g => g.SymmetricallyEquals(gameToAdd)) == 1;
+            var roomForMoreTypeIIGames = gameToAdd.GameType == 2 && teamGames.Count(g => g.GameType == 2) < 4;
+
+            var onlyOneTypeIIMatchupBetweenTeams =
+                gameToAdd.GameType == 2 && teamGames.Count(g => g.SymmetricallyEquals(gameToAdd)) == 1;
+
+            return noOtherGameIsSymmetricallyEqual
+                || onlyOneTypeIMatchupBetweenTeams
+                || (roomForMoreTypeIIGames && onlyOneTypeIIMatchupBetweenTeams);
+        }
+        #endregion
+
+        #region Scheduling Games
+        private static IEnumerable<List<(DateTimeOffset gameTime, GameMatchup game)>> GetRegularSeasonTimeslotsForGames(int seasonYear,
+            Dictionary<BasicTeamInfo, List<GameMatchup>> regularSeasonMatchups,
+            IEnumerable<BasicTeamInfo> teams)
+        {
             var regularSeasonWeekStartDates = GetRegularSeasonWeekStartDatesForYear(seasonYear);
-            var teamsPlayingThisWeek = new List<BasicTeamInfo>();
-            var random = new Random();
+            var gamesByWeek = SeparateGamesIntoWeeks(DeduplicateMatchups(regularSeasonMatchups), teams);
+            var regularSeasonWeeks = new List<(DateTimeOffset gameTime, GameMatchup game)>[17];
 
-            for (int i = 0; i < 17; i++)
+            for (var weekNumber = 0; weekNumber < gamesByWeek.Length; weekNumber++)
             {
-                regularSeasonWeeks[i] = new List<(DateTimeOffset gameTime, GameMatchup game)>();
-            }
-
-            for (var weekNumber = 0; weekNumber < regularSeasonWeeks.Length; weekNumber++)
-            {
-                var week = regularSeasonWeeks[weekNumber];
+                var gamesInWeekStack = new Stack<GameMatchup>(gamesByWeek[weekNumber]);
                 var weekStartDate = regularSeasonWeekStartDates[weekNumber];
 
                 // Fill in the primetime games.
@@ -580,48 +667,162 @@ namespace Celarix.JustForFun.FootballSimulator
 
                 foreach (var primetimeGameTime in primetimeGameTimes)
                 {
-                    AddGameToWeek(week, primetimeGameTime, regularSeasonMatchups, random, teamsPlayingThisWeek);
+                    regularSeasonWeeks[weekNumber].Add((primetimeGameTime, gamesInWeekStack.Pop()));
                 }
 
                 // Fill in the 2 4:30pm games.
                 var sundayAtFourThirtyPM = weekStartDate.AddDays(3).Add(new TimeSpan(16, 30, 0));
-                AddGameToWeek(week, sundayAtFourThirtyPM, regularSeasonMatchups, random, teamsPlayingThisWeek);
-                AddGameToWeek(week, sundayAtFourThirtyPM, regularSeasonMatchups, random, teamsPlayingThisWeek);
-
-                var byeCount = (weekNumber + 1) is <= 4 or >= 14
-                    ? 0
-                    : (weekNumber + 1) < 12
-                        ? 2
-                        : 3;
-                var onePMGameCount = 15 - byeCount;
+                regularSeasonWeeks[weekNumber].Add((sundayAtFourThirtyPM, gamesInWeekStack.Pop()));
+                regularSeasonWeeks[weekNumber].Add((sundayAtFourThirtyPM, gamesInWeekStack.Pop()));
+                
+                // Fill in the rest of the 1:00pm games.
                 var sundayAtOnePM = weekStartDate.AddDays(3).Add(new TimeSpan(13, 0, 0));
 
-                for (int j = 0; j < onePMGameCount; j++)
+                while (gamesInWeekStack.Any())
                 {
-                    // WYLO: turns out choosing teams at random until we find one that hasn't played
-                    // this week doesn't work. Say we're down to the Broncos and Bears and all other
-                    // 38 teams have been picked. If the Broncos never face the Bears, infinite loop.
-                    AddGameToWeek(week, sundayAtOnePM, regularSeasonMatchups, random, teamsPlayingThisWeek);
+                    regularSeasonWeeks[weekNumber].Add((sundayAtOnePM, gamesInWeekStack.Pop()));
                 }
-
-                teamsPlayingThisWeek.Clear();
             }
 
             return regularSeasonWeeks;
         }
 
-        private static void AddGameToWeek(List<(DateTimeOffset gameTime, GameMatchup game)> week,
-            DateTimeOffset gameTime,
-            Dictionary<BasicTeamInfo, List<GameMatchup>> regularSeasonMatchups,
-            Random random,
-            List<BasicTeamInfo> teamsPlayingThisWeek)
+        private static List<GameMatchup> DeduplicateMatchups(Dictionary<BasicTeamInfo, List<GameMatchup>> regularSeasonMatchups)
         {
-            var game = FindGameForTimeslot(regularSeasonMatchups, teamsPlayingThisWeek, random);
-            teamsPlayingThisWeek.Add(game.AwayTeam);
-            teamsPlayingThisWeek.Add(game.HomeTeam);
-            week.Add((gameTime, game));
+            // could it be this simple?
+            var hashSet = new HashSet<GameMatchup>();
+            var debugSeenGames = 0;
+            
+            foreach (var teamGameMatchup in regularSeasonMatchups.SelectMany(kvp => kvp.Value))
+            {
+                debugSeenGames += 1;
+                var debugGameAdded = hashSet.Add(teamGameMatchup);
+                Console.WriteLine(debugGameAdded
+                    ? $"#{debugSeenGames}: Game {teamGameMatchup} added to list."
+                    : $"#{debugSeenGames}: Duplicate. Game {teamGameMatchup} was not added.");
+            }
+
+            // WYLO: ugh. 4 games are being counted as duplicates. Add a dedupe game number property to GameMatchup,
+            // which gets assigned an incrementing number IFF the game was actually added. There should be 1 successful
+            // add and 1 failed add for every game. That will highlight the asymmetry.
+            if (hashSet.Count * 2 != regularSeasonMatchups.Sum(kvp => kvp.Value.Count))
+            {
+                throw new ArgumentException("Failed symmetry check.");
+            }
+
+            return hashSet.ToList();
         }
 
+        private static List<GameMatchup>[] SeparateGamesIntoWeeks(IEnumerable<GameMatchup> deduplicatedGames,
+            IEnumerable<BasicTeamInfo> teams)
+        {
+            var alphabeticalTeamNames = teams
+                .Select(t => t.Name)
+                .OrderBy(n => n)
+                .ToArray();
+            var teamHasSelectedGameThisWeek = new bool[alphabeticalTeamNames.Length];
+            var weeks = new List<GameMatchup>[17];
+            var currentWeekNumber = 0;
+            var gameEnumerator = new CyclingGameEnumerator(deduplicatedGames);
+
+            for (int i = 0; i < 17; i++)
+            {
+                weeks[i] = new List<GameMatchup>(20);
+            }
+
+            while (gameEnumerator.MoveNext())
+            {
+                var game = gameEnumerator.Current;
+                var awayTeamIndex = Array.IndexOf(alphabeticalTeamNames, game.AwayTeam.Name);
+                var homeTeamIndex = Array.IndexOf(alphabeticalTeamNames, game.HomeTeam.Name);
+                var bothTeamsCanPlay = !teamHasSelectedGameThisWeek[awayTeamIndex]
+                    && !teamHasSelectedGameThisWeek[homeTeamIndex];
+
+                if (bothTeamsCanPlay)
+                {
+                    teamHasSelectedGameThisWeek[awayTeamIndex] = true;
+                    teamHasSelectedGameThisWeek[homeTeamIndex] = true;
+                    game.SelectedForSchedule = true;
+                    weeks[currentWeekNumber].Add(game);
+
+                    if (teamHasSelectedGameThisWeek.All(t => t))
+                    {
+                        currentWeekNumber += 1;
+                        Array.Fill(teamHasSelectedGameThisWeek, false);
+                    }
+                }
+            }
+
+            return weeks;
+        }
+
+        private static void MoveGamesForByes(IReadOnlyList<List<GameMatchup?>> weeks)
+        {
+            var random = new Random();
+
+            for (int weekIndex = 4; weekIndex <= 12; weekIndex++)
+            {
+                var byesThisWeek = weekIndex < 11
+                    ? 2
+                    : 3;
+
+                for (int i = 0; i < byesThisWeek; i++)
+                {
+                    var gameIndexToMove = random.Next(0, weeks[weekIndex].Count);
+                    var gameToMove = weeks[weekIndex][gameIndexToMove];
+                    weeks[weekIndex].RemoveAt(gameIndexToMove);
+                    weeks[16].Add(gameToMove);
+                }
+            }
+        }
+
+        private static List<DateTimeOffset> GetRegularSeasonWeekStartDatesForYear(int calendarYear)
+        {
+            // Week 1 starts on the second Thursday of September
+            var weekStartDate = GetNthWeekdayOfMonth(calendarYear, 9, DayOfWeek.Thursday, 2);
+
+            var weekStartDates = new List<DateTimeOffset>
+            {
+                weekStartDate
+            };
+
+            for (int i = 2; i <= 17; i++)
+            {
+                weekStartDate = weekStartDate.AddDays(7d);
+                weekStartDates.Add(weekStartDate);
+            }
+
+            return weekStartDates;
+        }
+
+        private static DateTimeOffset GetNthWeekdayOfMonth(int year, int month, DayOfWeek dayOfWeek, int occurence)
+        {
+            var date = new DateTimeOffset(year, month, 1, 0, 0, 0, TimeSpan.Zero);
+            var seenOccurences = 0;
+
+            while (seenOccurences < occurence && date.Day < DateTime.DaysInMonth(year, month))
+            {
+                if (date.DayOfWeek == dayOfWeek)
+                {
+                    seenOccurences += 1;
+
+                    if (seenOccurences == occurence) { break; }
+                }
+
+                date = date.AddDays(1d);
+            }
+
+            if (seenOccurences != occurence)
+            {
+                throw new ArgumentOutOfRangeException(nameof(occurence),
+                    $"Asked for occurence #{occurence} of {dayOfWeek} in {CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(month)} {year}");
+            }
+
+            return date;
+        }
+        #endregion
+
+        #region Preseason Generation
         private static IEnumerable<List<(DateTimeOffset gameTime, GameMatchup game)>> GetAllPreseasonMatchupsForSeasonYear(IReadOnlyCollection<BasicTeamInfo> basicTeamInfos,
             IReadOnlyCollection<GameMatchup?> regularSeasonMatchups,
             DateTimeOffset regularSeasonWeek1StartDate)
@@ -666,47 +867,6 @@ namespace Celarix.JustForFun.FootballSimulator
             return preseasonWeeks;
         }
 
-        private static void AssignGameToBothTeams(IReadOnlyDictionary<BasicTeamInfo, List<GameMatchup>> games, GameMatchup game)
-        {
-            if (GameIsNotAlreadyPresent(games[game.AwayTeam], game))
-            {
-                games[game.AwayTeam].Add(game);
-            }
-
-            if (GameIsNotAlreadyPresent(games[game.HomeTeam], game))
-            {
-                games[game.HomeTeam].Add(game);
-            }
-        }
-
-        private static bool GameIsNotAlreadyPresent(IReadOnlyCollection<GameMatchup> teamGames, GameMatchup gameToAdd)
-        {
-            var noOtherGameIsSymmetricallyEqual = teamGames.All(g => !g.SymmetricallyEquals(gameToAdd));
-            var onlyOneTypeIMatchupBetweenTeams = gameToAdd.GameType == 1 && teamGames.Count(g => g.SymmetricallyEquals(gameToAdd)) == 1;
-            var roomForMoreTypeIIGames = gameToAdd.GameType == 2 && teamGames.Count(g => g.GameType == 2) < 4;
-            var onlyOneTypeIIMatchupBetweenTeams = gameToAdd.GameType == 2 && teamGames.Count(g => g.SymmetricallyEquals(gameToAdd)) == 1;
-
-            return noOtherGameIsSymmetricallyEqual || onlyOneTypeIMatchupBetweenTeams || (roomForMoreTypeIIGames && onlyOneTypeIIMatchupBetweenTeams);
-        }
-        
-        private static List<DateTimeOffset> GetRegularSeasonWeekStartDatesForYear(int calendarYear)
-        {
-            // Week 1 starts on the second Thursday of September
-            var weekStartDate = GetNthWeekdayOfMonth(calendarYear, 9, DayOfWeek.Thursday, 2);
-            var weekStartDates = new List<DateTimeOffset>
-            {
-                weekStartDate
-            };
-
-            for (int i = 2; i <= 17; i++)
-            {
-                weekStartDate = weekStartDate.AddDays(7d);
-                weekStartDates.Add(weekStartDate);
-            }
-
-            return weekStartDates;
-        }
-
         private static List<DateTimeOffset> GetPreseasonWeekStartDatesForYear(DateTimeOffset regularSeasonWeek1StartDate) =>
             new List<DateTimeOffset>
             {
@@ -715,32 +875,7 @@ namespace Celarix.JustForFun.FootballSimulator
                 regularSeasonWeek1StartDate.AddDays(-14d),
                 regularSeasonWeek1StartDate.AddDays(-7d)
             };
-
-        private static DateTimeOffset GetNthWeekdayOfMonth(int year, int month, DayOfWeek dayOfWeek, int occurence)
-        {
-            var date = new DateTimeOffset(year, month, 1, 0, 0, 0, TimeSpan.Zero);
-            var seenOccurences = 0;
-
-            while (seenOccurences < occurence && date.Day < DateTime.DaysInMonth(year, month))
-            {
-                if (date.DayOfWeek == dayOfWeek)
-                {
-                    seenOccurences += 1;
-
-                    if (seenOccurences == occurence) { break; }
-                }
-
-                date = date.AddDays(1d);
-            }
-
-            if (seenOccurences != occurence)
-            {
-                throw new ArgumentOutOfRangeException(nameof(occurence),
-                    $"Asked for occurence #{occurence} of {dayOfWeek} in {CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(month)} {year}");
-            }
-
-            return date;
-        }
+        #endregion
 
         private static void RemoveGameFromBothTeams(Dictionary<BasicTeamInfo, List<GameMatchup>> games,
             GameMatchup selectedGame)
@@ -749,13 +884,11 @@ namespace Celarix.JustForFun.FootballSimulator
             games[selectedGame.HomeTeam].RemoveAll(g => g.Equals(selectedGame));
         }
 
-        private static GameMatchup FindGameForTimeslot(Dictionary<BasicTeamInfo, List<GameMatchup>> games, List<BasicTeamInfo> teamsAlreadyPlaying, Random random)
+        private static GameMatchup FindGameForTimeslot(Dictionary<BasicTeamInfo, List<GameMatchup>> games, Random random)
         {
             GameMatchup? selectedGame = null;
 
-            while (selectedGame == null
-                   || teamsAlreadyPlaying.Any(t => selectedGame.AwayTeam.Equals(t))
-                   || teamsAlreadyPlaying .Any(t => selectedGame.HomeTeam.Equals(t)))
+            while (selectedGame == null)
             {
                 var randomTeam = games.ElementAt(random.Next(0, games.Count));
                 var lastSelectedGameIndex = random.Next(0, randomTeam.Value.Count);
@@ -775,19 +908,5 @@ namespace Celarix.JustForFun.FootballSimulator
                 .Distinct(comparer)
                 .ToList();
         }
-
-        private static IEnumerable<GameRecord> ConvertWeekToGameRecords(IEnumerable<(DateTimeOffset gameTime, GameMatchup game)> week,
-            IReadOnlyCollection<Team> teams,
-            int weekNumber,
-            bool isRegularSeasonWeek) =>
-            week.Select(timeAndGame => new GameRecord
-            {
-                GameType = isRegularSeasonWeek ? GameType.RegularSeason : GameType.Preseason,
-                WeekNumber = weekNumber,
-                HomeTeam = teams.First(t => t.TeamName == timeAndGame.game.HomeTeam.Name),
-                AwayTeam = teams.First(t => t.TeamName == timeAndGame.game.AwayTeam.Name),
-                Stadium = teams.First(t => t.TeamName == timeAndGame.game.HomeTeam.Name).HomeStadium,
-                KickoffTime = timeAndGame.gameTime
-            });
     }
 }

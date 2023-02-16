@@ -98,13 +98,8 @@ namespace Celarix.IO.FileAnalysis.Analysis
 
                 if (ByteArrayStartsWith(buffer, jpeg))
                 {
-                    // Offset 0 (Two Bytes): JPEG SOI marker (FFD8 hex)
-                    // Offest 1 (Two Bytes): Application segment (FF?? normally ??=E0)
-                    // Trailer (Last Two Bytes): EOI marker FFD9 hex
-                    if (ByteArrayStartsWith(bufferEnd, jpegEnd))
-                    {
-                        return true;
-                    }
+                    // Misidentifying a JPEG doesn't really hurt us that much.
+                    return true;
                 }
             }
             catch (Exception ex)
