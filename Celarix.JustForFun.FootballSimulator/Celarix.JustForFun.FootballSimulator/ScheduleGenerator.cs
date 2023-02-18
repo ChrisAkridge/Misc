@@ -168,6 +168,8 @@ namespace Celarix.JustForFun.FootballSimulator
             public int GameType { get; init; }
             public BasicTeamInfo AddedBy { get; init; }
             public bool SelectedForSchedule { get; set; }
+            public int AddedToDeduplicationHashSet { get; set; }
+            public int SkippedForDeduplicationHashSet { get; set; }
 
             /// <summary>Indicates whether this instance and a specified object are equal.</summary>
             /// <param name="obj">The object to compare with the current instance.</param>
@@ -183,7 +185,7 @@ namespace Celarix.JustForFun.FootballSimulator
 
             /// <summary>Returns the hash code for this instance.</summary>
             /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
-            public override int GetHashCode() => 17 ^ AwayTeam.GetHashCode() ^ HomeTeam.GetHashCode();
+            public override int GetHashCode() => HashCode.Combine(AwayTeam, HomeTeam, GameType);
 
             /// <summary>Returns a string that represents the current object.</summary>
             /// <returns>A string that represents the current object.</returns>
@@ -689,28 +691,46 @@ namespace Celarix.JustForFun.FootballSimulator
 
         private static List<GameMatchup> DeduplicateMatchups(Dictionary<BasicTeamInfo, List<GameMatchup>> regularSeasonMatchups)
         {
-            // could it be this simple?
             var hashSet = new HashSet<GameMatchup>();
             var debugSeenGames = 0;
             
             foreach (var teamGameMatchup in regularSeasonMatchups.SelectMany(kvp => kvp.Value))
             {
                 debugSeenGames += 1;
-                var debugGameAdded = hashSet.Add(teamGameMatchup);
-                Console.WriteLine(debugGameAdded
+                var gameAdded = hashSet.Add(teamGameMatchup);
+
+                if (gameAdded)
+                {
+                    teamGameMatchup.AddedToDeduplicationHashSet += 1;
+                }
+                else
+                {
+                    teamGameMatchup.SkippedForDeduplicationHashSet += 1;
+                }
+                
+                Console.WriteLine(gameAdded
                     ? $"#{debugSeenGames}: Game {teamGameMatchup} added to list."
                     : $"#{debugSeenGames}: Duplicate. Game {teamGameMatchup} was not added.");
             }
 
-            // WYLO: ugh. 4 games are being counted as duplicates. Add a dedupe game number property to GameMatchup,
-            // which gets assigned an incrementing number IFF the game was actually added. There should be 1 successful
-            // add and 1 failed add for every game. That will highlight the asymmetry.
-            if (hashSet.Count * 2 != regularSeasonMatchups.Sum(kvp => kvp.Value.Count))
+            var deduplicatedGames = hashSet.ToList();
+            var duplicatedGameCount = regularSeasonMatchups.Sum(kvp => kvp.Value.Count);
+
+            if (deduplicatedGames.Count * 2 != duplicatedGameCount)
             {
-                throw new ArgumentException("Failed symmetry check.");
+                // forgive me.
+                deduplicatedGames.AddRange(regularSeasonMatchups.SelectMany(kvp => kvp.Value)
+                    .Where(g => g.AddedToDeduplicationHashSet == 0 && g.SkippedForDeduplicationHashSet == 2));
+
+                if (deduplicatedGames.Count * 2 != duplicatedGameCount)
+                {
+                    throw new ArgumentException("Failed symmetry check.");
+                }
             }
 
-            return hashSet.ToList();
+            // WYLO: i think i got it. Add a random GUID that we generate once per each pair of games.
+            // Adding a game still needs all the logic, but a game is symmetrically equal if the GUIDs are.
+            return deduplicatedGames;
         }
 
         private static List<GameMatchup>[] SeparateGamesIntoWeeks(IEnumerable<GameMatchup> deduplicatedGames,
