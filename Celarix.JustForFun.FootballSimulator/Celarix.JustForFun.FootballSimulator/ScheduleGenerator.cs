@@ -168,8 +168,7 @@ namespace Celarix.JustForFun.FootballSimulator
             public int GameType { get; init; }
             public BasicTeamInfo AddedBy { get; init; }
             public bool SelectedForSchedule { get; set; }
-            public int AddedToDeduplicationHashSet { get; set; }
-            public int SkippedForDeduplicationHashSet { get; set; }
+            public Guid GamePairId { get; set; }
 
             /// <summary>Indicates whether this instance and a specified object are equal.</summary>
             /// <param name="obj">The object to compare with the current instance.</param>
@@ -205,9 +204,21 @@ namespace Celarix.JustForFun.FootballSimulator
             public int GetHashCode(GameMatchup obj) => HashCode.Combine(obj.AwayTeam, obj.HomeTeam);
         }
 
+        private sealed class GameMatchupPairComparer : IEqualityComparer<GameMatchup>
+        {
+            public bool Equals(GameMatchup? x, GameMatchup? y) =>
+                ReferenceEquals(x, y)
+                || (!ReferenceEquals(x, null)
+                    && !ReferenceEquals(y, null)
+                    && x.GetType() == y.GetType()
+                    && x.GamePairId.Equals(y.GamePairId));
+
+            public int GetHashCode(GameMatchup obj) => obj.GamePairId.GetHashCode();
+        }
+
         private sealed class CyclingGameEnumerator : IEnumerator<GameMatchup>
         {
-            private List<GameMatchup> games;
+            private readonly List<GameMatchup> games;
             private int currentGameIndex = -1;
 
             public CyclingGameEnumerator(IEnumerable<GameMatchup> games)
@@ -229,22 +240,29 @@ namespace Celarix.JustForFun.FootballSimulator
             /// <see langword="true" /> if the enumerator was successfully advanced to the next element; <see langword="false" /> if the enumerator has passed the end of the collection.</returns>
             public bool MoveNext()
             {
+                AdvanceIndexAndCheckForLoop();
+
                 while (Current.SelectedForSchedule)
                 {
-                    currentGameIndex += 1;
-
-                    if (currentGameIndex >= games.Count)
-                    {
-                        if (games.All(g => g.SelectedForSchedule))
-                        {
-                            return false;
-                        }
-
-                        currentGameIndex = 0;
-                    }
+                    var loopOccurred = AdvanceIndexAndCheckForLoop();
+                    if (loopOccurred && games.All(g => g.SelectedForSchedule)) { return false; }
                 }
 
                 return true;
+
+                bool AdvanceIndexAndCheckForLoop()
+                {
+                    if (currentGameIndex < games.Count - 1)
+                    {
+                        currentGameIndex += 1;
+
+                        return false;
+                    }
+
+                    currentGameIndex = 0;
+
+                    return true;
+                }
             }
 
             /// <summary>Sets the enumerator to its initial position, which is before the first element in the collection.</summary>
@@ -431,7 +449,8 @@ namespace Celarix.JustForFun.FootballSimulator
                         AwayTeam = otherDivisionTeam,
                         HomeTeam = team,
                         GameType = 1,
-                        AddedBy = team
+                        AddedBy = team,
+                        GamePairId = Guid.NewGuid()
                     });
 
                     AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
@@ -439,7 +458,8 @@ namespace Celarix.JustForFun.FootballSimulator
                         AwayTeam = team,
                         HomeTeam = otherDivisionTeam,
                         GameType = 1,
-                        AddedBy = team
+                        AddedBy = team,
+                        GamePairId = Guid.NewGuid()
                     });
                 }
 
@@ -517,7 +537,8 @@ namespace Celarix.JustForFun.FootballSimulator
                             AwayTeam = orderedTypeIIOpponentTeams![i],
                             HomeTeam = team,
                             GameType = 2,
-                            AddedBy = team
+                            AddedBy = team,
+                            GamePairId = Guid.NewGuid()
                         });
                     }
                     else
@@ -527,7 +548,8 @@ namespace Celarix.JustForFun.FootballSimulator
                             AwayTeam = team,
                             HomeTeam = orderedTypeIIOpponentTeams![i],
                             GameType = 2,
-                            AddedBy = team
+                            AddedBy = team,
+                            GamePairId = Guid.NewGuid()
                         };
 
                         if (!regularSeasonMatchups[team].Any(g => g.SymmetricallyEquals(secondHalfGame)))
@@ -558,7 +580,8 @@ namespace Celarix.JustForFun.FootballSimulator
                         AwayTeam = i < 2 ? typeIIIOpponentTeams[i] : team,
                         HomeTeam = i < 2 ? team : typeIIIOpponentTeams[i],
                         GameType = 3,
-                        AddedBy = team
+                        AddedBy = team,
+                        GamePairId = Guid.NewGuid()
                     });
                 }
 
@@ -604,7 +627,8 @@ namespace Celarix.JustForFun.FootballSimulator
                     AwayTeam = typeIVOpponentTeams[0],
                     HomeTeam = team,
                     GameType = 4,
-                    AddedBy = team
+                    AddedBy = team,
+                    GamePairId = Guid.NewGuid()
                 });
 
                 AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
@@ -612,7 +636,8 @@ namespace Celarix.JustForFun.FootballSimulator
                     AwayTeam = team,
                     HomeTeam = typeIVOpponentTeams[1],
                     GameType = 4,
-                    AddedBy = team
+                    AddedBy = team,
+                    GamePairId = Guid.NewGuid()
                 });
             }
             
@@ -691,45 +716,26 @@ namespace Celarix.JustForFun.FootballSimulator
 
         private static List<GameMatchup> DeduplicateMatchups(Dictionary<BasicTeamInfo, List<GameMatchup>> regularSeasonMatchups)
         {
-            var hashSet = new HashSet<GameMatchup>();
+            var hashSet = new HashSet<GameMatchup>(new GameMatchupPairComparer());
             var debugSeenGames = 0;
             
             foreach (var teamGameMatchup in regularSeasonMatchups.SelectMany(kvp => kvp.Value))
             {
                 debugSeenGames += 1;
                 var gameAdded = hashSet.Add(teamGameMatchup);
-
-                if (gameAdded)
-                {
-                    teamGameMatchup.AddedToDeduplicationHashSet += 1;
-                }
-                else
-                {
-                    teamGameMatchup.SkippedForDeduplicationHashSet += 1;
-                }
                 
                 Console.WriteLine(gameAdded
                     ? $"#{debugSeenGames}: Game {teamGameMatchup} added to list."
                     : $"#{debugSeenGames}: Duplicate. Game {teamGameMatchup} was not added.");
             }
 
-            var deduplicatedGames = hashSet.ToList();
-            var duplicatedGameCount = regularSeasonMatchups.Sum(kvp => kvp.Value.Count);
-
-            if (deduplicatedGames.Count * 2 != duplicatedGameCount)
+            if (hashSet.Count * 2 != regularSeasonMatchups.Sum(kvp => kvp.Value.Count))
             {
-                // forgive me.
-                deduplicatedGames.AddRange(regularSeasonMatchups.SelectMany(kvp => kvp.Value)
-                    .Where(g => g.AddedToDeduplicationHashSet == 0 && g.SkippedForDeduplicationHashSet == 2));
-
-                if (deduplicatedGames.Count * 2 != duplicatedGameCount)
-                {
-                    throw new ArgumentException("Failed symmetry check.");
-                }
+                throw new ArgumentException("Failed symmetry check.");
             }
-
-            // WYLO: i think i got it. Add a random GUID that we generate once per each pair of games.
-            // Adding a game still needs all the logic, but a game is symmetrically equal if the GUIDs are.
+            
+            var deduplicatedGames = hashSet.ToList();
+            deduplicatedGames.Shuffle(new Random());
             return deduplicatedGames;
         }
 

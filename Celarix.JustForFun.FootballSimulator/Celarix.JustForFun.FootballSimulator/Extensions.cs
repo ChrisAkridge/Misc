@@ -24,5 +24,17 @@ namespace Celarix.JustForFun.FootballSimulator
 
             return -1;
         }
+
+        // https://stackoverflow.com/a/69455054/2709212
+        public static IList<T> Shuffle<T>(this IList<T> items, Random random)
+        {
+            for (int i = 0; i < items.Count - 1; i++)
+            {
+                int pos = random.Next(i, items.Count);
+                (items[i], items[pos]) = (items[pos], items[i]);
+            }
+
+            return items;
+        }
     }
 }
