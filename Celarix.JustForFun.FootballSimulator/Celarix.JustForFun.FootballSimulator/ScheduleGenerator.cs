@@ -739,47 +739,15 @@ namespace Celarix.JustForFun.FootballSimulator
             return deduplicatedGames;
         }
 
-        private static List<GameMatchup>[] SeparateGamesIntoWeeks(IEnumerable<GameMatchup> deduplicatedGames,
+        private static GameMatchup[][] SeparateGamesIntoWeeks(IEnumerable<GameMatchup> deduplicatedGames,
             IEnumerable<BasicTeamInfo> teams)
         {
-            var alphabeticalTeamNames = teams
-                .Select(t => t.Name)
-                .OrderBy(n => n)
+            var gameList = deduplicatedGames.ToList();
+            gameList.Shuffle(new Random());
+
+            return gameList
+                .Chunk(16)
                 .ToArray();
-            var teamHasSelectedGameThisWeek = new bool[alphabeticalTeamNames.Length];
-            var weeks = new List<GameMatchup>[17];
-            var currentWeekNumber = 0;
-            var gameEnumerator = new CyclingGameEnumerator(deduplicatedGames);
-
-            for (int i = 0; i < 17; i++)
-            {
-                weeks[i] = new List<GameMatchup>(20);
-            }
-
-            while (gameEnumerator.MoveNext())
-            {
-                var game = gameEnumerator.Current;
-                var awayTeamIndex = Array.IndexOf(alphabeticalTeamNames, game.AwayTeam.Name);
-                var homeTeamIndex = Array.IndexOf(alphabeticalTeamNames, game.HomeTeam.Name);
-                var bothTeamsCanPlay = !teamHasSelectedGameThisWeek[awayTeamIndex]
-                    && !teamHasSelectedGameThisWeek[homeTeamIndex];
-
-                if (bothTeamsCanPlay)
-                {
-                    teamHasSelectedGameThisWeek[awayTeamIndex] = true;
-                    teamHasSelectedGameThisWeek[homeTeamIndex] = true;
-                    game.SelectedForSchedule = true;
-                    weeks[currentWeekNumber].Add(game);
-
-                    if (teamHasSelectedGameThisWeek.All(t => t))
-                    {
-                        currentWeekNumber += 1;
-                        Array.Fill(teamHasSelectedGameThisWeek, false);
-                    }
-                }
-            }
-
-            return weeks;
         }
 
         private static void MoveGamesForByes(IReadOnlyList<List<GameMatchup?>> weeks)
