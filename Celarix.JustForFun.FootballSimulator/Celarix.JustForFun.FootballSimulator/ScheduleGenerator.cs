@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -168,7 +167,7 @@ namespace Celarix.JustForFun.FootballSimulator
             public int GameType { get; init; }
             public BasicTeamInfo AddedBy { get; init; }
             public bool SelectedForSchedule { get; set; }
-            public Guid GamePairId { get; set; }
+            public Guid GamePairId { get; init; }
 
             /// <summary>Indicates whether this instance and a specified object are equal.</summary>
             /// <param name="obj">The object to compare with the current instance.</param>
@@ -216,63 +215,6 @@ namespace Celarix.JustForFun.FootballSimulator
             public int GetHashCode(GameMatchup obj) => obj.GamePairId.GetHashCode();
         }
 
-        private sealed class CyclingGameEnumerator : IEnumerator<GameMatchup>
-        {
-            private readonly List<GameMatchup> games;
-            private int currentGameIndex = -1;
-
-            public CyclingGameEnumerator(IEnumerable<GameMatchup> games)
-            {
-                this.games = games.ToList();
-            }
-
-            /// <summary>Gets the element in the collection at the current position of the enumerator.</summary>
-            /// <returns>The element in the collection at the current position of the enumerator.</returns>
-            public GameMatchup Current => games[currentGameIndex];
-
-            /// <summary>Gets the element in the collection at the current position of the enumerator.</summary>
-            /// <returns>The element in the collection at the current position of the enumerator.</returns>
-            object IEnumerator.Current => Current;
-
-            /// <summary>Advances the enumerator to the next element of the collection.</summary>
-            /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-            /// <returns>
-            /// <see langword="true" /> if the enumerator was successfully advanced to the next element; <see langword="false" /> if the enumerator has passed the end of the collection.</returns>
-            public bool MoveNext()
-            {
-                AdvanceIndexAndCheckForLoop();
-
-                while (Current.SelectedForSchedule)
-                {
-                    var loopOccurred = AdvanceIndexAndCheckForLoop();
-                    if (loopOccurred && games.All(g => g.SelectedForSchedule)) { return false; }
-                }
-
-                return true;
-
-                bool AdvanceIndexAndCheckForLoop()
-                {
-                    if (currentGameIndex < games.Count - 1)
-                    {
-                        currentGameIndex += 1;
-
-                        return false;
-                    }
-
-                    currentGameIndex = 0;
-
-                    return true;
-                }
-            }
-
-            /// <summary>Sets the enumerator to its initial position, which is before the first element in the collection.</summary>
-            /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-            public void Reset() { throw new NotImplementedException(); }
-
-            /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
-            public void Dispose() { }
-        }
-
         public static List<GameRecord> GetPreseasonAndRegularSeasonGamesForSeason(int seasonYear,
             List<Team> teams,
             Dictionary<string, int>? previousSeasonTeamPositions)
@@ -287,7 +229,7 @@ namespace Celarix.JustForFun.FootballSimulator
                 .ToList();
             var regularSeasonMatchups =
                 GetAllRegularSeasonMatchupsForSeasonYear(basicTeamInfos, seasonYear, previousSeasonTeamPositions);
-            var regularSeasonWeeks = GetRegularSeasonTimeslotsForGames(seasonYear, regularSeasonMatchups, basicTeamInfos);
+            var regularSeasonWeeks = GetRegularSeasonTimeslotsForGames(seasonYear, regularSeasonMatchups);
             var preseasonWeeks = GetAllPreseasonMatchupsForSeasonYear(basicTeamInfos, GetAllMatchupsForSeason(regularSeasonMatchups),
                 GetNthWeekdayOfMonth(seasonYear, 9, DayOfWeek.Thursday, 2));
 
@@ -671,15 +613,16 @@ namespace Celarix.JustForFun.FootballSimulator
 
         #region Scheduling Games
         private static IEnumerable<List<(DateTimeOffset gameTime, GameMatchup game)>> GetRegularSeasonTimeslotsForGames(int seasonYear,
-            Dictionary<BasicTeamInfo, List<GameMatchup>> regularSeasonMatchups,
-            IEnumerable<BasicTeamInfo> teams)
+            Dictionary<BasicTeamInfo, List<GameMatchup>> regularSeasonMatchups)
         {
             var regularSeasonWeekStartDates = GetRegularSeasonWeekStartDatesForYear(seasonYear);
-            var gamesByWeek = SeparateGamesIntoWeeks(DeduplicateMatchups(regularSeasonMatchups), teams);
+            var gamesByWeek = MoveGamesForByes(SeparateGamesIntoWeeks(DeduplicateMatchups(regularSeasonMatchups)));
             var regularSeasonWeeks = new List<(DateTimeOffset gameTime, GameMatchup game)>[17];
 
             for (var weekNumber = 0; weekNumber < gamesByWeek.Length; weekNumber++)
             {
+                regularSeasonWeeks[weekNumber] = new List<(DateTimeOffset gameTime, GameMatchup game)>();
+                
                 var gamesInWeekStack = new Stack<GameMatchup>(gamesByWeek[weekNumber]);
                 var weekStartDate = regularSeasonWeekStartDates[weekNumber];
 
@@ -710,7 +653,6 @@ namespace Celarix.JustForFun.FootballSimulator
                     regularSeasonWeeks[weekNumber].Add((sundayAtOnePM, gamesInWeekStack.Pop()));
                 }
             }
-
             return regularSeasonWeeks;
         }
 
@@ -739,21 +681,25 @@ namespace Celarix.JustForFun.FootballSimulator
             return deduplicatedGames;
         }
 
-        private static GameMatchup[][] SeparateGamesIntoWeeks(IEnumerable<GameMatchup> deduplicatedGames,
-            IEnumerable<BasicTeamInfo> teams)
+        private static List<GameMatchup>[] SeparateGamesIntoWeeks(IEnumerable<GameMatchup> deduplicatedGames)
         {
             var gameList = deduplicatedGames.ToList();
             gameList.Shuffle(new Random());
 
             return gameList
-                .Chunk(16)
+                .Chunk(20)
+                .Select(w => w.ToList())
                 .ToArray();
         }
 
-        private static void MoveGamesForByes(IReadOnlyList<List<GameMatchup?>> weeks)
+        private static List<GameMatchup>[] MoveGamesForByes(List<GameMatchup>[] weeks)
         {
             var random = new Random();
-
+            var weeksWithWeek17 = new List<GameMatchup>[17];
+            Array.Copy(weeks, weeksWithWeek17, 16);
+            weeks = weeksWithWeek17;
+            weeks[16] = new List<GameMatchup>();
+            
             for (int weekIndex = 4; weekIndex <= 12; weekIndex++)
             {
                 var byesThisWeek = weekIndex < 11
@@ -768,6 +714,8 @@ namespace Celarix.JustForFun.FootballSimulator
                     weeks[16].Add(gameToMove);
                 }
             }
+
+            return weeks;
         }
 
         private static List<DateTimeOffset> GetRegularSeasonWeekStartDatesForYear(int calendarYear)
@@ -826,6 +774,11 @@ namespace Celarix.JustForFun.FootballSimulator
             var teamInfoBuffer = new List<BasicTeamInfo>();
             var random = new Random();
 
+            for (var i = 0; i < preseasonWeeks.Length; i++)
+            {
+                preseasonWeeks[i] = new List<(DateTimeOffset gameTime, GameMatchup game)>();
+            }
+
             for (var weekNumber = 0; weekNumber < preseasonWeeks.Length; weekNumber++)
             {
                 var week = preseasonWeeks[weekNumber];
@@ -833,29 +786,33 @@ namespace Celarix.JustForFun.FootballSimulator
                 
                 teamInfoBuffer.AddRange(basicTeamInfos);
                 GameMatchup? matchup;
-                int firstTeamIndex;
-                int secondTeamIndex;
 
-                do
+                for (int gameNumber = 0; gameNumber < 20; gameNumber++)
                 {
-                    firstTeamIndex = random.Next(0, teamInfoBuffer.Count);
+                    int firstTeamIndex;
+                    int secondTeamIndex;
 
                     do
                     {
-                        secondTeamIndex = random.Next(0, teamInfoBuffer.Count);
-                    } while (secondTeamIndex == firstTeamIndex);
+                        firstTeamIndex = random.Next(0, teamInfoBuffer.Count);
 
-                    matchup = new GameMatchup
-                    {
-                        HomeTeam = teamInfoBuffer[firstTeamIndex],
-                        AwayTeam = teamInfoBuffer[secondTeamIndex]
-                    };
-                } while (regularSeasonMatchups.Any(m => m!.SymmetricallyEquals(matchup)));
+                        do
+                        {
+                            secondTeamIndex = random.Next(0, teamInfoBuffer.Count);
+                        } while (secondTeamIndex == firstTeamIndex);
 
-                teamInfoBuffer.RemoveAt(Math.Max(firstTeamIndex, secondTeamIndex));
-                teamInfoBuffer.RemoveAt(Math.Min(firstTeamIndex, secondTeamIndex));
+                        matchup = new GameMatchup
+                        {
+                            HomeTeam = teamInfoBuffer[firstTeamIndex],
+                            AwayTeam = teamInfoBuffer[secondTeamIndex]
+                        };
+                    } while (regularSeasonMatchups.Any(m => m!.SymmetricallyEquals(matchup)));
+
+                    teamInfoBuffer.RemoveAt(Math.Max(firstTeamIndex, secondTeamIndex));
+                    teamInfoBuffer.RemoveAt(Math.Min(firstTeamIndex, secondTeamIndex));
                 
-                week.Add((weekStartDate.Add(new TimeSpan(19, 0, 0)), matchup));
+                    week.Add((weekStartDate.Add(new TimeSpan(19, 0, 0)), matchup));
+                }
             }
 
             return preseasonWeeks;

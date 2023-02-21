@@ -8,6 +8,8 @@ var schedule =
     Celarix.JustForFun.FootballSimulator.ScheduleGenerator
         .GetPreseasonAndRegularSeasonGamesForSeason(2023, teams, null);
 
+Console.WriteLine("");
+
 // should probably move this to Celarix.JustForFun.FootballSimulator
 void InitializeDatabase(FootballContext context)
 {
