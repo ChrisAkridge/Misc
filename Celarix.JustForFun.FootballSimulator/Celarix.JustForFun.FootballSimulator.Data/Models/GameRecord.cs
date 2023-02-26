@@ -15,6 +15,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         public SeasonRecord SeasonRecord { get; set; }
         public GameType GameType { get; set; }
         public int WeekNumber { get; set; }
+        public bool GameComplete { get; set; }
         
         public int HomeTeamID { get; set; }
         public Team HomeTeam { get; set; }

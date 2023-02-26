@@ -37,7 +37,15 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             if (!foldersInFolderAfterRemoval.Any() && !filesInFolder.Any())
             {
                 logger.Info($"Folder {folderPath} is empty, removing...");
-                LongDirectory.Delete(folderPath);
+
+                try
+                {
+                    LongDirectory.Delete(folderPath);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error($"Failed to delete {folderPath} ({ex.Message})");
+                }
             }
         }
     }

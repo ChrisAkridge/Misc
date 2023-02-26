@@ -12,7 +12,8 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         [Key]
         public int SeasonRecordID { get; set; }
         public int Year { get; set; }
-        
+        public bool SeasonComplete { get; set; }
+
         public List<GameRecord> GameRecords { get; set; }
     }
 }

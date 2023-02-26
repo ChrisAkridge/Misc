@@ -5,7 +5,7 @@ InitializeDatabase(footballContext);
 var teams = footballContext.Teams.ToList();
 
 var schedule =
-    Celarix.JustForFun.FootballSimulator.ScheduleGenerator
+    Celarix.JustForFun.FootballSimulator.Scheduling.ScheduleGenerator
         .GetPreseasonAndRegularSeasonGamesForSeason(2023, teams, null);
 
 Console.WriteLine("");

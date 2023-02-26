@@ -60,4 +60,11 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         FieldGoalSuccess,
         Touchdown
     }
+
+    public enum GameResult
+    {
+        Win,
+        Loss,
+        Tie
+    }
 }

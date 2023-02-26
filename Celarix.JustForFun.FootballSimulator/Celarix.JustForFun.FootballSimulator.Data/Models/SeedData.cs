@@ -8,6 +8,8 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
 {
     public static class SeedData
     {
+        private static Random random = new Random();
+        
         private static Team CreateTeam(string cityName, string teamName, string abbreviation, Conference conference,
             Division division, Stadium homeStadium) =>
             new Team
@@ -17,8 +19,22 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
                 TeamName = teamName,
                 Conference = conference,
                 Division = division,
-                HomeStadium = homeStadium
+                HomeStadium = homeStadium,
+                RunningOffenseStrength = GetRandomStrength(),
+                RunningDefenseStrength = GetRandomStrength(),
+                PassingOffenseStrength = GetRandomStrength(),
+                PassingDefenseStrength = GetRandomStrength(),
+                OffensiveLineStrength = GetRandomStrength(),
+                DefensiveLineStrength = GetRandomStrength(),
+                KickingStrength = GetRandomStrength(),
+                FieldGoalStrength = GetRandomStrength(),
+                KickReturnStrength = GetRandomStrength(),
+                KickDefenseStrength = GetRandomStrength(),
+                ClockManagementStrength = GetRandomStrength(),
+                Disposition = TeamDisposition.Conservative
             };
+
+        private static double GetRandomStrength() => 200d + (random.NextDouble() * 800d);
 
         private static Stadium CreateStadium(string name, string city, double totalPrecipitationOverSeason, double averageWindSpeed, params double[] averageTemperatures) =>
             new Stadium

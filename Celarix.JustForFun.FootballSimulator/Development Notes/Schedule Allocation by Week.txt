@@ -1,0 +1,35 @@
+Okay, we've made it through part 1: generate valid matchups for all 40 teams. Now we have to assign them to each of the 17 weeks of the NFL season.
+
+...how do we do that?
+
+Rule #1: No team can play in the same week twice
+Rule #2: Some teams get the week off between weeks 5 and 13
+
+What do we have? A Dictionary<BasicTeamInfo, List<GameMatchup>>. That is, a list of NFL teams with each team having their own list of all their matchups. The main weird thing is that this is all symmetric - if the Colts visit the Bears, the Colts entry will have a Colts @ Bears and so will the Bears entry. The ordering of the lists of games is COMPLETELY useless - the symmetrical game is not at the same index overall.
+
+Ideally, we can now ditch the dictionary since we've already figured out who faces who. Also ideally, we'd like to remove the symmetric games and have (20 * 16 = 320) game entries instead of 640 where each is a duplicate. The problem is that the only way we can figure out which game is the symmetric one is by searching through all the games and comparing them - O(N^2), mostly. Or we could use GetHashCode() and turn it into O(N log N), which, for 320 games, is basically 0.
+
+Then we have a List<GameMatchup>. There should be no duplicates and should be exactly half the size of the dictionary. Our next step is to try to assign week numbers to every matchup and figure out who gets bye weeks.
+
+One easy way to think of a bye is that we start with every team playing every week, then we delay either 2 or 3 games by one week. This can be made easier by separating the concept of which week a game is in (week number) and its ordinal position in the list of games that a team plays (game number). First, let's figure out how to separate the deduplicated games into 17 weeks, then choose the byes to actually get 20 games in Week 17.
+		
+The basic idea behind separating games into weeks is that we scan continuously through the list of all games until they've all been selected. As such, we'll need two things:
+	- A game matchup type with more details, including whether this game has been selected already
+	- An enumerator type that keeps cycling through the list until a provided lambda returns false (the Func<bool> here returns true until the selected flag has been set for all games). This enumerator also skips over individual items that return false when another lambda returns false - this lambda will check the selected flag on the game.
+
+Here's the steps:
+	1. Select out the list of deduplicated games into the more detailed type, then shuffle it.
+	2. Sort the list of team names alphabetically.
+	3. Create a bool[] indicating whether this team has had a game selected for this week. This array will be in the order of the sorted team names.
+	4. Create a List<GameMatchup>[] to represent all 17 weeks in the season.
+	5. Using the new enumerator, keep moving through games. For each game we see:
+		1. If the home AND away team both have their flag in the step 3 array clear:
+			1. Set the selected flag on the game.
+			2. Set the flags on both the home and away team.
+			3. If there are less than 20 games in the current week, add the game to the week; else, clear all the flags in the step 3 array, go to the next week and add the game to that.
+
+By this point, all games in the step 1 list should now be selected. The next step is to assign byes. We do this by working backward, starting from Week 13 and going to Week 5. In weeks 13 through 12, 3 games need to be pushed back, and in weeks 11 through 5, 2 games need to be pushed back. This makes for 20 slots where games would go which are now empty, which is, conveniently, the number of games in Week 17. This isn't even intentional!
+
+Let's do some math to see how many games we're looking at now. 17 weeks times 20 slots per week makes for 340 slots, which is 20 more than we need. The math checks out! In each week between 5 and 11, move 2 games at random to Week 17. Move 3 games each from Weeks 12 and 13. Nice! And since we're no longer having to remember symmetric games, we can just move them like normal objects.
+
+That should do it for the regular season! Sure, technically, the very first game of Week 1 should have the Super Bowl winner at home, but we can do that later.

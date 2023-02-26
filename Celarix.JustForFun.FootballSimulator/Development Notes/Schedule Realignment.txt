@@ -1,0 +1,104 @@
+No, this isn't right.
+
+1. Determine the second Thursday in September of the given year. This
+becomes the start date of the regular season Week 1.
+2. Figure out the opponents for each team across 16 regular season games,
+as well as whether the game is at home or away. The game types are
+as follows:
+  - Type I games: Two games against the three division rivals, one
+	home and one on the road. Six games total.
+  - Type II games: Four games chosen against all the teams in another
+	division from the same conference. Two games are at home, two
+	on the road. Since each conference has 5 teams, one division each
+	season must face itself again, and since a team cannot play itself,
+	it gets a fourth game with a random team in its own division.
+	The division changes on a five-year cycle:
+	  - First year:  East/West,   North/South, Extra plays self
+	  - Second year: East/South,  North/Extra, West plays self
+	  - Third year:  East/North,  West/Extra,  South plays self
+	  - Fourth year: East/Extra,  West/South,  North plays self
+	  - Fifth year:  Extra/North, West/South,  East plays self
+  - Type III games: Four games against all the teams in a division
+	from the other conference. Two games are at home, two on the road.
+	The division changes on a five-year cycle:
+	  - AFC East:  North, East,  West,  South, Extra
+	  - AFC North: South, West,  East,  Extra, North
+	  - AFC South: East,  South, Extra, North, West
+	  - AFC West:  West,  Extra, North, East,  South
+	  - AFC Extra: Extra, North, South, West,  East
+	  
+	  - NFC North: East,  Extra, West,   South, North
+	  - NFC East:  South, East,  North,  West,  Extra
+	  - NFC West:  West,  North, East,   Extra, South
+	  - NFC South: North, South, Extra,  East,  West
+	  - NFC Extra: Extra, West,  South,  North, East
+  - Type IV Games: Two games. Since Type II games choose from another
+	division, there are three divisions left in the conference beside
+	the one this team is in. We always ignore the Extra division here,
+	leading to two other conferences. Type IV games are against teams
+	that finished in the same position in the last season in those two
+	conferences. One game is at home and one is on the road. If no
+	previous seasons are available, the two teams are chosen from
+	these two conferences at random.
+3. A table is made - 40 columns (1 per team) and 16 rows (1 per game).
+Each cell represents an opponent team and whether the game is home
+or away. When a cell is filled in, the corresponding cell for the
+opponent team is filled in with the opposite home/away value.
+4. We also create a small map between a team and its division so we can
+quickly determine that.
+5. For each team,
+1. We fill in the Type I games in the first six slots. The first three
+   are at home and the next three are away. If the slot is already
+   filled in, we just skip over this cell.
+2. We fill in the Type II games. Given the year, we query for the
+   Type II opponent division and fill in the next four slots for the
+   team, again skipping over cells if it already has a value. The
+   first two slots are home games, the other two are away games.
+3. We fill in the Type III games. Mostly the same as the Type II games:
+   find opponent, fill next 4 slots with opponent teams, first 2 home,
+   next 2 away.
+4. We fill in the Type IV games. The caller must provide us either
+   with a dictionary mapping team names to their finishing positions
+   in the last season (string => int) or with null, indicating that
+   this is the first season and we have no previous record. We then
+   compute the divisions we should select from (not Extra, ours, or
+   the one we face Type II games with), pick the teams that finished
+   in the same spot as us, then fill in the games. The first game is
+   at home and the other is away.
+6. We must now create slots for each game of the regular season. The
+season runs for 17 weeks. Teams get a bye week once between Week 4
+and Week 12, and the entire regular season is 320 games in total.
+This is an average of 18.82 games per week, and since every team
+plays in all of Weeks 1-4 and 14-17, that makes for 160 games in non-bye
+weeks. This leaves 160 games for the other 9 weeks, 20 fewer games
+than if each team played every week. Splitting 20 missing games over
+9 weeks gives us something like 2 byes per week for the first 7 weeks
+and 3 per week for the final 2 - this is 4 teams and 6 teams with
+byes each week.
+
+Each week consists of 3 days of football played: Thursday, Sunday,
+and Monday. Each day gets 1 primetime game at 8:15pm and Sunday gets
+2 afternoon games at 4:25pm. The remaining games all occur at 1:00pm
+on Sunday - this makes for 15 1:00pm games in non-bye weeks, 13
+1:00pm games in 2-bye weeks, and 12 1:00pm games in 3-bye weeks.
+
+Week 1 of the regular season begins on the second Thursday in September.
+
+We create an array of dictionaries. Each dictionary is 1 week of
+regular-season football. The dictionary has DateTimeOffset keys
+and game info values, where game info is just the away team and
+home team. A game is chosen at random from the table in step 3
+and removed from both slots. The key-value pairs are assigned in this
+order: Thursday Night Football, all 12/13/15 1:00pm Sunday games,
+the 2 Sunday afternoon games, Sunday Night Football, then Monday
+Night Football.
+7. With the regular season generated, we can now generate the preseason,
+which relies on the regular schedule. The preseason is 4 weeks long
+and, here, will be scheduled with the same timeslots as the regular
+season - Thursday, Sunday, and Monday games. Each team plays 4 games
+for a total of 80 games (15 1:00pm Sunday games) and are chosen at
+random (opponents and who is at home) EXCEPT no matchup that occurs
+in the regular season can occur in the preseason.
+8. Finally, we concatenate the two dictionaries of games into one, sort
+it by date ascending, build GameRecord objects out of them, then return
+that.

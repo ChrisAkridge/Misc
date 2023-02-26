@@ -1,0 +1,92 @@
+God hopefully not every stage will suck this much.
+
+We need to determine standings in a division - that is, a mapping from the Bengals to 1st place, Ravens to 2nd, Steelers 3rd, and Browns 4th. This is usually doable by sorting via win-loss-tie percentage, but teams often have the same record in a division. How do we break these ties?
+
+We'll use the natural C# type for comparison, IComparer<T>, and hope that the break-three-way-tie scenario is amendable to breaking 2 two-way ties.
+
+A given team A should comparer larger to B if:
+
+1. A has a higher win percentage than B, or
+2. A has a higher win percentage than B in games played between A and B (head-to-head), or
+3. A has a higher win percentage in games played within its own division, or
+4. A has a higher win percentage against opponents that B also played, or
+5. A has a higher win percentage against opponents within the conference, or
+6. A has a higher strength of victory* than B, or
+7. A has a higher strength of schedule** than B, or
+8. A has a higher ranking*** (points scored - points allowed) in its conference than B, or
+9. A has a higher ranking*** (points scored - points allowed) against all teams than B, or
+10. A has a higher (points scored - points allowed) against opponents that B also played, or
+11. A has a higher (points scored - points allowed) in all of its game than B, or
+12. A has scored more touchdowns than B, or
+13. A coin toss comes up heads
+
+*Strength of victory is computed by combining the records of every team A has beat and using the win percentage of that.
+
+**Strength of schedule is computed by combining the records of every team A has played and using the win percentage of that.
+
+***Ranking here means the position in the conference/league.
+
+That's... a lot of extra data. Ideally, we wouldn't even have to evaluate later steps unless it becomes necessary. What do we need to make the comparison, in the worst case?
+
+- The games played by A and B (covers 1, 2, 4, 10, 11, 12)
+- The conferences and divisions that A and B are in (covers 3, 5)
+- The games played by all opponents of A and B (covers 6, 7)
+- The games played by EVERY team in the conferences of A and B (covers 8)
+- The games played by EVERY team (covers 9)
+- A random number generator (covers 13)
+
+This necessitates a lot of methods to pull out this data:
+
+- decimal GetWinPercentageOfTeamInGames(Team team, I<GameMatchup> games) (options 1 through 5)
+- decimal GetStrengthOfVictory(Team team, IEnumerable<GameMatchup> games) (option 6)
+- decimal GetStrengthOfSchedule(Team team, IEnumerable<GameMatchup> games) (option 7)
+- int GetNetPointsOfTeamInGames(Team team, IEnumerable<GameMatchup> games) (options 11 and 12)
+	- int GetCommonRankInNetPointsOfTeamInGames(Team team, IEnumerable<GameMatchup> games) (options 8 and 9)
+- int GetTouchdownCountForTeam(Team team, IEnumerable<GameMatchup> games)
+
+The comparison method should just receive a list of every game played this season as an IReadOnlyList that we carve up with Where as needed. We end up with the -1/0/+1 result of CompareTo.
+
+This works well until we have 3 tied teams. The tiebreaking order for that is:
+
+1. Head-to-head: Compare A's win percentage vs. B and C, B's win percentage vs. A and C, and C's win percentage with A and B. If we still have 3 teams tied,
+2. Win percentage in division: Highest win percentage in games in the same division. If we still have 3 teams tied,
+3. Common games: Determine teams that all 3 teams have played against and compare A, B, and C's win percentage against them. If we still have 3 teams tied,
+4. Win percentage in conference: Highest win percentage in games in the same conference. If we still have 3 teams tied,
+5. Strength of victory in all games.
+6. Strength of schedule in all games.
+7. Highest ranking of (points scored - points allowed) in games in their own conference.
+8. Highest ranking of (points scored - points allowed) in all their games.
+9. Highest (points scored - points allowed) in games against opponents played by all 3 teams.
+10. Highest (points scored - points allowed) in all games played.
+11. Most touchdowns scored.
+12. random.Next(0, 2)
+
+This is subtly different from the two-way tiebreaking, most notably in determining common games. Since common teams among 3 teams is usually less than 2, we can't just use the two-team tiebreaker for A and B and then B and C.
+
+This model fundamentally differs from C# comparison. We start with a collection where some elements might be equal, and we have logic to break 2-way ties and separate logic to break 3-or-more-way ties. And there are even more rules farther down!
+
+Decompose the problem. Given a collection of elements that may compare equal, how do we determine all the ties we need to break?
+
+- First, we can sort the incoming list. Ties will be next to each other. Either each element sorts after the next, or each element equals the last. We can then represent ties as a list of ranges of equal elements (i.e. indices 4 through 6, 9 through 14, etc.). Ranges of size 2 use 2-way tiebreaking logic, greater sizes use the other logic.
+- The underlying type is rather composite, but we also don't want to be throwing around database objects everywhere. Let's look at the initial type that we sort and get ties from:
+	class TeamWinPercentage : IComparable<TeamWinPercentage>
+	{
+		decimal WinPercentage;
+		string TeamName;
+	}
+- Having this type helps us only load stuff to break ties when we need it. Enter the following:
+	class Tiebreaker
+	{
+		List<Team> teams;
+		List<GameRecord> allSeasonGames;
+		Random random;
+		
+		TeamWinPercentage[] BreakTwoWayTie(TeamWinPercentage a, TeamWinPercentage b);
+		TeamWinPercentage[] BreakMultiWayTie(params IEnumerable<TeamWinPercentage> tiedTeams);
+		
+		Team GetTeamByName(string teamName);
+		// methods to get lists of games for each tiebreaking step
+	}
+
+
+The two Break*Tie methods will return an array of team names in the correct order. The range of the array can then be replaced with the correctly-order range.
