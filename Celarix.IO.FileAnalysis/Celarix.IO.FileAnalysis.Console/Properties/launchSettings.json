@@ -2,7 +2,7 @@
   "profiles": {
     "Celarix.IO.FileAnalysis.Console": {
       "commandName": "Project",
-      "commandLineArgs": "-postprocess \"H:\\37\""
+      "commandLineArgs": "-partialpostprocess \"H:\\39\""
     }
   }
 }

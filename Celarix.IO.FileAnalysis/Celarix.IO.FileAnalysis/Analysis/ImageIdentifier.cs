@@ -76,6 +76,12 @@ namespace Celarix.IO.FileAnalysis.Analysis
             {
                 using (var fs = Pri.LongPath.File.Open(filePath, FileMode.Open, FileAccess.Read))
                 {
+                    if (fs.Length > int.MaxValue)
+                    {
+                        // ain't no way we're dealing with a 2 GB image
+                        return false;
+                    }
+                    
                     if (fs.Length > buffer.Length)
                     {
                         fs.Read(buffer, 0, buffer.Length);
