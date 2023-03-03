@@ -131,6 +131,73 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
             if (teamAStrengthOfSchedule < teamBStrengthOfSchedule) { return SwapOrder(); }
 
             // 8. A has a higher ranking (points scored - points allowed) in its conference than B
+            var teamAConferenceTeams = GetTeamsInConferenceOfTeam(a.TeamName);
+            var teamBConferenceTeams = GetTeamsInConferenceOfTeam(b.TeamName);
+
+            var conferenceAPointsScoredMinusPointsAllowedRankings =
+                GetTeamNamesInPointsScoredMinusPointsAllowedOrder(teamAConferenceTeams);
+            var conferenceBPointsScoredMinusPointsAllowedRankings =
+                GetTeamNamesInPointsScoredMinusPointsAllowedOrder(teamBConferenceTeams);
+            var teamAPointsScoredMinusPointsAllowedRanking =
+                conferenceAPointsScoredMinusPointsAllowedRankings.IndexOf(a.TeamName);
+            var teamBPointsScoredMinusPointsAllowedRanking =
+                conferenceBPointsScoredMinusPointsAllowedRankings.IndexOf(b.TeamName);
+            
+            if (teamAPointsScoredMinusPointsAllowedRanking < teamBPointsScoredMinusPointsAllowedRanking) { return KeepOrder(); }
+
+            if (teamAPointsScoredMinusPointsAllowedRanking > teamBPointsScoredMinusPointsAllowedRanking) { return SwapOrder(); }
+
+            // 9. A has a higher ranking (points scored - points allowed) against all teams than B
+            var allPointsScoredMinusPointsAllowedRankings =
+                GetTeamNamesInPointsScoredMinusPointsAllowedOrder(teams.Select(t => t.TeamName).ToArray());
+            teamAPointsScoredMinusPointsAllowedRanking = allPointsScoredMinusPointsAllowedRankings.IndexOf(a.TeamName);
+            teamBPointsScoredMinusPointsAllowedRanking = allPointsScoredMinusPointsAllowedRankings.IndexOf(b.TeamName);
+            
+            if (teamAPointsScoredMinusPointsAllowedRanking < teamBPointsScoredMinusPointsAllowedRanking) { return KeepOrder(); }
+
+            if (teamAPointsScoredMinusPointsAllowedRanking > teamBPointsScoredMinusPointsAllowedRanking) { return SwapOrder(); }
+
+            // 10. A has a higher (points scored - points allowed) against opponents that B also played
+            var commonOpponentNames = GetCommonOpponentNamesExceptEachOther(commonGames, a.TeamName, b.TeamName).ToArray();
+            var pointsScoredMinusPointsAllowedForCommonAGames = commonGames
+                .Where(g => GameHasTeamPlaying(g, a.TeamName)
+                    && commonOpponentNames.Contains(GetOpponentNameForGame(g, a.TeamName)))
+                .Sum(g => GetPointsScoredMinusPointsAllowedForTeamInGame(g, a.TeamName));
+            var pointsScoredMinusPointsAllowedForCommonBGames = commonGames
+                .Where(g => GameHasTeamPlaying(g, b.TeamName)
+                    && commonOpponentNames.Contains(GetOpponentNameForGame(g, b.TeamName)))
+                .Sum(g => GetPointsScoredMinusPointsAllowedForTeamInGame(g, b.TeamName));
+            
+            if (pointsScoredMinusPointsAllowedForCommonAGames > pointsScoredMinusPointsAllowedForCommonBGames) { return KeepOrder(); }
+
+            if (pointsScoredMinusPointsAllowedForCommonAGames < pointsScoredMinusPointsAllowedForCommonBGames) { return SwapOrder(); }
+
+            // 11. A has a higher (points scored - points allowed) in all of its game than B
+            var pointsScoredMinusPointsAllowedForAllAGames = allSeasonGames
+                .Where(g => GameHasTeamPlaying(g, a.TeamName))
+                .Sum(g => GetPointsScoredMinusPointsAllowedForTeamInGame(g, a.TeamName));
+            var pointsScoredMinusPointsAllowedForAllBGames = allSeasonGames
+                .Where(g => GameHasTeamPlaying(g, b.TeamName))
+                .Sum(g => GetPointsScoredMinusPointsAllowedForTeamInGame(g, b.TeamName));
+            
+            if (pointsScoredMinusPointsAllowedForAllAGames > pointsScoredMinusPointsAllowedForAllBGames) { return KeepOrder(); }
+            
+            if (pointsScoredMinusPointsAllowedForAllAGames < pointsScoredMinusPointsAllowedForAllBGames) { return SwapOrder(); }
+
+            // 12. A has scored more touchdowns than B
+            var touchdownsScoredByA = GetTouchdownCountForTeamInGames(allSeasonGames
+                .Where(g => GameHasTeamPlaying(g, a.TeamName)), a.TeamName);
+            var touchdownsScoredByB = GetTouchdownCountForTeamInGames(allSeasonGames
+                .Where(g => GameHasTeamPlaying(g, b.TeamName)), b.TeamName);
+
+            if (touchdownsScoredByA > touchdownsScoredByB) { return KeepOrder(); }
+
+            if (touchdownsScoredByA < touchdownsScoredByB) { return SwapOrder(); }
+
+            // 13. A coin toss comes up heads
+            return random.NextDouble() < 0.5d
+                ? KeepOrder()
+                : SwapOrder();
 
             TeamWinPercentage[] KeepOrder()
             {
@@ -278,7 +345,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
                     return team.Conference == opponentTeam.Conference && team.Division == opponentTeam.Division;
                 });
 
-        private IEnumerable<GameRecord> GetCommonGamesBetweenTeams(string teamAName, string teamBName)
+        private GameRecord[] GetCommonGamesBetweenTeams(string teamAName, string teamBName)
         {
             var teamAGames = allSeasonGames.Where(g => GameHasTeamPlaying(g, teamAName)).ToArray();
             var teamBGames = allSeasonGames.Where(g => GameHasTeamPlaying(g, teamBName)).ToArray();
@@ -290,7 +357,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
             return teamAGames
                 .Where(g => commonOpponentNames.Contains(GetOpponentNameForGame(g, teamAName)))
                 .Concat(teamBGames
-                    .Where(g => commonOpponentNames.Contains(GetOpponentNameForGame(g, teamBName))));
+                    .Where(g => commonOpponentNames.Contains(GetOpponentNameForGame(g, teamBName))))
+                .ToArray();
         }
 
         private IEnumerable<GameRecord> GetConferenceGamesForTeam(string teamName)
@@ -343,9 +411,55 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
 
             return teamScore - opponentScore;
         }
-        
+
+        private string[] GetTeamNamesInPointsScoredMinusPointsAllowedOrder(string[] unsortedTeamNames)
+        {
+            return unsortedTeamNames
+                .Select(n =>
+                {
+                    var gamesPlayedByTeamAgainstProvidedTeams = allSeasonGames.Where(g => GameHasTeamPlaying(g, n)
+                        && unsortedTeamNames.Contains(GetOpponentNameForGame(g, n)));
+                    return new
+                    {
+                        TeamName = n,
+                        PointsScoredMinusPointsAllowed = gamesPlayedByTeamAgainstProvidedTeams
+                            .Sum(g => GetPointsScoredMinusPointsAllowedForTeamInGame(g, n))
+                    };
+                })
+                .OrderByDescending(np => np.PointsScoredMinusPointsAllowed)
+                .Select(np => np.TeamName)
+                .ToArray();
+        }
+
+        private string[] GetTeamsInConferenceOfTeam(string teamName)
+        {
+            var teamConference = GetTeamByName(teamName).Conference;
+            return teams
+                .Where(t => t.Conference == teamConference)
+                .Select(t => t.TeamName)
+                .ToArray();
+        }
+
+        private IEnumerable<string> GetCommonOpponentNamesExceptEachOther(IEnumerable<GameRecord> games, string aTeamName,
+            string bTeamName) =>
+            games.Where(g => !GameHasTeamPlaying(g, aTeamName) || !GameHasTeamPlaying(g, bTeamName))
+                .Select(game =>
+                    GameHasTeamPlaying(game, aTeamName)
+                        ? GetOpponentNameForGame(game, aTeamName)
+                        : GetOpponentNameForGame(game, bTeamName));
+
+        private int GetTouchdownCountForTeamInGames(IEnumerable<GameRecord> games, string teamName) =>
+            games.Sum(g => g.TeamDriveRecords
+                .Where(d => d.Team == GetHomeOrAwayForTeamInGame(g, teamName))
+                .Count(d => d.Result == DriveResult.Touchdown));
+
         private static bool GameHasTeamPlaying(GameRecord game, string teamName) =>
             game.AwayTeam.TeamName == teamName
             || game.HomeTeam.TeamName == teamName;
+
+        private static GameTeam GetHomeOrAwayForTeamInGame(GameRecord game, string teamName) =>
+            game.HomeTeam.TeamName == teamName
+                ? GameTeam.Home
+                : GameTeam.Away;
     }
 }
