@@ -37,37 +37,21 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
                     .OrderBy(tw => tw.WinPercentage)
                     .ToArray());
             var teamsInDivisionOrder = new Dictionary<ConferenceAndDivision, Team[]>();
+            var comparer = new DelegateComparer<TeamWinPercentage>((a, b) => CompareTeams(a!, b!));
 
             foreach (var division in teamsByDivision)
             {
-                var tiedRangesInDivision = GetRangesContainingTies(division.Value);
-
-                if (!tiedRangesInDivision.Any())
-                {
-                    teamsInDivisionOrder.Add(division.Key, division.Value
-                        .Select(twp => GetTeamByName(twp.TeamName))
-                        .ToArray());
-
-                    continue;
-                }
-
-                foreach (var tiedRange in tiedRangesInDivision)
-                {
-                    var tiedTeams = division.Value[tiedRange];
-                    
-                    if (tiedRange.End.Value - tiedRange.Start.Value == 2)
-                    {
-                        
-                    }
-                    else
-                    {
-                        
-                    }
-                }
+                var winPercentagesInDivisionOrder = division.Value
+                    .OrderBy(p => p, comparer);
+                teamsInDivisionOrder.Add(division.Key, winPercentagesInDivisionOrder
+                    .Select(p => teams.Single(t => t.TeamName == p.TeamName))
+                    .ToArray());
             }
+
+            return teamsInDivisionOrder;
         }
 
-        private TeamWinPercentage[] BreakTwoWayTie(TeamWinPercentage a, TeamWinPercentage b)
+        private int CompareTeams(TeamWinPercentage a, TeamWinPercentage b)
         {
             // 1. A has a higher win percentage than B (false since we've got this far)
             // 2. A has a higher win percentage than B in games played between A and B (head-to-head)
@@ -79,9 +63,9 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
                 switch (headToHeadTeamAWinPercentage)
                 {
                     case > 0.500m:
-                        return KeepOrder();
+                        return -1;
                     case < 0.500m:
-                        return SwapOrder();
+                        return 1;
                 }
             }
 
@@ -91,18 +75,18 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
             var teamADivisonRecord = GetWinPercentageForGamesWithTeam(a.TeamName, gamesPlayedInTeamADivision);
             var teamBDivisionRecord = GetWinPercentageForGamesWithTeam(b.TeamName, gamesPlayedInTeamBDivision);
 
-            if (teamADivisonRecord > teamBDivisionRecord) { return KeepOrder(); }
+            if (teamADivisonRecord > teamBDivisionRecord) { return -1; }
 
-            if (teamADivisonRecord < teamBDivisionRecord) { return SwapOrder(); }
+            if (teamADivisonRecord < teamBDivisionRecord) { return 1; }
 
             // 4. A has a higher win percentage against opponents that B also played
             var commonGames = GetCommonGamesBetweenTeams(a.TeamName, b.TeamName).ToArray();
             var teamACommonRecord = GetWinPercentageForGamesWithTeam(a.TeamName, commonGames);
             var teamBCommonRecord = GetWinPercentageForGamesWithTeam(b.TeamName, commonGames);
 
-            if (teamACommonRecord > teamBCommonRecord) { return KeepOrder(); }
+            if (teamACommonRecord > teamBCommonRecord) { return -1; }
 
-            if (teamACommonRecord < teamBDivisionRecord) { return SwapOrder(); }
+            if (teamACommonRecord < teamBDivisionRecord) { return 1; }
 
             // 5. A has a higher win percentage against opponents within the conference
             var teamAConferenceGames = GetConferenceGamesForTeam(a.TeamName);
@@ -110,25 +94,25 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
             var teamAConferenceRecord = GetWinPercentageForGamesWithTeam(a.TeamName, teamAConferenceGames);
             var teamBConferenceRecord = GetWinPercentageForGamesWithTeam(b.TeamName, teamBConferenceGames);
 
-            if (teamAConferenceRecord > teamBConferenceRecord) { return KeepOrder(); }
+            if (teamAConferenceRecord > teamBConferenceRecord) { return -1; }
 
-            if (teamAConferenceRecord < teamBConferenceRecord) { return SwapOrder(); }
+            if (teamAConferenceRecord < teamBConferenceRecord) { return 1; }
 
             // 6. A has a higher strength of victory than B
             var teamAStrengthOfVictory = GetStrengthOfVictoryForTeam(a.TeamName);
             var teamBStrengthOfVictory = GetStrengthOfVictoryForTeam(b.TeamName);
 
-            if (teamAStrengthOfVictory > teamBStrengthOfVictory) { return KeepOrder(); }
+            if (teamAStrengthOfVictory > teamBStrengthOfVictory) { return -1; }
 
-            if (teamAStrengthOfVictory < teamBStrengthOfVictory) { return SwapOrder(); }
+            if (teamAStrengthOfVictory < teamBStrengthOfVictory) { return 1; }
 
             // 7. A has a higher strength of schedule than B
             var teamAStrengthOfSchedule = GetStrengthOfScheduleForTeam(a.TeamName);
             var teamBStrengthOfSchedule = GetStrengthOfScheduleForTeam(b.TeamName);
 
-            if (teamAStrengthOfSchedule > teamBStrengthOfSchedule) { return KeepOrder(); }
+            if (teamAStrengthOfSchedule > teamBStrengthOfSchedule) { return -1; }
 
-            if (teamAStrengthOfSchedule < teamBStrengthOfSchedule) { return SwapOrder(); }
+            if (teamAStrengthOfSchedule < teamBStrengthOfSchedule) { return 1; }
 
             // 8. A has a higher ranking (points scored - points allowed) in its conference than B
             var teamAConferenceTeams = GetTeamsInConferenceOfTeam(a.TeamName);
@@ -143,9 +127,9 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
             var teamBPointsScoredMinusPointsAllowedRanking =
                 conferenceBPointsScoredMinusPointsAllowedRankings.IndexOf(b.TeamName);
             
-            if (teamAPointsScoredMinusPointsAllowedRanking < teamBPointsScoredMinusPointsAllowedRanking) { return KeepOrder(); }
+            if (teamAPointsScoredMinusPointsAllowedRanking < teamBPointsScoredMinusPointsAllowedRanking) { return -1; }
 
-            if (teamAPointsScoredMinusPointsAllowedRanking > teamBPointsScoredMinusPointsAllowedRanking) { return SwapOrder(); }
+            if (teamAPointsScoredMinusPointsAllowedRanking > teamBPointsScoredMinusPointsAllowedRanking) { return 1; }
 
             // 9. A has a higher ranking (points scored - points allowed) against all teams than B
             var allPointsScoredMinusPointsAllowedRankings =
@@ -153,9 +137,9 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
             teamAPointsScoredMinusPointsAllowedRanking = allPointsScoredMinusPointsAllowedRankings.IndexOf(a.TeamName);
             teamBPointsScoredMinusPointsAllowedRanking = allPointsScoredMinusPointsAllowedRankings.IndexOf(b.TeamName);
             
-            if (teamAPointsScoredMinusPointsAllowedRanking < teamBPointsScoredMinusPointsAllowedRanking) { return KeepOrder(); }
+            if (teamAPointsScoredMinusPointsAllowedRanking < teamBPointsScoredMinusPointsAllowedRanking) { return -1; }
 
-            if (teamAPointsScoredMinusPointsAllowedRanking > teamBPointsScoredMinusPointsAllowedRanking) { return SwapOrder(); }
+            if (teamAPointsScoredMinusPointsAllowedRanking > teamBPointsScoredMinusPointsAllowedRanking) { return 1; }
 
             // 10. A has a higher (points scored - points allowed) against opponents that B also played
             var commonOpponentNames = GetCommonOpponentNamesExceptEachOther(commonGames, a.TeamName, b.TeamName).ToArray();
@@ -168,9 +152,9 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
                     && commonOpponentNames.Contains(GetOpponentNameForGame(g, b.TeamName)))
                 .Sum(g => GetPointsScoredMinusPointsAllowedForTeamInGame(g, b.TeamName));
             
-            if (pointsScoredMinusPointsAllowedForCommonAGames > pointsScoredMinusPointsAllowedForCommonBGames) { return KeepOrder(); }
+            if (pointsScoredMinusPointsAllowedForCommonAGames > pointsScoredMinusPointsAllowedForCommonBGames) { return -1; }
 
-            if (pointsScoredMinusPointsAllowedForCommonAGames < pointsScoredMinusPointsAllowedForCommonBGames) { return SwapOrder(); }
+            if (pointsScoredMinusPointsAllowedForCommonAGames < pointsScoredMinusPointsAllowedForCommonBGames) { return 1; }
 
             // 11. A has a higher (points scored - points allowed) in all of its game than B
             var pointsScoredMinusPointsAllowedForAllAGames = allSeasonGames
@@ -180,9 +164,9 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
                 .Where(g => GameHasTeamPlaying(g, b.TeamName))
                 .Sum(g => GetPointsScoredMinusPointsAllowedForTeamInGame(g, b.TeamName));
             
-            if (pointsScoredMinusPointsAllowedForAllAGames > pointsScoredMinusPointsAllowedForAllBGames) { return KeepOrder(); }
+            if (pointsScoredMinusPointsAllowedForAllAGames > pointsScoredMinusPointsAllowedForAllBGames) { return -1; }
             
-            if (pointsScoredMinusPointsAllowedForAllAGames < pointsScoredMinusPointsAllowedForAllBGames) { return SwapOrder(); }
+            if (pointsScoredMinusPointsAllowedForAllAGames < pointsScoredMinusPointsAllowedForAllBGames) { return 1; }
 
             // 12. A has scored more touchdowns than B
             var touchdownsScoredByA = GetTouchdownCountForTeamInGames(allSeasonGames
@@ -190,76 +174,18 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
             var touchdownsScoredByB = GetTouchdownCountForTeamInGames(allSeasonGames
                 .Where(g => GameHasTeamPlaying(g, b.TeamName)), b.TeamName);
 
-            if (touchdownsScoredByA > touchdownsScoredByB) { return KeepOrder(); }
+            if (touchdownsScoredByA > touchdownsScoredByB) { return -1; }
 
-            if (touchdownsScoredByA < touchdownsScoredByB) { return SwapOrder(); }
+            if (touchdownsScoredByA < touchdownsScoredByB) { return 1; }
 
             // 13. A coin toss comes up heads
             return random.NextDouble() < 0.5d
-                ? KeepOrder()
-                : SwapOrder();
-
-            TeamWinPercentage[] KeepOrder()
-            {
-                return new[]
-                {
-                    a, b
-                };
-            }
-
-            TeamWinPercentage[] SwapOrder()
-            {
-                return new[]
-                {
-                    a, b
-                };
-            }
+                ? -1
+                : 1;
         }
 
         private Team GetTeamByName(string teamName) => teams.Single(t => t.TeamName == teamName);
 
-        private static IReadOnlyList<Range> GetRangesContainingTies(IReadOnlyList<TeamWinPercentage> winPercentages)
-        {
-            var tiedRanges = new List<Range>();
-            var currentTieRangeStart = -1;
-            var currentTieRangeEnd = -1;
-            TeamWinPercentage? lastTeam = null;
-
-            for (var i = 0; i < winPercentages.Count; i++)
-            {
-                var teamWinPercentage = winPercentages[i];
-
-                if (lastTeam?.WinPercentage == teamWinPercentage.WinPercentage)
-                {
-                    if (currentTieRangeStart == -1)
-                    {
-                        // Start of a new tie
-                        currentTieRangeStart = i - 1;
-                        currentTieRangeEnd = i;
-                    }
-                    else
-                    {
-                        // Nope, still tied
-                        currentTieRangeEnd += 1;
-                    }
-                }
-                else
-                {
-                    if (currentTieRangeStart != -1)
-                    {
-                        tiedRanges.Add(new Range(currentTieRangeStart, currentTieRangeEnd));
-                    }
-
-                    currentTieRangeStart = -1;
-                    currentTieRangeEnd = -1;
-                }
-
-                lastTeam = teamWinPercentage;
-            }
-
-            return tiedRanges;
-        }
-        
         private decimal GetWinPercentageForTeam(string teamName)
         {
             var gamesPlayedByTeam = allSeasonGames
@@ -300,7 +226,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
                 : 0;
         }
 
-        private GameResultForTeam GetResultForTeamInGame(GameRecord game, string teamName)
+        private static GameResultForTeam GetResultForTeamInGame(GameRecord game, string teamName)
         {
             var opponentName = GetOpponentNameForGame(game, teamName);
             var teamScore = GetScoreForTeamInGame(game, teamName);
@@ -313,7 +239,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
                     : GameResultForTeam.Loss;
         }
 
-        private int GetScoreForTeamInGame(GameRecord game, string teamName)
+        private static int GetScoreForTeamInGame(GameRecord game, string teamName)
         {
             var teamIsAwayTeam = game.AwayTeam.TeamName == teamName;
             return game.QuarterBoxScores
@@ -323,7 +249,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
                 .Sum(q => q.Score);
         }
 
-        private string GetOpponentNameForGame(GameRecord game, string selfTeamName)
+        private static string GetOpponentNameForGame(GameRecord game, string selfTeamName)
         {
             var teamIsAwayTeam = game.AwayTeam.TeamName == selfTeamName;
 
@@ -345,7 +271,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
                     return team.Conference == opponentTeam.Conference && team.Division == opponentTeam.Division;
                 });
 
-        private GameRecord[] GetCommonGamesBetweenTeams(string teamAName, string teamBName)
+        private IEnumerable<GameRecord> GetCommonGamesBetweenTeams(string teamAName, string teamBName)
         {
             var teamAGames = allSeasonGames.Where(g => GameHasTeamPlaying(g, teamAName)).ToArray();
             var teamBGames = allSeasonGames.Where(g => GameHasTeamPlaying(g, teamBName)).ToArray();
@@ -404,7 +330,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
                 / allOpponentNames.Length;
         }
 
-        private int GetPointsScoredMinusPointsAllowedForTeamInGame(GameRecord game, string teamName)
+        private static int GetPointsScoredMinusPointsAllowedForTeamInGame(GameRecord game, string teamName)
         {
             var teamScore = GetScoreForTeamInGame(game, teamName);
             var opponentScore = GetScoreForTeamInGame(game, GetOpponentNameForGame(game, teamName));
@@ -440,7 +366,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
                 .ToArray();
         }
 
-        private IEnumerable<string> GetCommonOpponentNamesExceptEachOther(IEnumerable<GameRecord> games, string aTeamName,
+        private static IEnumerable<string> GetCommonOpponentNamesExceptEachOther(IEnumerable<GameRecord> games, string aTeamName,
             string bTeamName) =>
             games.Where(g => !GameHasTeamPlaying(g, aTeamName) || !GameHasTeamPlaying(g, bTeamName))
                 .Select(game =>
