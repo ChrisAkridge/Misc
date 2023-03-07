@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Scheduling;
+using Celarix.JustForFun.FootballSimulator.Tiebreaking;
+using Microsoft.EntityFrameworkCore;
 
 namespace Celarix.JustForFun.FootballSimulator;
 
@@ -18,27 +20,62 @@ public sealed class MainLoop
 
     public void RunNextAction()
     {
-        if (DatabaseRequiredInitialization())
-        {
-            GameStatusMessage = "Added basic team info to database.";
+        //if (DatabaseRequiredInitialization())
+        //{
+        //    GameStatusMessage = "Added basic team info to database.";
 
-            return;
-        }
+        //    return;
+        //}
         
-        if (GetCurrentSeasonYear() == null)
+        //if (GetCurrentSeasonYear() == null)
+        //{
+        //var previousSeasonYear = GetLastSeasonYear();
+        //var newSeasonYear = (previousSeasonYear ?? 2014) + 1;
+        var newSeasonYear = 2016;
+
+        //var seasonRecord = new SeasonRecord
+        //{
+        //    Year = newSeasonYear
+        //};
+        //var seasonRecordEntity = context.SeasonRecords.Add(seasonRecord);
+        //context.SaveChanges();
+
+        var previousSeasonGames = /* previousSeasonYear != null
+            ? context.GameRecords
+                .Include(g => g.SeasonRecord)
+                .Where(g => g.SeasonRecord.Year == previousSeasonYear)
+            : */ Enumerable.Empty<GameRecord>();
+        var divisionTiebreaker = new DivisionTiebreaker(context.Teams.ToList(), previousSeasonGames);
+        Dictionary<string, int>? previousSeasonTeamPositions = null;
+        var seasonRecord = context.SeasonRecords.First(s => s.Year == 2015);
+
+        //if (previousSeasonYear != null)
+        //{
+        //    var divisionsInStandingOrder = divisionTiebreaker.GetTeamsInDivisionStandingsOrder();
+        //    previousSeasonTeamPositions = new Dictionary<string, int>();
+
+        //    foreach (var divisionKVP in divisionsInStandingOrder)
+        //    {
+        //        for (int i = 0; i < 4; i++)
+        //        {
+        //            previousSeasonTeamPositions.Add(divisionKVP.Value[i].TeamName, i + 1);
+        //        }
+        //    }
+        //}
+
+        var seasonSchedule = ScheduleGenerator.GetPreseasonAndRegularSeasonGamesForSeason(newSeasonYear,
+            context.Teams.ToList(), previousSeasonTeamPositions);
+
+        foreach (var gameRecord in seasonSchedule)
         {
-            var newSeasonYear = (GetLastSeasonYear() ?? 2014) + 1;
-
-            var seasonRecord = new SeasonRecord
-            {
-                Year = newSeasonYear
-            };
-            context.SeasonRecords.Add(seasonRecord);
-            context.SaveChanges();
-
-            var seasonSchedule = ScheduleGenerator.GetPreseasonAndRegularSeasonGamesForSeason(newSeasonYear,
-                context.Teams.ToList(), )
+            gameRecord.SeasonRecordID = seasonRecord.SeasonRecordID; /* seasonRecordEntity.Entity.SeasonRecordID */;
         }
+            
+        context.GameRecords.AddRange(seasonSchedule);
+        GameStatusMessage = $"Created schedule for the {newSeasonYear} season!";
+
+        return;
+        //}
     }
 
     private bool DatabaseRequiredInitialization()
@@ -84,21 +121,5 @@ public sealed class MainLoop
             .OrderByDescending(s => s.Year)
             .FirstOrDefault()
             ?.Year;
-    }
-
-    private Dictionary<string, int> GetTeamFinishingPositionsForSeason(int seasonYear)
-    {
-        var teamFinishingPositions = new Dictionary<int, string>();
-        var teamsByDivision = context.Teams
-            .ToList()
-            .GroupBy(t => new
-            {
-                t.Conference, t.Division
-            });
-
-        foreach (var division in teamsByDivision)
-        {
-            
-        }
     }
 }

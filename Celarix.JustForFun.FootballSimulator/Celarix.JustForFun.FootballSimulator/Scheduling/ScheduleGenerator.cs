@@ -15,6 +15,8 @@ public static class ScheduleGenerator
         List<Team> teams,
         Dictionary<string, int>? previousSeasonTeamPositions)
     {
+        // Bleh. 2015 season year fails. Wipe out database, run migrations, start again.
+        // Or maybe just comment out the part that makes the season record.
         var basicTeamInfos = teams
             .Select(t => new BasicTeamInfo
             {
@@ -28,7 +30,7 @@ public static class ScheduleGenerator
         var regularSeasonWeeks = GetRegularSeasonTimeslotsForGames(seasonYear, regularSeasonMatchups);
         var preseasonWeeks = GetAllPreseasonMatchupsForSeasonYear(basicTeamInfos, GetAllMatchupsForSeason(regularSeasonMatchups),
             GetNthWeekdayOfMonth(seasonYear, 9, DayOfWeek.Thursday, 2));
-
+        
         return preseasonWeeks.Select((pw, i) => ConvertWeekToGameRecords(pw, teams, i + 1, false))
             .Concat(regularSeasonWeeks.Select((rw, i) => ConvertWeekToGameRecords(rw, teams, i + 1, true)))
             .SelectMany(week => week)
@@ -105,7 +107,7 @@ public static class ScheduleGenerator
                 (Conference.AFC, X), new[]
                 {
                     new DivisionMatchupsForSeason(X, X, N, E),
-                    new DivisionMatchupsForSeason(N, N, E, S),
+                    new DivisionMatchupsForSeason(N, N, E, W),
                     new DivisionMatchupsForSeason(W, S, E, W),
                     new DivisionMatchupsForSeason(E, W, S, W),
                     new DivisionMatchupsForSeason(N, E, N, S)
@@ -155,7 +157,7 @@ public static class ScheduleGenerator
                 (Conference.NFC, X), new[]
                 {
                     new DivisionMatchupsForSeason(X, X, N, E),
-                    new DivisionMatchupsForSeason(N, W, E, S),
+                    new DivisionMatchupsForSeason(N, W, E, W),
                     new DivisionMatchupsForSeason(W, S, E, W),
                     new DivisionMatchupsForSeason(E, N, S, W),
                     new DivisionMatchupsForSeason(N, E, N, W)
