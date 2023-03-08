@@ -27,8 +27,9 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         public DateTimeOffset KickoffTime { get; set; }
         public double TemperatureAtKickoff { get; set; }
         public StadiumWeather WeatherAtKickoff { get; set; }
-        public string HomeTeamStrengthsAtKickoffJSON { get; set; }
-        public string AwayTeamStrengthsAtKickoffJSON { get; set; }
+        
+        public string? HomeTeamStrengthsAtKickoffJSON { get; set; }
+        public string? AwayTeamStrengthsAtKickoffJSON { get; set; }
 
         public List<QuarterBoxScore> QuarterBoxScores = new List<QuarterBoxScore>();
         public List<TeamGameRecord> TeamGameRecords = new List<TeamGameRecord>();

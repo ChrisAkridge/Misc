@@ -366,7 +366,7 @@ public static class ScheduleGenerator
 
     private static void AssignGameToBothTeams(IReadOnlyDictionary<BasicTeamInfo, List<GameMatchup>> games,
         GameMatchup game)
-    {
+    {   
         if (GameIsNotAlreadyPresent(games[game.AwayTeam], game)) { games[game.AwayTeam].Add(game); }
 
         if (GameIsNotAlreadyPresent(games[game.HomeTeam], game)) { games[game.HomeTeam].Add(game); }

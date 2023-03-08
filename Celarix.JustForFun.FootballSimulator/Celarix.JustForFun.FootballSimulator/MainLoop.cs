@@ -20,62 +20,64 @@ public sealed class MainLoop
 
     public void RunNextAction()
     {
-        //if (DatabaseRequiredInitialization())
-        //{
-        //    GameStatusMessage = "Added basic team info to database.";
-
-        //    return;
-        //}
-        
-        //if (GetCurrentSeasonYear() == null)
-        //{
-        //var previousSeasonYear = GetLastSeasonYear();
-        //var newSeasonYear = (previousSeasonYear ?? 2014) + 1;
-        var newSeasonYear = 2016;
-
-        //var seasonRecord = new SeasonRecord
-        //{
-        //    Year = newSeasonYear
-        //};
-        //var seasonRecordEntity = context.SeasonRecords.Add(seasonRecord);
-        //context.SaveChanges();
-
-        var previousSeasonGames = /* previousSeasonYear != null
-            ? context.GameRecords
-                .Include(g => g.SeasonRecord)
-                .Where(g => g.SeasonRecord.Year == previousSeasonYear)
-            : */ Enumerable.Empty<GameRecord>();
-        var divisionTiebreaker = new DivisionTiebreaker(context.Teams.ToList(), previousSeasonGames);
-        Dictionary<string, int>? previousSeasonTeamPositions = null;
-        var seasonRecord = context.SeasonRecords.First(s => s.Year == 2015);
-
-        //if (previousSeasonYear != null)
-        //{
-        //    var divisionsInStandingOrder = divisionTiebreaker.GetTeamsInDivisionStandingsOrder();
-        //    previousSeasonTeamPositions = new Dictionary<string, int>();
-
-        //    foreach (var divisionKVP in divisionsInStandingOrder)
-        //    {
-        //        for (int i = 0; i < 4; i++)
-        //        {
-        //            previousSeasonTeamPositions.Add(divisionKVP.Value[i].TeamName, i + 1);
-        //        }
-        //    }
-        //}
-
-        var seasonSchedule = ScheduleGenerator.GetPreseasonAndRegularSeasonGamesForSeason(newSeasonYear,
-            context.Teams.ToList(), previousSeasonTeamPositions);
-
-        foreach (var gameRecord in seasonSchedule)
+        if (DatabaseRequiredInitialization())
         {
-            gameRecord.SeasonRecordID = seasonRecord.SeasonRecordID; /* seasonRecordEntity.Entity.SeasonRecordID */;
-        }
-            
-        context.GameRecords.AddRange(seasonSchedule);
-        GameStatusMessage = $"Created schedule for the {newSeasonYear} season!";
+            GameStatusMessage = "Added basic team info to database.";
 
-        return;
-        //}
+            return;
+        }
+
+        if (GetCurrentSeasonYear() == null)
+        {
+            var teams = context.Teams.ToArray();
+            var previousSeasonYear = GetLastSeasonYear();
+            var newSeasonYear = (previousSeasonYear ?? 2014) + 1;
+
+            var seasonRecord = new SeasonRecord
+            {
+                Year = newSeasonYear
+            };
+            var seasonRecordEntity = context.SeasonRecords.Add(seasonRecord);
+            context.SaveChanges();
+
+            var previousSeasonGames = previousSeasonYear != null
+                ? context.GameRecords
+                    .Include(g => g.SeasonRecord)
+                    .Where(g => g.SeasonRecord.Year == previousSeasonYear)
+                : Enumerable.Empty<GameRecord>();
+            var divisionTiebreaker = new DivisionTiebreaker(context.Teams.ToList(), previousSeasonGames);
+            Dictionary<string, int>? previousSeasonTeamPositions = null;
+
+            if (previousSeasonYear != null)
+            {
+                var divisionsInStandingOrder = divisionTiebreaker.GetTeamsInDivisionStandingsOrder();
+                previousSeasonTeamPositions = new Dictionary<string, int>();
+
+                foreach (var divisionKVP in divisionsInStandingOrder)
+                {
+                    for (int i = 0; i < 4; i++)
+                    {
+                        previousSeasonTeamPositions.Add(divisionKVP.Value[i].TeamName, i + 1);
+                    }
+                }
+            }
+
+            var seasonSchedule = ScheduleGenerator.GetPreseasonAndRegularSeasonGamesForSeason(newSeasonYear,
+                context.Teams.ToList(), previousSeasonTeamPositions);
+
+            foreach (var gameRecord in seasonSchedule)
+            {
+                gameRecord.SeasonRecordID = seasonRecordEntity.Entity.SeasonRecordID;
+                gameRecord.StadiumID = teams.First(t => t.TeamName == gameRecord.HomeTeam.TeamName).HomeStadiumID;
+            }
+            
+            context.GameRecords.AddRange(seasonSchedule);
+            context.SaveChanges();
+            
+            GameStatusMessage = $"Created schedule for the {newSeasonYear} season!";
+
+            return;
+        }
     }
 
     private bool DatabaseRequiredInitialization()
