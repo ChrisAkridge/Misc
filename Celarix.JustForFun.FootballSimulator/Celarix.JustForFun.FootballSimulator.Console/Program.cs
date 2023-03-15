@@ -2,4 +2,4 @@
 
 var mainLoop = new MainLoop();
 mainLoop.RunNextAction();
-Console.WriteLine(mainLoop.GameStatusMessage);
+Console.WriteLine(mainLoop.StatusMessage);

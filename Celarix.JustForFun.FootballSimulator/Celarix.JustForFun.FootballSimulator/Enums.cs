@@ -12,3 +12,34 @@ internal enum GameResultForTeam
     Loss,
     Tie
 }
+
+internal enum NextPlayKind
+{
+    Kickoff,
+    FirstDown,
+    SecondDown,
+    ThirdDown,
+    FourthDown,
+    ConversionAttempt,
+    FreeKick
+}
+
+internal enum PlayResultKind
+{
+    BallDead,
+    IncompletePass,
+    FieldGoal,
+    MissedFieldGoal,
+    Touchdown,
+    ConversionAttempt,
+    Safety,
+    PuntDownedByPuntingTeam
+}
+
+internal enum DriveDirection
+{
+    // Toward internal yard 0
+    TowardHomeEndzone,
+    // Toward internal yard 100
+    TowardAwayEndzone
+}
