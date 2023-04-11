@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Celarix.Imaging;
 using Celarix.IO.FileAnalysis.Analysis;
+using Celarix.IO.FileAnalysis.FinalProcessing;
 using Celarix.IO.FileAnalysis.PostProcessing;
 using NLog;
 using SixLabors.Fonts;
@@ -61,7 +62,22 @@ namespace Celarix.IO.FileAnalysis.Console
                 
                 PostProcessor.PartialPostProcess(folderPath);
             }
-            // add TabInserter option
+            else if (args[0].Equals("-inserttabs", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var inputPath = args[1];
+                var outputPath = args[2];
+                var tabsToInsert = int.Parse(args[3]);
+                var lineToPrepend = args[4];
+                
+                TabInserter.InsertTabsForFile(inputPath, outputPath, tabsToInsert, lineToPrepend);
+            }
+            else if (args[0].Equals("-generatethinfiletree", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var inputPath = args[1];
+                var outputPath = args[2];
+                
+                ThinFileTreeGenerator.GenerateThinFileTree(inputPath, outputPath);
+            }
             else
             {
                 var inputFolderPath = args[0];

@@ -69,6 +69,11 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
 
         private static List<(string filePath, TextMapKind kind)> FindAllTextMapsInFolder(string folderPath)
         {
+            if (folderPath.Contains("textMaps"))
+            {
+                return new List<(string filePath, TextMapKind kind)>();
+            }
+            
             var textMaps = new List<(string filePath, TextMapKind kind)>();
 
             var filesInFolder = LongDirectory.GetFiles(folderPath, "*", SearchOption.TopDirectoryOnly);

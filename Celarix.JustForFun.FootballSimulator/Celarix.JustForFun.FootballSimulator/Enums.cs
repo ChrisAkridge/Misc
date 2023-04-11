@@ -33,7 +33,8 @@ internal enum PlayResultKind
     Touchdown,
     ConversionAttempt,
     Safety,
-    PuntDownedByPuntingTeam
+    PuntDownedByPuntingTeam,
+    KickRecovered
 }
 
 internal enum DriveDirection
@@ -42,4 +43,14 @@ internal enum DriveDirection
     TowardHomeEndzone,
     // Toward internal yard 100
     TowardAwayEndzone
+}
+
+internal enum ClockEvent
+{
+    TimeElapsed,
+    EndOfQuarter,
+    EndOfHalf,
+    EndOfGame,
+    StartingOvertimePeriod,
+    NewCoinTossRequired
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
 using ArgumentOutOfRangeException = System.ArgumentOutOfRangeException;
+using static Celarix.JustForFun.FootballSimulator.Helpers;
 
 namespace Celarix.JustForFun.FootballSimulator
 {
@@ -149,48 +150,11 @@ namespace Celarix.JustForFun.FootballSimulator
                         LineOfScrimmage = 15, // can be changed to the 2-yard-line if the team decides to go for 2
                         Team = lastPlayResult.Team
                     };
+                case PlayResultKind.KickRecovered:
+                    throw new NotImplementedException();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(lastPlayResult.Kind), $"Kind of last play result {lastPlayResult.Kind} is not valid.");
             }
         }
-
-        private static GameTeam OtherTeam(GameTeam team) =>
-            team switch
-            {
-                GameTeam.Home => GameTeam.Away,
-                GameTeam.Away => GameTeam.Home,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-
-        private static DriveDirection TowardOpponentEndzone(GameTeam team) =>
-            team switch
-            {
-                GameTeam.Home => DriveDirection.TowardAwayEndzone,
-                GameTeam.Away => DriveDirection.TowardHomeEndzone,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-
-        private static int? YardsDownfield(int lineOfScrimmage, int distance, DriveDirection direction)
-        {
-            var firstDownLine = lineOfScrimmage
-                + (direction == DriveDirection.TowardHomeEndzone
-                    ? -distance
-                    : distance);
-
-            return firstDownLine is < 0 or > 100
-                ? // It's goal-to-go!
-                null
-                : firstDownLine;
-        }
-
-        private static int TeamYardLineToInternalYardLine(int teamYardLine, GameTeam team) =>
-            team == GameTeam.Home
-                ? teamYardLine
-                : 100 - teamYardLine;
-
-        private static bool IsYardLineBeyondYardLine(int yardLineA, int yardLineB, DriveDirection direction) =>
-            direction == DriveDirection.TowardHomeEndzone
-                ? yardLineA < yardLineB
-                : yardLineA > yardLineB;
     }
 }

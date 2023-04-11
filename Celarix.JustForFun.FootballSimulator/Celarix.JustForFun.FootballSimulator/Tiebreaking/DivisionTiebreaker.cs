@@ -195,7 +195,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
             return GetWinPercentageForGamesWithTeam(teamName, gamesPlayedByTeam);
         }
 
-        private decimal GetWinPercentageForGamesWithTeam(string teamName, IEnumerable<GameRecord> games)
+        private static decimal GetWinPercentageForGamesWithTeam(string teamName, IEnumerable<GameRecord> games)
         {
             var wins = 0;
             var ties = 0;
@@ -374,7 +374,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
                         ? GetOpponentNameForGame(game, aTeamName)
                         : GetOpponentNameForGame(game, bTeamName));
 
-        private int GetTouchdownCountForTeamInGames(IEnumerable<GameRecord> games, string teamName) =>
+        private static int GetTouchdownCountForTeamInGames(IEnumerable<GameRecord> games, string teamName) =>
             games.Sum(g => g.TeamDriveRecords
                 .Where(d => d.Team == GetHomeOrAwayForTeamInGame(g, teamName))
                 .Count(d => d.Result == DriveResult.Touchdown));

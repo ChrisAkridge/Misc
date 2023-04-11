@@ -21,7 +21,7 @@ namespace Celarix.IO.FileAnalysis.FinalProcessing
 
             using var inputStream = new StreamReader(LongFile.OpenRead(inputFilePath));
             using var outputStream = LongFile.CreateText(outputFilePath);
-            var tabs = new string(' ', 4 * tabsToInsert);
+            var tabs = new string(' ', 2 * tabsToInsert);
             
             outputStream.WriteLine(lineToPrepend);
             var linesWritten = 1;

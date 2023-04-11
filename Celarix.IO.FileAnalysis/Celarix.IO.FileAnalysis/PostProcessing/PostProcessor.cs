@@ -31,12 +31,12 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
         {
             LoggingConfigurer.ConfigurePostProcessingLogging();
             logger.Info($"Perfoming post-processing on non-fully-analyzed folder {folderPath}...");
-            
+
             ImageFinder.FindAllImages(folderPath);
-            
+
             TextMapMover.MoveAllTextMaps(folderPath);
             CSharpMemberFileConcatenator.ConcatenateCSharpMemberFiles(folderPath);
-            
+
             EmptyFolderRemover.RemoveAllEmptyFolders(folderPath);
             FolderTreePrinter.PrintFolderTreeForFolder(folderPath);
         }

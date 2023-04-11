@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
+using Celarix.JustForFun.FootballSimulator.Gameplay;
 using Celarix.JustForFun.FootballSimulator.Scheduling;
 using Celarix.JustForFun.FootballSimulator.Tiebreaking;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ namespace Celarix.JustForFun.FootballSimulator;
 public sealed class MainLoop
 {
     private readonly FootballContext context;
+    private FootballGame? currentGame;
     
     public string StatusMessage { get; private set; }
 
@@ -33,9 +35,24 @@ public sealed class MainLoop
 
             return;
         }
-        
-        // 1. Get the next unplayed game in the list and set it as the current game.
-        // 2. Call into the game loop and run the next action until the game is complete.
+
+        if (currentGame != null)
+        {
+            currentGame.RunNextAction();
+            StatusMessage = currentGame.StatusMessage;
+
+            if (currentGame.GameOver)
+            {
+                currentGame.MarkGameRecordComplete();
+                currentGame = null;
+            }
+        }
+        else
+        {
+            var nextUnplayedGame = GetNextUnplayedGame();
+
+            if (nextUnplayedGame != null) { currentGame = new FootballGame(context, nextUnplayedGame); }
+        }
     }
 
     private void AddNextSeasonToDatabase()
@@ -128,5 +145,12 @@ public sealed class MainLoop
             .OrderByDescending(s => s.Year)
             .FirstOrDefault()
             ?.Year;
+    }
+
+    private GameRecord? GetNextUnplayedGame()
+    {
+        return context.GameRecords
+            .OrderBy(g => g.KickoffTime)
+            .FirstOrDefault(g => !g.GameComplete);
     }
 }
