@@ -16,12 +16,14 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             LoggingConfigurer.ConfigurePostProcessingLogging();
             logger.Info($"Performing post-processing on {folderPath}...");
 
+            var filePaths = FileListGenerator.GenerateFileList(folderPath);
+            
             if (deleteBinaryDrawingFiles)
             {
-                BinaryDrawingFileRemover.RemoveAllBinaryDrawingFiles(folderPath);
+                BinaryDrawingFileRemover.RemoveAllBinaryDrawingFiles(filePaths);
             }
-            TextMapMover.MoveAllTextMaps(folderPath);
-            CSharpMemberFileConcatenator.ConcatenateCSharpMemberFiles(folderPath);
+            TextMapMover.MoveAllTextMaps(folderPath, filePaths);
+            CSharpMemberFileConcatenator.ConcatenateCSharpMemberFiles(folderPath, filePaths);
 
             EmptyFolderRemover.RemoveAllEmptyFolders(folderPath);
             FolderTreePrinter.PrintFolderTreeForFolder(folderPath);
@@ -32,10 +34,12 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             LoggingConfigurer.ConfigurePostProcessingLogging();
             logger.Info($"Perfoming post-processing on non-fully-analyzed folder {folderPath}...");
 
+            var filePaths = FileListGenerator.GenerateFileList(folderPath);
+
             ImageFinder.FindAllImages(folderPath);
 
-            TextMapMover.MoveAllTextMaps(folderPath);
-            CSharpMemberFileConcatenator.ConcatenateCSharpMemberFiles(folderPath);
+            TextMapMover.MoveAllTextMaps(folderPath, filePaths);
+            CSharpMemberFileConcatenator.ConcatenateCSharpMemberFiles(folderPath, filePaths);
 
             EmptyFolderRemover.RemoveAllEmptyFolders(folderPath);
             FolderTreePrinter.PrintFolderTreeForFolder(folderPath);

@@ -15,10 +15,10 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        public static void RemoveAllBinaryDrawingFiles(string folderPath)
+        public static void RemoveAllBinaryDrawingFiles(string[] filePaths)
         {
-            logger.Info($"Removing all binary drawing files from {folderPath}...");
-            var binaryDrawingFilesToRemove = FindAllBinaryDrawingFilesInFolder(folderPath);
+            logger.Info($"Removing all binary drawing files...");
+            var binaryDrawingFilesToRemove = FindAllBinaryDrawingFilesInFolder(filePaths);
             logger.Info($"Found {binaryDrawingFilesToRemove.Count:N0} files to remove.");
 
             foreach (var filePath in binaryDrawingFilesToRemove)
@@ -28,30 +28,55 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             }
         }
 
-        private static List<string> FindAllBinaryDrawingFilesInFolder(string folderPath)
+        private static List<string> FindAllBinaryDrawingFilesInFolder(string[] filePaths)
         {
             var binaryDrawingFilePaths = new List<string>();
-            
-            var filesInFolder = LongDirectory.GetFiles(folderPath, "*", SearchOption.TopDirectoryOnly);
-            var foldersInFolder = LongDirectory.GetDirectories(folderPath, "*", SearchOption.TopDirectoryOnly);
-            
-            binaryDrawingFilePaths.AddRange(filesInFolder.Where(f => LongPath.GetFileName(f).Equals("bytes.png", StringComparison.InvariantCultureIgnoreCase)));
+            var filesCountedSoFar = 0;
 
-            foreach (var childFolderPath in foldersInFolder)
+            foreach (var path in filePaths)
             {
-                if (LongPath.GetFileName(childFolderPath).Equals("bytes", StringComparison.InvariantCultureIgnoreCase))
+                if (LongPath.GetFileName(path).Equals("bytes.png", StringComparison.InvariantCultureIgnoreCase) || FileIsPartOfCanvas(path))
                 {
-                    binaryDrawingFilePaths.AddRange(LongDirectory.GetFiles(childFolderPath, "*",
-                        SearchOption.AllDirectories));
+                    binaryDrawingFilePaths.Add(path);
                 }
-                else
+
+                filesCountedSoFar += 1;
+
+                if (filesCountedSoFar % 1000 == 0)
                 {
-                    binaryDrawingFilePaths.AddRange(FindAllBinaryDrawingFilesInFolder(childFolderPath));
+                    logger.Info($"Searched for binary drawing files across {filesCountedSoFar:N0} files");
                 }
             }
-            
-            logger.Info($"Folder {folderPath} has {binaryDrawingFilePaths.Count:N0} binary drawing files.");
+
+            logger.Info($"Found {binaryDrawingFilePaths.Count:N0} binary drawing files.");
             return binaryDrawingFilePaths;
+        }
+
+        private static bool FileIsPartOfCanvas(string filePath)
+        {
+            if (!LongPath.GetExtension(filePath)
+                    .Contains("png", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return false;
+            }
+
+            var pathParts = filePath.Split(LongPath.DirectorySeparatorChar);
+            var indexOfBytesPart = Array.IndexOf(pathParts, "bytes");
+
+            if (indexOfBytesPart == -1)
+            {
+                return false;
+            }
+
+            for (int i = indexOfBytesPart + 1; i < pathParts.Length; i++)
+            {
+                if (!LongPath.GetFileNameWithoutExtension(pathParts[i]).All(c => char.IsDigit(c)))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

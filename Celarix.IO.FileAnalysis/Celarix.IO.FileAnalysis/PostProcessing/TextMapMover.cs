@@ -21,13 +21,13 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
         
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        public static void MoveAllTextMaps(string folderPath)
+        public static void MoveAllTextMaps(string folderPath, string[] filePaths)
         {
-            logger.Info($"Moving all text maps from {folderPath}...");
+            logger.Info($"Moving all text maps in {folderPath}...");
 
             var guidBuffer = new byte[16];
-            var textMaps = FindAllTextMapsInFolder(folderPath);
-            logger.Info($"Found {textMaps.Count:N0} text maps in {folderPath}.");
+            var textMaps = FindAllTextMapsInFolder(filePaths);
+            logger.Info($"Found {textMaps.Count:N0} text maps.");
             var advancedProgress = new AdvancedProgress(textMaps.Count, DateTimeOffset.Now);
                 
             LongDirectory.CreateDirectory(LongPath.Combine(folderPath, TextMapPath));
@@ -67,28 +67,14 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             logger.Info("Moved all text maps.");
         }
 
-        private static List<(string filePath, TextMapKind kind)> FindAllTextMapsInFolder(string folderPath)
+        private static List<(string filePath, TextMapKind kind)> FindAllTextMapsInFolder(string[] filePaths)
         {
-            if (folderPath.Contains("textMaps"))
-            {
-                return new List<(string filePath, TextMapKind kind)>();
-            }
-            
-            var textMaps = new List<(string filePath, TextMapKind kind)>();
+            var textMapPaths = filePaths.Where(f =>
+                LongPath.GetFileName(f).Equals("textMap.png", StringComparison.InvariantCultureIgnoreCase)
+                && !f.Contains("textMaps", StringComparison.InvariantCultureIgnoreCase));
+            var textMaps = textMapPaths.Select(p => (p, DetermineTextMapKind(p))).ToList();
 
-            var filesInFolder = LongDirectory.GetFiles(folderPath, "*", SearchOption.TopDirectoryOnly);
-            var foldersInFolder = LongDirectory.GetDirectories(folderPath, "*", SearchOption.TopDirectoryOnly);
-
-            textMaps.AddRange(filesInFolder
-                .Where(f => LongPath.GetFileName(f).Equals("textMap.png", StringComparison.InvariantCultureIgnoreCase))
-                .Select(f => (f, DetermineTextMapKind(f))));
-
-            foreach (var childFolderPath in foldersInFolder)
-            {
-                textMaps.AddRange(FindAllTextMapsInFolder(childFolderPath));
-            }
-
-            logger.Info($"Folder {folderPath} has {textMaps.Count:N0} text maps.");
+            logger.Info($"Found {textMaps.Count:N0} text maps.");
             return textMaps;
         }
 
