@@ -150,7 +150,10 @@ public sealed class MainLoop
     private GameRecord? GetNextUnplayedGame()
     {
         return context.GameRecords
-            .OrderBy(g => g.KickoffTime)
-            .FirstOrDefault(g => !g.GameComplete);
+            .Include(g => g.HomeTeam)
+            .Include(g => g.AwayTeam)
+            .Where(g => !g.GameComplete)
+            .ToArray()
+            .MinBy(g => g.KickoffTime);
     }
 }

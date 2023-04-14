@@ -57,6 +57,8 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
             awayTeamStrengths = InGameTeamStrengths.FromTeam(currentGameRecord.AwayTeam);
             
             clock = new GameClock();
+
+            DebugDecisionModeActive = true;
         }
 
         public void RunNextAction()
@@ -171,7 +173,7 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
         
         #region Kickoffs
 
-        private bool PerformKickoff()
+        private void PerformKickoff()
         {
             var kickingTeam = GetTeamStrengths(nextPlay.Team);
             var receivingTeam = GetTeamStrengths(OtherTeam(nextPlay.Team));
@@ -283,7 +285,7 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
 
         private double ClampDistanceBasedOnFieldPosition(double internalYardNumber, double distance, DriveDirection direction)
         {
-            
+            return double.NaN;
         }
 
         private void AddDebugMessage(string message)

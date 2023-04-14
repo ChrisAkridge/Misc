@@ -1,5 +1,10 @@
 ﻿using Celarix.JustForFun.FootballSimulator;
 
 var mainLoop = new MainLoop();
-mainLoop.RunNextAction();
-Console.WriteLine(mainLoop.StatusMessage);
+
+while (true)
+{
+    mainLoop.RunNextAction();
+    Console.WriteLine(mainLoop.StatusMessage);
+    Thread.Sleep(1000);
+}
