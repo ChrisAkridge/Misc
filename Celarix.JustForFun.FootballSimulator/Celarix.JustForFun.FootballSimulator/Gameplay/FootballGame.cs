@@ -47,6 +47,16 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
         
         public bool DebugDecisionModeActive { get; set; }
 
+        private NextPlay NextPlay
+        {
+            get => nextPlay;
+            set
+            {
+                AddDebugMessage(GetNextPlayDebugMessage(value));
+                nextPlay = value;
+            }
+        }
+
         public FootballGame(FootballContext context, GameRecord currentGameRecord)
         {
             this.context = context;
@@ -84,10 +94,10 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
         {
             var awayTeamAbbreviation = AwayTeam.Abbreviation.PadLeft(3, ' ');
             var homeTeamAbbreviation = HomeTeam.Abbreviation.PadLeft(3, ' ');
-            var awayTeamPossessionIndicator = nextPlay.Team == GameTeam.Away
+            var awayTeamPossessionIndicator = NextPlay.Team == GameTeam.Away
                 ? '•'
                 : ' ';
-            var homeTeamPossesionIndicator = nextPlay.Team == GameTeam.Home
+            var homeTeamPossesionIndicator = NextPlay.Team == GameTeam.Home
                 ? '•'
                 : ' ';
 
@@ -106,7 +116,7 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
 
             var timeDisplay = $"{quarterDisplay} {minutes:D2}:{seconds:D2}";
 
-            var nextPlayDisplay = nextPlay.Kind switch
+            var nextPlayDisplay = NextPlay.Kind switch
             {
                 NextPlayKind.Kickoff => "Kickoff",
                 NextPlayKind.FirstDown => "1st and",
@@ -118,9 +128,9 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
                 _ => throw new ArgumentOutOfRangeException()
             };
 
-            var distanceDisplay = nextPlay.Kind is NextPlayKind.FirstDown or NextPlayKind.SecondDown
+            var distanceDisplay = NextPlay.Kind is NextPlayKind.FirstDown or NextPlayKind.SecondDown
                 or NextPlayKind.ThirdDown or NextPlayKind.FourthDown
-                ? $" {GetDistanceToFirstDownLine(nextPlay)?.ToString() ?? "Goal"}"
+                ? $" {GetDistanceToFirstDownLine(NextPlay)?.ToString() ?? "Goal"}"
                 : "";
 
             var debugDecisionsString = DebugDecisionModeActive
@@ -175,39 +185,50 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
 
         private void PerformKickoff()
         {
-            var kickingTeam = GetTeamStrengths(nextPlay.Team);
-            var receivingTeam = GetTeamStrengths(OtherTeam(nextPlay.Team));
+            var kickingTeam = GetTeamStrengths(NextPlay.Team);
+            var receivingTeam = GetTeamStrengths(OtherTeam(NextPlay.Team));
 
-            if (ShouldAttemptOnsideKick(nextPlay.Team))
+            if (ShouldAttemptOnsideKick(NextPlay.Team))
             {
                 var onsideStrengthDifferential = kickingTeam.KickingStrength - receivingTeam.KickDefenseStrength;
+                AddDebugMessage($"The onside kick differential is {onsideStrengthDifferential:F2}.");
+                
                 var chanceOfRecoveryPercentage = 10d + (onsideStrengthDifferential / 50d);
+                AddDebugMessage($"{GetTeamAbbreviation(NextPlay.Team)} has a {chanceOfRecoveryPercentage * 100:F2}% chance of recovering.");
+                
                 var kickRecoveredByKickingTeam = random.NextDouble() < chanceOfRecoveryPercentage / 100d;
-                // WYLO: ughhhh. also, the clamp should be only to the defense's 1-yard line.
-                // also ughhhhhhh.
-                var kickDistanceTraveled = ClampDistanceBasedOnFieldPosition(TeamYardLineToInternalYardLine(35, nextPlay.Team),
-                    SampleNormalDistribution(10d, onsideStrengthDifferential / 50d, random), nextPlay.Direction);
+                AddDebugMessage($"{GetTeamAbbreviation(NextPlay.Team)} has {(kickRecoveredByKickingTeam ? "recovered" : "not recovered")} the onside kick.");
+                
+                var kickDistanceTraveled = ClampDistanceBasedOnFieldPosition(TeamYardLineToInternalYardLine(35, NextPlay.Team),
+                    SampleNormalDistribution(10d, onsideStrengthDifferential / 50d, random),
+                    NextPlay.Direction,
+                    TeamYardLineToInternalYardLine(1, OtherTeam(NextPlay.Team)),
+                    TeamYardLineToInternalYardLine(99, NextPlay.Team));
 
                 if (kickDistanceTraveled < 10d && kickRecoveredByKickingTeam) { kickDistanceTraveled = 10d; }
 
-                nextPlay = NextPlayComputer.DetermineNextPlay(new PlayResult
+                NextPlay = NextPlayComputer.DetermineNextPlay(new PlayResult
                 {
                     Kind = PlayResultKind.BallDead,
-                    Team = kickRecoveredByKickingTeam ? nextPlay.Team : OtherTeam(nextPlay.Team),
+                    Team = kickRecoveredByKickingTeam ? NextPlay.Team : OtherTeam(NextPlay.Team),
                     DownNumber = null,
-                    BallDeadYard = TeamYardLineToInternalYardLine(45, nextPlay.Team),
+                    BallDeadYard = TeamYardLineToInternalYardLine(45, NextPlay.Team),
                     FirstDownLine = null,
-                    Direction = TowardOpponentEndzone(nextPlay.Team)
+                    Direction = TowardOpponentEndzone(NextPlay.Team)
                 });
                 
-                
+                AddDebugMessage($"Kick recovered at the {InternalYardNumberToString(NextPlay.LineOfScrimmage)}.");
+
+                StatusMessage = GetFullStatusMessage(kickRecoveredByKickingTeam
+                    ? $"Onside kick attempt recovered by {GetTeamAbbreviation(NextPlay.Team)}!"
+                    : $"Onside kick attempt failed; ball recovered by {GetTeamAbbreviation(NextPlay.Team)}.");
             }
             else { }
         }
         
         private bool ShouldKickoff()
         {
-            if (nextPlay.Kind == NextPlayKind.Kickoff)
+            if (NextPlay.Kind == NextPlayKind.Kickoff)
             {
                 return true;
             }
@@ -283,10 +304,27 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
                 .Where(s => s.Team == team)
                 .Sum(s => s.Score);
 
-        private double ClampDistanceBasedOnFieldPosition(double internalYardNumber, double distance, DriveDirection direction)
+        private static double ClampDistanceBasedOnFieldPosition(double internalYardNumber,
+            double distance,
+            DriveDirection direction,
+            double minInternalYardNumber = 0d,
+            double maxInternalYardNumber = 100d)
         {
-            return double.NaN;
+            return direction switch
+            {
+                DriveDirection.TowardHomeEndzone => Math.Max(internalYardNumber - distance, minInternalYardNumber),
+                DriveDirection.TowardAwayEndzone => Math.Min(internalYardNumber + distance, maxInternalYardNumber),
+                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+            };
         }
+
+        private string InternalYardNumberToString(int yardNumber) =>
+            yardNumber switch
+            {
+                50 => "midfield",
+                < 50 => $"{GetTeamAbbreviation(GameTeam.Home)} {yardNumber}",
+                _ => $"{GetTeamAbbreviation(GameTeam.Away)} {100 - yardNumber}"
+            };
 
         private void AddDebugMessage(string message)
         {
@@ -294,6 +332,31 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
             {
                 debugDecisions.Add(message);
             }
+        }
+
+        private string GetNextPlayDebugMessage(NextPlay play)
+        {
+            var teamAbbreviation = GetTeamAbbreviation(play.Team);
+            var lineOfScrimmageDisplay = InternalYardNumberToString(play.LineOfScrimmage);
+            int? distanceToFirstDownLine = play.FirstDownLine.HasValue
+                ? play.Direction == DriveDirection.TowardHomeEndzone
+                    ? (play.LineOfScrimmage - play.FirstDownLine)
+                    : (play.FirstDownLine - play.LineOfScrimmage)
+                : null;
+
+            return play.Kind switch
+            {
+                NextPlayKind.Kickoff => $"Next play is {teamAbbreviation} kickoff from {lineOfScrimmageDisplay}.",
+                NextPlayKind.FirstDown => $"Next play is {teamAbbreviation} 1st and {distanceToFirstDownLine}.",
+                NextPlayKind.SecondDown => $"Next play is {teamAbbreviation} 2nd and {distanceToFirstDownLine}.",
+                NextPlayKind.ThirdDown => $"Next play is {teamAbbreviation} 3rd and {distanceToFirstDownLine}.",
+                NextPlayKind.FourthDown => $"Next play is {teamAbbreviation} 4th and {distanceToFirstDownLine}.",
+                NextPlayKind.ConversionAttempt =>
+                    $"Next play is {DetermineArticle(teamAbbreviation)} {teamAbbreviation} conversion attempt.",
+                NextPlayKind.FreeKick =>
+                    $"Next play is {DetermineArticle(teamAbbreviation)} {teamAbbreviation} free kick.",
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         public void MarkGameRecordComplete()

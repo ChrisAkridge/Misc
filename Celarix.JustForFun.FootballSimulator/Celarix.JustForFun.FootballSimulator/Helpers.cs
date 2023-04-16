@@ -67,5 +67,13 @@ namespace Celarix.JustForFun.FootballSimulator
         }
 
         public static string FormatSeconds(int seconds) => $"{seconds / 60}:{seconds % 60:D2}";
+
+        public static string DetermineArticle(string subject) =>
+            new[]
+            {
+                'a', 'e', 'i', 'o', 'u'
+            }.Contains(subject.ToLowerInvariant()[0])
+                ? "an"
+                : "a";
     }
 }
