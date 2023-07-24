@@ -79,6 +79,17 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
             if (clockEvent == ClockEvent.NewCoinTossRequired)
             {
                 currentKickingTeam = ChooseKickingTeam();
+
+                NextPlay = new NextPlay
+                {
+                    Direction = currentKickingTeam == GameTeam.Home
+                        ? DriveDirection.TowardAwayEndzone
+                        : DriveDirection.TowardHomeEndzone,
+                    Kind = NextPlayKind.Kickoff,
+                    LineOfScrimmage = TeamYardLineToInternalYardLine(35, currentKickingTeam),
+                    Team = currentKickingTeam
+                };
+                
                 clock.Advance(0);
             }
             else if (clockEvent == ClockEvent.TimeElapsed)
@@ -174,8 +185,8 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
                 ? GameTeam.Away
                 : GameTeam.Home;
 
-            AddDebugMessage(
-                $"{GetTeamAbbreviation(GameTeam.Away)} elects to {(awayChoice == GameTeam.Away ? "kick" : "receive")}.");
+            StatusMessage =
+                $"{GetTeamAbbreviation(GameTeam.Home)} chose {(homeTeamChoosesHeads ? "heads" : "tails")} and {(coinTossIsHeads ? "won" : "lost")}; {GetTeamAbbreviation(GameTeam.Away)} elects to {(awayChoice == GameTeam.Away ? "kick" : "receive")}.";
 
             return awayChoice;
         }
@@ -190,52 +201,155 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
 
             if (ShouldAttemptOnsideKick(NextPlay.Team))
             {
-                var onsideStrengthDifferential = kickingTeam.KickingStrength - receivingTeam.KickDefenseStrength;
-                AddDebugMessage($"The onside kick differential is {onsideStrengthDifferential:F2}.");
-                
-                var chanceOfRecoveryPercentage = 10d + (onsideStrengthDifferential / 50d);
-                AddDebugMessage($"{GetTeamAbbreviation(NextPlay.Team)} has a {chanceOfRecoveryPercentage * 100:F2}% chance of recovering.");
-                
-                var kickRecoveredByKickingTeam = random.NextDouble() < chanceOfRecoveryPercentage / 100d;
-                AddDebugMessage($"{GetTeamAbbreviation(NextPlay.Team)} has {(kickRecoveredByKickingTeam ? "recovered" : "not recovered")} the onside kick.");
-                
-                var kickDistanceTraveled = ClampDistanceBasedOnFieldPosition(TeamYardLineToInternalYardLine(35, NextPlay.Team),
-                    SampleNormalDistribution(10d, onsideStrengthDifferential / 50d, random),
-                    NextPlay.Direction,
-                    TeamYardLineToInternalYardLine(1, OtherTeam(NextPlay.Team)),
-                    TeamYardLineToInternalYardLine(99, NextPlay.Team));
+                AttemptOnsideKick(kickingTeam, receivingTeam);
+            }
+            else
+            {
+                Kickoff(kickingTeam, receivingTeam);
+            }
+        }
 
-                if (kickDistanceTraveled < 10d && kickRecoveredByKickingTeam) { kickDistanceTraveled = 10d; }
+        private void AttemptOnsideKick(InGameTeamStrengths kickingTeam, InGameTeamStrengths receivingTeam)
+        {
+            var onsideStrengthDifferential = kickingTeam.KickingStrength - receivingTeam.KickDefenseStrength;
+            AddDebugMessage($"The onside kick differential is {onsideStrengthDifferential:F2}.");
 
+            var chanceOfRecoveryPercentage = 10d + (onsideStrengthDifferential / 50d);
+
+            AddDebugMessage(
+                $"{GetTeamAbbreviation(NextPlay.Team)} has a {chanceOfRecoveryPercentage:F2}% chance of recovering.");
+
+            var kickRecoveredByKickingTeam = random.NextDouble() < chanceOfRecoveryPercentage / 100d;
+
+            AddDebugMessage(
+                $"{GetTeamAbbreviation(NextPlay.Team)} has {(kickRecoveredByKickingTeam ? "recovered" : "not recovered")} the onside kick.");
+
+            var kickDistanceTraveled = ClampDistanceBasedOnFieldPosition(TeamYardLineToInternalYardLine(35, NextPlay.Team),
+                SampleNormalDistribution(10d, onsideStrengthDifferential / 50d, random),
+                NextPlay.Direction,
+                TeamYardLineToInternalYardLine(1, OtherTeam(NextPlay.Team)),
+                TeamYardLineToInternalYardLine(99, NextPlay.Team));
+
+            if (kickDistanceTraveled < 10d && kickRecoveredByKickingTeam) { kickDistanceTraveled = 10d; }
+
+            NextPlay = NextPlayComputer.DetermineNextPlay(new PlayResult
+            {
+                Kind = PlayResultKind.BallDead,
+                Team = kickRecoveredByKickingTeam ? NextPlay.Team : OtherTeam(NextPlay.Team),
+                DownNumber = null,
+                BallDeadYard =
+                    AddDistanceToYard(NextPlay.Direction, TeamYardLineToInternalYardLine(35, NextPlay.Team),
+                        kickDistanceTraveled),
+                FirstDownLine = null,
+                Direction = TowardOpponentEndzone(NextPlay.Team)
+            });
+
+            AddDebugMessage($"Kick recovered at the {InternalYardNumberToString(NextPlay.LineOfScrimmage)}.");
+
+            StatusMessage = GetFullStatusMessage(kickRecoveredByKickingTeam
+                ? $"Onside kick attempt recovered by {GetTeamAbbreviation(NextPlay.Team)}!"
+                : $"Onside kick attempt failed; ball recovered by {GetTeamAbbreviation(NextPlay.Team)}.");
+        }
+
+        private void Kickoff(InGameTeamStrengths kickingTeam, InGameTeamStrengths receivingTeam)
+        {
+            var kickDifferential = kickingTeam.KickingStrength - receivingTeam.KickDefenseStrength;
+            var kickReturnDifferential = receivingTeam.KickReturnStrength - receivingTeam.RunningDefenseStrength;
+            AddDebugMessage($"The kick differential is {kickDifferential:F2}; the kick return differential is {kickReturnDifferential:F2}.");
+
+            var kickoffOutOfBoundsOdds = Math.Clamp(0.02d + (kickDifferential / 5000d), 0d, 1d);
+            AddDebugMessage($"The kickoff has a {kickoffOutOfBoundsOdds * 100:F2}% chance of going out of bounds.");
+
+            var kickoffOutOfBounds = random.NextDouble() < kickoffOutOfBoundsOdds;
+            AddDebugMessage($"The kickoff {(kickoffOutOfBounds ? "went" : "did not go")} out of bounds.");
+
+            var kickStrength = kickingTeam.KickingStrength - 1000d;
+
+            // TODO: negative kick strengths should result in a reduction in mean with no stddev change
+            // positive kick strengths result in an increase in stddev with no mean change
+            // i guess
+            // var kickDistance = SampleNormalDistribution(65d, 3d * (kickStrength / 50d), random);
+            var kickDistance = SampleNormalDistribution(new NormalDistributionParameters(65d, 3d, 0.1d, 0.06d), kickStrength, random);
+
+            var kickLandingYard = AddDistanceToYard(NextPlay.Direction, NextPlay.LineOfScrimmage, kickDistance);
+            AddDebugMessage($"The kickoff traveled {kickDistance:F2} yards.");
+
+            if (kickLandingYard < -10d || kickLandingYard >= 110d)
+            {
+                NextPlay = NextPlayComputer.DetermineNextPlay(new PlayResult
+                {
+                    BallDeadYard = null,
+                    Direction = TowardOpponentEndzone(OtherTeam(NextPlay.Team)),
+                    DownNumber = null,
+                    Kind = PlayResultKind.BallDead,
+                    Team = OtherTeam(NextPlay.Team)
+                });
+                
+                // TODO: better penalty handling
+                if (kickoffOutOfBounds)
+                {
+                    NextPlay.LineOfScrimmage = AddDistanceToYard(NextPlay.Direction, NextPlay.LineOfScrimmage, 5d);
+                    NextPlay.FirstDownLine = AddDistanceToYard(NextPlay.Direction, NextPlay.FirstDownLine!.Value, 5d);
+                }
+
+                StatusMessage = GetFullStatusMessage($"Touchback for {GetTeamAbbreviation(NextPlay.Team)}.");
+
+                return;
+            }
+
+            var receivingTeamSignalsFairCatch = kickReturnDifferential < -500d;
+            AddDebugMessage($"{GetTeamAbbreviation(OtherTeam(NextPlay.Team))} {(receivingTeamSignalsFairCatch ? "has signaled fair catch" : "to return")}.");
+
+            //if (!receivingTeamSignalsFairCatch)
+            //{
+            var ballCaughtByReceivingTeamOdds =
+                0.9999d - (0.0001d * ((receivingTeam.KickReturnStrength - 1000d) / 50d));
+            AddDebugMessage($"{GetTeamAbbreviation(OtherTeam(NextPlay.Team))} has a {ballCaughtByReceivingTeamOdds * 100d:F2}% chance of catching the ball.");
+
+            var ballCaughtByReceivingTeam = random.NextDouble() < ballCaughtByReceivingTeamOdds;
+            AddDebugMessage(
+                $"{GetTeamAbbreviation(OtherTeam(NextPlay.Team))} has {(ballCaughtByReceivingTeam ? "caught" : "not caught")} the kickoff.");
+
+            if (ballCaughtByReceivingTeam)
+            {
                 NextPlay = NextPlayComputer.DetermineNextPlay(new PlayResult
                 {
                     Kind = PlayResultKind.BallDead,
-                    Team = kickRecoveredByKickingTeam ? NextPlay.Team : OtherTeam(NextPlay.Team),
+                    Team = OtherTeam(NextPlay.Team),
                     DownNumber = null,
-                    BallDeadYard = TeamYardLineToInternalYardLine(45, NextPlay.Team),
+                    BallDeadYard = kickLandingYard,
                     FirstDownLine = null,
-                    Direction = TowardOpponentEndzone(NextPlay.Team)
+                    Direction = TowardOpponentEndzone(OtherTeam(NextPlay.Team))
                 });
-                
-                AddDebugMessage($"Kick recovered at the {InternalYardNumberToString(NextPlay.LineOfScrimmage)}.");
 
-                StatusMessage = GetFullStatusMessage(kickRecoveredByKickingTeam
-                    ? $"Onside kick attempt recovered by {GetTeamAbbreviation(NextPlay.Team)}!"
-                    : $"Onside kick attempt failed; ball recovered by {GetTeamAbbreviation(NextPlay.Team)}.");
+                StatusMessage = GetFullStatusMessage(
+                        $"{GetTeamAbbreviation(NextPlay.Team)} signals fair catch and caught the ball at {InternalYardNumberToString(NextPlay.LineOfScrimmage)}.");
+
+                return;
             }
-            else { }
+            else
+            {
+                // Handle fumble
+            }
+            
+            //}
+            //else
+            //{
+            //    // TODO: better penalty handling
+
+            //}
         }
-        
+
         private bool ShouldKickoff()
         {
+            if (clock.PeriodNumber is 1 or 3 or >= 5)
+            {
+                return clock.SecondsElapsedInPeriod == 0;
+            }
+            
             if (NextPlay.Kind == NextPlayKind.Kickoff)
             {
                 return true;
-            }
-
-            if (clock.PeriodNumber is 1 or 3 or >= 5)
-            {
-                return clock.SecondsLeftInPeriod == 0;
             }
 
             return false;
@@ -247,7 +361,7 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
 
             if (team.Disposition == TeamDisposition.Insane)
             {
-                AddDebugMessage($"{team.Abbreviation} is insane, will attempt on onside kick.");
+                AddDebugMessage($"{team.Abbreviation} is insane, will attempt an onside kick.");
                 return true;
             }
 
@@ -276,8 +390,8 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
 
         private static int? GetDistanceToFirstDownLine(NextPlay nextPlay) =>
             nextPlay.Direction == DriveDirection.TowardHomeEndzone
-                ? nextPlay.LineOfScrimmage - nextPlay.FirstDownLine
-                : nextPlay.FirstDownLine - nextPlay.LineOfScrimmage;
+                ? nextPlay.FirstDownLine - nextPlay.LineOfScrimmage
+                : nextPlay.LineOfScrimmage - nextPlay.FirstDownLine;
 
         private string GetTeamName(GameTeam team) =>
             team == GameTeam.Home
@@ -310,20 +424,30 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
             double minInternalYardNumber = 0d,
             double maxInternalYardNumber = 100d)
         {
-            return direction switch
+            switch (direction)
             {
-                DriveDirection.TowardHomeEndzone => Math.Max(internalYardNumber - distance, minInternalYardNumber),
-                DriveDirection.TowardAwayEndzone => Math.Min(internalYardNumber + distance, maxInternalYardNumber),
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-            };
+                case DriveDirection.TowardAwayEndzone:
+                {
+                    var distanceToMinYard = internalYardNumber - minInternalYardNumber;
+
+                    return Math.Min(distanceToMinYard, distance);
+                }
+                case DriveDirection.TowardHomeEndzone:
+                {
+                    var distanceToMaxYard = maxInternalYardNumber - internalYardNumber;
+
+                    return Math.Min(distanceToMaxYard, distance);
+                }
+                default: throw new ArgumentOutOfRangeException(nameof(direction));
+            }
         }
 
         private string InternalYardNumberToString(int yardNumber) =>
             yardNumber switch
             {
                 50 => "midfield",
-                < 50 => $"{GetTeamAbbreviation(GameTeam.Home)} {yardNumber}",
-                _ => $"{GetTeamAbbreviation(GameTeam.Away)} {100 - yardNumber}"
+                < 50 => $"{GetTeamAbbreviation(GameTeam.Away)} {yardNumber}",
+                _ => $"{GetTeamAbbreviation(GameTeam.Home)} {100 - yardNumber}"
             };
 
         private void AddDebugMessage(string message)
@@ -356,6 +480,18 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
                 NextPlayKind.FreeKick =>
                     $"Next play is {DetermineArticle(teamAbbreviation)} {teamAbbreviation} free kick.",
                 _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+
+        private int AddDistanceToYard(DriveDirection direction, int internalYardNumber, double distance)
+        {
+            return direction switch
+            {
+                DriveDirection.TowardHomeEndzone => internalYardNumber
+                    + (int)Math.Round(distance, MidpointRounding.ToZero),
+                DriveDirection.TowardAwayEndzone => internalYardNumber
+                    - (int)Math.Round(distance, MidpointRounding.ToPositiveInfinity),
+                _ => throw new ArgumentOutOfRangeException(nameof(direction))
             };
         }
 

@@ -78,6 +78,12 @@ namespace Celarix.IO.FileAnalysis.Console
                 
                 ThinFileTreeGenerator.GenerateThinFileTree(inputPath, outputPath);
             }
+            else if (args[0].Equals("-movenumberedtextmaps", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var textMapsPath = args[1];
+                
+                NumberedTextMapMover.MoveNumberedTextMaps(textMapsPath);
+            }
             else
             {
                 var inputFolderPath = args[0];

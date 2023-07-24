@@ -314,7 +314,18 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             return MessageType.Other;
         }
 
-        private static int GetEstimateFileCountFromMessage(string message) =>
-            int.Parse(message.Split(' ')[2], NumberStyles.AllowThousands);
+        private static int GetEstimateFileCountFromMessage(string message)
+        {
+            try
+            {
+                return int.Parse(message.Split(' ')[2], NumberStyles.AllowThousands);
+            }
+            catch (FormatException)
+            {
+                // Sorry for using exceptions as control flow, but TryParse doesn't have an overload that accepts a NumberStyles
+                // and also I just woke up
+                return 0;
+            }
+        }
     }
 }

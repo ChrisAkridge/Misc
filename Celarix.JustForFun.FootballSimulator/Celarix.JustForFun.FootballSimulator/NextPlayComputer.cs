@@ -52,6 +52,24 @@ namespace Celarix.JustForFun.FootballSimulator
                     };
                 case PlayResultKind.BallDead or PlayResultKind.IncompletePass:
                 {
+                    if (lastPlayResult.DownNumber is null)
+                    {
+                        // Handles kickoffs and touchbacks
+                        var receivingTeamDirection = TowardOpponentEndzone(lastPlayResult.Team);
+
+                        var newLineOfScrimmage = lastPlayResult.BallDeadYard
+                            ?? TeamYardLineToInternalYardLine(25, OtherTeam(lastPlayResult.Team));
+
+                        return new NextPlay
+                        {
+                            Kind = NextPlayKind.FirstDown,
+                            Team = OtherTeam(lastPlayResult.Team),
+                            Direction = receivingTeamDirection,
+                            LineOfScrimmage = newLineOfScrimmage,
+                            FirstDownLine = YardsDownfield(newLineOfScrimmage, 10, receivingTeamDirection)
+                        };
+                    }
+
                     var ballDeadYard = lastPlayResult.BallDeadYard
                         ?? throw new ArgumentNullException(nameof(lastPlayResult.BallDeadYard),
                             "Cannot have a null ball-dead-yard for a ball dead or incomplete pass play result.");
@@ -77,54 +95,35 @@ namespace Celarix.JustForFun.FootballSimulator
                             };
                         }
                     }
-                
-                    switch (lastPlayResult.DownNumber)
-                    {
-                        case 4:
-                        {
-                            var otherTeamDirection = TowardOpponentEndzone(OtherTeam(lastPlayResult.Team));
 
-                            return new NextPlay
-                            {
-                                Kind = NextPlayKind.FirstDown,
-                                Team = OtherTeam(lastPlayResult.Team),
-                                Direction = otherTeamDirection,
-                                LineOfScrimmage = ballDeadYard,
-                                FirstDownLine = YardsDownfield(ballDeadYard, 10, otherTeamDirection)
-                            };
-                        }
-                        case null:
+                    if (lastPlayResult.DownNumber == 4)
+                    {
+                        var otherTeamDirection = TowardOpponentEndzone(OtherTeam(lastPlayResult.Team));
+
+                        return new NextPlay
                         {
-                            // Handles kickoffs and touchbacks
-                            var otherTeamDirection = TowardOpponentEndzone(OtherTeam(lastPlayResult.Team));
-                            var newLineOfScrimmage = lastPlayResult.BallDeadYard
-                                ?? TeamYardLineToInternalYardLine(25, OtherTeam(lastPlayResult.Team));
-                    
-                            return new NextPlay
-                            {
-                                Kind = NextPlayKind.FirstDown,
-                                Team = OtherTeam(lastPlayResult.Team),
-                                Direction = otherTeamDirection,
-                                LineOfScrimmage = newLineOfScrimmage,
-                                FirstDownLine = YardsDownfield(newLineOfScrimmage, 10, otherTeamDirection)
-                            };
-                        }
-                        default:
-                            return new NextPlay
-                            {
-                                Kind = lastPlayResult.DownNumber switch
-                                {
-                                    1 => NextPlayKind.SecondDown,
-                                    2 => NextPlayKind.ThirdDown,
-                                    3 => NextPlayKind.FourthDown,
-                                    _ => throw new ArgumentOutOfRangeException(nameof(lastPlayResult.DownNumber))
-                                },
-                                Team = lastPlayResult.Team,
-                                Direction = lastPlayResult.Direction,
-                                LineOfScrimmage = ballDeadYard,
-                                FirstDownLine = lastPlayResult.FirstDownLine
-                            };
+                            Kind = NextPlayKind.FirstDown,
+                            Team = OtherTeam(lastPlayResult.Team),
+                            Direction = otherTeamDirection,
+                            LineOfScrimmage = ballDeadYard,
+                            FirstDownLine = YardsDownfield(ballDeadYard, 10, otherTeamDirection)
+                        };
                     }
+
+                    return new NextPlay
+                    {
+                        Kind = lastPlayResult.DownNumber switch
+                        {
+                            1 => NextPlayKind.SecondDown,
+                            2 => NextPlayKind.ThirdDown,
+                            3 => NextPlayKind.FourthDown,
+                            _ => throw new ArgumentOutOfRangeException(nameof(lastPlayResult.DownNumber))
+                        },
+                        Team = lastPlayResult.Team,
+                        Direction = lastPlayResult.Direction,
+                        LineOfScrimmage = ballDeadYard,
+                        FirstDownLine = lastPlayResult.FirstDownLine
+                    };
                 }
                 case PlayResultKind.PuntDownedByPuntingTeam:
                 {

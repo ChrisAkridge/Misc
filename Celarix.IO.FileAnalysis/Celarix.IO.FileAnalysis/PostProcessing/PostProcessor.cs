@@ -17,7 +17,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
             logger.Info($"Performing post-processing on {folderPath}...");
 
             var filePaths = FileListGenerator.GenerateFileList(folderPath);
-            
+
             if (deleteBinaryDrawingFiles)
             {
                 BinaryDrawingFileRemover.RemoveAllBinaryDrawingFiles(filePaths);
