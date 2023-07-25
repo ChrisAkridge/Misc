@@ -15,6 +15,7 @@ namespace Celarix.IO.FileAnalysis.FinalProcessing
 
 		public static void CombineCanvases(string[] canvasPaths, string outputPath)
 		{
+            LoggingConfigurer.ConfigurePostProcessingLogging();
 			logger.Info($"Combining {canvasPaths.Length} canvases...");
 			var blocks = canvasPaths
 				.Select(p => new Block
@@ -25,7 +26,7 @@ namespace Celarix.IO.FileAnalysis.FinalProcessing
 				.ToArray();
 
 			var progress = new Progress<string>();
-			progress.ProgressChanged += (s, e) => logger.Info(e);
+			progress.ProgressChanged += (_, e) => logger.Info(e);
 
 			var packer = new Packer();
 			packer.Fit(blocks, progress);
@@ -64,6 +65,7 @@ namespace Celarix.IO.FileAnalysis.FinalProcessing
 
 		private static void MoveCanvasToOutput(Block block, string outputFolder)
 		{
+            logger.Info($"Moving canvas {block.CanvasFolderPath}...");
 			var maxZoomLevel = GetMaxZoomLevel(block.CanvasFolderPath);
 
 			for (var i = maxZoomLevel; i >= 0; i--)
@@ -75,6 +77,8 @@ namespace Celarix.IO.FileAnalysis.FinalProcessing
 				var outputBottomY = outputTopY + block.Fit.Size.Height;
 				for (var y = outputTopY; y < outputBottomY; y++)
 				{
+                    logger.Info($"Moving canvas at zoom level {i}, row {y}");
+                    
 					var outputLeftX = block.Fit.Location.X;
 					var outputRightX = outputLeftX + block.Fit.Size.Width;
 

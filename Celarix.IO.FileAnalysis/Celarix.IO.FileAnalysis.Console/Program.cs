@@ -84,6 +84,13 @@ namespace Celarix.IO.FileAnalysis.Console
                 
                 NumberedTextMapMover.MoveNumberedTextMaps(textMapsPath);
             }
+            else if (args[0].Equals("-combinecanvases", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var canvasPathsFilePath = args[1];
+                var outputPath = args[2];
+                
+                CanvasCombiner.CombineCanvases(File.ReadAllLines(canvasPathsFilePath), outputPath);
+            }
             else
             {
                 var inputFolderPath = args[0];

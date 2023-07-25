@@ -64,26 +64,5 @@ namespace Celarix.IO.FileAnalysis.Extensions
                 }
             }
         }
-
-        public static IEnumerable<T> SafeEnumerate<T>(this IEnumerable<T> sequence, IList<Exception> exceptions)
-        {
-            using var enumerator = sequence.GetEnumerator();
-
-            safeMoveNext:
-            try
-            {
-                enumerator.MoveNext();
-            }
-            catch (Exception ex)
-            {
-                exceptions.Add(ex);
-
-                goto safeMoveNext;
-            }
-
-            yield return enumerator.Current;
-
-            goto safeMoveNext;
-        }
     }
 }
