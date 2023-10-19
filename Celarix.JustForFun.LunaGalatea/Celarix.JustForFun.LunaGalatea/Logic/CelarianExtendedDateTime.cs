@@ -63,6 +63,8 @@ namespace Celarix.JustForFun.LunaGalatea.Logic
             "HEN", "DOD", "KAI"
         };
 
+        private static readonly List<ExtendedDayCultureInfo> cultureInfo = GetCultureInfo();
+
         /// <summary>
         /// The number of 100ns ticks since 0001-01-01T00:00:00Z.
         /// </summary>
@@ -117,93 +119,157 @@ namespace Celarix.JustForFun.LunaGalatea.Logic
 
         public CelarianExtendedDateTime(DateTimeOffset earthTime) : this(earthTime.Ticks) { }
 
+        public CelarianExtendedDateTime(int year,
+            int month,
+            int day,
+            int hour,
+            int minute,
+            int second) : this((year * TicksPerYear)
+            + (month * TicksPerMonth)
+            + (day * TicksPerDay)
+            + (hour * TicksPerHour)
+            + (minute * TicksPerMinute)
+            + (second * TicksPerSecond)) { }
+
         public string ToISO8601StyleString() => $"{Year + 1}-{Month + 1}-{Day + 1} {Hour:D2}:{Minute:D2}:{Second:D2}";
 
         public string ToAmericanLongDateStyleString() =>
             $"{DayOfWeekName}, {MonthName} {Day + 1}, {Year + 1} {HoursInMeridian:D2}:{Minute:D2}:{Second:D2} {Meridian}";
 
-        public string GetDayCulture() =>
-            DayOfWeekName switch
-            {
-                "Themisday" => "Mid-week day off",
-                "Palday" => "Mid-week day off",
-                "Galaday" => "Day off for community",
-                "Kerday" => "Day off for family",
-                "Lunaday" => "Day off for self and partners",
-                _ => "Workday"
-            };
+        public string GetDayCulture() => cultureInfo[GetIndexOfCurrentCultureInfo()].DayCulture;
 
-        public string GetTimeCulture() =>
-            DayOfWeekName switch
+        public string GetTimeCulture() => cultureInfo[GetIndexOfCurrentCultureInfo()].TimeCulture;
+
+        public DateTimeOffset GetTimeOfNextCulture()
+        {
+            var currentCultureIndex = GetIndexOfCurrentCultureInfo();
+            var currentCulture = cultureInfo[currentCultureIndex];
+            var nextCultureIndex = currentCultureIndex + 1;
+            
+            if (currentCultureIndex == cultureInfo.Count - 1)
             {
-                "Themisday" or "Palday" => Hour switch
+                nextCultureIndex = 0;
+            }
+            
+            var nextCulture = cultureInfo[nextCultureIndex];
+            var now = new CelarianExtendedDateTime(DateTimeOffset.Now);
+            var startOfToday = new CelarianExtendedDateTime(now.Year, now.Month, now.Day, 0, 0, 0);
+            CelarianExtendedDateTime nextCultureStartTime;
+
+            if (currentCulture.DayOfWeekNumber != nextCulture.DayOfWeekNumber)
+            {
+                var startOfTomorrow = new CelarianExtendedDateTime(startOfToday.Ticks + TicksPerDay);
+                nextCultureStartTime = new CelarianExtendedDateTime(startOfTomorrow.Ticks + (nextCulture.StartingHour * TicksPerHour));
+            }
+            else
+            {
+                nextCultureStartTime =
+                    new CelarianExtendedDateTime(startOfToday.Ticks + (nextCulture.StartingHour * TicksPerHour));
+            }
+            
+            return new DateTimeOffset(nextCultureStartTime.Ticks, DateTimeOffset.UtcNow.Offset);
+        }
+
+        private int GetIndexOfCurrentCultureInfo()
+        {
+            for (var i = 0; i < cultureInfo.Count; i++)
+            {
+                var info = cultureInfo[i];
+                if (info.DayOfWeekNumber == Day % 14 && Hour >= info.StartingHour && Hour < info.EndingHour)
                 {
-                    >= 0 and < 3 => "First sleep",
-                    >= 3 and < 6 => "Overnight wakefulness",
-                    >= 6 and < 14 => "Second sleep",
-                    >= 14 and < 16 => "Breakfast",
-                    >= 16 and < 24 => "Chores, homework, errands, maintenance, lunch",
-                    >= 24 and < 25 => "Siesta",
-                    >= 25 and < 27 => "Dinner",
-                    >= 27 and < 33 => "High Leisure",
-                    >= 33 and < 37 => "Low Leisure",
-                    _ => throw new ArgumentOutOfRangeException()
-                },
-                "Galaday" => Hour switch
-                {
-                    >= 0 and < 3 => "First sleep",
-                    >= 3 and < 6 => "Overnight wakefulness",
-                    >= 6 and < 14 => "Second sleep",
-                    >= 14 and < 16 => "Breakfast",
-                    >= 16 and < 22 => "Fellowship with community",
-                    >= 22 and < 24 => "Lunch",
-                    >= 24 and < 26 => "Siesta",
-                    >= 26 and < 32 => "High Leisure",
-                    >= 32 and < 34 => "Dinner",
-                    >= 34 and < 37 => "Low Leisure",
-                    _ => throw new ArgumentOutOfRangeException()
-                },
-                "Kerday" => Hour switch
-                {
-                    >= 0 and < 3 => "First sleep",
-                    >= 3 and < 6 => "Overnight wakefulness",
-                    >= 6 and < 14 => "Second sleep",
-                    >= 14 and < 16 => "Breakfast",
-                    >= 16 and < 22 => "High Leisure",
-                    >= 22 and < 24 => "Lunch",
-                    >= 24 and < 30 => "Family time",
-                    >= 30 and < 32 => "Siesta",
-                    >= 32 and < 34 => "Dinner",
-                    >= 34 and < 37 => "Low Leisure",
-                    _ => throw new ArgumentOutOfRangeException()
-                },
-                "Lunaday" => Hour switch
-                {
-                    >= 0 and < 3 => "First sleep",
-                    >= 3 and < 6 => "Overnight wakefulness",
-                    >= 6 and < 14 => "Second sleep",
-                    >= 14 and < 16 => "Breakfast",
-                    >= 16 and < 20 => "High Leisure",
-                    >= 20 and < 21 => "Lunch",
-                    >= 21 and < 23 => "Siesta",
-                    >= 23 and < 24 => "Dinner",
-                    >= 25 and < 29 => "Low Leisure",
-                    >= 29 and < 37 => "Lover's Time 💖",
-                    _ => throw new ArgumentOutOfRangeException()
-                },
-                _ => Hour switch
-                {
-                    >= 0 and < 3 => "First sleep",
-                    >= 3 and < 6 => "Overnight wakefulness",
-                    >= 6 and < 14 => "Second sleep",
-                    >= 14 and < 16 => "Breakfast",
-                    >= 16 and < 26 => "Work",
-                    >= 26 and < 27 => "Siesta",
-                    >= 27 and < 29 => "Dinner",
-                    >= 29 and < 33 => "Chores, homework, errands, maintenance",
-                    >= 33 and < 37 => "Hobbies, projects, entertainment",
-                    _ => throw new ArgumentOutOfRangeException()
+                    return i;
                 }
-            };
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        private static List<ExtendedDayCultureInfo> GetCultureInfo()
+        {
+            var cultureInfos = new List<ExtendedDayCultureInfo>();
+            
+            for (int i = 0; i < 14; i++)
+            {
+                var fullDayName = fullDayNames[i];
+                switch (fullDayName)
+                {
+                    case "Themisday" or "Palday":
+                    {
+                        const string dayCulture = "Mid-week day off";
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 0, 3, dayCulture, "First sleep"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 3, 6, dayCulture, "Overnight wakefulness"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 6, 14, dayCulture, "Second sleep"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 14, 16, dayCulture, "Breakfast"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 16, 24, dayCulture, "Chores, homework, errands, maintenance, lunch"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 24, 25, dayCulture, "Siesta"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 25, 27, dayCulture, "Dinner"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 27, 33, dayCulture, "High leisure"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 33, 37, dayCulture, "Low leisure"));
+                        break;
+                    }
+                    case "Galaday":
+                    {
+                        const string dayCulture = "Day off for community";
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 0, 3, dayCulture, "First sleep"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 3, 6, dayCulture, "Overnight wakefulness"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 6, 14, dayCulture, "Second sleep"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 14, 16, dayCulture, "Breakfast"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 16, 22, dayCulture, "Fellowship with community"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 22, 24, dayCulture, "Lunch"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 24, 26, dayCulture, "Siesta"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 26, 32, dayCulture, "High leisure"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 32, 34, dayCulture, "Dinner"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 34, 37, dayCulture, "Low leisure"));
+                        break;
+                    }
+                    case "Kerday":
+                    {
+                        const string dayCulture = "Day off for family";
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 0, 3, dayCulture, "First sleep"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 3, 6, dayCulture, "Overnight wakefulness"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 6, 14, dayCulture, "Second sleep"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 14, 16, dayCulture, "Breakfast"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 16, 22, dayCulture, "High leisure"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 22, 24, dayCulture, "Lunch"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 24, 30, dayCulture, "Family time"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 30, 32, dayCulture, "Siesta"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 32, 34, dayCulture, "Dinner"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 34, 37, dayCulture, "Low leisure"));
+                        break;
+                    }
+                    case "Lunaday":
+                    {
+                        const string dayCulture = "Day off for self and partners";
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 0, 3, dayCulture, "First sleep"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 3, 6, dayCulture, "Overnight wakefulness"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 6, 14, dayCulture, "Second sleep"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 14, 16, dayCulture, "Breakfast"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 16, 20, dayCulture, "High leisure"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 20, 21, dayCulture, "Lunch"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 21, 23, dayCulture, "Siesta"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 23, 24, dayCulture, "Dinner"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 24, 29, dayCulture, "Low leisure"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 29, 37, dayCulture, "Lover's time 💖"));
+                        break;
+                    }
+                    default:
+                    {
+                        const string dayCulture = "Workday";
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 0, 3, dayCulture, "First sleep"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 3, 6, dayCulture, "Overnight wakefulness"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 6, 14, dayCulture, "Second sleep"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 14, 16, dayCulture, "Breakfast"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 16, 26, dayCulture, "Work"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 26, 27, dayCulture, "Siesta"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 27, 29, dayCulture, "Dinner"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 29, 33, dayCulture, "Chores, homework, errands, maintenance"));
+                        cultureInfos.Add(new ExtendedDayCultureInfo(i, 33, 37, dayCulture, "Hobbies, projects, entertainment"));
+                        break;
+                    }
+                }
+            }
+            
+            return cultureInfos;
+        }
     }
 }

@@ -39,9 +39,9 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
 
         public async Task Render(int timerTicks)
         {
-            if (timerTicks % 120 == 0)
+            if (string.IsNullOrEmpty(quoteLabel.Text) || timerTicks % 1800 == 0)
             {
-                if (string.IsNullOrEmpty(quoteLabel.Text) || MarketOpen())
+                if (MarketOpen())
                 {
                     var quotes = await provider.GetDisplayObject();
                     quoteLabel.Text = string.Join(Environment.NewLine, quotes);
@@ -53,7 +53,12 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
         {
             var now = DateTimeOffset.Now;
             return now.DayOfWeek is not (DayOfWeek.Saturday or DayOfWeek.Sunday)
-                && (now.Hour >= 9 && now.Minute >= 30 && now.Hour < 16);
+                && now.Hour switch
+                {
+                    < 9 => false,
+                    9 => now.Minute >= 30,
+                    _ => now.Hour < 16
+                };
         }
     }
 }
