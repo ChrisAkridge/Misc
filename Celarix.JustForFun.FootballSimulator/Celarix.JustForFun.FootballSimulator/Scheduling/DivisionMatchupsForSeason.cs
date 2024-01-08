@@ -7,17 +7,17 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling;
 
 internal readonly struct DivisionMatchupsForSeason
 {
-    public Division TypeIIOpponentDivision { get; }
-    public Division TypeIIIOpponentDivision { get; }
-    public Division[] TypeIVOpponentDivisions { get; }
+    public Division IntraconferenceOpponentDivision { get; }
+    public Division InterconferenceOpponentDivision { get; }
+    public Division[] RemainingIntraconferenceOpponentDivisions { get; }
 
     public DivisionMatchupsForSeason(Division typeIIOpponentDivision, Division typeIIIOpponentDivision,
         Division firstTypeIVOpponentDivision, Division secondTypeIVOpponentDivision)
     {
-        TypeIIOpponentDivision = typeIIOpponentDivision;
-        TypeIIIOpponentDivision = typeIIIOpponentDivision;
+        IntraconferenceOpponentDivision = typeIIOpponentDivision;
+        InterconferenceOpponentDivision = typeIIIOpponentDivision;
 
-        TypeIVOpponentDivisions = new[]
+        RemainingIntraconferenceOpponentDivisions = new[]
         {
             firstTypeIVOpponentDivision, secondTypeIVOpponentDivision
         };

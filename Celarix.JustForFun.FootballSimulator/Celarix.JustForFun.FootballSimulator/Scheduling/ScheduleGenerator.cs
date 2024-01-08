@@ -176,7 +176,7 @@ public static class ScheduleGenerator
 
         foreach (var team in basicTeamInfos)
         {
-            // Type I games: teams in this division (6 games)
+            // Intradivision games (6 games)
             var otherTeamsInDivision = basicTeamInfos
                 .Where(i => i.Conference == team.Conference
                     && i.Division == team.Division
@@ -203,43 +203,43 @@ public static class ScheduleGenerator
                 });
             }
 
-            var typeIIOpponentDivision = divisionMatchupCycle[(team.Conference, team.Division)][cycleYear]
-                .TypeIIOpponentDivision;
-            // Type II games: intraconference games (4 games)
-            var allTypeIIOpponentTeams =
+            var intraconferenceOpponentDivision = divisionMatchupCycle[(team.Conference, team.Division)][cycleYear]
+                .IntraconferenceOpponentDivision;
+            // Intraconference games (4 games)
+            var allIntraconferenceOpponentTeams =
                 basicTeamInfos
                     .Where(t => t.Conference == team.Conference
-                        && t.Division == typeIIOpponentDivision)
+                        && t.Division == intraconferenceOpponentDivision)
                     .ToList();
-            var orderedTypeIIOpponentTeams = allTypeIIOpponentTeams.ToArray();
+            var orderedIntraconferenceOpponentTeams = allIntraconferenceOpponentTeams.ToArray();
 
-            if (typeIIOpponentDivision == team.Division)
+            if (intraconferenceOpponentDivision == team.Division)
             {
-                allTypeIIOpponentTeams.Sort();
+                allIntraconferenceOpponentTeams.Sort();
 
-                int teamIndexInDivision = allTypeIIOpponentTeams.IndexOf(team);
+                int teamIndexInDivision = allIntraconferenceOpponentTeams.IndexOf(team);
 
-                orderedTypeIIOpponentTeams = teamIndexInDivision switch
+                orderedIntraconferenceOpponentTeams = teamIndexInDivision switch
                 {
                     0 => new[]
                     {
-                        allTypeIIOpponentTeams[1], allTypeIIOpponentTeams[1], allTypeIIOpponentTeams[2],
-                        allTypeIIOpponentTeams[3]
+                        allIntraconferenceOpponentTeams[1], allIntraconferenceOpponentTeams[1], allIntraconferenceOpponentTeams[2],
+                        allIntraconferenceOpponentTeams[3]
                     },
                     1 => new[]
                     {
-                        allTypeIIOpponentTeams[0], allTypeIIOpponentTeams[0], allTypeIIOpponentTeams[3],
-                        allTypeIIOpponentTeams[2]
+                        allIntraconferenceOpponentTeams[0], allIntraconferenceOpponentTeams[0], allIntraconferenceOpponentTeams[3],
+                        allIntraconferenceOpponentTeams[2]
                     },
                     2 => new[]
                     {
-                        allTypeIIOpponentTeams[3], allTypeIIOpponentTeams[3], allTypeIIOpponentTeams[0],
-                        allTypeIIOpponentTeams[1]
+                        allIntraconferenceOpponentTeams[3], allIntraconferenceOpponentTeams[3], allIntraconferenceOpponentTeams[0],
+                        allIntraconferenceOpponentTeams[1]
                     },
                     3 => new[]
                     {
-                        allTypeIIOpponentTeams[2], allTypeIIOpponentTeams[2], allTypeIIOpponentTeams[1],
-                        allTypeIIOpponentTeams[0]
+                        allIntraconferenceOpponentTeams[2], allIntraconferenceOpponentTeams[2], allIntraconferenceOpponentTeams[1],
+                        allIntraconferenceOpponentTeams[0]
                     },
                     _ => throw new ArgumentOutOfRangeException()
                 };
@@ -250,11 +250,11 @@ public static class ScheduleGenerator
             {
                 if (i < 2)
                 {
-                    // When a division faces itself for type II games, the first 2 games are always
+                    // When a division faces itself for intraconference games, the first 2 games are always
                     // against the same team.
                     AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
                     {
-                        AwayTeam = orderedTypeIIOpponentTeams![i],
+                        AwayTeam = orderedIntraconferenceOpponentTeams![i],
                         HomeTeam = team,
                         GameType = 2,
                         AddedBy = team,
@@ -266,7 +266,7 @@ public static class ScheduleGenerator
                     var secondHalfGame = new GameMatchup
                     {
                         AwayTeam = team,
-                        HomeTeam = orderedTypeIIOpponentTeams![i],
+                        HomeTeam = orderedIntraconferenceOpponentTeams![i],
                         GameType = 2,
                         AddedBy = team,
                         GamePairId = Guid.NewGuid()
@@ -279,36 +279,36 @@ public static class ScheduleGenerator
                 }
             }
 
-            // Type III games: interconference games (4 games)
-            var typeIIIOpponentDivision =
-                divisionMatchupCycle[(team.Conference, team.Division)][cycleYear].TypeIIIOpponentDivision;
+            // Interconference games (4 games)
+            var interconferenceOpponentDivision =
+                divisionMatchupCycle[(team.Conference, team.Division)][cycleYear].InterconferenceOpponentDivision;
 
-            var typeIIIOpponentTeams = basicTeamInfos.Where(t => t.Conference
+            var interconferenceOpponentTeams = basicTeamInfos.Where(t => t.Conference
                     == team.Conference switch
                     {
                         Conference.AFC => Conference.NFC,
                         Conference.NFC => Conference.AFC,
                         _ => throw new ArgumentOutOfRangeException()
                     }
-                    && t.Division == typeIIIOpponentDivision)
+                    && t.Division == interconferenceOpponentDivision)
                 .ToList();
 
             for (int i = 0; i < 4; i++)
             {
                 AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
                 {
-                    AwayTeam = i < 2 ? typeIIIOpponentTeams[i] : team,
-                    HomeTeam = i < 2 ? team : typeIIIOpponentTeams[i],
+                    AwayTeam = i < 2 ? interconferenceOpponentTeams[i] : team,
+                    HomeTeam = i < 2 ? team : interconferenceOpponentTeams[i],
                     GameType = 3,
                     AddedBy = team,
                     GamePairId = Guid.NewGuid()
                 });
             }
 
-            // Type IV games: other divisions based on standings
-            var typeIVOpponentDivisions = divisionMatchupCycle[(team.Conference, team.Division)][cycleYear]
-                .TypeIVOpponentDivisions;
-            var typeIVOpponentTeams = new BasicTeamInfo[2];
+            // 2 remaining intraconference divisions based on standings (2 games)
+            var remainingIntraconferenceOpponentDivisions = divisionMatchupCycle[(team.Conference, team.Division)][cycleYear]
+                .RemainingIntraconferenceOpponentDivisions;
+            var remainingIntraconferenceOpponentTeams = new BasicTeamInfo[2];
 
             if (previousSeasonTeamPositions == null)
             {
@@ -319,32 +319,32 @@ public static class ScheduleGenerator
                 var teamSortedIndex = teamDivisionNames.IndexOf(team);
                     
                 // No previous season info, choose two teams at random.
-                typeIVOpponentTeams[0] = basicTeamInfos
-                    .Where(t => t.Conference != team.Conference && t.Division == typeIVOpponentDivisions[0])
+                remainingIntraconferenceOpponentTeams[0] = basicTeamInfos
+                    .Where(t => t.Conference != team.Conference && t.Division == remainingIntraconferenceOpponentDivisions[0])
                     .OrderBy(t => t.Name)
                     .ElementAt(teamSortedIndex);
 
-                typeIVOpponentTeams[1] = basicTeamInfos
-                    .Where(t => t.Conference != team.Conference && t.Division == typeIVOpponentDivisions[1])
+                remainingIntraconferenceOpponentTeams[1] = basicTeamInfos
+                    .Where(t => t.Conference != team.Conference && t.Division == remainingIntraconferenceOpponentDivisions[1])
                     .OrderBy(t => t.Name)
                     .ElementAt(teamSortedIndex);
             }
             else
             {
-                typeIVOpponentTeams[0] = basicTeamInfos
+                remainingIntraconferenceOpponentTeams[0] = basicTeamInfos
                     .Single(t => t.Conference != team.Conference
-                        && t.Division == typeIVOpponentDivisions[0]
+                        && t.Division == remainingIntraconferenceOpponentDivisions[0]
                         && previousSeasonTeamPositions[t.Name] == previousSeasonTeamPositions[team.Name]);
 
-                typeIVOpponentTeams[1] = basicTeamInfos
+                remainingIntraconferenceOpponentTeams[1] = basicTeamInfos
                     .Single(t => t.Conference != team.Conference
-                        && t.Division == typeIVOpponentDivisions[1]
+                        && t.Division == remainingIntraconferenceOpponentDivisions[1]
                         && previousSeasonTeamPositions[t.Name] == previousSeasonTeamPositions[team.Name]);
             }
 
             AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
             {
-                AwayTeam = typeIVOpponentTeams[0],
+                AwayTeam = remainingIntraconferenceOpponentTeams[0],
                 HomeTeam = team,
                 GameType = 4,
                 AddedBy = team,
@@ -354,7 +354,7 @@ public static class ScheduleGenerator
             AssignGameToBothTeams(regularSeasonMatchups, new GameMatchup
             {
                 AwayTeam = team,
-                HomeTeam = typeIVOpponentTeams[1],
+                HomeTeam = remainingIntraconferenceOpponentTeams[1],
                 GameType = 4,
                 AddedBy = team,
                 GamePairId = Guid.NewGuid()
@@ -376,16 +376,16 @@ public static class ScheduleGenerator
     {
         var noOtherGameIsSymmetricallyEqual = teamGames.All(g => !g.SymmetricallyEquals(gameToAdd));
 
-        var onlyOneTypeIMatchupBetweenTeams =
+        var onlyOneIntradivisionMatchupBetweenTeams =
             gameToAdd.GameType == 1 && teamGames.Count(g => g.SymmetricallyEquals(gameToAdd)) == 1;
-        var roomForMoreTypeIIGames = gameToAdd.GameType == 2 && teamGames.Count(g => g.GameType == 2) < 4;
+        var roomForMoreIntraconferenceGames = gameToAdd.GameType == 2 && teamGames.Count(g => g.GameType == 2) < 4;
 
-        var onlyOneTypeIIMatchupBetweenTeams =
+        var onlyOneIntraconferenceMatchupBetweenTeams =
             gameToAdd.GameType == 2 && teamGames.Count(g => g.SymmetricallyEquals(gameToAdd)) == 1;
 
         return noOtherGameIsSymmetricallyEqual
-            || onlyOneTypeIMatchupBetweenTeams
-            || (roomForMoreTypeIIGames && onlyOneTypeIIMatchupBetweenTeams);
+            || onlyOneIntradivisionMatchupBetweenTeams
+            || (roomForMoreIntraconferenceGames && onlyOneIntraconferenceMatchupBetweenTeams);
     }
     #endregion
 
