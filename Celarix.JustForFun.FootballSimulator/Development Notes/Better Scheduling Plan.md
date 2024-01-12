@@ -74,8 +74,8 @@ Interconference opponents each year are determined as follows:
 
 Finally, remaining intraconference divisions are kinda annoying. Actually, the previous two tables were annoying to assign, too. But now that we have `SymmetricTable<TKey>`, we can make the determination of a table quite easy! Here it is, generated with symmetry!
 
-East:  Extra/South, West/Extra, South/West, West/North, South/West
-West:  North/Extra, East/South, North/East, North/Extra, North/East
-North: West/Extra, South/West, West/South, Extra/South, West/South
-South: Extra/East, Extra/West, East/Extra, East/North, East/Extra
-Extra: South/North, South/East, East/South, North/West, East/South
+- East:  Extra/South, West/Extra, South/West, West/North, South/West
+- West:  North/Extra, East/South, North/East, North/Extra, North/East
+- North: West/Extra, South/West, West/South, Extra/South, West/South
+- South: Extra/East, Extra/West, East/Extra, East/North, East/Extra
+- Extra: South/North, South/East, East/South, North/West, East/South
