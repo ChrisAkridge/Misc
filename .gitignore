@@ -193,3 +193,5 @@ FakesAssemblies/
 /Celarix.JustForFun.FootballSimulator/.vs/Celarix.JustForFun.FootballSimulator/v17
 /Celarix.JustForFun.LunaGalatea/.vs/Celarix.JustForFun.LunaGalatea/FileContentIndex
 /Celarix.JustForFun.LunaGalatea/.vs/ProjectEvaluation
+
+*.vsidx

@@ -28,7 +28,7 @@ namespace Celarix.IO.FileAnalysis.Console
                 ZoomableCanvasTileEdgeLength = 1024
             };
 
-            if (args[0].Equals("-postprocess", StringComparison.InvariantCultureIgnoreCase))
+            if (args[0].Equals(" - postprocess", StringComparison.InvariantCultureIgnoreCase))
             {
                 var folderPath = args[1];
 
@@ -90,6 +90,28 @@ namespace Celarix.IO.FileAnalysis.Console
                 var outputPath = args[2];
                 
                 CanvasCombiner.CombineCanvases(File.ReadAllLines(canvasPathsFilePath), outputPath);
+            }
+            else if (args[0].Equals("-findvideos", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var searchFolderPath = args[1];
+                var listOutputPaths = args[2];
+                
+                VideoFinder.FindAllVideosInFolder(searchFolderPath, listOutputPaths);
+            }
+            else if (args[0].Equals("-generatethumbnails", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var videoListPath = args[1];
+                var ezThumbBinaryPath = args[2];
+                var outputFolderPath = args[3];
+                
+                VideoThumbnailGenerator.GenerateThumbnailsForVideos(videoListPath, ezThumbBinaryPath, outputFolderPath);
+            }
+            else if (args[0].Equals("-concatenatetextfiles", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var inputFolderPath = args[1];
+                var outputPath = args[2];
+                
+                TextFileConcatenator.ConcatenateTextFilesInFolder(inputFolderPath, outputPath);
             }
             else
             {
@@ -162,6 +184,88 @@ namespace Celarix.IO.FileAnalysis.Console
                 .ToArray());
 
             return newStringBuilder.ToString();
+        }
+
+        private static void MultiPrependAndIndent(string filePath, IReadOnlyList<string> prependStrings)
+        {
+            var currentInputFilePath = filePath;
+            
+            for (int i = 0; i < prependStrings.Count; i++)
+            {
+                var outputFilePath = (i < prependStrings.Count - 1)
+                    ? Path.Combine(Path.GetDirectoryName(currentInputFilePath),
+                        $"{Path.GetFileNameWithoutExtension(currentInputFilePath)}_prepended{i}{Path.GetExtension(currentInputFilePath)}")
+                    : Path.Combine(Path.GetDirectoryName(currentInputFilePath),
+                        $"{Path.GetFileNameWithoutExtension(currentInputFilePath)}_final{Path.GetExtension(currentInputFilePath)}");
+                TabInserter.InsertTabsForFile(currentInputFilePath, outputFilePath, 1, prependStrings[i]);
+                currentInputFilePath = outputFilePath;
+            }
+        }
+
+        private static string[] GetPrependStringsForTreeFiles(string filePath) =>
+            new[]
+            {
+                Path.GetFileNameWithoutExtension(filePath)
+            };
+
+        private static void ConcatenateAllLogsInFolder(string folderPath)
+        {
+            LoggingConfigurer.ConfigurePostProcessingLogging();
+            var logger = LogManager.GetCurrentClassLogger();
+            
+            var annexFolders = Directory.GetDirectories(folderPath, "*", SearchOption.TopDirectoryOnly);
+            var comparer = new LogFileNameComparer();
+            var linesWritten = 0;
+
+            foreach (var annexFolder in annexFolders)
+            {
+                logger.Info($"Concatenating all logs in {annexFolder}...");
+                
+                var logFiles = Directory.GetFiles(annexFolder, "*.log", SearchOption.TopDirectoryOnly)
+                    .OrderBy(f => Path.GetFileName(f), comparer);
+                var annexFolderName = Path.GetFileName(annexFolder);
+                var outputPath = Path.Combine(folderPath, $"{annexFolderName}.log");
+                using var outputStream = new StreamWriter(File.OpenWrite(outputPath));
+                
+                foreach (var logFile in logFiles)
+                {
+                    logger.Info($"Concatenating {logFile}...");
+                    using var inputStream = new StreamReader(File.OpenRead(logFile));
+
+                    while (inputStream.ReadLine() is { } line)
+                    {
+                        outputStream.WriteLine(line);
+                        linesWritten += 1;
+
+                        if (linesWritten % 100000 == 0) { logger.Info($"Wrote {linesWritten} lines"); }
+                    }
+                }
+            }
+        }
+    }
+
+    internal sealed class LogFileNameComparer : IComparer<string>
+    {
+        public int Compare(string x, string y)
+        {
+            var (xDate, xFileNumber) = GetParts(x);
+            var (yDate, yFileNumber) = GetParts(y);
+            
+            var dateComparison = xDate.CompareTo(yDate);
+
+            return dateComparison != 0 ? dateComparison : xFileNumber.CompareTo(yFileNumber);
+        }
+
+        private static (DateOnly date, int fileNumber) GetParts(string fileName)
+        {
+            var parts = fileName.Split('.');
+            var date = DateOnly.Parse(parts[0].TrimEnd('_'));
+
+            return parts.Length == 3
+                ? (date, int.Parse(parts[1]))
+                : parts[0].EndsWith('_')
+                    ? (date, 0)
+                    : (date, int.MaxValue);
         }
     }
 }

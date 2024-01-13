@@ -2,7 +2,7 @@
   "profiles": {
     "Celarix.IO.FileAnalysis.Console": {
       "commandName": "Project",
-      "commandLineArgs": "-movenumberedtextmaps \"I:\\X\\02\\textMaps\\asm\""
+      "commandLineArgs": "-combinecanvases \"H:\\fa\\archiveCanvasPaths.txt\" \"K:\\Final Artifacts\\archiveCanvas2\""
     }
   }
 }

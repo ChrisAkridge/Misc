@@ -30,7 +30,7 @@ The NFC Extra consists of:
 Symmetry is a concept that comes up a lot in scheduling an NFL season:
 
 - If Team A plays Team B, necessarily Team B must play Team A.
-- If the North division plays the South in a season, necessarily the South must also play the North
+- If the North division plays the South in a season, necessarily the South must also play the North.
 
 And so forth. It'd be nice to have a data structure resembling a table that, when a certain cell is assigned, its symmetric cell is also assigned. So let's build one!
 
@@ -79,3 +79,85 @@ Finally, remaining intraconference divisions are kinda annoying. Actually, the p
 - North: West/Extra, South/West, West/South, Extra/South, West/South
 - South: Extra/East, Extra/West, East/Extra, East/North, East/Extra
 - Extra: South/North, South/East, East/South, North/West, East/South
+
+## Determining Opponents for a Team
+
+Now we get to generate the first part of the schedule: the 16 teams that every team would face. Since this is symmetrical (if the Bengals play the Colts, necessarily the Colts play the Bengals), we can use `SymmetricTable<TKey>` here as well. The total opponents grid is 16 by 40 = 640 cells, of which 320 are symmetrically duplicated.
+
+Given a year modulo 5, starting by arbitrarily assigning 2014 as year #0, we can determine the opponents for a team by just iterating over empty grid cells. We create a table with 40 rows, one per team, and 16 opponent cells, looping over each team and cell, skipping ones that are already assigned. Each cell gets assigned an opponent based on its index in the row:
+
+- Rows 0 through 5: Intradivisional games against the other 3 teams in the division.
+- Rows 6 through 9: Intraconference games against the 4 teams in the division chosen by the first table up there.
+- Rows 10 through 13: Interconference games against the 4 teams in the division chosen by the second table.
+- Rows 14 and 15: Remaining intraconference games against the 2 teams that finished in the same divisional position in the previous season.
+
+The first 14 games are easy, but the remaining intraconference games do require us to know last season's division standings. This is provided as an input to the schedule generator. In the case that there is no previous season, a division standing order is determined at "random" by shuffling each division using an instance of the `Random` class. However, for repeatability, it's not quite random - the RNG will be seeded with the same value each time. That value is -1528635010, chosen randomly.
+
+## Creating Game Records
+
+We then need to generate game records from the table of opponents. Again, we loop over the table over rows and cells. At each cell, we take the two teams (key value and cell value) and create a game record using that. The game is hosted by the key value team if the cell is in indices 3 through 5, 8, 9, 12, 13, or 15. Otherwise, the cell value is the home team. Knowing the home team lets us choose the stadium, too. Also, based on the index, we assign the kind of game (intradivisional, intraconference, interconference, remaining divisional). This lets us distinguish "true" intradivisional games from the extras we sometimes have to play from the intraconference games.
+
+As we iterate through the cells, we overwrite the cell with a null, symmetrically setting the opponent to null as well. We do this so that we only create one game record per matchup. Thus, cells containing null are skipped over.
+
+(seriously this is so much easier than how it's currently being handled)
+
+## Scheduling Bye Weeks
+
+Each of the 40 teams gets 1 bye week between weeks 4 and week 13. This 10-week span is convenient because `40 / 10 = 4`, so 4 teams a week get a bye. Since 4 teams comprise 2 games a week, we can make byes by shuffling around the 20 games in each week. Let's move 20 games from throughout the season into Week 17 to start. Since all games in Week 17 are the last intradivisional games, we'll need to do a bit of clever shuffling. Let's begin.
+
+1. Create an array of 40 `bool` instances, one for each team. This will keep track of which teams have had their games marked to be moved to Week 17.
+2. Filter the list of all 320 games down to the 120 intradivisional games and shuffle it.
+3. For each game in this second list:
+	1. Check if the home team's entry in the boolean array is `true` and skip this game if so.
+	2. Otherwise, set the home team's entry AND the away team's entry to `true` and add this game to a list of games to move to Week 17.
+3. Back in the list of all 320 games, set the week number on the games from the moved list to 17.
+
+We now have 20 games marked as being in week 17 and 300 games to distribute over 16 weeks. This works out to 18.75 games per week on average, but we can cleverely lay them out.
+
+## How Many Games in a Week?
+
+Each week of the NFL season has many games:
+
+- Thursday Night Football is 1 game on Thursday night at 8:15pm.
+- Sunday Night Football is 1 game on Sunday night at 8:15pm.
+- Monday Night Football is 1 game on Monday night at 8:15pm.
+- We'll arbitrarily pick 2 more games to be the Sunday "double header" on Sunday at 4:25pm.
+
+That leaves every other game for the main timeslot of 1:00pm on Sunday. As mentioned, Week 17 will have 20 games, and byes don't start until Week 4, meaning that Weeks 1 through 3 also have 20 games. Conveniently, by having 20 games each in Weeks 1 through 3 and 14 through 17, having exactly 18 games for Weeks 4 through 13 adds up to 320 games exactly.
+
+Assigning weeks has proven quite tricky in the past, but I think a semi-elegant solution with `SymmetricTable<TKey>` is in the cards.
+
+1. Make a 40-row, 16-column symmetric table, with one row per team and 1 week per column.
+2. Loop through all the week 17 games and symmetrically assign both the home team to be playing the away team and the away team to be playing the home team. HOWEVER, the cell we assign it to is going to be chosen as follows
+	1. Choose a random cell from index 3 (Week 4) to index 12 (Week 13).
+	2. Are there fewer than 4 cells already assigned in this *column* (that is, have fewer than 2 teams already been assigned to this week)? If so, go back to step 2-1.
+	3. Otherwise, symmetrically assign the home team to play the away team and the away team to play the home team (i.e. for a Bengals/Colts game, assign `["Bengals"][index] = "Colts"`, which automatically assigns `["Colts"][index] = "Bengals"`).
+	
+Why bother with this? It lets us assign which four teams get byes in each week by determining where their games would have been "taken" from. We can then assign the rest of the 300 games actually quite easily:
+
+1. Iterate through the 640 cells of our table, down each column first, then across the columns. This is basically looping through in games-in-a-week order rather than weeks-for-a-team order. Skip any non-null cell.
+2. If the cell is empty, find the first game in our game records list that has the cell's key (home team) as the home team and does not have an assigned week number. Given the column number plus one, assign that to the game record's week number.
+3. Set the opponent, which symmetrically sets the opponent to play the home team.
+
+And there we have it. In 5 easy steps, we've figured out the week numbers for all 320 games with each team playing exactly once per week.
+
+## Actually Scheduling the Games
+
+Easy. Super easy.
+
+1. Group all 320 games by their week number (17 games).
+2. Shuffle each group.
+3. Assign games 0 through 4 to the TNF slot, the SNF slot, the MNF slot, and both double-header slots.
+4. Assign all remaining games to the Sunday 1:00pm slot.
+
+Done. Valid regular season schedule generated.
+
+The first day of the season is the second Thursday in September of each calendar year. Each next week starts with the next Thursday.
+
+## Scheduling The Preseason
+
+Each team plays 4 additional exhibition games before the second Thursday in September, known as the preseason. These games don't count for anything, so I don't feel the need to schedule it quite so carefully as the real NFL does (they try not to have any matchups in the preseason that occur in the regular season).
+
+We'll start by making a 40 by 4 symmetric table. We'll iterate over each cell in row-then-cell order (so games 1 through 4 for each team) and choose a random other team to be the opponent, symmetrically assigning that team to play us in the same week. Skipping over empty cells, we eventually get a list of opponents for every team.
+
+Next, we generate game records using the same emptying strategy on the table as before, making 80 game records. We then shuffle that list, assign week numbers based on which batch of 20 the shuffled games end up in, and schedule them. Every single preseason game is played on Thursday at 7:00pm, meaning 20 games are in play at that time. The preseason begins 4 weeks before the regular season.
