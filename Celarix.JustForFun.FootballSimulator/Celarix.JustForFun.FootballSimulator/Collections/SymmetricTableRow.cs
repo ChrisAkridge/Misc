@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Celarix.JustForFun.FootballSimulator.Collections
 {
-    public sealed class SymmetricTableRow<T> where T : class
+    public sealed class SymmetricTableRow<T> where T : class?
     {
         private readonly T[] cells;
 

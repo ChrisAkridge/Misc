@@ -72,13 +72,35 @@ Interconference opponents each year are determined as follows:
 - NFC South: North, South, Extra,  East,  West
 - NFC Extra: Extra, West,  South,  North, East
 
-Finally, remaining intraconference divisions are kinda annoying. Actually, the previous two tables were annoying to assign, too. But now that we have `SymmetricTable<TKey>`, we can make the determination of a table quite easy! Here it is, generated with symmetry!
+Finally, remaining intraconference divisions are kinda annoying. In fact, they're not possible without modification. I'm having trouble understanding it, so I'll attempt to explain.
 
-- East:  Extra/South, West/Extra, South/West, West/North, South/West
-- West:  North/Extra, East/South, North/East, North/Extra, North/East
-- North: West/Extra, South/West, West/South, Extra/South, West/South
-- South: Extra/East, Extra/West, East/Extra, East/North, East/Extra
-- Extra: South/North, South/East, East/South, North/West, East/South
+In the normal NFL, with 32 teams and 8 divisions, we have nice symmetry among all the game types. The conferences have 4 divisions and 2 of them are already ruled out each year by being accounted for in the intradivision and intraconference games. The remaining 2 can then fill 2 game slots with ease. But adding a fifth division makes for 3 possible opponents for remaining intraconference. We can just pick 2 of those 3, right? Well, let's try to build just the first year of a valid table:
+
+```
+East:  North/South
+West:  Extra/North 
+North: East /West
+South:      /East
+Extra: West /
+```
+
+We always end up in the same spot: one division has a free slot #1 and another has a free slot #2. Slot #1 represents the first game and slot #2 represents the second; if a division already has a filled slot #1 (like Extra, who plays West here), we can't use that to fill the empty slot #1 in the other division. No one's free that slot. A similar problem exists for slot #2.
+
+Let's say we move Extra's West game to slot #2. This lets us match Extra and South up in slot #1, but we'd also need to move West playing Extra to slot #2, but West is already playing North in that slot. This causes a cascade of slot swaps that ends up in a looping cycle for which there is no solution. Having 8 slots across the 4 divisions is trivial, as in the 4 matchups (`North<>South, North<>East, South<>North, South<>West, East<>North, East<>West, West<>South, West<>East`), each division is named 4 times. To add Extra means we'd need to find 4 spaces to put "Extra", but we'd only be adding 2 new matchups (`Extra<>???, Extra<>???`). The only possible solve is if Extra plays itself.
+
+More intradivision matchups would allow for a solution. We could try to arrange the schedule so that no division faces itself more than twice a year, but the way that remaining intraconference games work would throw a wrench in that. A team plays the team that finished in the same divisional rank as it did last season. If you're playing your own division again, that could very well be yourself, and you can't play a game against yourself. But I think that playoff seeding might give us an idea that might work.
+
+In the previous season, 4 teams ranked from first to fourth in their division. Typical playoff seeding has the #4 team face the #1 team and the #2 team face the #3 team. We can do this twice per team when a division faces itself, preserving the symmetry and still letting division rankings play a role.
+
+Let's determine a rotation that will only have a division face itself no more than twice per season:
+
+- North: West/East,    East/South,   West/Extra,   South/East,   East/West
+- South: (plays self), West/North,   Extra/West,   North/Extra,  West/East
+- East:  Extra/North,  North/West,   (plays self), Extra/North,  North/South
+- West:  North/Extra,  South/East,   North/South,  (plays self), South/North
+- Extra: East/West,    (plays self), South/North,  East/South,   (plays self)
+
+If a division is playing another division, they face the two teams that finished in the same division rank as they did. If they are playing themselves, #4 from the previous season plays #1 twice, and #3 plays #2 twice.
 
 ## Determining Opponents for a Team
 
@@ -89,7 +111,7 @@ Given a year modulo 5, starting by arbitrarily assigning 2014 as year #0, we can
 - Rows 0 through 5: Intradivisional games against the other 3 teams in the division.
 - Rows 6 through 9: Intraconference games against the 4 teams in the division chosen by the first table up there.
 - Rows 10 through 13: Interconference games against the 4 teams in the division chosen by the second table.
-- Rows 14 and 15: Remaining intraconference games against the 2 teams that finished in the same divisional position in the previous season.
+- Rows 14 and 15: Remaining intraconference games against the 2 teams that finished in the same divisional position in the previous season, or twice against the inversely ranked team in your own division based on the third table up there.
 
 The first 14 games are easy, but the remaining intraconference games do require us to know last season's division standings. This is provided as an input to the schedule generator. In the case that there is no previous season, a division standing order is determined at "random" by shuffling each division using an instance of the `Random` class. However, for repeatability, it's not quite random - the RNG will be seeded with the same value each time. That value is -1528635010, chosen randomly.
 
