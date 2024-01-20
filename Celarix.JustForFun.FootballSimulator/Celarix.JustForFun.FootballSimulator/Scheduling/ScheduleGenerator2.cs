@@ -19,6 +19,11 @@ public static class ScheduleGenerator2
     // tied to the idea of exactly 40 teams across 10 divisions and 2 conferences, though. I
     // really don't want to make it seem like it supports any other configuration.
     
+    // Okay, how about this:
+    // - Use BasicTeamInfo instead of strings to represent teams
+    // - Take in a list of Team DB objects, check if it has exactly 40 teams, and throw if not
+    // - Convert those teams into BasicTeamInfo and use that for the rest of the schedule generation
+    
     private const int YearZero = 2014;
     private static readonly string[] teamNames =
     {

@@ -94,11 +94,11 @@ In the previous season, 4 teams ranked from first to fourth in their division. T
 
 Let's determine a rotation that will only have a division face itself no more than twice per season:
 
-- North: West/East,    East/South,   West/Extra,   South/East,   East/West
-- South: (plays self), West/North,   Extra/West,   North/Extra,  West/East
-- East:  Extra/North,  North/West,   (plays self), Extra/North,  North/South
-- West:  North/Extra,  South/East,   North/South,  (plays self), South/North
-- Extra: East/West,    (plays self), South/North,  East/South,   (plays self)
+- North: West/East,    East/South,   West/Extra,   South/East,   (plays self)
+- South: (plays self), West/North,   Extra/West,   North/Extra,  East/West
+- East:  Extra/North,  North/West,   (plays self), Extra/North,  South/Extra
+- West:  North/Extra,  South/East,   North/South,  (plays self), Extra/South
+- Extra: East/West,    (plays self), South/North,  East/South,   West/East
 
 If a division is playing another division, they face the two teams that finished in the same division rank as they did. If they are playing themselves, #4 from the previous season plays #1 twice, and #3 plays #2 twice.
 
