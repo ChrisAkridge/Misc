@@ -1,5 +1,7 @@
 ﻿using Celarix.JustForFun.FootballSimulator;
 using Celarix.JustForFun.FootballSimulator.Collections;
+using Celarix.JustForFun.FootballSimulator.Data.Models;
+using Celarix.JustForFun.FootballSimulator.Scheduling;
 
 //var mainLoop = new MainLoop();
 

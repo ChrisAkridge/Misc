@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Celarix.IO.FileListHandler": {
+      "commandName": "Project",
+      "commandLineArgs": "-m \"G:\\Documents\\Files\\Pictures\\Receiving\\kiri_kanna_1.txt\" \"G:\\Documents\\Files\\Pictures\\Receiving\\kiri_kanna_out0\""
+    }
+  }
+}

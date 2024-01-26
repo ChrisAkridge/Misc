@@ -194,3 +194,5 @@ FakesAssemblies/
 /Celarix.JustForFun.LunaGalatea/.vs/Celarix.JustForFun.LunaGalatea/FileContentIndex
 /Celarix.JustForFun.LunaGalatea/.vs/ProjectEvaluation
 /Celarix.SimpleIncrementalBackup/.vs/Celarix.SimpleIncrementalBackup
+
+*.vsidx
