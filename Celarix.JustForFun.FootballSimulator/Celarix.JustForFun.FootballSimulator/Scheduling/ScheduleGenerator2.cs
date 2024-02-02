@@ -25,32 +25,19 @@ public static class ScheduleGenerator2
     // - Convert those teams into BasicTeamInfo and use that for the rest of the schedule generation
     
     private const int YearZero = 2014;
-    private static readonly string[] teamNames =
-    {
-        "Cincinnati", "Baltimore", "Pittsburgh", "Cleveland",
-        "Indianapolis", "Tennessee", "Houston", "Jacksonville",
-        "Buffalo", "New England", "Miami", "New York Jets",
-        "Denver", "Oakland", "San Diego", "Kansas City",
-        "Louisville", "Toledo", "Portales", "Vostok Station",
-        
-        "Detroit", "Chicago", "Green Bay", "Minnesota", 
-        "Atlanta", "Carolina", "Tampa Bay", "New Orleans",
-        "New York Giants", "Philadelphia", "Washington", "Dallas",
-        "Seattle", "San Francisco", "St. Louis", "Arizona",
-        "Furnace Creek", "Dover", "Grand Forks", "Wainwright"
-    };
     
-    private static SymmetricTable<string?> GetTeamOpponentsForSeason(int seasonYear,
-        Dictionary<string, int>? previousSeasonDivisionRankings)
+    private static SymmetricTable<BasicTeamInfo?> GetTeamOpponentsForSeason(BasicTeamInfo[] teams,
+        int seasonYear,
+        Dictionary<BasicTeamInfo, int>? previousSeasonDivisionRankings)
     {
         var yearCycleNumber = (seasonYear - YearZero) % 5;
-        var opponents = SymmetricTable<string>.FromRowKeys(teamNames, 16, StringComparer.OrdinalIgnoreCase);
-        previousSeasonDivisionRankings ??= GetDefaultPreviousSeasonDivisionRankings();
+        var opponents = SymmetricTable<BasicTeamInfo>.FromRowKeys(teams, 16, new BasicTeamInfoComparer());
+        previousSeasonDivisionRankings ??= GetDefaultPreviousSeasonDivisionRankings(teams);
 
-        foreach (var team in teamNames)
+        foreach (var team in teams)
         {
-            var teamConference = GetConferenceForTeam(team);
-            var teamDivision = GetDivisionForTeam(team);
+            var teamConference = team.Conference;
+            var teamDivision = team.Division;
             
             var intradivisionOpponents = GetTeamsInDivision(teamConference, teamDivision).Where(t => team != t).ToArray();
             var intraconferenceOpponents = GetTeamsInDivision(teamConference, GetIntraconferenceOpponentDivisions(yearCycleNumber, teamDivision));
@@ -114,241 +101,6 @@ public static class ScheduleGenerator2
                 });
             }
         }
-    }
-    
-    private static Division GetIntraconferenceOpponentDivisions(int yearCycleNumber, Division division)
-    {
-        const Division N = Division.North;
-        const Division S = Division.South;
-        const Division E = Division.East;
-        const Division W = Division.West;
-        const Division X = Division.Extra;
-        
-        return yearCycleNumber switch
-        {
-            0 => division switch
-            {
-                E => W,
-                W => E,
-                N => S,
-                S => N,
-                X => X,
-                _ => throw new ArgumentOutOfRangeException(nameof(division))
-            },
-            1 => division switch
-            {
-                E => S,
-                S => E,
-                N => X,
-                X => N,
-                W => W,
-                _ => throw new ArgumentOutOfRangeException(nameof(division))
-            },
-            2 => division switch
-            {
-                E => N,
-                N => E,
-                W => X,
-                X => W,
-                S => S,
-                _ => throw new ArgumentOutOfRangeException(nameof(division))
-            },
-            3 => division switch
-            {
-                E => X,
-                X => E,
-                W => S,
-                S => W,
-                N => N,
-                _ => throw new ArgumentOutOfRangeException(nameof(division))
-            },
-            4 => division switch
-            {
-                X => N,
-                N => X,
-                W => S,
-                S => W,
-                E => E,
-                _ => throw new ArgumentOutOfRangeException(nameof(division))
-            },
-            _ => throw new ArgumentOutOfRangeException(nameof(yearCycleNumber))
-        };
-    }
-
-    private static Division GetInterconferenceOpponentDivision(int yearCycleNumber, Conference conference,
-        Division division)
-    {
-        const Conference AFC = Conference.AFC;
-        const Conference NFC = Conference.NFC;
-
-        const Division N = Division.North;
-        const Division S = Division.South;
-        const Division E = Division.East;
-        const Division W = Division.West;
-        const Division X = Division.Extra;
-
-        return conference switch
-        {
-            AFC => division switch
-            {
-                E => yearCycleNumber switch
-                {
-                    0 => N,
-                    1 => E,
-                    2 => W,
-                    3 => S,
-                    4 => X,
-                    _ => throw new ArgumentOutOfRangeException(nameof(yearCycleNumber))
-                },
-                N => yearCycleNumber switch
-                {
-                    0 => S,
-                    1 => W,
-                    2 => E,
-                    3 => X,
-                    4 => N,
-                    _ => throw new ArgumentOutOfRangeException(nameof(yearCycleNumber))
-                },
-                S => yearCycleNumber switch
-                {
-                    0 => E,
-                    1 => S,
-                    2 => X,
-                    3 => N,
-                    4 => W,
-                    _ => throw new ArgumentOutOfRangeException(nameof(yearCycleNumber))
-                },
-                W => yearCycleNumber switch
-                {
-                    0 => W,
-                    1 => X,
-                    2 => N,
-                    3 => E,
-                    4 => S,
-                    _ => throw new ArgumentOutOfRangeException(nameof(yearCycleNumber))
-                },
-                X => yearCycleNumber switch
-                {
-                    0 => X,
-                    1 => N,
-                    2 => S,
-                    3 => W,
-                    4 => E,
-                    _ => throw new ArgumentOutOfRangeException(nameof(yearCycleNumber))
-                },
-                _ => throw new ArgumentOutOfRangeException(nameof(division))
-            },
-            NFC => division switch
-            {
-                E => yearCycleNumber switch
-                {
-                    0 => S,
-                    1 => E,
-                    2 => N,
-                    3 => W,
-                    4 => X,
-                    _ => throw new ArgumentOutOfRangeException(nameof(yearCycleNumber))
-                },
-                N => yearCycleNumber switch
-                {
-                    0 => E,
-                    1 => X,
-                    2 => W,
-                    3 => S,
-                    4 => N,
-                    _ => throw new ArgumentOutOfRangeException(nameof(yearCycleNumber))
-                },
-                S => yearCycleNumber switch
-                {
-                    0 => N,
-                    1 => S,
-                    2 => X,
-                    3 => E,
-                    4 => W,
-                    _ => throw new ArgumentOutOfRangeException(nameof(yearCycleNumber))
-                },
-                W => yearCycleNumber switch
-                {
-                    0 => W,
-                    1 => N,
-                    2 => E,
-                    3 => X,
-                    4 => S,
-                    _ => throw new ArgumentOutOfRangeException(nameof(yearCycleNumber))
-                },
-                X => yearCycleNumber switch
-                {
-                    0 => X,
-                    1 => W,
-                    2 => S,
-                    3 => N,
-                    4 => E,
-                    _ => throw new ArgumentOutOfRangeException(nameof(yearCycleNumber))
-                },
-                _ => throw new ArgumentOutOfRangeException(nameof(division))
-            },
-            _ => throw new ArgumentOutOfRangeException(nameof(conference))
-        };
-    }
-
-    private static (Division, Division) GetRemainingIntraconferenceOpponentDivisions(int yearCycleNumber,
-        Division division)
-    {
-        const Division N = Division.North;
-        const Division S = Division.South;
-        const Division E = Division.East;
-        const Division W = Division.West;
-        const Division X = Division.Extra;
-
-        return yearCycleNumber switch
-        {
-            0 => division switch
-            {
-                N => (W, E),
-                S => (S, S),
-                E => (X, N),
-                W => (N, X),
-                X => (E, W),
-                _ => throw new ArgumentOutOfRangeException(nameof(division))
-            },
-            1 => division switch
-            {
-                N => (E, S),
-                S => (W, N),
-                E => (N, W),
-                W => (S, E),
-                X => (X, X),
-                _ => throw new ArgumentOutOfRangeException(nameof(division))
-            },
-            2 => division switch
-            {
-                N => (W, X),
-                S => (X, W),
-                E => (E, E),
-                W => (N, S),
-                X => (S, N),
-                _ => throw new ArgumentOutOfRangeException(nameof(division))
-            },
-            3 => division switch
-            {
-                N => (S, E),
-                S => (N, X),
-                E => (X, N),
-                W => (W, W),
-                X => (E, S),
-                _ => throw new ArgumentOutOfRangeException(nameof(division))
-            },
-            4 => division switch
-            {
-                N => (N, N),
-                S => (E, W),
-                E => (S, X),
-                W => (X, S),
-                X => (W, E),
-                _ => throw new ArgumentOutOfRangeException(nameof(division))
-            },
-            _ => throw new ArgumentOutOfRangeException(nameof(yearCycleNumber))
-        };
     }
 
     private static string[] GetRemainingIntraconferenceOpponentTeams(Conference conference,
@@ -438,14 +190,14 @@ public static class ScheduleGenerator2
         return teamNames[indexBasis..(indexBasis + 4)];
     }
 
-    private static Dictionary<string, int> GetDefaultPreviousSeasonDivisionRankings()
+    private static Dictionary<BasicTeamInfo, int> GetDefaultPreviousSeasonDivisionRankings(BasicTeamInfo[] teams)
     {
         var random = new Random(-1528635010);
-        var rankings = new Dictionary<string, int>();
+        var rankings = new Dictionary<BasicTeamInfo, int>();
 
-        for (int i = 0; i < teamNames.Length; i += 4)
+        for (int i = 0; i < teams.Length; i += 4)
         {
-            var divisionTeams = teamNames[i..(i + 4)];
+            var divisionTeams = teams[i..(i + 4)];
             divisionTeams.Shuffle(random);
 
             for (var j = 0; j < divisionTeams.Length; j++)

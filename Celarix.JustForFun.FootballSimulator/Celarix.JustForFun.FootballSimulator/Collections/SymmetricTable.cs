@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,6 +37,21 @@ public sealed class SymmetricTable<T> where T : class?
         this.comparer = comparer;
     }
 
+    public void SetCellUnlessAlreadySet(T? key, int cellNumber, T? value)
+    {
+        var row = GetMatchingRow(key);
+        var symmetricRow = GetMatchingRow(value);
+        if (row[cellNumber] == null)
+        {
+            row[cellNumber] = value;
+            symmetricRow[cellNumber] = key;
+        }
+        else
+        {
+            Debug.Assert(symmetricRow[cellNumber] == key);
+        }
+    }
+
     public T? ElementAt(int index)
     {
         var rowIndex = index / cellsPerRow;
@@ -58,6 +74,19 @@ public sealed class SymmetricTable<T> where T : class?
 
         row[cellNumber] = null;
         symmetricRow[cellNumber] = null;
+    }
+
+    public int CountColumn(int columnNumber, Func<T?, bool> predicate)
+    {
+        var count = 0;
+        foreach (var row in rows)
+        {
+            if (predicate(row[columnNumber]))
+            {
+                count += 1;
+            }
+        }
+        return count;
     }
 
     private SymmetricTableRow<T?> GetMatchingRow(T? key)

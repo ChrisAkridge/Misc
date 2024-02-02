@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace Celarix.JustForFun.FootballSimulator;
 
+internal enum ScheduledGameType
+{
+    Intradivisional,
+    Intraconference,
+    Interconference,
+    RemainingIntraconference
+}
+
 internal enum GameResultForTeam
 {
     Win,

@@ -152,7 +152,7 @@ Assigning weeks has proven quite tricky in the past, but I think a semi-elegant 
 1. Make a 40-row, 16-column symmetric table, with one row per team and 1 week per column.
 2. Loop through all the week 17 games and symmetrically assign both the home team to be playing the away team and the away team to be playing the home team. HOWEVER, the cell we assign it to is going to be chosen as follows
 	1. Choose a random cell from index 3 (Week 4) to index 12 (Week 13).
-	2. Are there fewer than 4 cells already assigned in this *column* (that is, have fewer than 2 teams already been assigned to this week)? If so, go back to step 2-1.
+	2. ~~Are there fewer than 4 cells already assigned in this *column* (that is, have fewer than 2 teams already been assigned to this week)? If so, go back to step 2-1.~~ Past Chris, this step, with a blank table, would loop forever, given that we haven't assigned anything yet, so all columns are empty. I'm just going to assume you meant "are there already 4 cells assigned in this column" because that's the only interpretation that makes sense to present-me.
 	3. Otherwise, symmetrically assign the home team to play the away team and the away team to play the home team (i.e. for a Bengals/Colts game, assign `["Bengals"][index] = "Colts"`, which automatically assigns `["Colts"][index] = "Bengals"`).
 	
 Why bother with this? It lets us assign which four teams get byes in each week by determining where their games would have been "taken" from. We can then assign the rest of the 300 games actually quite easily:
