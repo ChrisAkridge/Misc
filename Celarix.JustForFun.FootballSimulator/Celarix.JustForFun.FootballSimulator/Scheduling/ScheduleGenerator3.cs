@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Celarix.JustForFun.FootballSimulator.Collections;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
@@ -11,7 +6,7 @@ using static Celarix.JustForFun.FootballSimulator.Scheduling.DivisionMatchupCycl
 
 namespace Celarix.JustForFun.FootballSimulator.Scheduling
 {
-    internal sealed class ScheduleGenerator3
+    public sealed class ScheduleGenerator3
     {
         private const int YearZero = 2014;
 
@@ -27,90 +22,207 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
             this.teams = teams;
         }
 
-        private SymmetricTable<BasicTeamInfo?> GetTeamOpponentsForSeason(int cycleYear,
+        public List<GameRecord> GenerateScheduleForYear(int year,
+            Dictionary<BasicTeamInfo, Team> dataTeams,
             Dictionary<BasicTeamInfo, int>? previousSeasonDivisionRankings)
         {
-            var opponents = SymmetricTable<BasicTeamInfo>.FromRowKeys(teams, 16, new BasicTeamInfoComparer());
+            var cycleYear = (year - YearZero) % 5;
+            var teamOpponents = GetTeamOpponentsForSeason(cycleYear, previousSeasonDivisionRankings);
+            var scheduledGames = GetRegularSeasonGameRecords(teamOpponents, dataTeams);
+            ChooseByeGames(scheduledGames);
+            AssignWeekNumbers(scheduledGames);
+            ScheduleGamesToTimeslots(scheduledGames, year);
+            var preseasonGames = GetPreseasonGamesForYear(year, dataTeams);
+
+            return preseasonGames.Concat(scheduledGames.Select(g => g.GameRecord))
+                .OrderBy(g => g.KickoffTime)
+                .ToList();
+        }
+
+        private List<GameMatchup> GetTeamOpponentsForSeason(int cycleYear,
+            Dictionary<BasicTeamInfo, int>? previousSeasonDivisionRankings)
+        {
+            var comparer = new BasicTeamInfoComparer();
+            var matchups = new List<GameMatchup>();
             previousSeasonDivisionRankings ??= GetDefaultPreviousSeasonDivisionRankings();
 
             foreach (var team in teams)
             {
-                var teamOpponents = new List<BasicTeamInfo>();
-
                 // Intradivision: 2 games each against 3 division opponents (6 games total)
-                teamOpponents.AddRange(GetTeamsInDivision(team.Conference, team.Division).Where(t => t != team).RepeatEachItem(2));
+                foreach (var intradivisionOpponent in GetTeamsInDivision(team.Conference, team.Division)
+                             .Where(t => !comparer.Equals(t, team)))
+                {
+                    matchups.Add(new GameMatchup
+                    {
+                        TeamA = team,
+                        TeamB = intradivisionOpponent,
+                        GameType = ScheduledGameType.IntradivisionalFirstSet,
+                        HomeTeamIsTeamA = true
+                    });
+
+                    matchups.Add(new GameMatchup
+                    {
+                        TeamA = team,
+                        TeamB = intradivisionOpponent,
+                        GameType = ScheduledGameType.IntradivisionalSecondSet,
+                        HomeTeamIsTeamA = false
+                    });
+                }
 
                 // Intraconference: 1 game against each of the 4 teams in another division in the same conference (4 games total)
-                teamOpponents.AddRange(GetIntraconferenceOpponentsForTeam(team, cycleYear));
+                var intraconferenceOpponents = GetIntraconferenceOpponentsForTeam(team, cycleYear).GroupBy(o => o.Name).ToArray();
+
+                if (intraconferenceOpponents.Length == 3)
+                {
+                    var doubleOpponent = intraconferenceOpponents.First(g => g.Count() == 2).First();
+                    matchups.Add(new GameMatchup
+                    {
+                        TeamA = team,
+                        TeamB = doubleOpponent,
+                        GameType = ScheduledGameType.IntraconferenceFirstSet,
+                        HomeTeamIsTeamA = true
+                    });
+                    matchups.Add(new GameMatchup
+                    {
+                        TeamA = team,
+                        TeamB = doubleOpponent,
+                        GameType = ScheduledGameType.IntraconferenceSecondSet,
+                        HomeTeamIsTeamA = false
+                    });
+                    
+                    matchups.AddRange(intraconferenceOpponents.Where(g => g.Count() == 1)
+                        .Select(g => g.First())
+                        .Select((o, i) => new GameMatchup
+                        {
+                            TeamA = team,
+                            TeamB = o,
+                            GameType = ScheduledGameType.IntraconferenceFirstSet,
+                            HomeTeamIsTeamA = i % 2 == 0
+                        }));
+                }
+                else
+                {
+                    matchups.AddRange(intraconferenceOpponents.SelectMany(g => g)
+                        .Select((o, i) => new GameMatchup
+                        {
+                            TeamA = team,
+                            TeamB = o,
+                            GameType = ScheduledGameType.IntraconferenceFirstSet,
+                            HomeTeamIsTeamA = i % 2 == 0
+                        }));
+                }
 
                 // Interconference: 1 game against each of the 4 teams in a division in the other conference (4 games total)
-                teamOpponents.AddRange(GetTeamsInDivision(team.Conference.OtherConference(),
-                    GetInterconferenceOpponentDivision(cycleYear, team.Conference, team.Division)));
-
+                matchups.AddRange(GetTeamsInDivision(team.Conference.OtherConference(), GetInterconferenceOpponentDivision(cycleYear, team.Conference, team.Division))
+                    .Select((o, i) => new GameMatchup
+                    {
+                        TeamA = team,
+                        TeamB = o,
+                        GameType = ScheduledGameType.Interconference,
+                        HomeTeamIsTeamA = i % 2 == 0
+                    }));
+                
                 // Remaining intraconference: 1 game against 2 teams in 2 other divisions that finished in the same position as the team did (2 games total)
-                teamOpponents.AddRange(GetRemainingIntraconferenceOpponentTeams(team, cycleYear, previousSeasonDivisionRankings));
+                var remainingIntraconferenceOpponents = GetRemainingIntraconferenceOpponentTeams(team, cycleYear, previousSeasonDivisionRankings).ToArray();
 
-                for (var cellNumber = 0; cellNumber < 16; cellNumber++)
+                if (comparer.Equals(remainingIntraconferenceOpponents[0], remainingIntraconferenceOpponents[1]))
                 {
-                    opponents.SetCellUnlessAlreadySet(team, cellNumber, teamOpponents[cellNumber]);
+                    // We're in the year where the division plays itself for the remaining intraconference games.
+                    matchups.Add(new GameMatchup
+                    {
+                        TeamA = team,
+                        TeamB = remainingIntraconferenceOpponents[0],
+                        GameType = ScheduledGameType.RemainingIntraconferenceFirstSet,
+                        HomeTeamIsTeamA = true
+                    });
+
+                    matchups.Add(new GameMatchup
+                    {
+                        TeamA = team,
+                        TeamB = remainingIntraconferenceOpponents[0],
+                        GameType = ScheduledGameType.RemainingIntraconferenceSecondSet,
+                        HomeTeamIsTeamA = false
+                    });
+                }
+                else
+                {
+                    matchups.AddRange(remainingIntraconferenceOpponents.Select((o, i) => new GameMatchup
+                    {
+                        TeamA = team,
+                        TeamB = o,
+                        GameType = ScheduledGameType.RemainingIntraconferenceFirstSet,
+                        HomeTeamIsTeamA = i % 2 == 0
+                    }));
                 }
             }
 
-            return opponents;
+            if (matchups.Count != 640)
+            {
+                throw new InvalidOperationException("Invalid number of matchups.");
+            }
+
+            if (matchups.GroupBy(m => m.TeamA).Any(g => g.Count(m => m.HomeTeamIsTeamA) != 8))
+            {
+                throw new InvalidOperationException("Invalid number of home matchups.");
+            }
+            
+            return matchups;
         }
 
-        private List<ScheduledGame> GetRegularSeasonGameRecords(SymmetricTable<BasicTeamInfo?> opponents,
+        private List<ScheduledGame> GetRegularSeasonGameRecords(List<GameMatchup> matchups,
             Dictionary<BasicTeamInfo, Team> dataTeams)
         {
             var gameRecords = new List<ScheduledGame>(320);
+            matchups = matchups
+                .Distinct(new GameMatchupComparer(new BasicTeamInfoComparer()))
+                .OrderBy(m => m.TeamA.Name)
+                .ToList();
 
-            foreach (var team in opponents.Keys)
+            if (matchups.Count != 320)
             {
-                for (int i = 0; i < 16; i++)
-                {
-                    if (opponents[team, i] == null) { continue; }
-                    var keyTeamIsHome = i % 2 == 0;
-                    var homeTeam = keyTeamIsHome ? team! : opponents[team, i]!;
-                    var awayTeam = keyTeamIsHome ? opponents[team, i]! : team!;
-                    var homeDataTeam = dataTeams[homeTeam];
-                    var awayDataTeam = dataTeams[awayTeam];
-
-                    GameRecord gameRecord = new GameRecord
-                    {
-                        GameType = GameType.RegularSeason,
-                        WeekNumber = 0,
-                        HomeTeam = homeDataTeam,
-                        AwayTeam = awayDataTeam,
-                        StadiumID = homeDataTeam.HomeStadiumID
-                    };
-                    var gameType = i switch
-                    {
-                        < 5 => ScheduledGameType.Intradivisional,
-                        < 9 => ScheduledGameType.Intraconference,
-                        < 13 => ScheduledGameType.Interconference,
-                        < 16 => ScheduledGameType.RemainingIntraconference,
-                        _ => throw new InvalidOperationException("Invalid game type.")
-                    };
-
-                    gameRecords.Add(new ScheduledGame
-                    {
-                        GameRecord = gameRecord,
-                        GameType = gameType,
-                        HomeTeamInfo = homeTeam,
-                        AwayTeamInfo = awayTeam
-                    });
-
-                    opponents.SymmetricallyClear(team, i);
-                }
+                throw new InvalidOperationException("Invalid number of matchups.");
             }
 
+            if (matchups.Count(m => m.HomeTeamIsTeamA) != 160)
+            {
+                throw new InvalidOperationException("Invalid number of home matchups.");
+            }
+
+            foreach (var matchup in matchups)
+            {
+                var homeTeam = matchup.HomeTeamIsTeamA ? matchup.TeamA : matchup.TeamB;
+                var awayTeam = matchup.HomeTeamIsTeamA ? matchup.TeamB : matchup.TeamA;
+
+                var homeDataTeam = dataTeams[homeTeam];
+                var awayDataTeam = dataTeams[awayTeam];
+                
+                gameRecords.Add(new ScheduledGame
+                {
+                    HomeTeamInfo = homeTeam,
+                    AwayTeamInfo = awayTeam,
+                    GameRecord = new GameRecord
+                    {
+                        GameType = GameType.RegularSeason,
+                        AwayTeam = awayDataTeam,
+                        StadiumID = homeDataTeam.HomeStadiumID,
+                        HomeTeam = homeDataTeam
+                    },
+                    GameType = matchup.GameType
+                });
+            }
+
+            if (gameRecords.Count != 320)
+            {
+                throw new InvalidOperationException("Invalid number of game records.");
+            }
+            
             return gameRecords;
         }
 
         private void ChooseByeGames(List<ScheduledGame> scheduledGames)
         {
-            var byeChosenForTeam = new Dictionary<BasicTeamInfo, bool>();
-            var intradivisionalGames = scheduledGames.Where(g => g.GameType == ScheduledGameType.Intradivisional).ToList();
+            var byeChosenForTeam = teams.ToDictionary(t => t, _ => false);
+            var intradivisionalGames = scheduledGames.Where(g => g.GameType is ScheduledGameType.IntradivisionalFirstSet or ScheduledGameType.IntradivisionalSecondSet).ToList();
             var random = new Random();
 
             Debug.Assert(intradivisionalGames.Count == 120);
@@ -119,7 +231,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 
             foreach (var game in intradivisionalGames)
             {
-                if (byeChosenForTeam[game.HomeTeamInfo]) { continue; }
+                if (byeChosenForTeam[game.HomeTeamInfo] || byeChosenForTeam[game.AwayTeamInfo]) { continue; }
                 byeChosenForTeam[game.HomeTeamInfo] = true;
                 byeChosenForTeam[game.AwayTeamInfo] = true;
 
@@ -127,24 +239,32 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
                 game.GameRecord.WeekNumber = 17;
             }
 
-            Debug.Assert(scheduledGames.Count(g => g.GameRecord.WeekNumber == 17) == 20);
+            if (scheduledGames.Count(g => g.GameRecord.WeekNumber == 17) != 20)
+            {
+                throw new InvalidOperationException("Invalid number of bye games.");
+            }
         }
 
         private void AssignWeekNumbers(List<ScheduledGame> scheduledGames)
         {
             var gameWeeks = SymmetricTable<BasicTeamInfo?>.FromRowKeys(teams, 16, new BasicTeamInfoComparer());
+            var comparer = new BasicTeamInfoComparer();
             var random = new Random();
+            
+            scheduledGames.Shuffle(random);
 
             // Step 1: Choose where each week 17 game was "taken" from to create a bye.
-            foreach (var week17Game in scheduledGames.Where(g => g.GameRecord.WeekNumber == 17))
+            var week17Games = scheduledGames.Where(g => g.GameRecord.WeekNumber == 17).ToList();
+
+            foreach (var week17Game in week17Games)
             {
                 int gameTakenFromWeek;
                 do
                 {
                     gameTakenFromWeek = random.Next(3, 12);
-                } while (gameWeeks.CountColumn(gameTakenFromWeek, c => c != null) == 4);
+                } while (gameWeeks.CountColumn(gameTakenFromWeek, c => c != null) == 8);
 
-                gameWeeks[week17Game.HomeTeamInfo, gameTakenFromWeek] = week17Game.AwayTeamInfo;
+                gameWeeks.SetCellUnlessAlreadySet(week17Game.HomeTeamInfo, gameTakenFromWeek, week17Game.AwayTeamInfo);
             }
 
             // Step 2: Assign the remaining week numbers.
@@ -153,9 +273,21 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
                 foreach (var team in teams)
                 {
                     if (gameWeeks[team, weekNumber] != null) { continue; }
-                    var firstFreeGame = scheduledGames.First(g => g.HomeTeamInfo == team && g.GameRecord.WeekNumber == 0);
+                    var firstFreeGame = scheduledGames.First(g => comparer.Equals(g.HomeTeamInfo, team) && g.GameRecord.WeekNumber == 0);
                     firstFreeGame.GameRecord.WeekNumber = weekNumber + 1;
                     gameWeeks[team, weekNumber] = firstFreeGame.AwayTeamInfo;
+
+                    Console.Clear();
+                    Console.WriteLine(gameWeeks);
+
+                    // WYLO: okay, how about this
+                    // 1. Loop over every team
+                    // 2. Select out all the games they play in, home and away
+                    // 3. Shuffle that list
+                    // 4. Loop over the list and assign the week number unless it's already assigned
+                    // Will this actually work? We should get 16 games per team, with progressively
+                    // more games assigned to a week as we go through the teams. The most important
+                    // thing is that no team plays more than once in a week.
                 }
             }
         }
@@ -186,6 +318,80 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 
                 weekStartMidnight = weekStartMidnight.AddDays(7);
             }
+        }
+
+        private List<GameRecord> GetPreseasonGamesForYear(int year,
+            Dictionary<BasicTeamInfo, Team> dataTeams)
+        {
+            var preseasonKickoffDay = GetNFLKickoffDayForYear(year).AddDays(-28);
+            var teamComparer = new BasicTeamInfoComparer();
+            var preseasonOpponents = SymmetricTable<BasicTeamInfo?>.FromRowKeys(teams, 4, teamComparer);
+            var random = new Random(year);
+
+            foreach (var team in teams)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    if (preseasonOpponents[team, i] != null) { continue; }
+                    var opponent = teams[random.Next(40)];
+
+                    while (teamComparer.Equals(team, opponent))
+                    {
+                        opponent = teams[random.Next(40)];
+                    }
+
+                    preseasonOpponents[team, i] = opponent;
+                }
+            }
+            
+            var preseasonGames = new List<GameRecord>(80);
+            var weekStartDay = preseasonKickoffDay;
+            var gamesAssignedThisWeek = 0;
+            var weekNumber = 1;
+
+            foreach (var team in teams)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    if (preseasonOpponents[team, i] == null) { continue; }
+                    var opponent = preseasonOpponents[team, i]!;
+                    var teamIsHomeTeam = i % 2 == 0;
+                    var homeTeam = teamIsHomeTeam ? team : opponent;
+                    var awayTeam = teamIsHomeTeam ? opponent : team;
+                    var homeDataTeam = dataTeams[homeTeam];
+                    var awayDataTeam = dataTeams[awayTeam];
+
+                    preseasonGames.Add(new GameRecord
+                    {
+                        GameType = GameType.Preseason,
+                        WeekNumber = weekNumber,
+                        HomeTeam = homeDataTeam,
+                        AwayTeam = awayDataTeam,
+                        StadiumID = homeDataTeam.HomeStadiumID,
+                        KickoffTime = gamesAssignedThisWeek switch
+                        {
+                            0 => weekStartDay.AddHours(19),                               // Thursday 7:00pm
+                            >= 1 and <= 15 => weekStartDay.AddDays(3).AddHours(13),       // Sunday 1:00pm
+                            <= 17 => weekStartDay.AddDays(3).AddHours(16).AddMinutes(25), // Sunday 4:25pm
+                            18 => weekStartDay.AddDays(3).AddHours(20),                   // Sunday 8:00pm
+                            19 => weekStartDay.AddDays(4).AddHours(20),                   // Monday 8:00pm
+                            _ => throw new InvalidOperationException("Invalid game number.")
+                        }
+                    });
+
+                    preseasonOpponents.SymmetricallyClear(team, i);
+                    gamesAssignedThisWeek += 1;
+
+                    if (gamesAssignedThisWeek == 20)
+                    {
+                        gamesAssignedThisWeek = 0;
+                        weekNumber += 1;
+                        weekStartDay = weekStartDay.AddDays(7);
+                    }
+                }
+            }
+            
+            return preseasonGames;
         }
 
         private IEnumerable<BasicTeamInfo> GetTeamsInDivision(Conference conference, Division division) =>
@@ -255,12 +461,28 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
             IReadOnlyDictionary<BasicTeamInfo, int> previousSeasonDivisionRankings)
         {
             var opponentDivisions = GetRemainingIntraconferenceOpponentDivisions(cycleYear, team.Division);
-            var teamsInDivisions = GetTeamsInDivision(team.Conference, opponentDivisions.Item1)
-                .Concat(GetTeamsInDivision(team.Conference, opponentDivisions.Item2));
-            var teamRanking = previousSeasonDivisionRankings[team];
-            var matchingRankTeams = teamsInDivisions.Where(t => previousSeasonDivisionRankings[t] == teamRanking);
 
-            return matchingRankTeams;
+            if (team.Division != opponentDivisions.Item1)
+            {
+                var teamsInDivisions = GetTeamsInDivision(team.Conference, opponentDivisions.Item1)
+                    .Concat(GetTeamsInDivision(team.Conference, opponentDivisions.Item2));
+                var teamRanking = previousSeasonDivisionRankings[team];
+                return teamsInDivisions.Where(t => previousSeasonDivisionRankings[t] == teamRanking);
+            }
+            else
+            {
+                // A team faces its own division again every five years. #4 plays #1 and #3 plays #2 twice.
+                var divisionTeams = GetTeamsInDivision(team.Conference, team.Division).ToArray();
+
+                return Enumerable.Repeat(previousSeasonDivisionRankings[team] switch
+                {
+                    1 => divisionTeams.First(t => previousSeasonDivisionRankings[t] == 4),
+                    2 => divisionTeams.First(t => previousSeasonDivisionRankings[t] == 3),
+                    3 => divisionTeams.First(t => previousSeasonDivisionRankings[t] == 2),
+                    4 => divisionTeams.First(t => previousSeasonDivisionRankings[t] == 1),
+                    _ => throw new InvalidOperationException("Invalid division ranking.")
+                }, 2);
+            }
         }
 
         private Dictionary<BasicTeamInfo, int> GetDefaultPreviousSeasonDivisionRankings()

@@ -30,8 +30,6 @@ public sealed class SymmetricTable<T> where T : class?
         }
     }
 
-    public int TotalCells => rows.Count * cellsPerRow;
-
     private SymmetricTable(IEqualityComparer<T?> comparer)
     {
         this.comparer = comparer;
@@ -48,23 +46,11 @@ public sealed class SymmetricTable<T> where T : class?
         }
         else
         {
-            Debug.Assert(symmetricRow[cellNumber] == key);
+            if (symmetricRow[cellNumber] != key)
+            {
+                throw new InvalidOperationException($"Cell {cellNumber} is already set to {row[cellNumber]} and cannot be set to {value}");
+            }
         }
-    }
-
-    public T? ElementAt(int index)
-    {
-        var rowIndex = index / cellsPerRow;
-        var cellIndex = index % cellsPerRow;
-        return rows[rowIndex][cellIndex];
-    }
-
-    public (T? rowKey, T? cellValue) RowAndElementAt(int index)
-    {
-        var rowIndex = index / cellsPerRow;
-        var cellIndex = index % cellsPerRow;
-        var row = rows[rowIndex];
-        return (row.Key, row[cellIndex]);
     }
 
     public void SymmetricallyClear(T? key, int cellNumber)
@@ -130,7 +116,7 @@ public sealed class SymmetricTable<T> where T : class?
 
             for (int i = 0; i < cellsPerRow; i++)
             {
-                var cellValue = row[i]?.ToString() ?? "(null)";
+                var cellValue = row[i]?.ToString() ?? "()";
                 sb.Append(cellValue);
                 sb.Append(", ");
             }

@@ -8,10 +8,13 @@ namespace Celarix.JustForFun.FootballSimulator;
 
 internal enum ScheduledGameType
 {
-    Intradivisional,
-    Intraconference,
+    IntradivisionalFirstSet,
+    IntradivisionalSecondSet,
+    IntraconferenceFirstSet,
+    IntraconferenceSecondSet,
     Interconference,
-    RemainingIntraconference
+    RemainingIntraconferenceFirstSet,
+    RemainingIntraconferenceSecondSet,
 }
 
 internal enum GameResultForTeam

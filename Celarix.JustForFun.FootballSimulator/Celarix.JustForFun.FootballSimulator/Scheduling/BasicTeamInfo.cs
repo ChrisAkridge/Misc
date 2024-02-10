@@ -5,7 +5,7 @@ using Celarix.JustForFun.FootballSimulator.Data.Models;
 
 namespace Celarix.JustForFun.FootballSimulator.Scheduling;
 
-internal sealed class BasicTeamInfo : IComparable<BasicTeamInfo>
+public sealed class BasicTeamInfo : IComparable<BasicTeamInfo>
 {
     public string Name { get; }
     public Conference Conference { get; }

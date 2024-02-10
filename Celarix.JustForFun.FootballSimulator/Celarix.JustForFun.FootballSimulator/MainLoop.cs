@@ -87,17 +87,17 @@ public sealed class MainLoop
             }
         }
 
-        var seasonSchedule = ScheduleGenerator.GetPreseasonAndRegularSeasonGamesForSeason(newSeasonYear,
-            context.Teams.ToList(), previousSeasonTeamPositions);
+        //var seasonSchedule = ScheduleGenerator.GetPreseasonAndRegularSeasonGamesForSeason(newSeasonYear,
+        //    context.Teams.ToList(), previousSeasonTeamPositions);
 
-        foreach (var gameRecord in seasonSchedule)
-        {
-            gameRecord.SeasonRecordID = seasonRecordEntity.Entity.SeasonRecordID;
-            gameRecord.StadiumID = teams.First(t => t.TeamName == gameRecord.HomeTeam.TeamName).HomeStadiumID;
-        }
+        //foreach (var gameRecord in seasonSchedule)
+        //{
+        //    gameRecord.SeasonRecordID = seasonRecordEntity.Entity.SeasonRecordID;
+        //    gameRecord.StadiumID = teams.First(t => t.TeamName == gameRecord.HomeTeam.TeamName).HomeStadiumID;
+        //}
 
-        context.GameRecords.AddRange(seasonSchedule);
-        context.SaveChanges();
+        //context.GameRecords.AddRange(seasonSchedule);
+        //context.SaveChanges();
 
         StatusMessage = $"Created schedule for the {newSeasonYear} season!";
     }
