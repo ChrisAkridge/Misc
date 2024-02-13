@@ -34,6 +34,8 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
             ScheduleGamesToTimeslots(scheduledGames, year);
             var preseasonGames = GetPreseasonGamesForYear(year, dataTeams);
 
+            // WYLO: we're generating 97 preseason games for 2014, instead of 80
+            // also cycle year 3 gives us 118 home games, instead of 120
             return preseasonGames.Concat(scheduledGames.Select(g => g.GameRecord))
                 .OrderBy(g => g.KickoffTime)
                 .ToList();
@@ -221,13 +223,12 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 
         private void ChooseByeGames(List<ScheduledGame> scheduledGames)
         {
-            // Maybe pick week numbers first, then choose bye games?
             var byeChosenForTeam = teams.ToDictionary(t => t, _ => false);
             var random = new Random();
 
             scheduledGames.Shuffle(random);
 
-            foreach (var game in scheduledGames.Where(g => g.GameRecord.WeekNumber is >= 3 and <= 13))
+            foreach (var game in scheduledGames.Where(g => g.GameType is ScheduledGameType.IntradivisionalFirstSet or ScheduledGameType.IntradivisionalSecondSet))
             {
                 if (byeChosenForTeam[game.HomeTeamInfo] || byeChosenForTeam[game.AwayTeamInfo]) { continue; }
                 byeChosenForTeam[game.HomeTeamInfo] = true;
@@ -245,53 +246,57 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 
         private void AssignWeekNumbers(List<ScheduledGame> scheduledGames)
         {
-            // TODO: make all Random instances a field
-            var random = new Random(1234);
+            var gameSlots = new ScheduledGame[320];
+            
+            var gamesToAssign = 320;
+            var random = new Random(-1394683294);
             var comparer = new BasicTeamInfoComparer();
-            scheduledGames.Shuffle(random);
+            var assigningStartTime = DateTimeOffset.Now;
+            var gamesToAssignCounts = new DropoutStack<int>(25);
 
-            Func<ScheduledGame, int, int> scorer = (game, index) =>
+            while (DateTimeOffset.Now - assigningStartTime < TimeSpan.FromSeconds(15d))
             {
-                var weekNumber = index / 20;
-                var weekStartIndex = weekNumber * 20;
-
-                var homeTeamAlreadyPlays = false;
-                var awayTeamAlreadyPlays = false;
-
-                for (var i = weekStartIndex; i < index; i++)
+                scheduledGames.Shuffle(random);
+                var unassignedGames = scheduledGames.Where(g => g.GameRecord.WeekNumber == 0).ToArray();
+                var slotIndex = FirstEmptySlot(gameSlots);
+                if (unassignedGames.Length != gameSlots.Count(s => s == null))
                 {
-                    var weekGame = scheduledGames[i];
-                    if (comparer.Equals(weekGame.HomeTeamInfo, game.HomeTeamInfo) ||
-                        comparer.Equals(weekGame.AwayTeamInfo, game.HomeTeamInfo))
-                    {
-                        homeTeamAlreadyPlays = true;
-                    }
-
-                    if (comparer.Equals(weekGame.HomeTeamInfo, game.AwayTeamInfo) ||
-                        comparer.Equals(weekGame.AwayTeamInfo, game.AwayTeamInfo))
-                    {
-                        awayTeamAlreadyPlays = true;
-                    }
-
-                    if (homeTeamAlreadyPlays && awayTeamAlreadyPlays) { return -2; }
+                    throw new InvalidOperationException("Invalid number of unassigned games.");
                 }
 
-                return homeTeamAlreadyPlays || awayTeamAlreadyPlays ? -1 : 0;
-            };
-            var hillClimber = new BacktrackingHillClimber<ScheduledGame>(scheduledGames, scorer, random);
-            var climbingStartTime = DateTimeOffset.Now;
-            while (DateTimeOffset.Now - climbingStartTime < TimeSpan.FromSeconds(100))
-            {
-                for (int i = 0; i < 100; i++)
+                foreach (var unassignedGame in unassignedGames)
                 {
-                    hillClimber.RunClimbStep();
+                    if (!GameTeamsAlreadyPlayThisWeek(unassignedGame, gameSlots, slotIndex, comparer))
+                    {
+                        if (gameSlots[slotIndex] != null)
+                        {
+                            throw new InvalidOperationException("Invalid game slot.");
+                        }
+
+                        gameSlots[slotIndex] = unassignedGame;
+                        unassignedGame.GameRecord.WeekNumber = (slotIndex / 20) + 1;
+                        gamesToAssign -= 1;
+                    }
+
+                    slotIndex = NextEmptySlotAfterCurrent(gameSlots, slotIndex);
+                }
+
+                gamesToAssignCounts.Push(gamesToAssign);
+                if (gamesToAssignCounts.Distinct().Count() == 1)
+                {
+                    break;
                 }
             }
 
+            // Fill in the rest of the game slots.
+            var remainingUnassignedGames = new Queue<ScheduledGame>(scheduledGames.Where(g => g.GameRecord.WeekNumber == 0));
             for (int i = 0; i < 320; i++)
             {
-                var weekNumber = i / 20;
-                scheduledGames[i].GameRecord.WeekNumber = weekNumber + 1;
+                if (gameSlots[i] == null)
+                {
+                    gameSlots[i] = remainingUnassignedGames.Dequeue();
+                    gameSlots[i].GameRecord.WeekNumber = (i / 20) + 1;
+                }
             }
         }
 

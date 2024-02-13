@@ -19,18 +19,18 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 
         private readonly IList<T> list;
         private readonly Func<T, int, int> itemScorer;
-        private readonly Stack<SwapEvent> swapHistory;
+        private readonly Stack<SwapEvent> shuffleHistory;
         private readonly Random random;
 
         public BacktrackingHillClimber(IList<T> list, Func<T, int, int> itemScorer, Random random)
         {
             this.list = list;
             this.itemScorer = itemScorer;
-            swapHistory = new Stack<SwapEvent>();
+            shuffleHistory = new Stack<SwapEvent>();
             this.random = random;
         }
 
-        public void RunClimbStep()
+        public void RunShuffleStep()
         {
             // A poor man's hill climbing algorithm. Remember swaps that make the score worse until
             // we fill the stack, then backtrack a random amount of steps and try from there.
@@ -52,17 +52,14 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
                 throw new InvalidOperationException("Should be unreachable, but good to guard against infinite loops.");
             }
 
-            if (swapHistory.Count == MaxShuffleHistory)
+            if (shuffleHistory.Count == MaxShuffleHistory)
             {
                 int backTrackCount = random.Next(1, MaxShuffleHistory);
                 for (int i = 0; i < backTrackCount; i++)
                 {
-                    var lastEvent = swapHistory.Pop();
+                    var lastEvent = shuffleHistory.Pop();
                     (list[lastEvent.FirstIndex], list[lastEvent.SecondIndex]) = (list[lastEvent.SecondIndex], list[lastEvent.FirstIndex]);
                 }
-
-                Console.WriteLine($"Backtracking {backTrackCount} steps, back to score {GetTotalScore()}");
-                return;
             }
 
             int badItemIndexToSwap = random.Next(badItemIndices.Count);
@@ -80,25 +77,17 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
             };
             (list[swap.FirstIndex], list[swap.SecondIndex]) = (list[swap.SecondIndex], list[swap.FirstIndex]);
 
-            var newScore = GetTotalScore();
-            Console.WriteLine($"{totalScore} to {newScore}, stack depth {swapHistory.Count}");
-            if (newScore < totalScore)
-            {
-                swapHistory.Push(swap);
-            }
-        }
-
-        private int GetTotalScore()
-        {
-            var score = 0;
-
+            var newScore = 0;
             for (int i = 0; i < list.Count; i++)
             {
                 T? item = list[i];
-                score += itemScorer(item, i);
+                newScore += itemScorer(item, i);
             }
 
-            return score;
+            if (newScore < totalScore)
+            {
+                shuffleHistory.Push(swap);
+            }
         }
     }
 }
