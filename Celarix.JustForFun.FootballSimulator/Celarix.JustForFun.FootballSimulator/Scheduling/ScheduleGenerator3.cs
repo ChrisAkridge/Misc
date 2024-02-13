@@ -29,8 +29,8 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
             var cycleYear = (year - YearZero) % 5;
             var teamOpponents = GetTeamOpponentsForSeason(cycleYear, previousSeasonDivisionRankings);
             var scheduledGames = GetRegularSeasonGameRecords(teamOpponents, dataTeams);
-            ChooseByeGames(scheduledGames);
             AssignWeekNumbers(scheduledGames);
+            ChooseByeGames(scheduledGames);
             ScheduleGamesToTimeslots(scheduledGames, year);
             var preseasonGames = GetPreseasonGamesForYear(year, dataTeams);
 
@@ -221,15 +221,13 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 
         private void ChooseByeGames(List<ScheduledGame> scheduledGames)
         {
+            // Maybe pick week numbers first, then choose bye games?
             var byeChosenForTeam = teams.ToDictionary(t => t, _ => false);
-            var intradivisionalGames = scheduledGames.Where(g => g.GameType is ScheduledGameType.IntradivisionalFirstSet or ScheduledGameType.IntradivisionalSecondSet).ToList();
             var random = new Random();
 
-            Debug.Assert(intradivisionalGames.Count == 120);
+            scheduledGames.Shuffle(random);
 
-            intradivisionalGames.Shuffle(random);
-
-            foreach (var game in intradivisionalGames)
+            foreach (var game in scheduledGames.Where(g => g.GameRecord.WeekNumber is >= 3 and <= 13))
             {
                 if (byeChosenForTeam[game.HomeTeamInfo] || byeChosenForTeam[game.AwayTeamInfo]) { continue; }
                 byeChosenForTeam[game.HomeTeamInfo] = true;
@@ -247,49 +245,116 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 
         private void AssignWeekNumbers(List<ScheduledGame> scheduledGames)
         {
-            var gameWeeks = SymmetricTable<BasicTeamInfo?>.FromRowKeys(teams, 16, new BasicTeamInfoComparer());
+            // TODO: make all Random instances a field
+            var random = new Random(1234);
             var comparer = new BasicTeamInfoComparer();
-            var random = new Random();
-            
             scheduledGames.Shuffle(random);
 
-            // Step 1: Choose where each week 17 game was "taken" from to create a bye.
-            var week17Games = scheduledGames.Where(g => g.GameRecord.WeekNumber == 17).ToList();
-
-            foreach (var week17Game in week17Games)
+            Func<ScheduledGame, int, int> scorer = (game, index) =>
             {
-                int gameTakenFromWeek;
-                do
+                var weekNumber = index / 20;
+                var weekStartIndex = weekNumber * 20;
+
+                var homeTeamAlreadyPlays = false;
+                var awayTeamAlreadyPlays = false;
+
+                for (var i = weekStartIndex; i < index; i++)
                 {
-                    gameTakenFromWeek = random.Next(3, 12);
-                } while (gameWeeks.CountColumn(gameTakenFromWeek, c => c != null) == 8);
+                    var weekGame = scheduledGames[i];
+                    if (comparer.Equals(weekGame.HomeTeamInfo, game.HomeTeamInfo) ||
+                        comparer.Equals(weekGame.AwayTeamInfo, game.HomeTeamInfo))
+                    {
+                        homeTeamAlreadyPlays = true;
+                    }
 
-                gameWeeks.SetCellUnlessAlreadySet(week17Game.HomeTeamInfo, gameTakenFromWeek, week17Game.AwayTeamInfo);
-            }
+                    if (comparer.Equals(weekGame.HomeTeamInfo, game.AwayTeamInfo) ||
+                        comparer.Equals(weekGame.AwayTeamInfo, game.AwayTeamInfo))
+                    {
+                        awayTeamAlreadyPlays = true;
+                    }
 
-            // Step 2: Assign the remaining week numbers.
-            for (int weekNumber = 0; weekNumber < 16; weekNumber++)
+                    if (homeTeamAlreadyPlays && awayTeamAlreadyPlays) { return -2; }
+                }
+
+                return homeTeamAlreadyPlays || awayTeamAlreadyPlays ? -1 : 0;
+            };
+            var hillClimber = new BacktrackingHillClimber<ScheduledGame>(scheduledGames, scorer, random);
+            var climbingStartTime = DateTimeOffset.Now;
+            while (DateTimeOffset.Now - climbingStartTime < TimeSpan.FromSeconds(100))
             {
-                foreach (var team in teams)
+                for (int i = 0; i < 100; i++)
                 {
-                    if (gameWeeks[team, weekNumber] != null) { continue; }
-                    var firstFreeGame = scheduledGames.First(g => comparer.Equals(g.HomeTeamInfo, team) && g.GameRecord.WeekNumber == 0);
-                    firstFreeGame.GameRecord.WeekNumber = weekNumber + 1;
-                    gameWeeks[team, weekNumber] = firstFreeGame.AwayTeamInfo;
-
-                    Console.Clear();
-                    Console.WriteLine(gameWeeks);
-
-                    // WYLO: okay, how about this
-                    // 1. Loop over every team
-                    // 2. Select out all the games they play in, home and away
-                    // 3. Shuffle that list
-                    // 4. Loop over the list and assign the week number unless it's already assigned
-                    // Will this actually work? We should get 16 games per team, with progressively
-                    // more games assigned to a week as we go through the teams. The most important
-                    // thing is that no team plays more than once in a week.
+                    hillClimber.RunClimbStep();
                 }
             }
+
+            for (int i = 0; i < 320; i++)
+            {
+                var weekNumber = i / 20;
+                scheduledGames[i].GameRecord.WeekNumber = weekNumber + 1;
+            }
+        }
+
+        private bool GameTeamsAlreadyPlayThisWeek(ScheduledGame gameToAssign,
+            ScheduledGame[] gameSlots,
+            int slotIndex,
+            BasicTeamInfoComparer comparer)
+        {
+            var weekNumber = slotIndex / 20;
+            var weekStartSlot = weekNumber * 20;
+            var weekEndSlot = weekStartSlot + 19;
+
+            for (int i = weekStartSlot; i < weekEndSlot; i++)
+            {
+                var gameSlot = gameSlots[i];
+                if (gameSlot is null) { continue; }
+                if (comparer.Equals(gameSlot.HomeTeamInfo, gameToAssign.HomeTeamInfo) ||
+                    comparer.Equals(gameSlot.HomeTeamInfo, gameToAssign.AwayTeamInfo) ||
+                    comparer.Equals(gameSlot.AwayTeamInfo, gameToAssign.HomeTeamInfo) ||
+                    comparer.Equals(gameSlot.AwayTeamInfo, gameToAssign.AwayTeamInfo))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private int NextEmptySlotAfterCurrent(ScheduledGame[] gameSlots, int currentSlotIndex)
+        {
+            var hasWrappedAround = false;
+
+            do
+            {
+                currentSlotIndex += 1;
+                if (currentSlotIndex >= gameSlots.Length)
+                {
+                    if (hasWrappedAround)
+                    {
+                        throw new InvalidOperationException("No empty slot found.");
+                    }
+                    else
+                    {
+                        currentSlotIndex = 0;
+                        hasWrappedAround = true;
+                    }
+                }
+            } while (gameSlots[currentSlotIndex] != null);
+
+            return currentSlotIndex;
+        }
+
+        private int FirstEmptySlot(ScheduledGame[] gameSlots)
+        {
+            for (int i = 0; i < gameSlots.Length; i++)
+            {
+                if (gameSlots[i] is null)
+                {
+                    return i;
+                }
+            }
+
+            throw new InvalidOperationException("No empty slot found.");
         }
 
         private void ScheduleGamesToTimeslots(List<ScheduledGame> scheduledGames, int year)

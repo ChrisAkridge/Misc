@@ -13,6 +13,7 @@ using Celarix.JustForFun.FootballSimulator.Scheduling;
 //}
 
 var context = new FootballContext();
+context.Database.EnsureCreated();
 var settings = context.SimulatorSettings.SingleOrDefault();
 
 if (settings?.SeedDataInitialized != true)
