@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Celarix.JustForFun.LunaGalatea.Logic.Yahtzee;
+using Celarix.JustForFun.LunaGalatea.Providers;
 
 namespace Celarix.JustForFun.LunaGalatea.Presentation
 {
@@ -22,7 +23,8 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
                 Location = new Point(5, startingY),
                 AutoSize = true,
                 MaximumSize = new Size(panel.Width - 10, 0),
-                Text = YahtzeePlayer.GetDisplayText()
+                Text = YahtzeePlayer.GetDisplayText(),
+                Font = IPresenter.GetDisplayFont(false)
             };
 
             startingY += TextRenderer.MeasureText(label.Text, label.Font).Height + 5;

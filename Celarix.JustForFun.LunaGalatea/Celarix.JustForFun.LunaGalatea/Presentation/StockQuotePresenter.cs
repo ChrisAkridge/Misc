@@ -17,7 +17,8 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
             quoteLabel = new Label
             {
                 Location = new Point(5, startingY),
-                Size = new Size(512, 85)
+                Size = new Size(512, 85),
+                Font = IPresenter.GetDisplayFont(provider.UseMonospaceFont)
             };
 
             startingY += quoteLabel.Height;

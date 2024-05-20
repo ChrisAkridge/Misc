@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Celarix.JustForFun.LunaGalatea.Providers;
+using Label = System.Windows.Forms.Label;
 
 namespace Celarix.JustForFun.LunaGalatea.Presentation
 {
-    public sealed class TimeDisplayPresenter : IPresenter
+    public sealed class TimeVisualizerPresenter : IPresenter
     {
-        private readonly TimeDisplayProvider provider = new TimeDisplayProvider();
-
+        private readonly TimeVisualizerProvider provider = new TimeVisualizerProvider();
         private readonly Label timeLabel;
 
-        public TimeDisplayPresenter(Panel panel, Settings settings, int startingY, out int endingY)
+        public TimeVisualizerPresenter(Panel panel, Settings settings, int startingY, out int endingY)
         {
             timeLabel = new Label
             {
@@ -21,10 +21,10 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
                 AutoSize = true,
                 Font = IPresenter.GetDisplayFont(provider.UseMonospaceFont)
             };
-
+            
             Render(0);
             startingY += TextRenderer.MeasureText(timeLabel.Text, timeLabel.Font).Height + 5;
-
+            
             var separatorLabel = new Label
             {
                 AutoSize = false,
@@ -33,7 +33,7 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
                 BackColor = SystemColors.ControlDark,
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
-            
+
             panel.Controls.Add(timeLabel);
             panel.Controls.Add(separatorLabel);
 

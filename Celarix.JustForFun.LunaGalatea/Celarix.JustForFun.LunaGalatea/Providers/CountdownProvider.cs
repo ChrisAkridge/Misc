@@ -13,6 +13,8 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
         private readonly IClock clock;
         private readonly DateTimeZone easternTime;
 
+        public bool UseMonospaceFont => false;
+
         /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
         public CountdownProvider(IClock clock)
         {
@@ -58,13 +60,15 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                 $"Christmas Eve: {ForFixedDateEvent(nowInstant, now, 12, 24)}",
                 $"Christmas Day: {ForFixedDateEvent(nowInstant, now, 12, 25)}",
                 $"New Year's Season: {ForFixedDateEvent(nowInstant, now, 12, 26)}",
-                $"New Year's Eve: {ForFixedDateEvent(nowInstant, now, 12, 31)}"
+                $"New Year's Eve: {ForFixedDateEvent(nowInstant, now, 12, 31)}",
+                $"Great American Solar Eclipse: {ForOnceOffEvent(nowInstant, now, 2045, 8, 12)}"
             };
 
             // TODO: we could REALLY make this better in the future
             return countdowns
                 .Select(c => c.Split(':'))
-                .OrderBy(s => int.Parse(s[1][..s[1].IndexOf('d')]))
+                .Where(s => !string.IsNullOrWhiteSpace(s[1]))
+                .OrderBy(s => s[1].Contains("Today", StringComparison.InvariantCultureIgnoreCase) ? 0 : int.Parse(s[1][..s[1].IndexOf('d')]))
                 .Select(s => string.Join(":", s))
                 .ToList();
         }
@@ -142,6 +146,31 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                     : new LocalDateTime(now.Year + 1, monthForNextYear, dayForNextYear, 0, 0, 0);
             var nextOccurrenceZonedDate = easternTime.AtStrictly(nextOccurrenceLocalDate);
             return FormatDuration(nextOccurrenceZonedDate.ToInstant() - nowInstant);
+        }
+
+        private string? ForOnceOffEvent(Instant nowInstant,
+            ZonedDateTime now,
+            int eventYear,
+            int eventMonth,
+            int eventDay)
+        {
+            if (now.Year == eventYear
+                && now.Month == eventMonth
+                && now.Day == eventDay)
+            {
+                return "Today!";
+            }
+
+            if (now.Year > eventYear
+                || (now.Year == eventYear && now.Month == eventMonth)
+                || (now.Year == eventYear && now.Month == eventMonth && now.Day > eventDay))
+            {
+                return null;
+            }
+
+            var eventLocalDate = new LocalDateTime(eventYear, eventMonth, eventDay, 0, 0, 0);
+            var eventZonedDate = easternTime.AtStrictly(eventLocalDate);
+            return FormatDuration(eventZonedDate.ToInstant() - nowInstant);
         }
 
         private static string FormatDuration(Duration duration)

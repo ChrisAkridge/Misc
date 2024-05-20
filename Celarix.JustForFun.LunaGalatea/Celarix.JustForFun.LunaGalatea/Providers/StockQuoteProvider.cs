@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Celarix.JustForFun.LunaGalatea.Logic;
-using LewisFam.Stocks;
+﻿using Celarix.JustForFun.LunaGalatea.Logic;
 
 namespace Celarix.JustForFun.LunaGalatea.Providers
 {
     public class StockQuoteProvider : IAsyncProvider<List<string>>
     {
+        public bool UseMonospaceFont => false;
+        
         public async Task<List<string>> GetDisplayObject()
         {
             var stockNamesAndSymbols = new[]
@@ -19,7 +15,19 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                 new KeyValuePair<string, string>("Vanguard Total Stock Market", "VTI")
             };
 
-            var quotes = await StockQuote.CreateFromSymbolsAndFriendlyNames(stockNamesAndSymbols);
+            List<StockQuote> quotes;
+            try
+            {
+                quotes = await StockQuote.CreateFromSymbolsAndFriendlyNames(stockNamesAndSymbols);
+            }
+            catch (Exception ex)
+            {
+                return new List<string>
+                {
+                    $"Failed to load stock info: {ex.Message}"
+                };
+            }
+            
             return quotes
                 .Select(q => $"{q.FriendlyName}: {q.CurrentPrice:N2} ({q.PriceChange:N2}, {q.PercentChange:F2}%)")
                 .ToList();

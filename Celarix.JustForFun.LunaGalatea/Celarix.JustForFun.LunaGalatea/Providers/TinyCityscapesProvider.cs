@@ -9,7 +9,9 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
     public sealed class TinyCityscapesProvider : IProvider<string>
     {
         private const double SkyCharacterProbability = 1d / 6d;
-        
+
+        public bool UseMonospaceFont => true;
+
         private readonly string[] skyCharacters = new[]
         {
             "🌘",

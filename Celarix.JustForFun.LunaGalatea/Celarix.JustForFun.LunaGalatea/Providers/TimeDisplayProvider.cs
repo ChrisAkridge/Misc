@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Celarix.JustForFun.LunaGalatea.Logic;
+using LewisFam.Extensions;
 using NodaTime;
 
 namespace Celarix.JustForFun.LunaGalatea.Providers
@@ -12,6 +13,9 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
     {
         private readonly Dictionary<string, DateTimeZone> timeZones;
         private readonly List<string> buffer;
+        private readonly DateTimeZone easternTime;
+
+        public bool UseMonospaceFont => true;
 
         public TimeDisplayProvider()
         {
@@ -30,20 +34,18 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
             };
 
             buffer = new List<string>();
+            easternTime = DateTimeZoneProviders.Tzdb["America/New_York"];
         }
         
         public IReadOnlyList<string> GetDisplayObject()
         {
+            const int timeZonesPerLine = 2;
             buffer.Clear();
             
             // https://stackoverflow.com/a/21031514
             var now = SystemClock.Instance.GetCurrentInstant();
 
-            foreach (var (name, timeZone) in timeZones)
-            {
-                var zdt = now.InZone(timeZone);
-                buffer.Add($"{name}: {zdt:ddd yyyy-MM-dd hh:mm:ss tt}");
-            }
+            buffer.AddRange(GetTimeZoneTable(now, timeZonesPerLine));
 
             var extendedDate = new CelarianExtendedDateTime(DateTimeOffset.UtcNow);
             var nextCultureStartTime = extendedDate.GetTimeOfNextCulture().ToOffset(DateTimeOffset.Now.Offset);
@@ -55,6 +57,26 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
             buffer.Add($"({extendedDate.GetDayCulture()}, {extendedDate.GetTimeCulture()})");
             buffer.Add($"(until {nextCultureStartTime:yyyy-MM-dd hh:mm tt}, in {timeString})");
             return buffer;
+        }
+
+        private string GetTimeZoneNowDisplay(DateTimeZone zone, string zoneName, Instant now)
+        {
+            var nowDayOfWeekInEastern = now.InZone(easternTime).DayOfWeek;
+            var zonedDateTime = now.InZone(zone);
+            var nowDayOfWeekInZone = zonedDateTime.DayOfWeek;
+
+            return nowDayOfWeekInZone == nowDayOfWeekInEastern
+                ? $"{zoneName} {zonedDateTime:hh:mm:ss tt}"
+                : $"{zoneName} {nowDayOfWeekInZone.ToString().Substring(0, 3)} {zonedDateTime:hh:mm:ss tt}";
+        }
+
+        private IEnumerable<string> GetTimeZoneTable(Instant now, int timeZonesPerLine)
+        {
+            var timeZoneDisplays = timeZones.Select(kvp => GetTimeZoneNowDisplay(kvp.Value, kvp.Key, now)).ToArray();
+            var maximumDisplayLength = timeZoneDisplays.Select(d => d.Length).Max() + 1;
+            var paddedDisplays = timeZoneDisplays.Select(d => d.PadRight(maximumDisplayLength));
+            var displayBatches = paddedDisplays.Batch(timeZonesPerLine);
+            return displayBatches.Select(b => string.Join("", b));
         }
     }
 }

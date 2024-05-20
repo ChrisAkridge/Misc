@@ -17,7 +17,10 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
             cityscapeLabel = new Label
             {
                 Location = new Point(5, startingY),
-                AutoSize = true
+                AutoSize = true,
+                Font = provider.UseMonospaceFont
+                    ? new Font("Consolas", 12f)
+                    : new Font("Segoe UI", 9.25f)
             };
             
             Render(0);
