@@ -2,7 +2,7 @@
   "profiles": {
     "Celarix.SimpleIncrementalBackup.Console": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Users\\ChrisAckridge\\Pictures\\Screenshots\" \"C:\\Users\\ChrisAckridge\\Documents\\baktest\""
+      "commandLineArgs": "\"X:\\\\\" \"Y:\\\\\""
     }
   }
 }

@@ -6,10 +6,13 @@
         {
             License();
             if (args.Length < 2
-                || args.Length > 3
+                || args.Length > 4
                 || !Directory.Exists(args[0])
                 || !Directory.Exists(args[1])
-                || (args.Length == 3 && !args[2].Equals("-d", StringComparison.InvariantCultureIgnoreCase)))
+                || (args.Length == 3 && !args[2].Equals("-d", StringComparison.InvariantCultureIgnoreCase))
+                || (args.Length == 4
+	                && !args[2].Equals("-d", StringComparison.InvariantCultureIgnoreCase)
+	                && !args[3].Equals("-f", StringComparison.InvariantCultureIgnoreCase)))
             {
                 Usage();
                 return;
@@ -18,8 +21,9 @@
             var sourceFolder = args[0];
             var backupFolder = args[1];
             var deleteImmediately = args.Length == 3;
+            var deleteFirst = args.Length == 4;
 
-            var agent = new BackupAgent(sourceFolder, backupFolder, deleteImmediately);
+            var agent = new BackupAgent(sourceFolder, backupFolder, deleteImmediately, deleteFirst);
             agent.RunBackup();
         }
 
@@ -52,6 +56,7 @@
             w("\t<source folder>: The folder to back up. Can be the root of a drive (i.e. \"C:\"");
             w("\t<backup folder>: The folder to back up to. Can be the root of a drive (i.e. \"D:\"");
             w("\t-d: Immediately delete files from the backup folder that have been deleted from the source folder.");
+            w("\t-f: Delete files first before running the backup. Dangerous, but useful if a very large number of files have been moved that would be too large to fit twice in the destination.");
         }
     }
 }

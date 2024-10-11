@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Celarix.SimpleIncrementalBackup.Data.Models
 {
+	[Index(nameof(Path))]
     public sealed class FileEntry
     {
         public int FileEntryId { get; set; }
