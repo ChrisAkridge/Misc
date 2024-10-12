@@ -17,6 +17,14 @@ internal enum ScheduledGameType
     RemainingIntraconferenceSecondSet,
 }
 
+internal enum GameWeekSlotType
+{
+	Empty,
+	Assigned,
+	PreviouslyAssigned,
+	Ineligible
+}
+
 internal enum GameResultForTeam
 {
     Win,
