@@ -39,20 +39,13 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 		
 		// Matchup Generation
 		
-		private static GameMatchup CreateMatchup(BasicTeamInfo teamA, BasicTeamInfo teamB, ScheduledGameType gameType, bool homeTeamIsTeamA) =>
+		private static GameMatchup CreateMatchup(BasicTeamInfo teamA, BasicTeamInfo teamB, ScheduledGameType gameType) =>
 			new GameMatchup
 			{
 				TeamA = teamA,
 				TeamB = teamB,
-				GameType = gameType,
-				HomeTeamIsTeamA = homeTeamIsTeamA
+				GameType = gameType
 			};
-
-		private static GameMatchup CreateHomeMatchup(BasicTeamInfo teamA, BasicTeamInfo teamB, ScheduledGameType gameType) =>
-			CreateMatchup(teamA, teamB, gameType, true);
-
-		private static GameMatchup CreateAwayMatchup(BasicTeamInfo teamA, BasicTeamInfo teamB, ScheduledGameType gameType) =>
-			CreateMatchup(teamA, teamB, gameType, false);
 
 		private void AddIntradivisionGamesForTeam(BasicTeamInfo team, List<GameMatchup> matchups)
 		{
@@ -60,8 +53,8 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 			foreach (var intradivisionOpponent in GetTeamsInDivision(teams, team.Conference, team.Division)
 				         .Where(t => !comparer.Equals(t, team)))
 			{
-				AddMatchup(matchups, CreateHomeMatchup(team, intradivisionOpponent, ScheduledGameType.IntradivisionalFirstSet));
-				AddMatchup(matchups, CreateAwayMatchup(team, intradivisionOpponent, ScheduledGameType.IntraconferenceSecondSet));
+				AddMatchup(matchups, CreateMatchup(team, intradivisionOpponent, ScheduledGameType.IntradivisionalFirstSet));
+				AddMatchup(matchups, CreateMatchup(team, intradivisionOpponent, ScheduledGameType.IntradivisionalSecondSet));
 			}
 		}
 
@@ -73,19 +66,19 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 			if (intraconferenceOpponents.Length == 3)
 			{
 				var doubleOpponent = intraconferenceOpponents.First(g => g.Count() == 2).First();
-				AddMatchup(matchups, CreateHomeMatchup(team, doubleOpponent, ScheduledGameType.IntraconferenceFirstSet));
-				AddMatchup(matchups, CreateAwayMatchup(team, doubleOpponent, ScheduledGameType.IntraconferenceSecondSet));
+				AddMatchup(matchups, CreateMatchup(team, doubleOpponent, ScheduledGameType.IntraconferenceFirstSet));
+				AddMatchup(matchups, CreateMatchup(team, doubleOpponent, ScheduledGameType.IntraconferenceSecondSet));
 
 				var firstSetOpponents = intraconferenceOpponents.Where(g => g.Count() == 1)
 					.Select(g => g.First())
-					.Select((o, i) => CreateMatchup(team, o, ScheduledGameType.IntraconferenceFirstSet, i % 2 == 0));
+					.Select((o, i) => CreateMatchup(team, o, ScheduledGameType.IntraconferenceFirstSet));
 
 				AddMatchupRange(matchups, firstSetOpponents);
 			}
 			else
 			{
 				var firstSetOpponents = intraconferenceOpponents.SelectMany(g => g)
-					.Select((o, i) => CreateMatchup(team, o, ScheduledGameType.IntraconferenceFirstSet, i % 2 == 0));
+					.Select((o, i) => CreateMatchup(team, o, ScheduledGameType.IntraconferenceFirstSet));
 
 				AddMatchupRange(matchups, firstSetOpponents);
 			}
@@ -97,7 +90,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 			var interconferenceMatchups = GetTeamsInDivision(teams,
 					team.Conference.OtherConference(),
 					DivisionMatchupCycles.GetInterconferenceOpponentDivision(cycleYear, team.Conference, team.Division))
-				.Select((o, i) => CreateMatchup(team, o, ScheduledGameType.Interconference, i % 2 == 0));
+				.Select((o, i) => CreateMatchup(team, o, ScheduledGameType.Interconference));
 
 			AddMatchupRange(matchups, interconferenceMatchups);
 		}
@@ -111,13 +104,13 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 			if (comparer.Equals(remainingIntraconferenceOpponents[0], remainingIntraconferenceOpponents[1]))
 			{
 				// We're in the year when the division plays itself for the remaining intraconference games.
-				AddMatchup(matchups, CreateHomeMatchup(team, remainingIntraconferenceOpponents[0], ScheduledGameType.RemainingIntraconferenceFirstSet));
-				AddMatchup(matchups, CreateAwayMatchup(team, remainingIntraconferenceOpponents[0], ScheduledGameType.RemainingIntraconferenceSecondSet));
+				AddMatchup(matchups, CreateMatchup(team, remainingIntraconferenceOpponents[0], ScheduledGameType.RemainingIntraconferenceFirstSet));
+				AddMatchup(matchups, CreateMatchup(team, remainingIntraconferenceOpponents[0], ScheduledGameType.RemainingIntraconferenceSecondSet));
 			}
 			else
 			{
 				var remainingIntraconferenceFirstSetMatchups = remainingIntraconferenceOpponents
-					.Select((o, i) => CreateMatchup(team, o, ScheduledGameType.IntraconferenceFirstSet, i % 2 == 0));
+					.Select((o, i) => CreateMatchup(team, o, ScheduledGameType.RemainingIntraconferenceFirstSet));
 				AddMatchupRange(matchups, remainingIntraconferenceFirstSetMatchups);
 			}
 		}
@@ -148,11 +141,8 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 
 		private static void AddMatchup(ICollection<GameMatchup> matchups, GameMatchup matchup)
 		{
-			Log.Information("Adding matchup #{GameNumber}: {TeamA} vs. {TeamB} ({GameType}, home team is {HomeTeam})",
-				matchups.Count, matchup.TeamA.Name, matchup.TeamB.Name, matchup.GameType,
-				matchup.HomeTeamIsTeamA
-					? matchup.TeamA.Name
-					: matchup.TeamB.Name);
+			Log.Information("Adding matchup #{GameNumber}: {TeamA} vs. {TeamB} ({GameType})",
+				matchups.Count, matchup.TeamA.Name, matchup.TeamB.Name, matchup.GameType);
 
 			matchups.Add(matchup);
 		}
@@ -285,7 +275,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 			var builder = new StringBuilder();
 			builder.AppendLine(Has640Matchups(matchups));
 			builder.AppendLine(EachTeamAppears32Times(matchups));
-			builder.AppendLine(EachTeamAppearsAtHome16Times(matchups));
+			builder.AppendLine(EachTeamHasProperNumberOfGameTypes(matchups));
 			
 			var errors = builder.ToString().Trim();
 
@@ -304,32 +294,31 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 			teams.All(t => matchups.Count(m => comparer.Equals(m.TeamA, t) || comparer.Equals(m.TeamB, t)) == 32)
 				? string.Empty
 				: "Each team should appear 32 times in the matchups";
-		
-		private string EachTeamAppearsAtHome16Times(ICollection<GameMatchup> matchups)
+
+		private string EachTeamHasProperNumberOfGameTypes(ICollection<GameMatchup> matchups)
 		{
-			var allTeamsAppearAtHome16Times = true;
+			var matchupsByTeam = matchups.GroupBy(m => m.TeamA);
+			var allTeamsHaveCorrectNumberOfGamesByType = true;
 
-			foreach (var t in teams)
+			foreach (var team in matchupsByTeam)
 			{
-				var teamAppearancesAtHome = matchups.Count(m =>
+				var intradivisionalCount = team.Count(m => m.GameType is ScheduledGameType.IntradivisionalFirstSet or ScheduledGameType.IntradivisionalSecondSet);
+				var intraconferenceCount = team.Count(m => m.GameType is ScheduledGameType.IntraconferenceFirstSet or ScheduledGameType.IntraconferenceSecondSet);
+				var interconferenceCount = team.Count(m => m.GameType == ScheduledGameType.Interconference);
+				var remainingIntraconferenceCount = team.Count(m => m.GameType is ScheduledGameType.RemainingIntraconferenceFirstSet or ScheduledGameType.RemainingIntraconferenceSecondSet);
+				
+				if (intradivisionalCount != 6 || intraconferenceCount != 4 || interconferenceCount != 4 || remainingIntraconferenceCount != 2)
 				{
-					var teamIsAAndAtHome = comparer.Equals(m.TeamA, t) && m.HomeTeamIsTeamA;
-					var teamIsBAndAtHome = comparer.Equals(m.TeamB, t) && !m.HomeTeamIsTeamA;
-
-					return teamIsAAndAtHome || teamIsBAndAtHome;
-				});
-
-				if (teamAppearancesAtHome != 16)
-				{
-					allTeamsAppearAtHome16Times = false;
-
-					Log.Error("{Team} appears at home {Appearances} times, but needed 16 appearances", t.Name, teamAppearancesAtHome);
+					allTeamsHaveCorrectNumberOfGamesByType = false;
+					
+					Log.Error("{Team} has {Intradivisional}/6 intradivisional games, {Intraconference}/4 intraconference games, {Interconference}/4 interconference games, and {RemainingIntraconference}/2 remaining intraconference games",
+						team.Key.Name, intradivisionalCount, intraconferenceCount, interconferenceCount, remainingIntraconferenceCount);
 				}
 			}
-
-			return allTeamsAppearAtHome16Times
+			
+			return allTeamsHaveCorrectNumberOfGamesByType
 				? string.Empty
-				: "Each team should appear at home 16 times in the matchups";
+				: "Each team should have 6 intradivisional games, 4 intraconference games, 4 interconference games, and 2 remaining intraconference games";
 		}
 	}
 }

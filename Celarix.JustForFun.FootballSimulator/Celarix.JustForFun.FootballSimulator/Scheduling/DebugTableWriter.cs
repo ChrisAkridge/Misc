@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Celarix.JustForFun.FootballSimulator.Collections;
 
 namespace Celarix.JustForFun.FootballSimulator.Scheduling
 {
 	internal sealed class DebugTableWriter
 	{
 		private StringBuilder htmlBuilder;
+		private readonly Random random = new Random();
 		
 		public DebugTableWriter()
 		{
@@ -23,38 +25,53 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 			htmlBuilder.AppendLine("<body>");
 		}
 
-		public void AddUpdatedTable(GameWeekSlotType[,] table, string sectionHeader)
+		public void AddUpdatedTable(SymmetricTable<BasicTeamInfo?> table, string sectionHeader)
 		{
 			htmlBuilder.AppendLine($"<h1>{sectionHeader}</h1>");
 			
 			// Start a table in the builder.
 			htmlBuilder.AppendLine("<table border=\"1\">");
 			
-			// We're going to rotate the table, so we'll make one row per array column (game week).
-			for (var i = 0; i < table.GetLength(1); i++)
+			// Write a table header with cells " ", "1", "2", "3", and "4".
+			htmlBuilder.AppendLine("<tr>");
+			htmlBuilder.AppendLine("<th> </th>");
+			for (int i = 0; i < 4; i++)
+			{
+				htmlBuilder.AppendLine($"<th>{i + 1}</th>");
+			}
+			htmlBuilder.AppendLine("</tr>");
+			
+			// For each row of the table, write the team name and then four cells, either empty if null, or the opponent if present.
+			// Choose a random background color for the symmetrically connected cells.
+			var randomColorsForCells = new Dictionary<(BasicTeamInfo? team, int index), string>();
+			foreach (var team in table.Keys)
 			{
 				htmlBuilder.AppendLine("<tr>");
-				
-				// We're going to rotate the table, so we'll make one column per array row (game).
-				for (var j = 0; j < table.GetLength(0); j++)
+				htmlBuilder.AppendLine($"<td>{team?.Name ?? "null"}</td>");
+				for (int i = 0; i < 4; i++)
 				{
-					// Color the cell based on the value.
-					// Empty: white
-					// Assigned: green
-					// PreviouslyAssigned: red
-					// Ineligible: dark gray
-					string cellColor = table[j, i] switch
+					var opponent = table[team, i];
+
+					if (opponent == null)
 					{
-						GameWeekSlotType.Empty => "white",
-						GameWeekSlotType.Assigned => "green",
-						GameWeekSlotType.PreviouslyAssigned => "red",
-						GameWeekSlotType.Ineligible => "darkgray",
-						_ => throw new InvalidOperationException("Unknown GameWeekSlotType value.")
-					};
-					
-					htmlBuilder.AppendLine($"<td style=\"background-color: {cellColor};\">{j}</td>");
+						htmlBuilder.AppendLine("<td> </td>");
+					}
+					else
+					{
+						string randomColor;
+
+						if (randomColorsForCells.ContainsKey((team, i)))
+						{
+							randomColor = randomColorsForCells[(team, i)];
+						}
+						else
+						{
+							randomColor = $"#{random.Next(0x1000000):X6}";
+							randomColorsForCells.Add((opponent, i), randomColor);
+						}
+						htmlBuilder.AppendLine($"<td style=\"background-color:{randomColor}\">{opponent.Name}</td>");
+					}
 				}
-				
 				htmlBuilder.AppendLine("</tr>");
 			}
 			

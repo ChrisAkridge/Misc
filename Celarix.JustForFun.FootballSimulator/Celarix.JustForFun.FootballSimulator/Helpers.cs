@@ -12,7 +12,9 @@ namespace Celarix.JustForFun.FootballSimulator
 {
     internal static class Helpers
     {
-        private static readonly Dictionary<(double mean, double standardDeviation), Normal> distributionCache =
+	    public static int SchedulingRandomSeed => -1039958483;
+
+		private static readonly Dictionary<(double mean, double standardDeviation), Normal> distributionCache =
             new Dictionary<(double mean, double standardDeviation), Normal>();
 
 		public static IEnumerable<BasicTeamInfo> GetTeamsInDivision(IEnumerable<BasicTeamInfo> teams, Conference conference, Division division) =>
