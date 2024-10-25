@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Celarix.JustForFun.GraphingPlayground.Models;
 using Celarix.JustForFun.GraphingPlayground.Models.CSVMaps;
+using ScottPlot.Plottables;
 using ScottPlot.WinForms;
 
 namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
@@ -13,8 +14,11 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 	{
 		private VErSatileBasics[] rows;
 		private Dictionary<string, Action<FormsPlot>> views;
+		private readonly List<PlotIndexMapping> indexMappings = [];
 
 		public string Name => "VErSatile Basics";
+		public AdditionalSupport AdditionalSupport { get; private set; }
+		public IReadOnlyList<PlotIndexMapping> IndexMappings => IndexMappings;
 
 		public void Load(PlaygroundLoadArguments loadArguments)
 		{
@@ -41,7 +45,9 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 
 		private void ViewHoursByDateByType(FormsPlot formsPlot, string hoursType)
 		{
-			var dates = rows.Select(r => DateTime.Parse(r.Date)).ToArray();
+			indexMappings.Clear();
+			
+			var dates = rows.Select(r => DateTime.Parse(r.Date)).ToList();
 			var hours = rows.Select(r =>
 				{
 					var hoursText = hoursType switch
@@ -57,15 +63,36 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 						_ => throw new ArgumentException($"Unknown hours type: {hoursType}")
 					};
 
-					return double.TryParse(hoursText, out var hours) ? hours : 0d;
+					return double.TryParse(hoursText, out var parsedHours) ? parsedHours : 0d;
 				})
-				.ToArray();
+				.ToList();
+
+			while (hours.First() == 0 && hours.Count > 1)
+			{
+				dates.RemoveAt(0);
+				hours.RemoveAt(0);
+			}
+			
+			while (hours.Last() == 0 && hours.Count > 1)
+			{
+				dates.RemoveAt(dates.Count - 1);
+				hours.RemoveAt(hours.Count - 1);
+			}
 
 			formsPlot.Plot.Clear();
 			formsPlot.Plot.Add.Scatter(dates, hours);
 			formsPlot.Plot.Axes.DateTimeTicksBottom();
 			formsPlot.Plot.Title($"{hoursType} Hours");
 			formsPlot.Refresh();
+
+			AdditionalSupport = AdditionalSupport.LinearRegression
+				| AdditionalSupport.RollingAverage;
+			indexMappings.Add(new PlotIndexMapping
+			{
+				Index = 0,
+				Name = $"{hoursType} Hours",
+				Type = PlotIndexType.Data
+			});
 		}
 	}
 }

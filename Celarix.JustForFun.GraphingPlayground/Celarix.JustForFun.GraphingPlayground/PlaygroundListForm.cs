@@ -35,6 +35,7 @@ namespace Celarix.JustForFun.GraphingPlayground
 			}
 
 			var playgroundForm = new PlaygroundForm(instance);
+			playgroundForm.Text = instance.Name;
 			playgroundForm.ShowDialog();
 		}
 

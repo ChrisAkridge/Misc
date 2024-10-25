@@ -6,8 +6,17 @@ using System.Threading.Tasks;
 
 namespace Celarix.JustForFun.GraphingPlayground
 {
-	internal enum GraphType
+	internal enum PlotIndexType
 	{
-		ScatterWithDate
+		Data,
+		LinearRegression,
+		RollingAverage
+	}
+	
+	[Flags]
+	internal enum AdditionalSupport
+	{
+		LinearRegression = 0x1,
+		RollingAverage = 0x2,
 	}
 }

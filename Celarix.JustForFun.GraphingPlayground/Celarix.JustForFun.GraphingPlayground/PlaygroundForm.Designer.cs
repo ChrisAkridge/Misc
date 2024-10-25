@@ -38,7 +38,13 @@
 			TSSeparator1 = new ToolStripSeparator();
 			TSDDBViews = new ToolStripDropDownButton();
 			GroupChartControls = new GroupBox();
+			NUDRollingAveragePeriod = new NumericUpDown();
+			StaticLabelRollingAveragePeriod = new Label();
+			CheckRollingAverage = new CheckBox();
+			CheckLinearRegression = new CheckBox();
 			TSMain.SuspendLayout();
+			GroupChartControls.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)NUDRollingAveragePeriod).BeginInit();
 			SuspendLayout();
 			// 
 			// OFDMain
@@ -105,12 +111,61 @@
 			// GroupChartControls
 			// 
 			GroupChartControls.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-			GroupChartControls.Location = new Point(743, 57);
+			GroupChartControls.Controls.Add(NUDRollingAveragePeriod);
+			GroupChartControls.Controls.Add(StaticLabelRollingAveragePeriod);
+			GroupChartControls.Controls.Add(CheckRollingAverage);
+			GroupChartControls.Controls.Add(CheckLinearRegression);
+			GroupChartControls.Location = new Point(743, 28);
 			GroupChartControls.Name = "GroupChartControls";
-			GroupChartControls.Size = new Size(272, 434);
+			GroupChartControls.Size = new Size(272, 463);
 			GroupChartControls.TabIndex = 5;
 			GroupChartControls.TabStop = false;
 			GroupChartControls.Text = "Controls";
+			// 
+			// NUDRollingAveragePeriod
+			// 
+			NUDRollingAveragePeriod.Enabled = false;
+			NUDRollingAveragePeriod.Location = new Point(56, 67);
+			NUDRollingAveragePeriod.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+			NUDRollingAveragePeriod.Name = "NUDRollingAveragePeriod";
+			NUDRollingAveragePeriod.Size = new Size(68, 23);
+			NUDRollingAveragePeriod.TabIndex = 3;
+			NUDRollingAveragePeriod.Value = new decimal(new int[] { 1, 0, 0, 0 });
+			NUDRollingAveragePeriod.ValueChanged += NUDRollingAveragePeriod_ValueChanged;
+			// 
+			// StaticLabelRollingAveragePeriod
+			// 
+			StaticLabelRollingAveragePeriod.AutoSize = true;
+			StaticLabelRollingAveragePeriod.Enabled = false;
+			StaticLabelRollingAveragePeriod.Location = new Point(6, 69);
+			StaticLabelRollingAveragePeriod.Name = "StaticLabelRollingAveragePeriod";
+			StaticLabelRollingAveragePeriod.Size = new Size(44, 15);
+			StaticLabelRollingAveragePeriod.TabIndex = 2;
+			StaticLabelRollingAveragePeriod.Text = "Period:";
+			// 
+			// CheckRollingAverage
+			// 
+			CheckRollingAverage.AutoSize = true;
+			CheckRollingAverage.Enabled = false;
+			CheckRollingAverage.Location = new Point(6, 47);
+			CheckRollingAverage.Name = "CheckRollingAverage";
+			CheckRollingAverage.Size = new Size(109, 19);
+			CheckRollingAverage.TabIndex = 1;
+			CheckRollingAverage.Text = "Rolling Average";
+			CheckRollingAverage.UseVisualStyleBackColor = true;
+			CheckRollingAverage.CheckedChanged += CheckRollingAverage_CheckedChanged;
+			// 
+			// CheckLinearRegression
+			// 
+			CheckLinearRegression.AutoSize = true;
+			CheckLinearRegression.Enabled = false;
+			CheckLinearRegression.Location = new Point(6, 22);
+			CheckLinearRegression.Name = "CheckLinearRegression";
+			CheckLinearRegression.Size = new Size(118, 19);
+			CheckLinearRegression.TabIndex = 0;
+			CheckLinearRegression.Text = "Linear Regression";
+			CheckLinearRegression.UseVisualStyleBackColor = true;
+			CheckLinearRegression.CheckedChanged += CheckLinearRegression_CheckedChanged;
 			// 
 			// PlaygroundForm
 			// 
@@ -124,6 +179,9 @@
 			Text = "{title}";
 			TSMain.ResumeLayout(false);
 			TSMain.PerformLayout();
+			GroupChartControls.ResumeLayout(false);
+			GroupChartControls.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)NUDRollingAveragePeriod).EndInit();
 			ResumeLayout(false);
 			PerformLayout();
 		}
@@ -138,5 +196,9 @@
 		private ToolStripSeparator TSSeparator1;
 		private ToolStripDropDownButton TSDDBViews;
 		private GroupBox GroupChartControls;
+		private CheckBox CheckLinearRegression;
+		private NumericUpDown NUDRollingAveragePeriod;
+		private Label StaticLabelRollingAveragePeriod;
+		private CheckBox CheckRollingAverage;
 	}
 }
