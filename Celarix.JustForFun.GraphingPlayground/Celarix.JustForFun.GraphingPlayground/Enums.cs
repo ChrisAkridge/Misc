@@ -19,4 +19,10 @@ namespace Celarix.JustForFun.GraphingPlayground
 		LinearRegression = 0x1,
 		RollingAverage = 0x2,
 	}
+
+	internal enum GraphPropertyType
+	{
+		Numeric,
+		Date
+	}
 }
