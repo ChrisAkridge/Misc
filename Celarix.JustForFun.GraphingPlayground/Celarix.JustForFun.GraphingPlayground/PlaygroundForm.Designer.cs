@@ -38,6 +38,8 @@
 			TSSeparator1 = new ToolStripSeparator();
 			TSDDBViews = new ToolStripDropDownButton();
 			GroupChartControls = new GroupBox();
+			CheckLockYAxis = new CheckBox();
+			CheckLockXAxis = new CheckBox();
 			NUDRollingAveragePeriod = new NumericUpDown();
 			StaticLabelRollingAveragePeriod = new Label();
 			CheckRollingAverage = new CheckBox();
@@ -63,7 +65,7 @@
 			PlotMain.DisplayScale = 1F;
 			PlotMain.Location = new Point(12, 28);
 			PlotMain.Name = "PlotMain";
-			PlotMain.Size = new Size(725, 463);
+			PlotMain.Size = new Size(731, 469);
 			PlotMain.TabIndex = 2;
 			// 
 			// TSMain
@@ -71,7 +73,7 @@
 			TSMain.Items.AddRange(new ToolStripItem[] { TSBOpenFile, TSBSaveAs, TSSeparator1, TSDDBViews });
 			TSMain.Location = new Point(0, 0);
 			TSMain.Name = "TSMain";
-			TSMain.Size = new Size(1027, 25);
+			TSMain.Size = new Size(1033, 25);
 			TSMain.TabIndex = 3;
 			TSMain.Text = "toolStrip1";
 			// 
@@ -110,17 +112,43 @@
 			// 
 			// GroupChartControls
 			// 
-			GroupChartControls.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+			GroupChartControls.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+			GroupChartControls.Controls.Add(CheckLockYAxis);
+			GroupChartControls.Controls.Add(CheckLockXAxis);
 			GroupChartControls.Controls.Add(NUDRollingAveragePeriod);
 			GroupChartControls.Controls.Add(StaticLabelRollingAveragePeriod);
 			GroupChartControls.Controls.Add(CheckRollingAverage);
 			GroupChartControls.Controls.Add(CheckLinearRegression);
-			GroupChartControls.Location = new Point(743, 28);
+			GroupChartControls.Location = new Point(749, 28);
 			GroupChartControls.Name = "GroupChartControls";
-			GroupChartControls.Size = new Size(272, 463);
+			GroupChartControls.Size = new Size(272, 469);
 			GroupChartControls.TabIndex = 5;
 			GroupChartControls.TabStop = false;
 			GroupChartControls.Text = "Controls";
+			// 
+			// CheckLockYAxis
+			// 
+			CheckLockYAxis.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+			CheckLockYAxis.AutoSize = true;
+			CheckLockYAxis.Location = new Point(98, 444);
+			CheckLockYAxis.Name = "CheckLockYAxis";
+			CheckLockYAxis.Size = new Size(86, 19);
+			CheckLockYAxis.TabIndex = 5;
+			CheckLockYAxis.Text = "Lock Y Axis";
+			CheckLockYAxis.UseVisualStyleBackColor = true;
+			CheckLockYAxis.CheckedChanged += CheckLockYAxis_CheckedChanged;
+			// 
+			// CheckLockXAxis
+			// 
+			CheckLockXAxis.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+			CheckLockXAxis.AutoSize = true;
+			CheckLockXAxis.Location = new Point(6, 444);
+			CheckLockXAxis.Name = "CheckLockXAxis";
+			CheckLockXAxis.Size = new Size(86, 19);
+			CheckLockXAxis.TabIndex = 4;
+			CheckLockXAxis.Text = "Lock X Axis";
+			CheckLockXAxis.UseVisualStyleBackColor = true;
+			CheckLockXAxis.CheckedChanged += CheckLockXAxis_CheckedChanged;
 			// 
 			// NUDRollingAveragePeriod
 			// 
@@ -171,7 +199,7 @@
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
-			ClientSize = new Size(1027, 503);
+			ClientSize = new Size(1033, 509);
 			Controls.Add(GroupChartControls);
 			Controls.Add(TSMain);
 			Controls.Add(PlotMain);
@@ -200,5 +228,7 @@
 		private NumericUpDown NUDRollingAveragePeriod;
 		private Label StaticLabelRollingAveragePeriod;
 		private CheckBox CheckRollingAverage;
+		private CheckBox CheckLockYAxis;
+		private CheckBox CheckLockXAxis;
 	}
 }

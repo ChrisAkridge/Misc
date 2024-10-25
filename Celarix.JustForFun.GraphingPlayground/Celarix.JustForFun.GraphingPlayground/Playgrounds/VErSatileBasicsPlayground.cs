@@ -18,7 +18,7 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 
 		public string Name => "VErSatile Basics";
 		public AdditionalSupport AdditionalSupport { get; private set; }
-		public IReadOnlyList<PlotIndexMapping> IndexMappings => IndexMappings;
+		public IReadOnlyList<PlotIndexMapping> IndexMappings => indexMappings;
 
 		public void Load(PlaygroundLoadArguments loadArguments)
 		{
@@ -36,7 +36,9 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 				["Starflower Hours"] = p => ViewHoursByDateByType(p, "Starflower"),
 				["Seashell Hours"] = p => ViewHoursByDateByType(p, "Seashell"),
 				["Tachycardia Hours"] = p => ViewHoursByDateByType(p, "Tachycardia"),
-				["Sleep Hours"] = p => ViewHoursByDateByType(p, "Sleep")
+				["Sleep Hours"] = p => ViewHoursByDateByType(p, "Sleep"),
+				["Weight"] = ViewWeightByDate,
+				["Morning Blood Pressure"] = ViewMorningBloodPressureByDate
 			};
 		}
 		
@@ -67,17 +69,7 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 				})
 				.ToList();
 
-			while (hours.First() == 0 && hours.Count > 1)
-			{
-				dates.RemoveAt(0);
-				hours.RemoveAt(0);
-			}
-			
-			while (hours.Last() == 0 && hours.Count > 1)
-			{
-				dates.RemoveAt(dates.Count - 1);
-				hours.RemoveAt(hours.Count - 1);
-			}
+			TrimZeroes(dates, hours);
 
 			formsPlot.Plot.Clear();
 			formsPlot.Plot.Add.Scatter(dates, hours);
@@ -93,6 +85,123 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 				Name = $"{hoursType} Hours",
 				Type = PlotIndexType.Data
 			});
+		}
+		
+		private void ViewWeightByDate(FormsPlot formsPlot)
+		{
+			indexMappings.Clear();
+			
+			var dates = rows.Select(r => DateTime.Parse(r.Date)).ToList();
+			var weights = new List<double>();
+			var lastWeight = 0d;
+			
+			foreach (var row in rows)
+			{
+				var parsedWeight = double.TryParse(row.Weight, out var weight)
+					? weight
+					: lastWeight;
+				lastWeight = parsedWeight;
+				weights.Add(parsedWeight);
+			}
+
+			TrimZeroes(dates, weights);
+
+			formsPlot.Plot.Clear();
+			formsPlot.Plot.Add.Scatter(dates, weights);
+			formsPlot.Plot.Axes.DateTimeTicksBottom();
+			formsPlot.Plot.Title("Weight");
+			formsPlot.Refresh();
+
+			AdditionalSupport = AdditionalSupport.LinearRegression
+				| AdditionalSupport.RollingAverage;
+			indexMappings.Add(new PlotIndexMapping
+			{
+				Index = 0,
+				Name = "Weight",
+				Type = PlotIndexType.Data
+			});
+		}
+
+		private void ViewMorningBloodPressureByDate(FormsPlot formsPlot)
+		{
+			indexMappings.Clear();
+			
+			var dates = rows.Select(r => DateTime.Parse(r.Date)).ToList();
+			var diastolicPressures = new List<double>();
+			var systolicPressures = new List<double>();
+			var lastDiastolicPressure = 0d;
+			var lastSystolicPressure = 0d;
+			
+			foreach (var row in rows)
+			{
+				var parsedDiastolicPressure = double.TryParse(row.MorningDiastolicBloodPressure, out var diastolicPressure)
+					? diastolicPressure
+					: lastDiastolicPressure;
+				lastDiastolicPressure = parsedDiastolicPressure;
+				diastolicPressures.Add(parsedDiastolicPressure);
+				
+				var parsedSystolicPressure = double.TryParse(row.MorningSystolicBloodPressure, out var systolicPressure)
+					? systolicPressure
+					: lastSystolicPressure;
+				lastSystolicPressure = parsedSystolicPressure;
+				systolicPressures.Add(parsedSystolicPressure);
+			}
+			
+			TrimZeroes(dates, diastolicPressures, systolicPressures);
+			
+			formsPlot.Plot.Clear();
+			formsPlot.Plot.Add.Scatter(dates, diastolicPressures, ScottPlot.Color.FromColor(Color.Red));
+			formsPlot.Plot.Add.Scatter(dates, systolicPressures, ScottPlot.Color.FromColor(Color.Lime));
+			formsPlot.Plot.Axes.DateTimeTicksBottom();
+			formsPlot.Plot.Title("Morning Blood Pressure");
+			formsPlot.Refresh();
+			
+			AdditionalSupport = AdditionalSupport.LinearRegression
+				| AdditionalSupport.RollingAverage;
+			indexMappings.Add(new PlotIndexMapping
+			{
+				Index = 0,
+				Name = "Morning Diastolic Blood Pressure",
+				Type = PlotIndexType.Data
+			});
+			indexMappings.Add(new PlotIndexMapping
+			{
+				Index = 1,
+				Name = "Morning Systolic Blood Pressure",
+				Type = PlotIndexType.Data
+			});
+		}
+
+		private void TrimZeroes<TXAxis>(List<TXAxis> xAxis, List<double> yAxis)
+		{
+			while (yAxis.First() == 0 && yAxis.Count > 1)
+			{
+				xAxis.RemoveAt(0);
+				yAxis.RemoveAt(0);
+			}
+			
+			while (yAxis.Last() == 0 && yAxis.Count > 1)
+			{
+				xAxis.RemoveAt(xAxis.Count - 1);
+				yAxis.RemoveAt(yAxis.Count - 1);
+			}
+		}
+		
+		private void TrimZeroes<TXAxis>(List<TXAxis> xAxis, List<double> yAxis1, List<double> yAxis2)
+		{
+			while (yAxis1.First() == 0 && yAxis2.First() == 0 && yAxis1.Count > 1)
+			{
+				xAxis.RemoveAt(0);
+				yAxis1.RemoveAt(0);
+				yAxis2.RemoveAt(0);
+			}
+			
+			while (yAxis1.Last() == 0 && yAxis2.Last() == 0 && yAxis1.Count > 1)
+			{
+				xAxis.RemoveAt(xAxis.Count - 1);
+				yAxis1.RemoveAt(yAxis1.Count - 1);
+				yAxis2.RemoveAt(yAxis2.Count - 1);
+			}
 		}
 	}
 }

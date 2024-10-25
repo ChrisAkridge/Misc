@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Celarix.JustForFun.GraphingPlayground.Models;
 using ScottPlot;
+using ScottPlot.AxisRules;
 using ScottPlot.Plottables;
 
 namespace Celarix.JustForFun.GraphingPlayground
@@ -47,8 +48,9 @@ namespace Celarix.JustForFun.GraphingPlayground
 		{
 			PlotMain.Reset();
 			indexMappings.Clear();
-
 			playground.GetView(viewName)(PlotMain);
+			indexMappings.AddRange(playground.IndexMappings);
+
 			SetAdditionalSupportControlsEnabled();
 		}
 
@@ -61,6 +63,30 @@ namespace Celarix.JustForFun.GraphingPlayground
 			StaticLabelRollingAveragePeriod.Enabled = additionalSupport.HasFlag(AdditionalSupport.RollingAverage);
 			NUDRollingAveragePeriod.Enabled = additionalSupport.HasFlag(AdditionalSupport.RollingAverage);
 		}
+
+		private void SetAxisRules()
+		{
+			PlotMain.Plot.Axes.Rules.Clear();
+			var limits = PlotMain.Plot.Axes.GetLimits();
+
+			if (CheckLockXAxis.CheckState == CheckState.Checked)
+			{
+				var rule = new LockedHorizontal(PlotMain.Plot.Axes.Bottom, limits.Left, limits.Right);
+				PlotMain.Plot.Axes.Rules.Add(rule);
+			}
+
+			if (CheckLockYAxis.CheckState == CheckState.Checked)
+			{
+				var rule = new LockedVertical(PlotMain.Plot.Axes.Left, limits.Bottom, limits.Top);
+				PlotMain.Plot.Axes.Rules.Add(rule);
+			}
+
+			PlotMain.Refresh();
+		}
+
+		private void CheckLockXAxis_CheckedChanged(object sender, EventArgs e) => SetAxisRules();
+
+		private void CheckLockYAxis_CheckedChanged(object sender, EventArgs e) => SetAxisRules();
 
 		private void CheckLinearRegression_CheckedChanged(object sender, EventArgs e)
 		{
@@ -108,7 +134,9 @@ namespace Celarix.JustForFun.GraphingPlayground
 			var titleBuilder = new StringBuilder();
 			indexMappings.RemoveAll(m => m.Type == PlotIndexType.LinearRegression);
 
-			foreach (var scatterPlot in PlotMain.Plot.GetPlottables<Scatter>())
+			var initialScatterPlots = PlotMain.Plot.GetPlottables<Scatter>().ToArray();
+
+			foreach (var scatterPlot in initialScatterPlots)
 			{
 				var scatterPoints = scatterPlot.Data.GetScatterPoints();
 				var linearRegression = new ScottPlot.Statistics.LinearRegression(scatterPoints);
