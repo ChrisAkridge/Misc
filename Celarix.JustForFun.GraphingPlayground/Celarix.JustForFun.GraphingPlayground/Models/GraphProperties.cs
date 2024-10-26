@@ -25,10 +25,14 @@ namespace Celarix.JustForFun.GraphingPlayground.Models
 		public double StandardDeviation { get; }
 		public IReadOnlyDictionary<decimal, double> Percentiles => percentiles;
 		
-		public GraphProperties(GraphPropertyType propertyType, IReadOnlyList<double> values)
+		public double DistributionBucketSize { get; set; }
+		
+		public GraphProperties(GraphPropertyType propertyType, IReadOnlyList<double> values,
+			double distributionBucketSize)
 		{
 			PropertyType = propertyType;
-			
+			DistributionBucketSize = distributionBucketSize;
+
 			var sortedValues = values.OrderBy(v => v).ToArray();
 
 			MinValue = sortedValues.First();
@@ -37,7 +41,7 @@ namespace Celarix.JustForFun.GraphingPlayground.Models
 			Median = CalculateMedian(sortedValues);
 			Mode = CalculateMode(values);
 			StandardDeviation = CalculateStandardDeviation(values);
-			percentiles = CalculatePercentiles(values);
+			percentiles = CalculatePercentiles(sortedValues);
 		}
 		
 		private static double CalculateMedian(IReadOnlyList<double> values)

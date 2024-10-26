@@ -13,7 +13,7 @@ namespace Celarix.JustForFun.GraphingPlayground
 		string Name { get; }
 		AdditionalSupport AdditionalSupport { get; }
 		IReadOnlyList<PlotIndexMapping> IndexMappings { get; }
-
+		IReadOnlyDictionary<string, GraphProperties> GraphProperties { get; }
 
 		void Load(PlaygroundLoadArguments loadArguments);
 		Action<FormsPlot> GetView(string actionName);

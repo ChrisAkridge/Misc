@@ -15,10 +15,12 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 		private VErSatileBasics[] rows;
 		private Dictionary<string, Action<FormsPlot>> views;
 		private readonly List<PlotIndexMapping> indexMappings = [];
+		private readonly Dictionary<string, GraphProperties> graphProperties = [];
 
 		public string Name => "VErSatile Basics";
 		public AdditionalSupport AdditionalSupport { get; private set; }
 		public IReadOnlyList<PlotIndexMapping> IndexMappings => indexMappings;
+		public IReadOnlyDictionary<string, GraphProperties> GraphProperties => graphProperties;
 
 		public void Load(PlaygroundLoadArguments loadArguments)
 		{
@@ -48,6 +50,7 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 		private void ViewHoursByDateByType(FormsPlot formsPlot, string hoursType)
 		{
 			indexMappings.Clear();
+			graphProperties.Clear();
 			
 			var dates = rows.Select(r => DateTime.Parse(r.Date)).ToList();
 			var hours = rows.Select(r =>
@@ -78,18 +81,22 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 			formsPlot.Refresh();
 
 			AdditionalSupport = AdditionalSupport.LinearRegression
-				| AdditionalSupport.RollingAverage;
+				| AdditionalSupport.RollingAverage
+				| AdditionalSupport.Distribution;
 			indexMappings.Add(new PlotIndexMapping
 			{
 				Index = 0,
 				Name = $"{hoursType} Hours",
-				Type = PlotIndexType.Data
+				Type = PlotIndexType.Data,
+				BucketSize = 0.25d
 			});
+			graphProperties["Hours"] = new GraphProperties(GraphPropertyType.Numeric, hours, 0.25d);
 		}
 		
 		private void ViewWeightByDate(FormsPlot formsPlot)
 		{
 			indexMappings.Clear();
+			graphProperties.Clear();
 			
 			var dates = rows.Select(r => DateTime.Parse(r.Date)).ToList();
 			var weights = new List<double>();
@@ -99,12 +106,23 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 			{
 				var parsedWeight = double.TryParse(row.Weight, out var weight)
 					? weight
-					: lastWeight;
-				lastWeight = parsedWeight;
+					: 0d;
 				weights.Add(parsedWeight);
 			}
 
 			TrimZeroes(dates, weights);
+
+			for (var i = 0; i < weights.Count; i++)
+			{
+				if (weights[i] != 0)
+				{
+					lastWeight = weights[i];
+				}
+				else
+				{
+					weights[i] = lastWeight;
+				}
+			}
 
 			formsPlot.Plot.Clear();
 			formsPlot.Plot.Add.Scatter(dates, weights);
@@ -113,13 +131,16 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 			formsPlot.Refresh();
 
 			AdditionalSupport = AdditionalSupport.LinearRegression
-				| AdditionalSupport.RollingAverage;
+				| AdditionalSupport.RollingAverage
+				| AdditionalSupport.Distribution;
 			indexMappings.Add(new PlotIndexMapping
 			{
 				Index = 0,
 				Name = "Weight",
-				Type = PlotIndexType.Data
+				Type = PlotIndexType.Data,
+				BucketSize = 5d
 			});
+			graphProperties["Weight (lbs.)"] = new GraphProperties(GraphPropertyType.Numeric, weights, 5d);
 		}
 
 		private void ViewMorningBloodPressureByDate(FormsPlot formsPlot)
@@ -136,18 +157,37 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 			{
 				var parsedDiastolicPressure = double.TryParse(row.MorningDiastolicBloodPressure, out var diastolicPressure)
 					? diastolicPressure
-					: lastDiastolicPressure;
-				lastDiastolicPressure = parsedDiastolicPressure;
+					: 0d;
 				diastolicPressures.Add(parsedDiastolicPressure);
 				
 				var parsedSystolicPressure = double.TryParse(row.MorningSystolicBloodPressure, out var systolicPressure)
 					? systolicPressure
-					: lastSystolicPressure;
-				lastSystolicPressure = parsedSystolicPressure;
+					: 0d;
 				systolicPressures.Add(parsedSystolicPressure);
 			}
 			
 			TrimZeroes(dates, diastolicPressures, systolicPressures);
+
+			for (int i = 0; i < dates.Count; i++)
+			{
+				if (diastolicPressures[i] != 0)
+				{
+					lastDiastolicPressure = diastolicPressures[i];
+				}
+				else
+				{
+					diastolicPressures[i] = lastDiastolicPressure;
+				}
+				
+				if (systolicPressures[i] != 0)
+				{
+					lastSystolicPressure = systolicPressures[i];
+				}
+				else
+				{
+					systolicPressures[i] = lastSystolicPressure;
+				}
+			}
 			
 			formsPlot.Plot.Clear();
 			formsPlot.Plot.Add.Scatter(dates, diastolicPressures, ScottPlot.Color.FromColor(Color.Red));
@@ -157,19 +197,27 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 			formsPlot.Refresh();
 			
 			AdditionalSupport = AdditionalSupport.LinearRegression
-				| AdditionalSupport.RollingAverage;
+				| AdditionalSupport.RollingAverage
+				| AdditionalSupport.Distribution;
 			indexMappings.Add(new PlotIndexMapping
 			{
 				Index = 0,
 				Name = "Morning Diastolic Blood Pressure",
-				Type = PlotIndexType.Data
+				Type = PlotIndexType.Data,
+				BucketSize = 5d
 			});
 			indexMappings.Add(new PlotIndexMapping
 			{
 				Index = 1,
 				Name = "Morning Systolic Blood Pressure",
-				Type = PlotIndexType.Data
+				Type = PlotIndexType.Data,
+				BucketSize = 5d
 			});
+
+			graphProperties["Diastolic Pressure"] =
+				new GraphProperties(GraphPropertyType.Numeric, diastolicPressures, 5d);
+			graphProperties["Systolic Pressure"] =
+				new GraphProperties(GraphPropertyType.Numeric, systolicPressures, 5d);
 		}
 
 		private void TrimZeroes<TXAxis>(List<TXAxis> xAxis, List<double> yAxis)

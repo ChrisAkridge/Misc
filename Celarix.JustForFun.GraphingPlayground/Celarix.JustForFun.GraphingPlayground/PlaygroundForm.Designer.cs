@@ -38,6 +38,10 @@
 			TSSeparator1 = new ToolStripSeparator();
 			TSDDBViews = new ToolStripDropDownButton();
 			GroupChartControls = new GroupBox();
+			ComboDistributionGraph = new ComboBox();
+			ButtonToDistribution = new Button();
+			ComboGraphPropertiesList = new ComboBox();
+			LabelGraphProperties = new Label();
 			CheckLockYAxis = new CheckBox();
 			CheckLockXAxis = new CheckBox();
 			NUDRollingAveragePeriod = new NumericUpDown();
@@ -113,6 +117,10 @@
 			// GroupChartControls
 			// 
 			GroupChartControls.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+			GroupChartControls.Controls.Add(ComboDistributionGraph);
+			GroupChartControls.Controls.Add(ButtonToDistribution);
+			GroupChartControls.Controls.Add(ComboGraphPropertiesList);
+			GroupChartControls.Controls.Add(LabelGraphProperties);
 			GroupChartControls.Controls.Add(CheckLockYAxis);
 			GroupChartControls.Controls.Add(CheckLockXAxis);
 			GroupChartControls.Controls.Add(NUDRollingAveragePeriod);
@@ -125,6 +133,47 @@
 			GroupChartControls.TabIndex = 5;
 			GroupChartControls.TabStop = false;
 			GroupChartControls.Text = "Controls";
+			// 
+			// ComboDistributionGraph
+			// 
+			ComboDistributionGraph.DropDownStyle = ComboBoxStyle.DropDownList;
+			ComboDistributionGraph.Enabled = false;
+			ComboDistributionGraph.FormattingEnabled = true;
+			ComboDistributionGraph.Location = new Point(130, 97);
+			ComboDistributionGraph.Name = "ComboDistributionGraph";
+			ComboDistributionGraph.Size = new Size(136, 23);
+			ComboDistributionGraph.TabIndex = 9;
+			// 
+			// ButtonToDistribution
+			// 
+			ButtonToDistribution.Enabled = false;
+			ButtonToDistribution.Location = new Point(6, 96);
+			ButtonToDistribution.Name = "ButtonToDistribution";
+			ButtonToDistribution.Size = new Size(118, 23);
+			ButtonToDistribution.TabIndex = 8;
+			ButtonToDistribution.Text = "To Distribution";
+			ButtonToDistribution.UseVisualStyleBackColor = true;
+			ButtonToDistribution.Click += ButtonToDistribution_Click;
+			// 
+			// ComboGraphPropertiesList
+			// 
+			ComboGraphPropertiesList.DropDownStyle = ComboBoxStyle.DropDownList;
+			ComboGraphPropertiesList.FormattingEnabled = true;
+			ComboGraphPropertiesList.Location = new Point(6, 415);
+			ComboGraphPropertiesList.Name = "ComboGraphPropertiesList";
+			ComboGraphPropertiesList.Size = new Size(260, 23);
+			ComboGraphPropertiesList.TabIndex = 7;
+			ComboGraphPropertiesList.SelectedIndexChanged += ComboGraphPropertiesList_SelectedIndexChanged;
+			// 
+			// LabelGraphProperties
+			// 
+			LabelGraphProperties.AutoSize = true;
+			LabelGraphProperties.Font = new Font("Consolas", 9.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+			LabelGraphProperties.Location = new Point(6, 267);
+			LabelGraphProperties.Name = "LabelGraphProperties";
+			LabelGraphProperties.Size = new Size(126, 45);
+			LabelGraphProperties.TabIndex = 6;
+			LabelGraphProperties.Text = "Max: 0 Min: 0\r\nMean: 0 Median: 0\r\nMode: 0 StdDev: 0";
 			// 
 			// CheckLockYAxis
 			// 
@@ -230,5 +279,9 @@
 		private CheckBox CheckRollingAverage;
 		private CheckBox CheckLockYAxis;
 		private CheckBox CheckLockXAxis;
+		private Label LabelGraphProperties;
+		private ComboBox ComboGraphPropertiesList;
+		private Button ButtonToDistribution;
+		private ComboBox ComboDistributionGraph;
 	}
 }

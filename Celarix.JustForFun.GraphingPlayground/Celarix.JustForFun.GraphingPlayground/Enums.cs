@@ -18,6 +18,7 @@ namespace Celarix.JustForFun.GraphingPlayground
 	{
 		LinearRegression = 0x1,
 		RollingAverage = 0x2,
+		Distribution = 0x4
 	}
 
 	internal enum GraphPropertyType

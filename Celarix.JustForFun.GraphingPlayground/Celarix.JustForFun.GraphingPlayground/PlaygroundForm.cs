@@ -44,12 +44,32 @@ namespace Celarix.JustForFun.GraphingPlayground
 			}
 		}
 
-		private void SwitchToView(string viewName)
+		private void Reset(bool resetGraphProperties = true)
 		{
 			PlotMain.Reset();
 			indexMappings.Clear();
+			ComboGraphPropertiesList.Items.Clear();
+			SetGraphProperties(null);
+			ComboDistributionGraph.Items.Clear();
+		}
+
+		private void SwitchToView(string viewName)
+		{
+			Reset();
+
 			playground.GetView(viewName)(PlotMain);
+
 			indexMappings.AddRange(playground.IndexMappings);
+
+			foreach (var graphPropertiesName in playground.GraphProperties.Keys)
+			{
+				ComboGraphPropertiesList.Items.Add(graphPropertiesName);
+			}
+
+			foreach (var indexMapping in indexMappings)
+			{
+				ComboDistributionGraph.Items.Add(indexMapping.Name);
+			}
 
 			SetAdditionalSupportControlsEnabled();
 		}
@@ -62,6 +82,8 @@ namespace Celarix.JustForFun.GraphingPlayground
 			CheckRollingAverage.Enabled = additionalSupport.HasFlag(AdditionalSupport.RollingAverage);
 			StaticLabelRollingAveragePeriod.Enabled = additionalSupport.HasFlag(AdditionalSupport.RollingAverage);
 			NUDRollingAveragePeriod.Enabled = additionalSupport.HasFlag(AdditionalSupport.RollingAverage);
+			ButtonToDistribution.Enabled = additionalSupport.HasFlag(AdditionalSupport.Distribution);
+			ComboDistributionGraph.Enabled = additionalSupport.HasFlag(AdditionalSupport.Distribution);
 		}
 
 		private void SetAxisRules()
@@ -125,6 +147,62 @@ namespace Celarix.JustForFun.GraphingPlayground
 			}
 
 			PlotMain.Refresh();
+		}
+
+		private void ComboGraphPropertiesList_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (ComboGraphPropertiesList.SelectedItem is string item)
+			{
+				var properties = playground.GraphProperties[item];
+				SetGraphProperties(properties);
+			}
+		}
+
+		private void SetGraphProperties(GraphProperties? properties)
+		{
+			if (properties == null)
+			{
+				LabelGraphProperties.Text = "Max: 0 Min: 0\r\nMean: 0 Median: 0\r\nMode: 0 StdDev: 0";
+
+				return;
+			}
+
+			var builder = new StringBuilder();
+			builder.AppendLine($"Max: {properties.MaxValue:F2} Min: {properties.MinValue:F2}");
+			builder.AppendLine($"Mean: {properties.Mean:F2} Median: {properties.Median:F2}");
+			builder.AppendLine($"Mode: {properties.Mode:F2} StdDev: {properties.StandardDeviation:F2}");
+
+			foreach (var kvpPair in properties.Percentiles.Pair())
+			{
+				if (kvpPair.First.Key != 0m)
+				{
+					builder.Append($"{PercentileLabel(kvpPair.First.Key)} {kvpPair.First.Value:F2} ");
+				}
+
+				if (kvpPair.Second.Key != 0m)
+				{
+					builder.AppendLine($"{PercentileLabel(kvpPair.Second.Key)} {kvpPair.Second.Value:F2}");
+				}
+			}
+
+			LabelGraphProperties.Text = builder.ToString();
+
+			return;
+
+			string PercentileLabel(decimal percentile)
+			{
+				var times100 = (int)(percentile * 100m);
+
+				return $"{times100.Ordinal()} %ile:";
+			}
+		}
+
+		private void ButtonToDistribution_Click(object sender, EventArgs e)
+		{
+			if (ComboDistributionGraph.SelectedItem is not string selectedGraphName) { return; }
+			
+			var selectedGraph = indexMappings.First(m => m.Name == selectedGraphName);
+			BuildDistribution(selectedGraph);
 		}
 
 		#region Additional Support
@@ -203,6 +281,33 @@ namespace Celarix.JustForFun.GraphingPlayground
 					Type = PlotIndexType.RollingAverage
 				});
 			}
+		}
+
+		private void BuildDistribution(PlotIndexMapping indexMapping)
+		{
+			if (PlotMain.Plot.PlottableList[indexMapping.Index] is not Scatter scatterPlot)
+			{
+				MessageBox.Show("The selected plot is not a scatter plot.", "Invalid Plot Type", MessageBoxButtons.OK,
+					MessageBoxIcon.Error);
+				return;
+			}
+
+			var scatterPoints = scatterPlot.Data.GetScatterPoints();
+			var values = scatterPoints.Select(p => p.Y).ToArray();
+			var distribution = new ScottPlot.Statistics.Histogram(values, indexMapping.GetBucketCount(values.Min(), values.Max()));
+
+			Reset(resetGraphProperties: false);
+			var barPlot = PlotMain.Plot.Add.Bars(distribution.Bins, distribution.Counts);
+
+			foreach (var bar in barPlot.Bars)
+			{
+				bar.Size = distribution.BinSize * 0.8d;
+			}
+			
+			PlotMain.Plot.Title($"Distribution of {indexMapping.Name}");
+			PlotMain.Refresh();
+			ButtonToDistribution.Enabled = false;
+			ComboDistributionGraph.Enabled = false;
 		}
 		#endregion
 	}
