@@ -2,7 +2,7 @@
   "profiles": {
     "Celarix.SimpleIncrementalBackup.Console": {
       "commandName": "Project",
-      "commandLineArgs": "\"X:\\\\\" \"Y:\\\\\""
+      "commandLineArgs": "\"X:\\\\\" \"Y:\\\\\" -d -f"
     }
   }
 }

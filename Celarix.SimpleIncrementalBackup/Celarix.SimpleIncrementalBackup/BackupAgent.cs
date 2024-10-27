@@ -55,7 +55,8 @@ namespace Celarix.SimpleIncrementalBackup
             else
             {
 	            // Untested!
-	            MarkOrDeleteFilesNotInSource(Directory.GetFiles(SourceFolderPath, "*", SearchOption.AllDirectories).ToList());
+	            MarkOrDeleteFilesNotInSource(SafeEnumerate(Directory.EnumerateFiles(SourceFolderPath, "*",
+		            SearchOption.AllDirectories)));
 	            
 	            CopyFilesAndUpdateDatabase(seenFilePaths);
             }
@@ -143,7 +144,7 @@ namespace Celarix.SimpleIncrementalBackup
             }
         }
 
-        private void MarkOrDeleteFilesNotInSource(List<string> seenFilePaths)
+        private void MarkOrDeleteFilesNotInSource(IEnumerable<string> seenFilePaths)
         {
             context!.SaveChanges();
             var allFilesInDatabase = context!.FileEntries
@@ -265,6 +266,29 @@ namespace Celarix.SimpleIncrementalBackup
             };
 
             return isNegative ? $"-{sizeString}" : sizeString;
+        }
+
+        private IEnumerable<T> SafeEnumerate<T>(IEnumerable<T> source)
+        {
+	        var enumerator = source.GetEnumerator();
+			while (true)
+			{
+				try
+				{
+					if (!enumerator.MoveNext())
+					{
+						enumerator.Dispose();
+						yield break;
+					}
+				}
+				catch (Exception ex)
+				{
+					logger.Error(ex, "Error enumerating");
+					continue;
+				}
+
+				yield return enumerator.Current;
+			}
         }
 
         public void Dispose()

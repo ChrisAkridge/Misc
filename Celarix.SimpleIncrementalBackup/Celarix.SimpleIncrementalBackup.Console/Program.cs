@@ -20,7 +20,7 @@
 
             var sourceFolder = args[0];
             var backupFolder = args[1];
-            var deleteImmediately = args.Length == 3;
+            var deleteImmediately = args.Length is 3 or 4;
             var deleteFirst = args.Length == 4;
 
             var agent = new BackupAgent(sourceFolder, backupFolder, deleteImmediately, deleteFirst);
