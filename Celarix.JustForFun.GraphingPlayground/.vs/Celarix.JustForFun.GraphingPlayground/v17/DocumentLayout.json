@@ -7,6 +7,10 @@
       "RelativeMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|solutionrelative:celarix.justforfun.graphingplayground\\playgrounds\\singlefiledistribution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|f:\\documents\\github\\misc\\celarix.justforfun.graphingplayground\\celarix.justforfun.graphingplayground\\playgrounds\\versatilebasicsplayground.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|solutionrelative:celarix.justforfun.graphingplayground\\playgrounds\\versatilebasicsplayground.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|f:\\documents\\github\\misc\\celarix.justforfun.graphingplayground\\celarix.justforfun.graphingplayground\\logic\\hextickgenerators.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|solutionrelative:celarix.justforfun.graphingplayground\\logic\\hextickgenerators.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -21,10 +25,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|f:\\documents\\github\\misc\\celarix.justforfun.graphingplayground\\celarix.justforfun.graphingplayground\\enums.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|solutionrelative:celarix.justforfun.graphingplayground\\enums.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|f:\\documents\\github\\misc\\celarix.justforfun.graphingplayground\\celarix.justforfun.graphingplayground\\playgrounds\\versatilebasicsplayground.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|solutionrelative:celarix.justforfun.graphingplayground\\playgrounds\\versatilebasicsplayground.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\celarix.justforfun.graphingplayground\\playgroundform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
@@ -83,6 +83,18 @@
             {
               "$type": "Document",
               "DocumentIndex": 3,
+              "Title": "FileDistribution.cs",
+              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Logic\\FileDistribution.cs",
+              "RelativeDocumentMoniker": "Celarix.JustForFun.GraphingPlayground\\Logic\\FileDistribution.cs",
+              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Logic\\FileDistribution.cs",
+              "RelativeToolTip": "Celarix.JustForFun.GraphingPlayground\\Logic\\FileDistribution.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAD4AAAAzAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-27T03:25:06.368Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "Extensions.cs",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Extensions.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.GraphingPlayground\\Extensions.cs",
@@ -90,34 +102,19 @@
               "RelativeToolTip": "Celarix.JustForFun.GraphingPlayground\\Extensions.cs",
               "ViewState": "AQIAABMAAAAAAAAAAAAgwDgAAAAUAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T03:39:19.992Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-10-27T03:39:19.992Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "HexTickGenerators.cs",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Logic\\HexTickGenerators.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.GraphingPlayground\\Logic\\HexTickGenerators.cs",
               "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Logic\\HexTickGenerators.cs",
               "RelativeToolTip": "Celarix.JustForFun.GraphingPlayground\\Logic\\HexTickGenerators.cs",
-              "ViewState": "AQIAAJwAAAAAAAAAAAAMwJ0AAAAEAAAA",
+              "ViewState": "AQIAAIsAAAAAAAAAAAAcwJ0AAAAEAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T03:28:23.36Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "FileDistribution.cs",
-              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Logic\\FileDistribution.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.GraphingPlayground\\Logic\\FileDistribution.cs",
-              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Logic\\FileDistribution.cs",
-              "RelativeToolTip": "Celarix.JustForFun.GraphingPlayground\\Logic\\FileDistribution.cs",
-              "ViewState": "AQIAADIAAAAAAAAAAADwvzsAAAACAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-27T03:25:06.368Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-10-27T03:28:23.36Z"
             },
             {
               "$type": "Document",
@@ -127,14 +124,14 @@
               "RelativeDocumentMoniker": "Celarix.JustForFun.GraphingPlayground\\Playgrounds\\SingleFileDistribution.cs",
               "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Playgrounds\\SingleFileDistribution.cs",
               "RelativeToolTip": "Celarix.JustForFun.GraphingPlayground\\Playgrounds\\SingleFileDistribution.cs",
-              "ViewState": "AQIAAG0AAAAAAAAAAIAwwIQAAABHAAAA",
+              "ViewState": "AQIAAG0AAAAAAAAAAIAwwHYAAAADAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-10-27T03:10:42.864Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "Enums.cs",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Enums.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.GraphingPlayground\\Enums.cs",
@@ -142,12 +139,11 @@
               "RelativeToolTip": "Celarix.JustForFun.GraphingPlayground\\Enums.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAABQAAAAUAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-25T02:03:51.915Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-10-25T02:03:51.915Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 1,
               "Title": "VErSatileBasicsPlayground.cs",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Playgrounds\\VErSatileBasicsPlayground.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.GraphingPlayground\\Playgrounds\\VErSatileBasicsPlayground.cs",
@@ -155,8 +151,7 @@
               "RelativeToolTip": "Celarix.JustForFun.GraphingPlayground\\Playgrounds\\VErSatileBasicsPlayground.cs",
               "ViewState": "AQIAAEoAAAAAAAAAAAAAwFAAAAAXAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-25T01:07:49.784Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-10-25T01:07:49.784Z"
             },
             {
               "$type": "Document",
@@ -167,8 +162,7 @@
               "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\PlaygroundForm.cs [Design]",
               "RelativeToolTip": "Celarix.JustForFun.GraphingPlayground\\PlaygroundForm.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-25T00:50:31.587Z",
-              "EditorCaption": " [Design]"
+              "WhenOpened": "2024-10-25T00:50:31.587Z"
             },
             {
               "$type": "Document",

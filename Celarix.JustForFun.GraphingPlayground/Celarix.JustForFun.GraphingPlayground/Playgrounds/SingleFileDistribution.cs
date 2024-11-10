@@ -130,7 +130,7 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 			
 			formsPlot.Plot.Clear();
 			var heatmap = formsPlot.Plot.Add.Heatmap(values);
-			heatmap.Extent = new CoordinateRect(0d, edgeLength, 0d, edgeLength);
+			heatmap.Extent = new CoordinateRect(0d, edgeLength + 1, 0d, edgeLength + 1);
 			formsPlot.Plot.Title(title);
 			
 			var yTickGenerator = new ScottPlot.TickGenerators.NumericAutomatic
