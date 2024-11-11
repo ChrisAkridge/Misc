@@ -3,44 +3,36 @@
   "WorkspaceRootPath": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{ADEF7BB6-11FB-4DF0-B9ED-0E4AD0C760DE}|Celarix.IO.FileAnalysis.Data\\Celarix.IO.FileAnalysis.Data.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis.data\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{ADEF7BB6-11FB-4DF0-B9ED-0E4AD0C760DE}|Celarix.IO.FileAnalysis.Data\\Celarix.IO.FileAnalysis.Data.csproj|solutionrelative:celarix.io.fileanalysis.data\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\fileanalysisiii\\videodurationloader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\fileanalysisiii\\videodurationloader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9CD073A0-7AA7-4021-A621-0A4CAFA83739}|SevenZipSharp-dev\\SevenZip\\SevenZip.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\sevenzipsharp-dev\\sevenzip\\sevenzip.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
-      "RelativeMoniker": "D:0:0:{9CD073A0-7AA7-4021-A621-0A4CAFA83739}|SevenZipSharp-dev\\SevenZip\\SevenZip.csproj|solutionrelative:sevenzipsharp-dev\\sevenzip\\sevenzip.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+      "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\fileanalysisiii\\imagesizeloader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\fileanalysisiii\\imagesizeloader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DD174519-AC54-4279-8D6B-022BB9859DBF}|Celarix.IO.FileAnalysis.Console\\Celarix.IO.FileAnalysis.Console.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis.console\\celarix.io.fileanalysis.console.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
-      "RelativeMoniker": "D:0:0:{DD174519-AC54-4279-8D6B-022BB9859DBF}|Celarix.IO.FileAnalysis.Console\\Celarix.IO.FileAnalysis.Console.csproj|solutionrelative:celarix.io.fileanalysis.console\\celarix.io.fileanalysis.console.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+      "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\fileanalysisiii\\tridfiletypeidentifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\fileanalysisiii\\tridfiletypeidentifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\celarix.io.fileanalysis.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
-      "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\celarix.io.fileanalysis.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+      "AbsoluteMoniker": "D:0:0:{DD174519-AC54-4279-8D6B-022BB9859DBF}|Celarix.IO.FileAnalysis.Console\\Celarix.IO.FileAnalysis.Console.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis.console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DD174519-AC54-4279-8D6B-022BB9859DBF}|Celarix.IO.FileAnalysis.Console\\Celarix.IO.FileAnalysis.Console.csproj|solutionrelative:celarix.io.fileanalysis.console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\finalprocessing\\canvascombiner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\finalprocessing\\canvascombiner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{ADEF7BB6-11FB-4DF0-B9ED-0E4AD0C760DE}|Celarix.IO.FileAnalysis.Data\\Celarix.IO.FileAnalysis.Data.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis.data\\models\\filerecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ADEF7BB6-11FB-4DF0-B9ED-0E4AD0C760DE}|Celarix.IO.FileAnalysis.Data\\Celarix.IO.FileAnalysis.Data.csproj|solutionrelative:celarix.io.fileanalysis.data\\models\\filerecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\postprocessing\\textmapcanvasgenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\postprocessing\\textmapcanvasgenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{ADEF7BB6-11FB-4DF0-B9ED-0E4AD0C760DE}|Celarix.IO.FileAnalysis.Data\\Celarix.IO.FileAnalysis.Data.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis.data\\analysiscontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ADEF7BB6-11FB-4DF0-B9ED-0E4AD0C760DE}|Celarix.IO.FileAnalysis.Data\\Celarix.IO.FileAnalysis.Data.csproj|solutionrelative:celarix.io.fileanalysis.data\\analysiscontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\finalprocessing\\thinfiletreegenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\finalprocessing\\thinfiletreegenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{ADEF7BB6-11FB-4DF0-B9ED-0E4AD0C760DE}|Celarix.IO.FileAnalysis.Data\\Celarix.IO.FileAnalysis.Data.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis.data\\models\\filedistributionset.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ADEF7BB6-11FB-4DF0-B9ED-0E4AD0C760DE}|Celarix.IO.FileAnalysis.Data\\Celarix.IO.FileAnalysis.Data.csproj|solutionrelative:celarix.io.fileanalysis.data\\models\\filedistributionset.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\analysis\\pathfilewriter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\analysis\\pathfilewriter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\analysis\\analyzercore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\analysis\\analyzercore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\analysis\\imageidentifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\analysis\\imageidentifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{ADEF7BB6-11FB-4DF0-B9ED-0E4AD0C760DE}|Celarix.IO.FileAnalysis.Data\\Celarix.IO.FileAnalysis.Data.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis.data\\models\\folderrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ADEF7BB6-11FB-4DF0-B9ED-0E4AD0C760DE}|Celarix.IO.FileAnalysis.Data\\Celarix.IO.FileAnalysis.Data.csproj|solutionrelative:celarix.io.fileanalysis.data\\models\\folderrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -71,124 +63,101 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Class1.cs",
-              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.Data\\Class1.cs",
-              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis.Data\\Class1.cs",
-              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.Data\\Class1.cs",
-              "RelativeToolTip": "Celarix.IO.FileAnalysis.Data\\Class1.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Title": "VideoDurationLoader.cs",
+              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\VideoDurationLoader.cs",
+              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\VideoDurationLoader.cs",
+              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\VideoDurationLoader.cs",
+              "RelativeToolTip": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\VideoDurationLoader.cs",
+              "ViewState": "AQIAAD0AAAAAAAAAAAAcwFoAAAA0AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-10T04:41:09.756Z",
+              "WhenOpened": "2024-11-10T23:57:32.258Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "SevenZip",
-              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\SevenZipSharp-dev\\SevenZip\\SevenZip.csproj",
-              "RelativeDocumentMoniker": "SevenZipSharp-dev\\SevenZip\\SevenZip.csproj",
-              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\SevenZipSharp-dev\\SevenZip\\SevenZip.csproj",
-              "RelativeToolTip": "SevenZipSharp-dev\\SevenZip\\SevenZip.csproj",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2024-11-10T04:39:53.727Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Celarix.IO.FileAnalysis.Console",
-              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.Console\\Celarix.IO.FileAnalysis.Console.csproj",
-              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis.Console\\Celarix.IO.FileAnalysis.Console.csproj",
-              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.Console\\Celarix.IO.FileAnalysis.Console.csproj",
-              "RelativeToolTip": "Celarix.IO.FileAnalysis.Console\\Celarix.IO.FileAnalysis.Console.csproj",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2024-11-10T04:39:46.01Z",
+              "Title": "ImageSizeLoader.cs",
+              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\ImageSizeLoader.cs",
+              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\ImageSizeLoader.cs",
+              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\ImageSizeLoader.cs",
+              "RelativeToolTip": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\ImageSizeLoader.cs",
+              "ViewState": "AQIAAAYAAAAAAAAAAAAAAA0AAAACAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-10T22:51:52.039Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "Celarix.IO.FileAnalysis",
-              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj",
-              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj",
-              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj",
-              "RelativeToolTip": "Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2024-11-10T04:38:52.046Z",
-              "EditorCaption": ""
+              "Title": "Program.cs",
+              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.Console\\Program.cs",
+              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis.Console\\Program.cs",
+              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.Console\\Program.cs",
+              "RelativeToolTip": "Celarix.IO.FileAnalysis.Console\\Program.cs",
+              "ViewState": "AQIAABAAAAAAAAAAAAAiwBsAAAAmAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-10T05:21:01.752Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "CanvasCombiner.cs",
-              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FinalProcessing\\CanvasCombiner.cs",
-              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\FinalProcessing\\CanvasCombiner.cs",
-              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FinalProcessing\\CanvasCombiner.cs",
-              "RelativeToolTip": "Celarix.IO.FileAnalysis\\FinalProcessing\\CanvasCombiner.cs",
-              "ViewState": "AQIAAAMAAAAAAAAAAAAAAAwAAAAjAAAA",
+              "DocumentIndex": 2,
+              "Title": "TRiDFileTypeIdentifier.cs",
+              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\TRiDFileTypeIdentifier.cs",
+              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\TRiDFileTypeIdentifier.cs",
+              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\TRiDFileTypeIdentifier.cs",
+              "RelativeToolTip": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\TRiDFileTypeIdentifier.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABYAAAADAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-03T04:32:34.733Z",
+              "WhenOpened": "2024-11-10T05:09:03.081Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
-              "Title": "TextMapCanvasGenerator.cs",
-              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\PostProcessing\\TextMapCanvasGenerator.cs",
-              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\PostProcessing\\TextMapCanvasGenerator.cs",
-              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\PostProcessing\\TextMapCanvasGenerator.cs",
-              "RelativeToolTip": "Celarix.IO.FileAnalysis\\PostProcessing\\TextMapCanvasGenerator.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAAAuAAAA",
+              "Title": "AnalysisContext.cs",
+              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.Data\\AnalysisContext.cs",
+              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis.Data\\AnalysisContext.cs",
+              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.Data\\AnalysisContext.cs",
+              "RelativeToolTip": "Celarix.IO.FileAnalysis.Data\\AnalysisContext.cs",
+              "ViewState": "AQIAAAkAAAAAAAAAAAAAACYAAAAWAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-03T04:32:12.991Z"
+              "WhenOpened": "2024-11-10T05:05:54.01Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 6,
-              "Title": "ThinFileTreeGenerator.cs",
-              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FinalProcessing\\ThinFileTreeGenerator.cs",
-              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\FinalProcessing\\ThinFileTreeGenerator.cs",
-              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FinalProcessing\\ThinFileTreeGenerator.cs",
-              "RelativeToolTip": "Celarix.IO.FileAnalysis\\FinalProcessing\\ThinFileTreeGenerator.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAtAAAA",
+              "Title": "FileDistributionSet.cs",
+              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.Data\\Models\\FileDistributionSet.cs",
+              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis.Data\\Models\\FileDistributionSet.cs",
+              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.Data\\Models\\FileDistributionSet.cs",
+              "RelativeToolTip": "Celarix.IO.FileAnalysis.Data\\Models\\FileDistributionSet.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABEAAAAeAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-03T04:31:58.049Z"
+              "WhenOpened": "2024-11-10T04:56:50.322Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 7,
-              "Title": "PathFileWriter.cs",
-              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\Analysis\\PathFileWriter.cs",
-              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\Analysis\\PathFileWriter.cs",
-              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\Analysis\\PathFileWriter.cs",
-              "RelativeToolTip": "Celarix.IO.FileAnalysis\\Analysis\\PathFileWriter.cs",
-              "ViewState": "AQIAADsAAAAAAAAAAAAnwFEAAAAdAAAA",
+              "Title": "FolderRecord.cs",
+              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.Data\\Models\\FolderRecord.cs",
+              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis.Data\\Models\\FolderRecord.cs",
+              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.Data\\Models\\FolderRecord.cs",
+              "RelativeToolTip": "Celarix.IO.FileAnalysis.Data\\Models\\FolderRecord.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABQAAABAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-03T04:30:40.082Z"
+              "WhenOpened": "2024-11-10T04:47:32.97Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "AnalyzerCore.cs",
-              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\Analysis\\AnalyzerCore.cs",
-              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\Analysis\\AnalyzerCore.cs",
-              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\Analysis\\AnalyzerCore.cs",
-              "RelativeToolTip": "Celarix.IO.FileAnalysis\\Analysis\\AnalyzerCore.cs",
-              "ViewState": "AQIAAD8AAAAAAAAAAAAIwFwAAAAmAAAA",
+              "DocumentIndex": 4,
+              "Title": "FileRecord.cs",
+              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.Data\\Models\\FileRecord.cs",
+              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis.Data\\Models\\FileRecord.cs",
+              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.Data\\Models\\FileRecord.cs",
+              "RelativeToolTip": "Celarix.IO.FileAnalysis.Data\\Models\\FileRecord.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACMAAAAEAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-03T04:30:34.027Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "ImageIdentifier.cs",
-              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\Analysis\\ImageIdentifier.cs",
-              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\Analysis\\ImageIdentifier.cs",
-              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\Analysis\\ImageIdentifier.cs",
-              "RelativeToolTip": "Celarix.IO.FileAnalysis\\Analysis\\ImageIdentifier.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-03T04:30:30.283Z"
+              "WhenOpened": "2024-11-10T04:44:56.627Z"
             }
           ]
         }

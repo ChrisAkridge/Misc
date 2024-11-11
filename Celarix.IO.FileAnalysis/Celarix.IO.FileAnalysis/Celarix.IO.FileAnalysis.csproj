@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Celarix.Imaging" Version="1.0.5" />
+    <PackageReference Include="Celarix.Imaging" Version="1.0.6" />
     <PackageReference Include="CSharpLib" Version="3.0.1" />
     <PackageReference Include="ICSharpCode.Decompiler" Version="7.1.0.6543" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.10.0" />
@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Celarix.IO.FileAnalysis.Data\Celarix.IO.FileAnalysis.Data.csproj" />
     <ProjectReference Include="..\SevenZipSharp-dev\SevenZip\SevenZip.csproj" />
   </ItemGroup>
 

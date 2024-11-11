@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Celarix.Imaging;
 using Celarix.IO.FileAnalysis.Analysis;
+using Celarix.IO.FileAnalysis.FileAnalysisIII;
 using Celarix.IO.FileAnalysis.FinalProcessing;
 using Celarix.IO.FileAnalysis.PostProcessing;
 using NLog;
@@ -21,6 +22,12 @@ namespace Celarix.IO.FileAnalysis.Console
     {
         private static void Main(string[] args)
         {
+	        var sizeLoader = new ImageSizeLoader();
+	        var size = sizeLoader.TryGetSize(@"F:\Documents\Files\Pictures\Pictures\Dinarel Group\Summery Series\s097.webp", out var imageSize);
+	        
+	        System.Console.WriteLine(size);
+
+	        return;
             // TODO: add CommandLine library
             Celarix.Imaging.LibraryConfiguration.Instance = new LibraryConfiguration
             {
