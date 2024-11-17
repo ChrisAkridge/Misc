@@ -22,11 +22,12 @@ namespace Celarix.IO.FileAnalysis.Console
     {
         private static void Main(string[] args)
         {
-	        var sizeLoader = new ImageSizeLoader();
-	        var size = sizeLoader.TryGetSize(@"F:\Documents\Files\Pictures\Pictures\Dinarel Group\Summery Series\s097.webp", out var imageSize);
-	        
-	        System.Console.WriteLine(size);
+	        LoggingConfigurer.ConfigurePostProcessingLogging();
+	        var distributions = new FileDistributionGenerator();
 
+	        distributions.GenerateFileDistributions(
+		        @"F:\Documents\Files\Music\Recordings\Miscellaneous\(2024-11-05) KIRO Seattle - Election Day.mp3");
+	        
 	        return;
             // TODO: add CommandLine library
             Celarix.Imaging.LibraryConfiguration.Instance = new LibraryConfiguration

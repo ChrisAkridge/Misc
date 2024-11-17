@@ -95,7 +95,7 @@ namespace Celarix.IO.FileAnalysis.Analysis
             var shortenedPath = filePath;
             var font = SystemFonts.CreateFont("Consolas", 14f);
             
-            while (TextMeasurer.Measure(shortenedPath, new RendererOptions(font)).Width > resultImage.Width)
+            while (TextMeasurer.MeasureBounds(shortenedPath, new TextOptions(font)).Width > resultImage.Width)
             {
                 if (!Utilities.Utilities.TryShortenFilePath(shortenedPath, out shortenedPath)) { break; }
             }

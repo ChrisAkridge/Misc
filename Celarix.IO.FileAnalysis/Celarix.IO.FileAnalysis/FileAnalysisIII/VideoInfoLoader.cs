@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NLog;
 using SixLabors.ImageSharp;
 
 namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 {
 	public sealed class VideoInfoLoader
 	{
+		private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+		
 		public string FFProbeExecutablePath
 		{
 			get
@@ -25,9 +29,9 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 			}
 		}
 		
-		public bool TryGetDuration(string filePath, out TimeSpan duration)
+		public bool TryGetInfo(string filePath, out AnimatedImageOrVideoInfo info)
 		{
-			if (TryGetAnimatedWebPDuration(filePath, out duration))
+			if (TryGetAnimatedImageInfo(filePath, out info))
 			{
 				return true;
 			}
@@ -38,59 +42,75 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 					"FFProbe executable file path not specified.");
 			}
 			
-			var process = new System.Diagnostics.Process
+			var durationProcess = new Process
 			{
-				StartInfo = new System.Diagnostics.ProcessStartInfo
-				{
-					FileName = FFProbeExecutablePath,
-					Arguments = $"-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"{filePath}\"",
-					UseShellExecute = false,
-					RedirectStandardOutput = true,
-					CreateNoWindow = true
-				}
+				StartInfo = GetFFProbeProcessStartInfo(
+					$"-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"{filePath}\"")
 			};
-			process.Start();
-			var output = process.StandardOutput.ReadToEnd();
-			process.WaitForExit();
+			durationProcess.Start();
+			var output = durationProcess.StandardOutput.ReadToEnd();
+			durationProcess.WaitForExit();
 			
 			if (!double.TryParse(output, out var durationSeconds))
 			{
-				duration = default;
+				info = default;
 				return false;
 			}
 			
-			duration = TimeSpan.FromSeconds(durationSeconds);
+			var dimensionsProcess = new Process
+			{
+				StartInfo = GetFFProbeProcessStartInfo(
+					$"-v error -select_streams v -show_entries stream=width,height -of csv=s=x:p=0 \"{filePath}\"")
+			};
+			dimensionsProcess.Start();
+			output = dimensionsProcess.StandardOutput.ReadToEnd();
+			var outputParts = output.Split('x');
+			dimensionsProcess.WaitForExit();
+			
+			var frameCountProcess = new Process
+			{
+				StartInfo = GetFFProbeProcessStartInfo(
+					$"-v error -count_frames -select_streams v:0 -show_entries stream=nb_frames -of default=nokey=1:noprint_wrappers=1 \"{filePath}\"")
+			};
+			frameCountProcess.Start();
+			output = frameCountProcess.StandardOutput.ReadToEnd();
+			frameCountProcess.WaitForExit();
+
+			info = new AnimatedImageOrVideoInfo
+			{
+				Width = int.Parse(outputParts[0]),
+				Height = int.Parse(outputParts[1]),
+				FrameCount = int.Parse(output),
+				Duration = TimeSpan.FromSeconds(durationSeconds)
+			};
+			
+			logger.Info($"{filePath} (video): {info.Width}x{info.Height}, {info.FrameCount} frames, {info.Duration}");
+			
 			return true;
 		}
 
-		private static bool TryGetAnimatedWebPDuration(string filePath, out TimeSpan duration)
-		{
-			using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-			using var reader = new BinaryReader(stream);
-			var possibleFourCCHeader = reader.ReadBytes(4);
-			if (possibleFourCCHeader[0] != 0x52 || possibleFourCCHeader[1] != 0x49 || possibleFourCCHeader[2] != 0x46 || possibleFourCCHeader[3] != 0x46)
+		private ProcessStartInfo GetFFProbeProcessStartInfo(string arguments) =>
+			new()
 			{
-				duration = default;
-				return false;
-			}
+				FileName = FFProbeExecutablePath,
+				Arguments = arguments,
+				UseShellExecute = false,
+				RedirectStandardOutput = true,
+				CreateNoWindow = true
+			};
 
+		private static bool TryGetAnimatedImageInfo(string filePath, out AnimatedImageOrVideoInfo info)
+		{
 			try
 			{
-				// Skip the file size (4 bytes).
-				reader.BaseStream.Seek(4, SeekOrigin.Current);
-				// Skip the "WEBP" header (4 bytes).
-				reader.BaseStream.Seek(4, SeekOrigin.Current);
-				// Read the next 4 bytes as an ASCII string and compare it to "VP8X".
-				var vp8xHeader = reader.ReadBytes(4);
-				if (vp8xHeader[0] != 0x56 || vp8xHeader[1] != 0x50 || vp8xHeader[2] != 0x38 || vp8xHeader[3] != 0x58)
+				using var image = Image.Load(filePath);
+				
+				if (image.Frames.Count == 1)
 				{
-					duration = default;
+					info = null;
 					return false;
 				}
 				
-				// Okay, I've decided I don't care.
-				// Use SixLabors.ImageSharp to get the duration.
-				using var image = Image.Load(filePath);
 				var totalDurationMilliseconds = 0u;
 
 				foreach (var imageFrame in image.Frames)
@@ -104,10 +124,22 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 						totalDurationMilliseconds += (uint)gifMetadata.FrameDelay;
 					}
 				}
+				
+				info = new AnimatedImageOrVideoInfo
+				{
+					Width = image.Width,
+					Height = image.Height,
+					FrameCount = image.Frames.Count,
+					Duration = TimeSpan.FromMilliseconds(totalDurationMilliseconds)
+				};
+				
+				logger.Info($"{filePath} (animated image): {info.Width}x{info.Height}, {info.FrameCount} frames, {info.Duration}");
+				
+				return true;
 			}
 			catch
 			{
-				duration = default;
+				info = null;
 				return false;
 			}
 		}
