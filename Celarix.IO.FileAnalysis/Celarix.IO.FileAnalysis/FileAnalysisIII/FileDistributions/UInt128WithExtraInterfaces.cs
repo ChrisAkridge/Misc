@@ -12,7 +12,8 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 		INumber<UInt128WithExtraInterfaces>,
 		IAdditionOperators<UInt128WithExtraInterfaces, int, UInt128WithExtraInterfaces>,
 		IDivisionOperators<UInt128WithExtraInterfaces, int, UInt128WithExtraInterfaces>,
-		IMinMaxValue<UInt128WithExtraInterfaces>
+		IMinMaxValue<UInt128WithExtraInterfaces>,
+		IUnderlyingValue<UInt128>
 	{
 		private readonly UInt128 value = value;
 
@@ -465,5 +466,7 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 
 		/// <summary>Gets the minimum value of the current type.</summary>
 		public static UInt128WithExtraInterfaces MinValue => new(UInt128.MinValue);
+
+		public UInt128 Value => value;
 	}
 }

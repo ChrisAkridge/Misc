@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions;
+using Celarix.IO.FileAnalysis.Utilities;
 using NLog;
 using LongFile = Pri.LongPath.File;
 
@@ -21,8 +22,10 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 			using var reader = new BinaryReader(LongFile.OpenRead(filePath));
 			var buffer = new byte[3072];
 			int read;
+			
 			var totalRead = 0L;
 			var nextLoggingAmount = 1_048_576L;
+			var advancedProgress = new AdvancedProgress(new FileInfo(filePath).Length, DateTimeOffset.Now);
 			
 			var oneBitDistribution = new OneBitDistribution();
 			var twoBitDistribution = new TwoBitDistribution();
@@ -39,7 +42,8 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 				totalRead += read;
 				if (totalRead >= nextLoggingAmount)
 				{
-					logger.Info("Read {0} bytes", totalRead);
+					advancedProgress.CurrentAmount = totalRead;
+					logger.Info(advancedProgress.ToString());
 					nextLoggingAmount += 1_048_576L;
 				}
 				

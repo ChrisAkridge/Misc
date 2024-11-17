@@ -8,12 +8,17 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 {
 	public sealed class SixtyFourBitDistribution : IFileDistribution
 	{
-		private readonly BSPTreeNode<UInt64WithExtraInterfaces> root =
-			new(UInt64WithExtraInterfaces.MinValue, UInt64WithExtraInterfaces.MaxValue);
+		private readonly BucketedDistribution<ulong> root = new(() => ulong.MaxValue,
+			(v, d) => v / (ulong)d,
+			(a, b) => a > b,
+			v => int.CreateTruncating(v),
+			(v, d) => v / d,
+			(a, b) => a + b,
+			() => 1);
 
 		public void Add(ulong value)
 		{
-			root.Add(new UInt64WithExtraInterfaces(value));
+			root.Add(value);
 		}
 	}
 }

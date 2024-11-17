@@ -11,7 +11,8 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 	public struct UInt32WithExtraInterfaces(uint value) :
 		INumber<UInt32WithExtraInterfaces>,
 		IAdditionOperators<UInt32WithExtraInterfaces, int, UInt32WithExtraInterfaces>,
-		IDivisionOperators<UInt32WithExtraInterfaces, int, UInt32WithExtraInterfaces>, IMinMaxValue<UInt32WithExtraInterfaces>
+		IDivisionOperators<UInt32WithExtraInterfaces, int, UInt32WithExtraInterfaces>, IMinMaxValue<UInt32WithExtraInterfaces>,
+		IUnderlyingValue<uint>
 	{
 		private readonly uint value = value;
 
@@ -481,5 +482,7 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 
 		/// <summary>Gets the minimum value of the current type.</summary>
 		public static UInt32WithExtraInterfaces MinValue => new(uint.MinValue);
+
+		public uint Value => value;
 	}
 }

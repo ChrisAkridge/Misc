@@ -12,7 +12,8 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 		INumber<UInt64WithExtraInterfaces>,
 		IAdditionOperators<UInt64WithExtraInterfaces, int, UInt64WithExtraInterfaces>,
 		IDivisionOperators<UInt64WithExtraInterfaces, int, UInt64WithExtraInterfaces>,
-		IMinMaxValue<UInt64WithExtraInterfaces>
+		IMinMaxValue<UInt64WithExtraInterfaces>,
+		IUnderlyingValue<ulong>
 	{
 		private readonly ulong value = value;
 
@@ -460,5 +461,7 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 
 		/// <summary>Gets the minimum value of the current type.</summary>
 		public static UInt64WithExtraInterfaces MinValue => new(ulong.MinValue);
+
+		public ulong Value => value;
 	}
 }

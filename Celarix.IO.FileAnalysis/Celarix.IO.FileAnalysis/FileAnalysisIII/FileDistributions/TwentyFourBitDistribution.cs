@@ -8,7 +8,14 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 {
 	public sealed class TwentyFourBitDistribution : IFileDistribution
 	{
-		private readonly BSPTreeNode<int> root = new BSPTreeNode<int>(0, 16_777_215);
+		private readonly BucketedDistribution<int> root = new(16_777_215,
+			() => 16_777_215,
+			(v, d) => v / d,
+			(v, m) => v > m,
+			v => v,
+			(v, d) => v / d,
+			(a, b) => a + b,
+			() => 1);
 
 		public void AddSixteen(int _0,
 			int _1,
