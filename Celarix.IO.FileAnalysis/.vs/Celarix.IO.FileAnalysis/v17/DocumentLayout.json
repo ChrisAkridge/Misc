@@ -3,12 +3,24 @@
   "WorkspaceRootPath": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{DD174519-AC54-4279-8D6B-022BB9859DBF}|Celarix.IO.FileAnalysis.Console\\Celarix.IO.FileAnalysis.Console.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis.console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DD174519-AC54-4279-8D6B-022BB9859DBF}|Celarix.IO.FileAnalysis.Console\\Celarix.IO.FileAnalysis.Console.csproj|solutionrelative:celarix.io.fileanalysis.console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\fileanalysisiii\\filedistributions\\bucketeddistribution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\fileanalysisiii\\filedistributions\\bucketeddistribution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\fileanalysisiii\\filedistributiongenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\fileanalysisiii\\filedistributiongenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\fileanalysisiii\\filedistributions\\onehundredtwentyeightbitdistribution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\fileanalysisiii\\filedistributions\\onehundredtwentyeightbitdistribution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\fileanalysisiii\\filedistributions\\twentyfourbitdistribution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\fileanalysisiii\\filedistributions\\twentyfourbitdistribution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD174519-AC54-4279-8D6B-022BB9859DBF}|Celarix.IO.FileAnalysis.Console\\Celarix.IO.FileAnalysis.Console.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis.console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DD174519-AC54-4279-8D6B-022BB9859DBF}|Celarix.IO.FileAnalysis.Console\\Celarix.IO.FileAnalysis.Console.csproj|solutionrelative:celarix.io.fileanalysis.console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\utilities\\advancedprogress.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -43,6 +55,45 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "BucketedDistribution.cs",
+              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\BucketedDistribution.cs",
+              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\BucketedDistribution.cs",
+              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\BucketedDistribution.cs",
+              "RelativeToolTip": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\BucketedDistribution.cs",
+              "ViewState": "AQIAACQAAAAAAAAAAAAowEEAAABIAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-17T22:33:54.955Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "OneHundredTwentyEightBitDistribution.cs",
+              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\OneHundredTwentyEightBitDistribution.cs",
+              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\OneHundredTwentyEightBitDistribution.cs",
+              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\OneHundredTwentyEightBitDistribution.cs",
+              "RelativeToolTip": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\OneHundredTwentyEightBitDistribution.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABQAAAApAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-17T22:26:27.57Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TwentyFourBitDistribution.cs",
+              "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\TwentyFourBitDistribution.cs",
+              "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\TwentyFourBitDistribution.cs",
+              "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\TwentyFourBitDistribution.cs",
+              "RelativeToolTip": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\TwentyFourBitDistribution.cs",
+              "ViewState": "AQIAAAsAAAAAAAAAAAAQwB0AAAAQAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-17T22:22:18.844Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "Program.cs",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.Console\\Program.cs",
               "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis.Console\\Program.cs",
@@ -55,7 +106,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "AdvancedProgress.cs",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\Utilities\\AdvancedProgress.cs",
               "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\Utilities\\AdvancedProgress.cs",
@@ -74,7 +125,7 @@
               "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributionGenerator.cs",
               "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributionGenerator.cs",
               "RelativeToolTip": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributionGenerator.cs",
-              "ViewState": "AQIAABEAAAAAAAAAAAArwC0AAAAuAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAjwJ4AAAADAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-17T21:59:09.467Z",
               "EditorCaption": ""

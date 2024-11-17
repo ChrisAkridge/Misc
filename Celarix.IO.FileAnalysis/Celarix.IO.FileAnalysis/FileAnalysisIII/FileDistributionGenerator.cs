@@ -60,51 +60,47 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 				}
 				
 				var span = new ReadOnlySpan<byte>(buffer, 0, read);
-				var uint128Span = MemoryMarshal.Cast<byte, UInt128>(span);
+				var uint64Span = MemoryMarshal.Cast<byte, ulong>(span);
 				var nybbleDistributionStart = &fourBitDistribution.Nybble0000Count;
 				var twoBitDistributionStart = &twoBitDistribution.BitPair00Count;
 
 				// Twenty-four-bit distributions
-				for (int i = 0; i < uint128Span.Length; i += 3)
+				for (int i = 0; i < uint64Span.Length; i += 3)
 				{
-					var high24 = uint128Span[i];
-					var mid24 = uint128Span[i + 1];
-					var low24 = uint128Span[i + 2];
+					var high24 = uint64Span[i];
+					var mid24 = uint64Span[i + 1];
+					var low24 = uint64Span[i + 2];
 
-					// 16 bytes * 3 = 48 bytes, which is 384 bits. That's 16 24-bit values.
-					// 0123456789ABCDEF 0123456789ABCDEF 0123456789ABCDEF
-					// 0001112223334445 55666777888999AA ABBBCCCDDDEEEFFF
+					// 8 bytes * 3 = 24 bytes, which is 192 bits. That's 8 24-bit values.
+					// 01234567 01234567 01234567
+					// 00011122 23334445 55666777
 
-					twentyFourBitDistribution.AddSixteen((int)(high24 >> 104),
-						(int)(high24 >> 80) & 0xffffff,
-						(int)(high24 >> 56) & 0xffffff,
-						(int)(high24 >> 32) & 0xffffff,
-						(int)(high24 >> 8) & 0xffffff,
-						(int)(((high24 & 0xff) << 16) | (mid24 >> 112)),
-						(int)(mid24 >> 88) & 0xffffff,
-						(int)(mid24 >> 64) & 0xffffff,
-						(int)(mid24 >> 40) & 0xffffff,
-						(int)(mid24 >> 16) & 0xffffff,
-						(int)(((mid24 & 0xffff) << 8) | (low24 >> 120)),
-						(int)(low24 >> 96) & 0xffffff,
-						(int)(low24 >> 72) & 0xffffff,
-						(int)(low24 >> 48) & 0xffffff,
+					twentyFourBitDistribution.AddEight((int)(high24 >> 40),
+						(int)(high24 >> 16) & 0xffffff,
+						(int)(high24 & 0xffff) | (int)(mid24 >> 56),
+						(int)(mid24 >> 32) & 0xffffff,
+						(int)(mid24 >> 8) & 0xffffff,
+						(int)(mid24 & 0xff) | (int)(low24 >> 48),
 						(int)(low24 >> 24) & 0xffffff,
-						(int)low24 & 0xffffff);
+						(int)(low24 & 0xffffff));
 				}
 
-				foreach (var sixteenBytes in uint128Span)
+				// One-hundred-twenty-eight-bit distribution
+				for (int i = 0; i < uint64Span.Length; i += 2)
 				{
-					// One-hundred-twenty-eight-bit distribution
-					oneHundredTwentyEightBitDistribution.Add(sixteenBytes);
-					
+					var high64 = uint64Span[i];
+					var low64 = uint64Span[i + 1];
+					oneHundredTwentyEightBitDistribution.Add(high64, low64);
+				}
+
+				foreach (var eightBytes in uint64Span)
+				{
 					// Sixty-four-bit distributions
-					sixtyFourBitDistribution.Add((ulong)(sixteenBytes >> 64));
-					sixtyFourBitDistribution.Add((ulong)sixteenBytes);
+					sixtyFourBitDistribution.Add(eightBytes);
 					
 					// Thirty-two-bit distributions
-					var uintSource = sixteenBytes;
-					for (var i = 0; i < 4; i++)
+					var uintSource = eightBytes;
+					for (var i = 0; i < 2; i++)
 					{
 						var uintValue = (uint)uintSource;
 						thirtyTwoBitDistribution.Add(uintValue);
@@ -112,10 +108,10 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 					}
 					
 					// Sixteen-bit distributions
-					var shortSource = sixteenBytes;
+					var shortSource = eightBytes;
 					fixed (long* sixteenBitDistributionStart = &sixteenBitDistribution.counts[0])
 					{
-						for (var i = 0; i < 8; i++)
+						for (var i = 0; i < 4; i++)
 						{
 							var shortValue = shortSource & 0xffff;
 							*(sixteenBitDistributionStart + (int)shortValue) += 1;
@@ -124,10 +120,10 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 					}
 					
 					// Eight-bit distributions
-					var byteSource = sixteenBytes;
+					var byteSource = eightBytes;
 					fixed (long* eightBitDistributionStart = &eightBitDistribution.counts[0])
 					{
-						for (var i = 0; i < 16; i++)
+						for (var i = 0; i < 8; i++)
 						{
 							var byteValue = byteSource & 0xff;
 							*(eightBitDistributionStart + (int)byteValue) += 1;
@@ -136,8 +132,8 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 					}
 					
 					// Four-bit distributions
-					var nybbleSource = sixteenBytes;
-					for (var i = 0; i < 32; i++)
+					var nybbleSource = eightBytes;
+					for (var i = 0; i < 16; i++)
 					{
 						var nybble = nybbleSource & 0b1111;
 						*(nybbleDistributionStart + (int)nybble) += 1;
@@ -145,8 +141,8 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 					}
 					
 					// Two-bit distributions
-					var bitPairSource = sixteenBytes;
-					for (var i = 0; i < 64; i++)
+					var bitPairSource = eightBytes;
+					for (var i = 0; i < 32; i++)
 					{
 						var bitPair = bitPairSource & 0b11;
 						*(twoBitDistributionStart + (int)bitPair) += 1;
@@ -154,9 +150,9 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 					}
 					
 					// One-bit distribution
-					var bit1Count = UInt128.PopCount(sixteenBytes);
+					var bit1Count = ulong.PopCount(eightBytes);
 					oneBitDistribution.Bit1Count += (long)bit1Count;
-					oneBitDistribution.Bit0Count += 128 - (long)bit1Count;
+					oneBitDistribution.Bit0Count += 64 - (long)bit1Count;
 				}
 			}
 			

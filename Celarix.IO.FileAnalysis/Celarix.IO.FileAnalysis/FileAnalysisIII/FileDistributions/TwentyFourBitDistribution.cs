@@ -17,22 +17,8 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 			(a, b) => a + b,
 			() => 1);
 
-		public void AddSixteen(int _0,
-			int _1,
-			int _2,
-			int _3,
-			int _4,
-			int _5,
-			int _6,
-			int _7,
-			int _8,
-			int _9,
-			int _A,
-			int _B,
-			int _C,
-			int _D,
-			int _E,
-			int _F)
+		public void AddEight(int _0, int _1, int _2, int _3, int _4,
+			int _5, int _6, int _7)
 		{
 			root.Add(_0);
 			root.Add(_1);
@@ -42,14 +28,6 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 			root.Add(_5);
 			root.Add(_6);
 			root.Add(_7);
-			root.Add(_8);
-			root.Add(_9);
-			root.Add(_A);
-			root.Add(_B);
-			root.Add(_C);
-			root.Add(_D);
-			root.Add(_E);
-			root.Add(_F);
 		}
 	}
 }

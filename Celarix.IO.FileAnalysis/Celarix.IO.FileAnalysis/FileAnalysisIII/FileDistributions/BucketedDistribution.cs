@@ -25,8 +25,8 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 		private readonly Func<T, T, T> addFunc;
 		private readonly Func<T> oneFunc;
 
-		public T BucketSize => addFunc(divideByInt32Func(max, BucketCount), oneFunc());
-		
+		public T BucketSize { get; }
+
 		public BucketedDistribution(Func<T> maxValueFunc,
 			Func<T, int, T> divideByInt32Func,
 			Func<T, T, bool> greaterThanFunc,
@@ -43,6 +43,7 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 			this.addFunc = addFunc;
 			this.oneFunc = oneFunc;
 			max = maxValueFunc();
+			BucketSize = addFunc(divideByInt32Func(max, BucketCount), oneFunc());
 		}
 		
 		public BucketedDistribution(T max,
@@ -62,6 +63,7 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 			this.divideFunc = divideFunc;
 			this.addFunc = addFunc;
 			this.oneFunc = oneFunc;
+			BucketSize = addFunc(divideByInt32Func(max, BucketCount), oneFunc());
 		}
 
 		public void Add(T value)

@@ -16,9 +16,9 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 			(a, b) => a + b,
 			() => 1);
 
-		public void Add(UInt128 value)
+		public void Add(ulong high, ulong low)
 		{
-			root.Add(value);
+			root.Add(((UInt128)high << 64) | low);
 		}
 	}
 }
