@@ -28,8 +28,8 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 			var advancedProgress = new AdvancedProgress(new FileInfo(filePath).Length, DateTimeOffset.Now);
 			
 			var oneBitDistribution = new OneBitDistribution();
-			var twoBitDistribution = new TwoBitDistribution();
-			var fourBitDistribution = new FourBitDistribution();
+			var bitPairCounts = new long[4];
+			var nybbleCounts = new long[16];
 			var eightBitDistribution = new EightBitDistribution();
 			var sixteenBitDistribution = new SixteenBitDistribution();
 			var twentyFourBitDistribution = new TwentyFourBitDistribution();
@@ -61,8 +61,6 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 				
 				var span = new ReadOnlySpan<byte>(buffer, 0, read);
 				var uint64Span = MemoryMarshal.Cast<byte, ulong>(span);
-				var nybbleDistributionStart = &fourBitDistribution.Nybble0000Count;
-				var twoBitDistributionStart = &twoBitDistribution.BitPair00Count;
 
 				// Twenty-four-bit distributions
 				for (int i = 0; i < uint64Span.Length; i += 3)
@@ -136,7 +134,7 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 					for (var i = 0; i < 16; i++)
 					{
 						var nybble = nybbleSource & 0b1111;
-						*(nybbleDistributionStart + (int)nybble) += 1;
+						nybbleCounts[nybble] += 1;
 						nybbleSource >>= 4;
 					}
 					
@@ -145,7 +143,7 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 					for (var i = 0; i < 32; i++)
 					{
 						var bitPair = bitPairSource & 0b11;
-						*(twoBitDistributionStart + (int)bitPair) += 1;
+						bitPairCounts[bitPair] += 1;
 						bitPairSource >>= 2;
 					}
 					
@@ -159,8 +157,8 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII
 			return
 			[
 				oneBitDistribution,
-				twoBitDistribution,
-				fourBitDistribution,
+				new TwoBitDistribution(bitPairCounts[0], bitPairCounts[1], bitPairCounts[2], bitPairCounts[3]),
+				new FourBitDistribution(nybbleCounts),
 				eightBitDistribution,
 				sixteenBitDistribution,
 				twentyFourBitDistribution,

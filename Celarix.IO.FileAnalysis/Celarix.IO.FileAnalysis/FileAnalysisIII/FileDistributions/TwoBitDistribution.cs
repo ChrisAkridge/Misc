@@ -7,12 +7,14 @@ using System.Threading.Tasks;
 
 namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 {
-	[StructLayout(LayoutKind.Sequential)]
-	public struct TwoBitDistribution : IFileDistribution
+	public class TwoBitDistribution(long _00, long _01, long _10, long _11)
+		: IFileDistribution
 	{
-		public long BitPair00Count;
-		public long BitPair01Count;
-		public long BitPair10Count;
-		public long BitPair11Count;
+		private long[] counts =
+		[
+			_00, _01, _10, _11
+		];
+
+		public IReadOnlyList<long> Counts => counts;
 	}
 }
