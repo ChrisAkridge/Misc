@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -21,6 +22,26 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 			}
 			
 			this.counts = counts;
+		}
+		
+		public int SizeOnDisk => 16 * sizeof(long);
+		
+		public IFileDistribution Read(BinaryReader reader)
+		{
+			var distribution = new long[16];
+			for (int i = 0; i < 16; i++)
+			{
+				distribution[i] = reader.ReadInt64();
+			}
+			return new FourBitDistribution(distribution);
+		}
+
+		public void Write(BinaryWriter writer)
+		{
+			foreach (long count in counts)
+			{
+				writer.Write(count);
+			}
 		}
 	}
 }

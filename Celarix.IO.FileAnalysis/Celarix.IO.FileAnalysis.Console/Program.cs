@@ -23,10 +23,16 @@ namespace Celarix.IO.FileAnalysis.Console
         private static void Main(string[] args)
         {
 	        LoggingConfigurer.ConfigurePostProcessingLogging();
-	        var distributions = new FileDistributionGenerator();
+	        var distributionsGenerator = new FileDistributionGenerator();
 
-	        distributions.GenerateFileDistributions(
+	        var distributions = distributionsGenerator.GenerateFileDistributions(
 		        @"F:\Documents\Files\Music\Recordings\Miscellaneous\(2024-11-05) KIRO Seattle - Election Day.mp3");
+	        
+	        using var distributionStream = new BinaryWriter(File.OpenWrite(@"F:\Documents\Files\Unclassified Files\kiro_seattle.bin"));
+	        foreach (var distribution in distributions)
+	        {
+		        distribution.Write(distributionStream);
+	        }
 	        
 	        return;
             // TODO: add CommandLine library

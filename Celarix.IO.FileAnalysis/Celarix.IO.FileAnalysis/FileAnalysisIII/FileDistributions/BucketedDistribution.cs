@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -26,6 +27,7 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 		private readonly Func<T> oneFunc;
 
 		public T BucketSize { get; }
+		public int SizeOnDisk => buckets.Length * sizeof(int);
 
 		public BucketedDistribution(Func<T> maxValueFunc,
 			Func<T, int, T> divideByInt32Func,
@@ -75,6 +77,22 @@ namespace Celarix.IO.FileAnalysis.FileAnalysisIII.FileDistributions
 			
 			var bucketIndex = createOverflowFunc(divideFunc(value, BucketSize));
 			buckets[bucketIndex]++;
+		}
+		
+		public void Read(BinaryReader reader)
+		{
+			for (int i = 0; i < BucketCount; i++)
+			{
+				buckets[i] = reader.ReadInt32();
+			}
+		}
+		
+		public void Write(BinaryWriter writer)
+		{
+			foreach (int count in buckets)
+			{
+				writer.Write(count);
+			}
 		}
 	}
 }
