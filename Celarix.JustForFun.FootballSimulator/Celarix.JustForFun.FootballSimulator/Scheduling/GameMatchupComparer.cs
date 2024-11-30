@@ -6,13 +6,23 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling;
 
 internal sealed class GameMatchupComparer : IEqualityComparer<GameMatchup>
 {
-    public bool Equals(GameMatchup? x, GameMatchup? y) =>
-        ReferenceEquals(x, y)
-        || (!ReferenceEquals(x, null)
-            && !ReferenceEquals(y, null)
-            && x.GetType() == y.GetType()
-            && (x.AwayTeam.Equals(y.AwayTeam) || x.AwayTeam.Equals(y.HomeTeam))
-            && (x.HomeTeam.Equals(y.HomeTeam) || x.HomeTeam.Equals(y.AwayTeam)));
+    private readonly IEqualityComparer<BasicTeamInfo> teamComparer;
 
-    public int GetHashCode(GameMatchup obj) => HashCode.Combine(obj.AwayTeam, obj.HomeTeam);
+    public GameMatchupComparer(IEqualityComparer<BasicTeamInfo> teamComparer) => this.teamComparer = teamComparer;
+
+    public bool Equals(GameMatchup? x, GameMatchup? y)
+    {
+        if (x == null || y == null) { return false; }
+        if (x.GameType != y.GameType) { return false; }
+        
+        if (teamComparer.Equals(x.TeamA, y.TeamA) && teamComparer.Equals(x.TeamB, y.TeamB)) { return true; }
+        if (teamComparer.Equals(x.TeamA, y.TeamB) && teamComparer.Equals(x.TeamB, y.TeamA)) { return true; }
+
+        return false;
+    }
+
+    public int GetHashCode(GameMatchup obj) =>
+        obj == null
+            ? throw new ArgumentNullException(nameof(obj))
+            : HashCode.Combine(obj.GameType, obj.TeamA.GetHashCode() + obj.TeamB.GetHashCode());
 }

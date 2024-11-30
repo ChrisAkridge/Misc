@@ -34,5 +34,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         public List<QuarterBoxScore> QuarterBoxScores = new List<QuarterBoxScore>();
         public List<TeamGameRecord> TeamGameRecords = new List<TeamGameRecord>();
         public List<TeamDriveRecord> TeamDriveRecords = new List<TeamDriveRecord>();
+        
+        public override string ToString() => $"{AwayTeam.TeamName} @ {HomeTeam.TeamName} ({GameType})";
     }
 }

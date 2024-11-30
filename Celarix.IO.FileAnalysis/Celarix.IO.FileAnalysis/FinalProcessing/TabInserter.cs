@@ -16,7 +16,7 @@ namespace Celarix.IO.FileAnalysis.FinalProcessing
         public static void InsertTabsForFile(string inputFilePath, string outputFilePath, int tabsToInsert,
             string lineToPrepend)
         {
-            LoggingConfigurer.ConfigurePostProcessingLogging();
+            // LoggingConfigurer.ConfigurePostProcessingLogging();
             logger.Info($"Prepending {tabsToInsert} tabs for each line in {inputFilePath}, writing to {outputFilePath}...");
 
             using var inputStream = new StreamReader(LongFile.OpenRead(inputFilePath));

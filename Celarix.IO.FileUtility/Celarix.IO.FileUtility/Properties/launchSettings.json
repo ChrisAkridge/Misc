@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Celarix.IO.FileUtility": {
+      "commandName": "Project",
+      "commandLineArgs": "ProcessLinkList --input \"F:\\Documents\\Files\\Pictures\\Receiving\\2\\links.txt\""
+    }
+  }
+}

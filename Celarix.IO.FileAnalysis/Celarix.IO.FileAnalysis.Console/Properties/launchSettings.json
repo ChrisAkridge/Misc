@@ -2,7 +2,7 @@
   "profiles": {
     "Celarix.IO.FileAnalysis.Console": {
       "commandName": "Project",
-      "commandLineArgs": "-generatethinfiletree \"I:\\fa\\02 AKRIDGE-PC\\60\\tree.txt\" \"I:\\fa\\02 AKRIDGE-PC\\60\\thinTree.txt\""
+      "commandLineArgs": "-combinecanvases \"H:\\fa\\archiveCanvasPaths.txt\" \"K:\\Final Artifacts\\archiveCanvas2\""
     }
   }
 }

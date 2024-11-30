@@ -46,8 +46,14 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
             }
 
             var extendedDate = new CelarianExtendedDateTime(DateTimeOffset.UtcNow);
+            var nextCultureStartTime = extendedDate.GetTimeOfNextCulture().ToOffset(DateTimeOffset.Now.Offset);
+            var timeUntilNextCulture = nextCultureStartTime - DateTimeOffset.Now;
+            var timeString =
+                $"{timeUntilNextCulture.Hours}h{timeUntilNextCulture.Minutes}m{timeUntilNextCulture.Seconds}s";
+            
             buffer.Add($"Extended: {extendedDate.ToAmericanLongDateStyleString()}");
             buffer.Add($"({extendedDate.GetDayCulture()}, {extendedDate.GetTimeCulture()})");
+            buffer.Add($"(until {nextCultureStartTime:yyyy-MM-dd hh:mm tt}, in {timeString})");
             return buffer;
         }
     }

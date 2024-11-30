@@ -15,7 +15,7 @@ namespace Celarix.IO.FileAnalysis.Collections
 
         public Grouping(TKey key, IEnumerable<TElement> values)
         {
-            this.Key = key;
+            Key = key;
             this.values = values ?? throw new ArgumentNullException(nameof(values));
         }
 

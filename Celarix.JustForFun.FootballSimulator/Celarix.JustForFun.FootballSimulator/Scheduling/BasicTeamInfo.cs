@@ -5,11 +5,18 @@ using Celarix.JustForFun.FootballSimulator.Data.Models;
 
 namespace Celarix.JustForFun.FootballSimulator.Scheduling;
 
-internal readonly struct BasicTeamInfo : IComparable<BasicTeamInfo>
+public sealed class BasicTeamInfo : IComparable<BasicTeamInfo>
 {
-    public string Name { get; init; }
-    public Conference Conference { get; init; }
-    public Division Division { get; init; }
+    public string Name { get; }
+    public Conference Conference { get; }
+    public Division Division { get; }
+
+    public BasicTeamInfo(string name, Conference conference, Division division)
+    {
+        Name = name;
+        Conference = conference;
+        Division = division;
+    }
 
     /// <summary>Indicates whether this instance and a specified object are equal.</summary>
     /// <param name="obj">The object to compare with the current instance.</param>
@@ -29,5 +36,7 @@ internal readonly struct BasicTeamInfo : IComparable<BasicTeamInfo>
     /// <param name="other">An object to compare with this instance.</param>
     /// <returns>A value that indicates the relative order of the objects being compared. The return value has these meanings:
     /// <list type="table"><listheader><term> Value</term><description> Meaning</description></listheader><item><term> Less than zero</term><description> This instance precedes <paramref name="other" /> in the sort order.</description></item><item><term> Zero</term><description> This instance occurs in the same position in the sort order as <paramref name="other" />.</description></item><item><term> Greater than zero</term><description> This instance follows <paramref name="other" /> in the sort order.</description></item></list></returns>
-    public int CompareTo(BasicTeamInfo other) => string.Compare(Name, other.Name, StringComparison.Ordinal);
+    public int CompareTo(BasicTeamInfo? other) => other == null
+            ? 1
+            : string.Compare(Name, other.Name, StringComparison.Ordinal);
 }

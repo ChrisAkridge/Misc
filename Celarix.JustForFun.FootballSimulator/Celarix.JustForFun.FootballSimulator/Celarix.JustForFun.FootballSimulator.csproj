@@ -8,11 +8,16 @@
 
   <ItemGroup>
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="Serilog" Version="4.0.2" />
     <PackageReference Include="System.Text.Json" Version="6.0.7" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Celarix.JustForFun.FootballSimulator.Data\Celarix.JustForFun.FootballSimulator.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="SummaryWriting\" />
   </ItemGroup>
 
 </Project>

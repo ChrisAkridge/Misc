@@ -17,6 +17,7 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
         private readonly string[] currentPage = new string[PageSize];
         private int currentPageIndex = 0;
         private int rendersSincePageChange = 0;
+        private bool pausedOnCurrentPage = false;
 
         public CountdownPresenter(Panel panel, int startingY, out int endingY)
         {
@@ -42,6 +43,23 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
             panel.Controls.Add(separatorLabel);
 
             endingY = startingY + separatorLabel.Height + 5;
+
+            countdownLabel.Click += (_, e) =>
+            {
+                if (e is MouseEventArgs me)
+                {
+                    if (me.Button == MouseButtons.Left)
+                    {
+                        NextPage(provider.GetDisplayObject());
+                        rendersSincePageChange = 0;
+                    }
+                    else if (me.Button == MouseButtons.Right)
+                    {
+                        pausedOnCurrentPage = !pausedOnCurrentPage;
+                        rendersSincePageChange = 9;
+                    }
+                }
+            };
         }
 
         public void Render(int timerTicks)
@@ -49,10 +67,19 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
             var countdowns = provider.GetDisplayObject();
             
             FillPage(countdowns);
+
+            if (pausedOnCurrentPage)
+            {
+                currentPage[0] += "    PAUSE";
+            }
+
             countdownLabel.Text = string.Join(Environment.NewLine, currentPage);
             rendersSincePageChange += 1;
-            
-            if (rendersSincePageChange % 10 == 0) { NextPage(countdowns); }
+
+            if (rendersSincePageChange % 10 == 0 && !pausedOnCurrentPage)
+            {
+                NextPage(countdowns);
+            }
         }
 
         private void FillPage(IReadOnlyList<string> allCountdowns)
