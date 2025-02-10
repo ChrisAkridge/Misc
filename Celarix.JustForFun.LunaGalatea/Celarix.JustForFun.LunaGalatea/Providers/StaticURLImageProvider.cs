@@ -255,7 +255,7 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
         {
             var baseFolderPath = Environment.MachineName.ToLowerInvariant() switch
             {
-                "pavilion-core" => @"G:\Documents\Files\Pictures\Miscellaneous\TRIMARC",
+                "pavilion-core" => @"F:\Documents\Files\Pictures\Miscellaneous\TRIMARC",
                 "akridge-pc" => @"C:\Users\ChrisAckridge\Pictures\TRIMARC",
                 "bluebell01" => @"C:\Users\celarix\Pictures\TRIMARC",
                 _ => throw new ArgumentOutOfRangeException()

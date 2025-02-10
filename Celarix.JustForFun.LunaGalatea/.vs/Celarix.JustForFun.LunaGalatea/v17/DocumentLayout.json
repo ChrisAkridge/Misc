@@ -3,56 +3,36 @@
   "WorkspaceRootPath": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\presentation\\weatherpresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\presentation\\weatherpresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\presentation\\timevisualizerpresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\presentation\\timevisualizerpresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\providers\\weatherprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\providers\\weatherprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\providers\\timevisualizerprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\providers\\timevisualizerprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\presentation\\presentationmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\presentation\\presentationmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\presentation\\timedisplaypresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\presentation\\timedisplaypresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\logic\\weatherdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\logic\\weatherdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\providers\\timedisplayprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\providers\\timedisplayprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\presentation\\countdownpresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\presentation\\countdownpresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\providers\\timevisualizerprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\providers\\timevisualizerprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\presentation\\tinycityscapespresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\presentation\\tinycityscapespresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\presentation\\timedisplaypresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\presentation\\timedisplaypresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\presentation\\ipresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\presentation\\ipresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\logic\\noaaweathermodels\\output\\observation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\logic\\noaaweathermodels\\output\\observation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\presentation\\yahtzeepresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\presentation\\yahtzeepresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\presentation\\stockquotepresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\presentation\\stockquotepresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\presentation\\staticurlimagepresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\presentation\\staticurlimagepresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\presentation\\randomvaluepresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\presentation\\randomvaluepresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|c:\\users\\celarix\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\logic\\noaaweathermodels\\output\\weatherresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\logic\\noaaweathermodels\\output\\weatherresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -61,8 +41,8 @@
       "VerticalTabListWidth": 256,
       "DocumentGroups": [
         {
-          "DockedHeight": 213,
-          "SelectedChildIndex": 15,
+          "DockedHeight": 200,
+          "SelectedChildIndex": 21,
           "Children": [
             {
               "$type": "Bookmark",
@@ -106,6 +86,18 @@
             },
             {
               "$type": "Bookmark",
+              "Name": "ST:137:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:138:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:139:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
               "Name": "ST:135:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
@@ -125,171 +117,119 @@
               "Name": "ST:133:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
+              "$type": "Bookmark",
+              "Name": "ST:4:0:{34c7837f-3b3a-449c-bdf0-bdad86cbaf4a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:3:0:{34c7837f-3b3a-449c-bdf0-bdad86cbaf4a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:2:0:{34c7837f-3b3a-449c-bdf0-bdad86cbaf4a}"
+            },
+            {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "MainForm.cs [Design]",
-              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\MainForm.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\MainForm.cs",
-              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\MainForm.cs [Design]",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\MainForm.cs [Design]",
+              "Title": "WeatherPresenter.cs",
+              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\WeatherPresenter.cs",
+              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\WeatherPresenter.cs",
+              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\WeatherPresenter.cs",
+              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Presentation\\WeatherPresenter.cs",
+              "ViewState": "AQIAAAsAAAAAAAAAAAAIwDUAAAB4AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-15T20:27:02.288Z",
-              "EditorCaption": " [Design]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "TimeVisualizerPresenter.cs",
-              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\TimeVisualizerPresenter.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\TimeVisualizerPresenter.cs",
-              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\TimeVisualizerPresenter.cs",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Presentation\\TimeVisualizerPresenter.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAB8AAAAvAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-15T19:37:16.934Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "TimeDisplayProvider.cs",
-              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\TimeDisplayProvider.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Providers\\TimeDisplayProvider.cs",
-              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\TimeDisplayProvider.cs",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Providers\\TimeDisplayProvider.cs",
-              "ViewState": "AQIAACwAAAAAAAAAAAAgwA4AAAAIAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-15T19:35:46.65Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "TimeVisualizerProvider.cs",
-              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\TimeVisualizerProvider.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Providers\\TimeVisualizerProvider.cs",
-              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\TimeVisualizerProvider.cs",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Providers\\TimeVisualizerProvider.cs",
-              "ViewState": "AQIAABUAAAAAAAAAAAAYwC8AAABuAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-15T19:13:07.42Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "IPresenter.cs",
-              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\IPresenter.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\IPresenter.cs",
-              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\IPresenter.cs",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Presentation\\IPresenter.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAADwvw0AAAAnAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-15T19:03:43.821Z",
+              "WhenOpened": "2024-05-21T17:10:34.15Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "PresentationManager.cs",
-              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\PresentationManager.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\PresentationManager.cs",
-              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\PresentationManager.cs",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Presentation\\PresentationManager.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABsAAAATAAAA",
+              "Title": "TimeDisplayProvider.cs",
+              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\TimeDisplayProvider.cs",
+              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Providers\\TimeDisplayProvider.cs",
+              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\TimeDisplayProvider.cs",
+              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Providers\\TimeDisplayProvider.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAADwvxsAAABLAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-15T19:03:17.336Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "YahtzeePresenter.cs",
-              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\YahtzeePresenter.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\YahtzeePresenter.cs",
-              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\YahtzeePresenter.cs",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Presentation\\YahtzeePresenter.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABoAAAA2AAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-15T19:02:56.246Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "TinyCityscapesPresenter.cs",
-              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\TinyCityscapesPresenter.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\TinyCityscapesPresenter.cs",
-              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\TinyCityscapesPresenter.cs",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Presentation\\TinyCityscapesPresenter.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAADwvxcAAAAOAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-15T19:02:52.536Z",
+              "WhenOpened": "2024-05-21T16:57:24.567Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
+              "Title": "TimeVisualizerProvider.cs",
+              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\TimeVisualizerProvider.cs",
+              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Providers\\TimeVisualizerProvider.cs",
+              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\TimeVisualizerProvider.cs",
+              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Providers\\TimeVisualizerProvider.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAADwvwAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-21T16:57:22.866Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "TimeDisplayPresenter.cs",
               "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\TimeDisplayPresenter.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\TimeDisplayPresenter.cs",
               "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\TimeDisplayPresenter.cs",
               "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Presentation\\TimeDisplayPresenter.cs",
-              "ViewState": "AQIAABAAAAAAAAAAAAAQwC0AAABLAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAADwvwAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-15T19:02:48.535Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "StockQuotePresenter.cs",
-              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\StockQuotePresenter.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\StockQuotePresenter.cs",
-              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\StockQuotePresenter.cs",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Presentation\\StockQuotePresenter.cs",
-              "ViewState": "AQIAAAYAAAAAAAAAAADwvwAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-15T19:02:46.069Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "StaticURLImagePresenter.cs",
-              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\StaticURLImagePresenter.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\StaticURLImagePresenter.cs",
-              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\StaticURLImagePresenter.cs",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Presentation\\StaticURLImagePresenter.cs",
-              "ViewState": "AQIAAA4AAAAAAAAAAAAIwAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-15T19:02:42.395Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "RandomValuePresenter.cs",
-              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\RandomValuePresenter.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\RandomValuePresenter.cs",
-              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\RandomValuePresenter.cs",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Presentation\\RandomValuePresenter.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAADwvxcAAABLAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-15T19:02:35.094Z",
+              "WhenOpened": "2024-05-21T16:57:18.55Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 6,
-              "Title": "CountdownPresenter.cs",
-              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\CountdownPresenter.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\CountdownPresenter.cs",
-              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\CountdownPresenter.cs",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Presentation\\CountdownPresenter.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAAAgAAAA",
+              "Title": "Observation.cs",
+              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\NOAAWeatherModels\\Output\\Observation.cs",
+              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\NOAAWeatherModels\\Output\\Observation.cs",
+              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\NOAAWeatherModels\\Output\\Observation.cs",
+              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Logic\\NOAAWeatherModels\\Output\\Observation.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA0AAAAeAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-15T19:02:00.247Z",
+              "WhenOpened": "2024-05-21T16:55:26.616Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "WeatherResponse.cs",
+              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\NOAAWeatherModels\\Output\\WeatherResponse.cs",
+              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\NOAAWeatherModels\\Output\\WeatherResponse.cs",
+              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\NOAAWeatherModels\\Output\\WeatherResponse.cs",
+              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Logic\\NOAAWeatherModels\\Output\\WeatherResponse.cs",
+              "ViewState": "AQIAAAIAAAAAAAAAAAAEwB4AAAAXAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-21T16:55:24.559Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "WeatherProvider.cs",
+              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\WeatherProvider.cs",
+              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Providers\\WeatherProvider.cs",
+              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\WeatherProvider.cs",
+              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Providers\\WeatherProvider.cs",
+              "ViewState": "AQIAAEwAAAAAAAAAAAAmwHYAAAAeAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-21T16:52:53.95Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "WeatherData.cs",
+              "DocumentMoniker": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\WeatherData.cs",
+              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\WeatherData.cs",
+              "ToolTip": "C:\\Users\\celarix\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\WeatherData.cs",
+              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Logic\\WeatherData.cs",
+              "ViewState": "AQIAABAAAAAAAAAAAAAQwCQAAAASAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-20T22:27:01.408Z",
               "EditorCaption": ""
             }
           ]
