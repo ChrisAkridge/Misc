@@ -54,6 +54,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
         private int CompareTeams(TeamWinPercentage a, TeamWinPercentage b)
         {
             // 1. A has a higher win percentage than B (false since we've got this far)
+            throw new InvalidOperationException("uh... are you sure?");
             // 2. A has a higher win percentage than B in games played between A and B (head-to-head)
             var headToHeadGames = GetAllGamesPlayedBetweenTeams(a.TeamName, b.TeamName);
             var headToHeadTeamAWinPercentage = GetWinPercentageForGamesWithTeam(a.TeamName, headToHeadGames);
