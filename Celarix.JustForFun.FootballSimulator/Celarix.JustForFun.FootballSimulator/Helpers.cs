@@ -5,16 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Scheduling;
 using MathNet.Numerics.Distributions;
 
 namespace Celarix.JustForFun.FootballSimulator
 {
     internal static class Helpers
     {
-        private static readonly Dictionary<(double mean, double standardDeviation), Normal> distributionCache =
+	    public static int SchedulingRandomSeed => -1039958483;
+
+		private static readonly Dictionary<(double mean, double standardDeviation), Normal> distributionCache =
             new Dictionary<(double mean, double standardDeviation), Normal>();
 
-        public static GameTeam OtherTeam(GameTeam team) =>
+		public static IEnumerable<BasicTeamInfo> GetTeamsInDivision(IEnumerable<BasicTeamInfo> teams, Conference conference, Division division) =>
+			teams.Where(t => t.Conference == conference && t.Division == division);
+
+		public static GameTeam OtherTeam(GameTeam team) =>
             team switch
             {
                 GameTeam.Home => GameTeam.Away,

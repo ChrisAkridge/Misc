@@ -67,4 +67,12 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         Loss,
         Tie
     }
+
+    public enum BasicPlayerPosition
+    {
+	    Quarterback,
+	    Offense,
+	    Defense,
+	    Kicker
+    }
 }

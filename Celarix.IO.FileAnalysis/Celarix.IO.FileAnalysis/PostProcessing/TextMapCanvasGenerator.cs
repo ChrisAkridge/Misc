@@ -108,7 +108,7 @@ namespace Celarix.IO.FileAnalysis.PostProcessing
                 }
             }
             
-            Utilities.Utilities.DrawZoomLevelsForLevel0CanvasTiles(level0TilesPath);
+            // Utilities.Utilities.DrawZoomLevelsForLevel0CanvasTiles(level0TilesPath);
         }
 
         private static List<int> GetLongestLineLengthPerColumn(IEnumerable<BitArray> lineMaps, int linesPerColumn)

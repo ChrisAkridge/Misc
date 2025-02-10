@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34511.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Celarix.IO.FastSequentialRename", "Celarix.IO.FastSequentialRename\Celarix.IO.FastSequentialRename.csproj", "{9EF92A8B-2281-49DD-AAB7-36D4DFB1CA9F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9EF92A8B-2281-49DD-AAB7-36D4DFB1CA9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EF92A8B-2281-49DD-AAB7-36D4DFB1CA9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EF92A8B-2281-49DD-AAB7-36D4DFB1CA9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EF92A8B-2281-49DD-AAB7-36D4DFB1CA9F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DD0ABBB0-7613-40BB-94E1-FBFEE2132C44}
+	EndGlobalSection
+EndGlobal

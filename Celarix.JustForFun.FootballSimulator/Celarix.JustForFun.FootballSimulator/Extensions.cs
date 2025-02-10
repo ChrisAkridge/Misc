@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Celarix.JustForFun.FootballSimulator.Data.Models;
 
 namespace Celarix.JustForFun.FootballSimulator
 {
@@ -35,6 +36,25 @@ namespace Celarix.JustForFun.FootballSimulator
             }
 
             return items;
+        }
+
+        public static Conference OtherConference(this Conference conference) =>
+            conference switch
+            {
+                Conference.AFC => Conference.NFC,
+                Conference.NFC => Conference.AFC,
+                _ => throw new ArgumentOutOfRangeException(nameof(conference))
+            };
+
+        public static IEnumerable<T> RepeatEachItem<T>(this IEnumerable<T> sequence, int repeatCount)
+        {
+            foreach (var item in sequence)
+            {
+                for (int i = 0; i < repeatCount; i++)
+                {
+                    yield return item;
+                }
+            }
         }
     }
 }
