@@ -57,10 +57,10 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
                 },
                 4 => division switch
                 {
-                    X => N,
-                    N => X,
-                    W => S,
-                    S => W,
+                    X => S,
+                    N => W,
+                    W => N,
+                    S => X,
                     E => E,
                     _ => throw new ArgumentOutOfRangeException(nameof(division))
                 },

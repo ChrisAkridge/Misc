@@ -11,7 +11,10 @@ using NLog;
 
 namespace Celarix.SimpleIncrementalBackup
 {
-    public sealed class BackupAgent(string sourceFolderPath, string backupFolderPath, bool deleteAllDeletedFilesNow = false) : IDisposable
+    public sealed class BackupAgent(string sourceFolderPath,
+	    string backupFolderPath,
+	    bool deleteAllDeletedFilesNow = false,
+	    bool deleteFirst = false) : IDisposable
     {
         private const int SaveChangesInterval = 1000;
 
@@ -26,6 +29,7 @@ namespace Celarix.SimpleIncrementalBackup
         public string SourceFolderPath { get; } = sourceFolderPath;
         public string BackupFolderPath { get; } = backupFolderPath;
         public bool DeleteAllDeletedFilesNow { get; } = deleteAllDeletedFilesNow;
+        public bool DeleteFirst { get; } = deleteFirst;
 
         public void RunBackup()
         {
@@ -40,11 +44,22 @@ namespace Celarix.SimpleIncrementalBackup
             var backupLog = GetLogForCurrentBackup(context);
             var seenFilePaths = new List<string>();
 
-            CopyFilesAndUpdateDatabase(seenFilePaths);
+            if (!DeleteFirst)
+            {
+	            CopyFilesAndUpdateDatabase(seenFilePaths);
 
-            logger.Info($"Scanning database for deleted files, saw {seenFilePaths.Count} files in source.");
+	            logger.Info($"Scanning database for deleted files, saw {seenFilePaths.Count} files in source.");
 
-            MarkOrDeleteFilesNotInSource(seenFilePaths);
+	            MarkOrDeleteFilesNotInSource(seenFilePaths);
+            }
+            else
+            {
+	            // Untested!
+	            MarkOrDeleteFilesNotInSource(SafeEnumerate(Directory.EnumerateFiles(SourceFolderPath, "*",
+		            SearchOption.AllDirectories)));
+	            
+	            CopyFilesAndUpdateDatabase(seenFilePaths);
+            }
 
             backupLog.EndTime = DateTimeOffset.Now;
             backupLog.NewFileCount = newFileCount;
@@ -58,29 +73,78 @@ namespace Celarix.SimpleIncrementalBackup
         private void CopyFilesAndUpdateDatabase(List<string> seenFilePaths)
         {
             var sourceFiles = Directory.EnumerateFiles(SourceFolderPath, "*", SearchOption.AllDirectories);
-            foreach (var sourceFilePath in sourceFiles)
+            var failedFilePaths = new List<string>();
+            
+            foreach (var sourceFilePath in EnumerateFilesSkippingUnauthorized(sourceFiles))
             {
-                logger.Info($"Processing {sourceFilePath}...");
-                seenFilePaths.Add(sourceFilePath);
-                var sourceFileInfo = new FileInfo(sourceFilePath);
-
-                var entryFilePath = GetEntryFilePath(sourceFilePath);
-                var fileEntry = GetFileEntryFromDatabase(entryFilePath) ?? AddFileToDatabase(sourceFileInfo);
-
-                var destinationFilePath = GetDestinationFilePath(entryFilePath);
-                if (!File.Exists(destinationFilePath) || sourceFileInfo.LastWriteTimeUtc > fileEntry.BackupLastUpdated)
+                try
                 {
-                    logger.Info($"Copying {sourceFilePath} to {destinationFilePath} ({GetFileSizeString(sourceFileInfo.Length)})...");
-                    File.Copy(sourceFilePath, destinationFilePath, overwrite: true);
-                    UpdateFileEntryTimestamps(fileEntry, sourceFileInfo.LastWriteTimeUtc, DateTimeOffset.Now);
+                    if (sourceFilePath.Equals(Path.Combine(sourceFolderPath, "backupLog.db")))
+                    {
+                        logger.Warn("Skipping backupLog.db");
+                        continue;
+                    }
+                    
+                    logger.Info($"Processing {sourceFilePath}...");
+                    seenFilePaths.Add(sourceFilePath);
+                    var sourceFileInfo = new FileInfo(sourceFilePath);
 
-                    newFileCount += 1;
-                    sizeDelta += sourceFileInfo.Length;
+                    var entryFilePath = GetEntryFilePath(sourceFilePath);
+                    var fileEntry = GetFileEntryFromDatabase(entryFilePath) ?? AddFileToDatabase(sourceFileInfo);
+
+                    var destinationFilePath = GetDestinationFilePath(entryFilePath);
+                    if (!File.Exists(destinationFilePath) || sourceFileInfo.LastWriteTimeUtc > fileEntry.BackupLastUpdated)
+                    {
+                        logger.Info($"Copying {sourceFilePath} to {destinationFilePath} ({GetFileSizeString(sourceFileInfo.Length)})...");
+                        Directory.CreateDirectory(Path.GetDirectoryName(destinationFilePath));
+                        File.Copy(sourceFilePath, destinationFilePath, overwrite: true);
+                        UpdateFileEntryTimestamps(fileEntry, sourceFileInfo.LastWriteTimeUtc, DateTimeOffset.Now);
+
+                        newFileCount += 1;
+                        sizeDelta += sourceFileInfo.Length;
+                    }
                 }
+                catch (Exception ex)
+                {
+                    logger.Error(ex, $"Error processing {sourceFilePath}");
+                    failedFilePaths.Add(sourceFilePath);
+                }
+            }
+
+            if (failedFilePaths.Count > 0)
+            {
+                var errorListPath = Path.Combine(BackupFolderPath, "backupErrors.txt");
+                File.WriteAllLines(errorListPath, failedFilePaths);
+                
+                logger.Warn($"Failed to process {failedFilePaths.Count} files. See {errorListPath} for details.");
             }
         }
 
-        private void MarkOrDeleteFilesNotInSource(List<string> seenFilePaths)
+        private IEnumerable<string> EnumerateFilesSkippingUnauthorized(IEnumerable<string> files)
+        {
+            var enumerator = files.GetEnumerator();
+
+            while (true)
+            {
+                try
+                {
+                    if (!enumerator.MoveNext())
+                    {
+                        enumerator.Dispose();
+
+                        yield break;
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    continue;
+                }
+
+                yield return enumerator.Current;
+            }
+        }
+
+        private void MarkOrDeleteFilesNotInSource(IEnumerable<string> seenFilePaths)
         {
             context!.SaveChanges();
             var allFilesInDatabase = context!.FileEntries
@@ -91,20 +155,27 @@ namespace Celarix.SimpleIncrementalBackup
             foreach (var deletedFilePath in allFilesNotInSource)
             {
                 // Should be fast enough since the deleted files shouldn't be too common.
-                var entryFilePath = GetEntryFilePath(deletedFilePath);
-                var matchingEntry = context.FileEntries.FirstOrDefault(e => e.Path == entryFilePath);
-                if (DeleteAllDeletedFilesNow || matchingEntry!.FileDeletedOnLastBackup)
+                try
                 {
-                    logger.Warn($"Deleting {deletedFilePath} from backup folder!");
-                    var fileToDeletePath = Path.Combine(BackupFolderPath, entryFilePath);
-                    var deletedFileSize = new FileInfo(fileToDeletePath).Length;
-                    File.Delete(fileToDeletePath);
-                    deletedFileCount += 1;
-                    sizeDelta -= deletedFileSize;
+	                var entryFilePath = GetEntryFilePath(deletedFilePath);
+	                var matchingEntry = context.FileEntries.FirstOrDefault(e => e.Path == entryFilePath);
+	                if (DeleteAllDeletedFilesNow || matchingEntry!.FileDeletedOnLastBackup)
+	                {
+		                logger.Warn($"Deleting {deletedFilePath} from backup folder!");
+		                var fileToDeletePath = Path.Combine(BackupFolderPath, entryFilePath);
+		                var deletedFileSize = new FileInfo(fileToDeletePath).Length;
+		                File.Delete(fileToDeletePath);
+		                deletedFileCount += 1;
+		                sizeDelta -= deletedFileSize;
+	                }
+	                else
+	                {
+		                MarkFileAsDeletedFromSource(matchingEntry);
+	                }
                 }
-                else
+                catch (Exception ex)
                 {
-                    MarkFileAsDeletedFromSource(matchingEntry);
+	                logger.Error(ex, $"Error deleting {deletedFilePath}");
                 }
             }
         }
@@ -195,6 +266,29 @@ namespace Celarix.SimpleIncrementalBackup
             };
 
             return isNegative ? $"-{sizeString}" : sizeString;
+        }
+
+        private IEnumerable<T> SafeEnumerate<T>(IEnumerable<T> source)
+        {
+	        var enumerator = source.GetEnumerator();
+			while (true)
+			{
+				try
+				{
+					if (!enumerator.MoveNext())
+					{
+						enumerator.Dispose();
+						yield break;
+					}
+				}
+				catch (Exception ex)
+				{
+					logger.Error(ex, "Error enumerating");
+					continue;
+				}
+
+				yield return enumerator.Current;
+			}
         }
 
         public void Dispose()

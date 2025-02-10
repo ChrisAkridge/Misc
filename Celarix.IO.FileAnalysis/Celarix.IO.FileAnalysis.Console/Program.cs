@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Celarix.Imaging;
 using Celarix.IO.FileAnalysis.Analysis;
+using Celarix.IO.FileAnalysis.FileAnalysisIII;
 using Celarix.IO.FileAnalysis.FinalProcessing;
 using Celarix.IO.FileAnalysis.PostProcessing;
 using NLog;
@@ -21,6 +22,19 @@ namespace Celarix.IO.FileAnalysis.Console
     {
         private static void Main(string[] args)
         {
+	        LoggingConfigurer.ConfigurePostProcessingLogging();
+	        var distributionsGenerator = new FileDistributionGenerator();
+
+	        var distributions = distributionsGenerator.GenerateFileDistributions(
+		        @"F:\Documents\Files\Music\Recordings\Miscellaneous\(2024-11-05) KIRO Seattle - Election Day.mp3");
+	        
+	        using var distributionStream = new BinaryWriter(File.OpenWrite(@"F:\Documents\Files\Unclassified Files\kiro_seattle.bin"));
+	        foreach (var distribution in distributions)
+	        {
+		        distribution.Write(distributionStream);
+	        }
+	        
+	        return;
             // TODO: add CommandLine library
             Celarix.Imaging.LibraryConfiguration.Instance = new LibraryConfiguration
             {

@@ -33,6 +33,9 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         
         public int HomeStadiumID { get; set; }
         public Stadium HomeStadium { get; set; }
+        public List<PlayerRosterPosition> FullHistoricalRoster { get; set; }
+
+        public IEnumerable<PlayerRosterPosition> ActiveRoster => FullHistoricalRoster.Where(p => p.CurrentPlayer);
 
         /// <summary>Serves as the default hash function.</summary>
         /// <returns>A hash code for the current object.</returns>
