@@ -13,20 +13,16 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
         private readonly Random random;
         private readonly HttpClient client;
 
+        public bool UseMonospaceFont => false;
+
         public StaticURLImageProvider()
         {
             urls = new[]
             {
-                new KeyValuePair<string, string>("2nd and Broadway",
-                    "https://trimarc.org/images/milestone/CCTV_05_2nd_&_Broadway.jpg"),
                 new KeyValuePair<string, string>("2nd and Main",
                     "https://trimarc.org/images/milestone/CCTV_05_2nd_&_Main.jpg"),
-                new KeyValuePair<string, string>("2nd and Market",
-                    "https://trimarc.org/images/milestone/CCTV_05_2nd_&_Market.jpg"),
                 new KeyValuePair<string, string>("9th and Market",
                     "https://trimarc.org/images/milestone/CCTV_05_9th_&_Market.jpg"),
-                new KeyValuePair<string, string>("Brook and Broadway",
-                    "https://trimarc.org/images/milestone/CCTV_05_Brook_&_Broadway.jpg"),
                 new KeyValuePair<string, string>("I-264 at Bank Street",
                     "https://trimarc.org/images/milestone/CCTV_05_264_0007.jpg"),
                 new KeyValuePair<string, string>("I-264 at Bardstown Road",
@@ -103,8 +99,6 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                     "https://trimarc.org/images/milestone/CCTV_05_841_0373.jpg"),
                 new KeyValuePair<string, string>("I-64 East of Cochran Hill Tunnel",
                     "https://trimarc.org/images/milestone/CCTV_05_64_0088.jpg"),
-                new KeyValuePair<string, string>("I-64 Eastbound at 22nd Street 3.1",
-                    "https://trimarc.org/images/milestone/CCTV_05_64_0030.jpg"),
                 new KeyValuePair<string, string>("I-64 West of 22nd Street",
                     "https://trimarc.org/images/milestone/CCTV_05_64_0022.jpg"),
                 new KeyValuePair<string, string>("I-64 West of Oxmoor Farm Overpass",
@@ -127,7 +121,7 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                     "https://trimarc.org/images/milestone/CCTV_05_64_0079.jpg"),
                 new KeyValuePair<string, string>("I-64 at Hurstbourne Lane",
                     "https://trimarc.org/images/milestone/CCTV_05_64_0150.jpg"),
-                new KeyValuePair<string, string>("I-64 at I-254 (East intersection)",
+                new KeyValuePair<string, string>("I-64 at I-264 (East intersection)",
                     "https://trimarc.org/images/milestone/CCTV_05_64_0121.jpg"),
                 new KeyValuePair<string, string>("I-64 at I-264",
                     "https://trimarc.org/images/milestone/CCTV_05_64_0012.jpg"),
@@ -147,8 +141,6 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                     "https://trimarc.org/images/milestone/CCTV_05_64_0061_WB.jpg"),
                 new KeyValuePair<string, string>("I-64 at the Jefferson County Line",
                     "https://trimarc.org/images/milestone/CCTV_05_64_0242.jpg"),
-                new KeyValuePair<string, string>("I-64 near I-264 (West Louisville)",
-                    "https://trimarc.org/images/milestone/CCTV_05_64_0008.jpg"),
                 new KeyValuePair<string, string>("I-64 near I-65 (alternate)",
                     "https://trimarc.org/images/milestone/CCTV_05_64_0054-2.jpg"),
                 new KeyValuePair<string, string>("I-64 near I-65",
@@ -239,6 +231,13 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                 // https://stackoverflow.com/a/66655958
                 var request = new HttpRequestMessage(HttpMethod.Get, randomImageKvp.Value);
                 var response = client.Send(request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new KeyValuePair<string, string>(
+                        $"{randomImageKvp.Key}: Failed to load {randomImageKvp.Value}: {response.StatusCode}", null);
+                }
+                
                 var inputStream = response.Content.ReadAsStream();
                 using Stream outputStream = File.OpenWrite(savePath);
                 inputStream.CopyTo(outputStream);
@@ -256,10 +255,11 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
         {
             var baseFolderPath = Environment.MachineName.ToLowerInvariant() switch
             {
-                "pavilion-core" => @"G:\Documents\Files\Pictures\Miscellaneous\TRIMARC",
+                "pavilion-core" => @"F:\Documents\Files\Pictures\Miscellaneous\TRIMARC",
                 "akridge-pc" => @"C:\Users\ChrisAckridge\Pictures\TRIMARC",
                 "bluebell01" => @"C:\Users\celarix\Pictures\TRIMARC",
-                _ => throw new ArgumentOutOfRangeException()
+                "chris-hp15" => @"C:\Users\cakri\Pictures\TRIMARC",
+				_ => throw new ArgumentOutOfRangeException()
             };
 
             var imageFolderPath = Path.GetFileNameWithoutExtension(url);

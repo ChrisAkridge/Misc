@@ -18,7 +18,8 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
             timeLabel = new Label
             {
                 Location = new Point(5, startingY),
-                AutoSize = true
+                AutoSize = true,
+                Font = IPresenter.GetDisplayFont(provider.UseMonospaceFont)
             };
 
             Render(0);

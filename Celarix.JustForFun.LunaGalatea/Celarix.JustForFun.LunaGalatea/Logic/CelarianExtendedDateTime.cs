@@ -152,7 +152,7 @@ namespace Celarix.JustForFun.LunaGalatea.Logic
             }
             
             var nextCulture = cultureInfo[nextCultureIndex];
-            var now = new CelarianExtendedDateTime(DateTimeOffset.Now);
+            var now = new CelarianExtendedDateTime(DateTimeOffset.UtcNow);
             var startOfToday = new CelarianExtendedDateTime(now.Year, now.Month, now.Day, 0, 0, 0);
             CelarianExtendedDateTime nextCultureStartTime;
 

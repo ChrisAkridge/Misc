@@ -13,6 +13,8 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
         private readonly Random random;
         private readonly byte[] buffer;
 
+        public bool UseMonospaceFont => false;
+
         public RandomValueProvider()
         {
             random = new Random();
@@ -148,8 +150,15 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
 
         private string RandomCodePoint()
         {
-            var codePoint = random.Next(0, 0x10FFFF + 1);
-            return $"{char.ConvertFromUtf32(codePoint)} (U+{codePoint:X})";
+            try
+            {
+                var codePoint = random.Next(0, 0x10FFFF + 1);
+                return $"{char.ConvertFromUtf32(codePoint)} (U+{codePoint:X})";
+            }
+            catch
+            {
+                return $"Failed to select a valid codepoint.";
+            }
         }
 
         private string RandomString()

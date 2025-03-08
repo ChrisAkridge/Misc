@@ -8,6 +8,7 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
 {
     public interface IAsyncProvider<TDisplay>
     {
+        bool UseMonospaceFont { get; }
         Task<TDisplay> GetDisplayObject();
     }
 }

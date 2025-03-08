@@ -63,7 +63,7 @@ namespace Celarix.JustForFun.LunaGalatea
             MainPanel.BorderStyle = BorderStyle.Fixed3D;
             MainPanel.Location = new Point(6, 6);
             MainPanel.Name = "MainPanel";
-            MainPanel.Size = new Size(534, 670);
+            MainPanel.Size = new Size(659, 670);
             MainPanel.TabIndex = 0;
             // 
             // TimerMain
@@ -86,7 +86,7 @@ namespace Celarix.JustForFun.LunaGalatea
             tabControl1.Location = new Point(12, 12);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(554, 720);
+            tabControl1.Size = new Size(679, 720);
             tabControl1.TabIndex = 1;
             // 
             // TabPageUtilities
@@ -105,7 +105,7 @@ namespace Celarix.JustForFun.LunaGalatea
             TabPageUtilities.Location = new Point(4, 34);
             TabPageUtilities.Name = "TabPageUtilities";
             TabPageUtilities.Padding = new Padding(3);
-            TabPageUtilities.Size = new Size(546, 682);
+            TabPageUtilities.Size = new Size(671, 682);
             TabPageUtilities.TabIndex = 0;
             TabPageUtilities.Text = "Utilities";
             TabPageUtilities.UseVisualStyleBackColor = true;
@@ -220,7 +220,7 @@ namespace Celarix.JustForFun.LunaGalatea
             TabPageDisplays.Location = new Point(4, 34);
             TabPageDisplays.Name = "TabPageDisplays";
             TabPageDisplays.Padding = new Padding(3);
-            TabPageDisplays.Size = new Size(546, 682);
+            TabPageDisplays.Size = new Size(671, 682);
             TabPageDisplays.TabIndex = 1;
             TabPageDisplays.Text = "Displays";
             TabPageDisplays.UseVisualStyleBackColor = true;
@@ -229,7 +229,7 @@ namespace Celarix.JustForFun.LunaGalatea
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(578, 744);
+            ClientSize = new Size(703, 744);
             Controls.Add(tabControl1);
             Name = "MainForm";
             Text = "LunaGalatea";

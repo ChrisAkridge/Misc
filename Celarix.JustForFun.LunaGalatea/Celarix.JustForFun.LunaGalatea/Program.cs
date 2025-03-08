@@ -1,3 +1,5 @@
+using Celarix.JustForFun.LunaGalatea.Logic;
+
 namespace Celarix.JustForFun.LunaGalatea
 {
     internal static class Program

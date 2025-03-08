@@ -23,7 +23,8 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
                 Location = new Point(5, startingY),
                 AutoSize = true,
                 MaximumSize = new Size(panel.Width - 10, 0),
-                Text = "Loading image..."
+                Text = "Loading image...",
+                Font = IPresenter.GetDisplayFont(provider.UseMonospaceFont)
             };
 
             startingY += TextRenderer.MeasureText(label.Text, label.Font).Height + 5;
