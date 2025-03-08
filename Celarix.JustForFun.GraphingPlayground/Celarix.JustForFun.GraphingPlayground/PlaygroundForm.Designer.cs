@@ -254,6 +254,7 @@
 			Controls.Add(PlotMain);
 			Name = "PlaygroundForm";
 			Text = "{title}";
+			Load += PlaygroundForm_Load;
 			TSMain.ResumeLayout(false);
 			TSMain.PerformLayout();
 			GroupChartControls.ResumeLayout(false);

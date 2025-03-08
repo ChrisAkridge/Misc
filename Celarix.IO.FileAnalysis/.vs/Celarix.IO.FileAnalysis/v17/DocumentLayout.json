@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\fileanalysisiii\\filedistributions\\sixteenbitdistribution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\fileanalysisiii\\filedistributions\\sixteenbitdistribution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\fileanalysisiii\\filedistributions\\twobitdistribution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\fileanalysisiii\\filedistributions\\twobitdistribution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\fileanalysisiii\\filedistributions\\sixteenbitdistribution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|solutionrelative:celarix.io.fileanalysis\\fileanalysisiii\\filedistributions\\sixteenbitdistribution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{279C1C14-ADB1-4958-AADC-7AFFDC876461}|Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis.csproj|f:\\documents\\github\\misc\\celarix.io.fileanalysis\\celarix.io.fileanalysis\\fileanalysisiii\\filedistributions\\twentyfourbitdistribution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -58,11 +58,11 @@
       "DocumentGroups": [
         {
           "DockedHeight": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "SixteenBitDistribution.cs",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\SixteenBitDistribution.cs",
               "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\SixteenBitDistribution.cs",
@@ -75,13 +75,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "TwoBitDistribution.cs",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\TwoBitDistribution.cs",
               "RelativeDocumentMoniker": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\TwoBitDistribution.cs",
               "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.IO.FileAnalysis\\Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\TwoBitDistribution.cs",
               "RelativeToolTip": "Celarix.IO.FileAnalysis\\FileAnalysisIII\\FileDistributions\\TwoBitDistribution.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABIAAAAsAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-23T21:24:22.273Z",
               "EditorCaption": ""

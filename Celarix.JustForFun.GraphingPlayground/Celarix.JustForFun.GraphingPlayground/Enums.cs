@@ -26,4 +26,13 @@ namespace Celarix.JustForFun.GraphingPlayground
 		Numeric,
 		Date
 	}
+
+	internal enum MeijerDayType
+	{
+		Working,
+		NonWorking,
+		PaidTimeOff,
+		NonPaidTimeOff,
+		Other
+	}
 }

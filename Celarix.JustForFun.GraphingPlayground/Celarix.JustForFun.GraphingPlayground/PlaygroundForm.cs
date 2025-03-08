@@ -200,7 +200,7 @@ namespace Celarix.JustForFun.GraphingPlayground
 		private void ButtonToDistribution_Click(object sender, EventArgs e)
 		{
 			if (ComboDistributionGraph.SelectedItem is not string selectedGraphName) { return; }
-			
+
 			var selectedGraph = indexMappings.First(m => m.Name == selectedGraphName);
 			BuildDistribution(selectedGraph);
 		}
@@ -293,7 +293,7 @@ namespace Celarix.JustForFun.GraphingPlayground
 			}
 
 			var scatterPoints = scatterPlot.Data.GetScatterPoints();
-			var values = scatterPoints.Select(p => p.Y).ToArray();
+			var values = scatterPoints.Where(p => !double.IsNaN(p.Y)).Select(p => p.Y).ToArray();
 			var distribution = new ScottPlot.Statistics.Histogram(values, indexMapping.GetBucketCount(values.Min(), values.Max()));
 
 			Reset(resetGraphProperties: false);
@@ -303,12 +303,28 @@ namespace Celarix.JustForFun.GraphingPlayground
 			{
 				bar.Size = distribution.BinSize * 0.8d;
 			}
-			
+
 			PlotMain.Plot.Title($"Distribution of {indexMapping.Name}");
 			PlotMain.Refresh();
 			ButtonToDistribution.Enabled = false;
 			ComboDistributionGraph.Enabled = false;
 		}
 		#endregion
+
+		private void PlaygroundForm_Load(object sender, EventArgs e)
+		{
+			if (!playground.NeedsFile)
+			{
+				playground.Load(new PlaygroundLoadArguments());
+				TSBOpenFile.Enabled = false;
+
+				var viewNames = playground.GetViewNames();
+
+				foreach (var viewName in viewNames)
+				{
+					TSDDBViews.DropDownItems.Add(viewName, null, (_, _) => SwitchToView(viewName));
+				}
+			}
+		}
 	}
 }

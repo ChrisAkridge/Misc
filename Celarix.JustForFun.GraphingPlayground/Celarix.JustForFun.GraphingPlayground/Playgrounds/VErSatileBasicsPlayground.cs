@@ -18,6 +18,7 @@ namespace Celarix.JustForFun.GraphingPlayground.Playgrounds
 		private readonly Dictionary<string, GraphProperties> graphProperties = [];
 
 		public string Name => "VErSatile Basics";
+		public bool NeedsFile => true;
 		public AdditionalSupport AdditionalSupport { get; private set; }
 		public IReadOnlyList<PlotIndexMapping> IndexMappings => indexMappings;
 		public IReadOnlyDictionary<string, GraphProperties> GraphProperties => graphProperties;

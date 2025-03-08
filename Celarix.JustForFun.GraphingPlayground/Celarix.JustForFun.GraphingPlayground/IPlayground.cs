@@ -11,6 +11,7 @@ namespace Celarix.JustForFun.GraphingPlayground
 	internal interface IPlayground
 	{
 		string Name { get; }
+		bool NeedsFile { get; }
 		AdditionalSupport AdditionalSupport { get; }
 		IReadOnlyList<PlotIndexMapping> IndexMappings { get; }
 		IReadOnlyDictionary<string, GraphProperties> GraphProperties { get; }
