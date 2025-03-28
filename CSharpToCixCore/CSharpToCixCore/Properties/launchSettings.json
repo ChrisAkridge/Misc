@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CSharpToCixCore": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\git\\CarsQuickBuy.CQBAPI\\CarsQuickBuy.CQBAPI.sln\" \"C:\\Users\\ChrisAckridge\\Personal OneDrive\\OneDrive\\Documents\\Programming\\C# to Cix\\CQBAPI.cix\""
+    }
+  }
+}

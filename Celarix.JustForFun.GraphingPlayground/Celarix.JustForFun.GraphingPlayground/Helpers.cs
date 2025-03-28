@@ -67,5 +67,18 @@ namespace Celarix.JustForFun.GraphingPlayground
 
 			return palette;
 		}
+
+		public static int GetSummerSolsticeDayForYear(int year)
+		{
+			var juneFirstDay = DateTime.IsLeapYear(year) ? 152 : 151;
+
+			return year switch
+			{
+				1951 or 1955 => juneFirstDay + 22,
+				1988 or 1992 or 1996 or 2000 or 2004 or 2008 or 2012 or 2016 or 2020 or 2021 or 2024 or 2025 or 2028
+					or 2029 => juneFirstDay + 20,
+				_ => juneFirstDay + 21
+			};
+		}
 	}
 }

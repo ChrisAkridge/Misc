@@ -35,4 +35,13 @@ namespace Celarix.JustForFun.GraphingPlayground
 		NonPaidTimeOff,
 		Other
 	}
+
+	internal enum MeijerShiftType
+	{
+		NonWorking,
+		Open,
+		Midshift,
+		Closing,
+		ThirdShift
+	}
 }

@@ -44,6 +44,22 @@ namespace Celarix.JustForFun.GraphingPlayground.Models
 			percentiles = CalculatePercentiles(sortedValues);
 		}
 		
+		public GraphProperties(GraphPropertyType propertyType, IReadOnlyList<int> values, double distributionBucketSize)
+		{
+			PropertyType = propertyType;
+			DistributionBucketSize = distributionBucketSize;
+			
+			var sortedValues = values.OrderBy(v => v).Select(v => (double)v).ToArray();
+
+			MinValue = sortedValues.First();
+			MaxValue = sortedValues.Last();
+			Mean = values.Average();
+			Median = CalculateMedian(sortedValues);
+			Mode = CalculateMode(values);
+			StandardDeviation = CalculateStandardDeviation(values);
+			percentiles = CalculatePercentiles(sortedValues);
+		}
+
 		private static double CalculateMedian(IReadOnlyList<double> values)
 		{
 			var count = values.Count;
@@ -61,6 +77,13 @@ namespace Celarix.JustForFun.GraphingPlayground.Models
 			return mode?.Key ?? double.NaN;
 		}
 		
+		private static double CalculateMode(IEnumerable<int> values)
+		{
+			var mode = values.GroupBy(v => v).MaxBy(g => g.Count());
+			
+			return mode?.Key ?? double.NaN;
+		}
+
 		private static double CalculateStandardDeviation(IReadOnlyList<double> values)
 		{
 			var mean = values.Average();
@@ -69,6 +92,14 @@ namespace Celarix.JustForFun.GraphingPlayground.Models
 			return Math.Sqrt(sumOfSquares / values.Count);
 		}
 		
+		private static double CalculateStandardDeviation(IReadOnlyList<int> values)
+		{
+			var mean = values.Average();
+			var sumOfSquares = values.Sum(v => Math.Pow(v - mean, 2));
+
+			return Math.Sqrt(sumOfSquares / values.Count);
+		}
+
 		private static Dictionary<decimal, double> CalculatePercentiles(IReadOnlyList<double> values)
 		{
 			var percentiles = new Dictionary<decimal, double>();

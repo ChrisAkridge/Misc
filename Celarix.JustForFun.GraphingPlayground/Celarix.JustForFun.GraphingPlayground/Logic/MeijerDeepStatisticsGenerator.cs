@@ -5,12 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Celarix.JustForFun.GraphingPlayground.Collections;
+using Celarix.JustForFun.GraphingPlayground.Logic.MeijerDeepStatistics;
 using Celarix.JustForFun.GraphingPlayground.Models;
 using DocumentFormat.OpenXml.Drawing;
 using ScottPlot;
 using ScottPlot.Palettes;
 using ScottPlot.TickGenerators;
 using Color = ScottPlot.Color;
+using Orientation = ScottPlot.Orientation;
 using Path = System.IO.Path;
 
 namespace Celarix.JustForFun.GraphingPlayground.Logic
@@ -69,7 +71,10 @@ namespace Celarix.JustForFun.GraphingPlayground.Logic
 				//(nameof(LongestStretchOfNDaySeriesOfType), ".txt", LongestStretchOfNDaySeriesOfType),
 				//(nameof(LongestGapBetweenNDaySeriesOfType), ".txt", LongestGapBetweenNDaySeriesOfType),
 				//(nameof(WorkingVsNonWorkingSeries), ".txt", WorkingVsNonWorkingSeries),
-				(nameof(LongestStretchOfNonWorkingSeriesOfAtLeastNDays), ".png", LongestStretchOfNonWorkingSeriesOfAtLeastNDays)
+				//(nameof(LongestStretchOfNonWorkingSeriesOfAtLeastNDays), ".png", LongestStretchOfNonWorkingSeriesOfAtLeastNDays),
+				//(nameof(TotalVacationsTaken), ".txt", TotalVacationsTaken),
+				//(nameof(VacationsOnWeekdayCycle), ".png", VacationsOnWeekdayCycle),
+				(nameof(MappingOfAllQuarterHours), ".html", MappingOfAllQuarterHours)
 			];
 
 			for (var i = 0; i < actions.Length; i++)
@@ -115,37 +120,15 @@ namespace Celarix.JustForFun.GraphingPlayground.Logic
 			var paidTimeOffDayCount = days.Count(d => d.DayType == MeijerDayType.PaidTimeOff);
 			var nonPaidTimeOffDayCount = days.Count(d => d.DayType == MeijerDayType.NonPaidTimeOff);
 			var otherDayCount = days.Count(d => d.DayType == MeijerDayType.Other);
-			
-			var plot = new Plot();
 
-			var workingBar = plot.Add.Bar(position: 1, value: workingDayCount);
-			var nonWorkingBar = plot.Add.Bar(position: 2, value: nonWorkingDayCount);
-			var ptoBar = plot.Add.Bar(position: 3, value: paidTimeOffDayCount);
-			var nptoBar = plot.Add.Bar(position: 4, value: nonPaidTimeOffDayCount);
-			var otherBar = plot.Add.Bar(position: 5, value: otherDayCount);
-
-			workingBar.LegendText = workingDayCount.ToString();
-			nonWorkingBar.LegendText = nonWorkingDayCount.ToString();
-			ptoBar.LegendText = paidTimeOffDayCount.ToString();
-			nptoBar.LegendText = nonPaidTimeOffDayCount.ToString();
-			otherBar.LegendText = otherDayCount.ToString();
-
-			var ticks = new Tick[]
-			{
-				new(1, "Working"),
-				new(2, "Non-Working"),
-				new(3, "PTO"),
-				new(4, "NPTO"),
-				new(5, "Other")
-			};
-
-			plot.Axes.Bottom.TickGenerator = new NumericManual(ticks);
-			plot.Axes.Bottom.MajorTickStyle.Length = 0;
-			plot.HideGrid();
-			
-			plot.Axes.Margins(bottom: 0);
-			plot.ShowLegend();
-			plot.Title(question, size: 10f);
+			var plot = PlotGenerator.BarsWithManualTicks(question,
+			[
+				new KeyValuePair<string, double>("Working Days", workingDayCount),
+				new KeyValuePair<string, double>("Non-Working Days", nonWorkingDayCount),
+				new KeyValuePair<string, double>("Paid Time Off Days", paidTimeOffDayCount),
+				new KeyValuePair<string, double>("Non-Paid Time Off Days", nonPaidTimeOffDayCount),
+				new KeyValuePair<string, double>("Other Days", otherDayCount)
+			]);
 			
 			plot.SavePng(filePath, 960, 540);
 		}
@@ -156,28 +139,12 @@ namespace Celarix.JustForFun.GraphingPlayground.Logic
 
 			var workingDayCount = days.Count(d => d.DayType is MeijerDayType.Working or MeijerDayType.Other);
 			var nonWorkingDayCount = days.Length - workingDayCount;
-			
-			var plot = new Plot();
-			
-			var workingBar = plot.Add.Bar(position: 1, value: workingDayCount);
-			var offDayBar = plot.Add.Bar(position: 2, value: nonWorkingDayCount);
-			
-			workingBar.LegendText = workingDayCount.ToString();
-			offDayBar.LegendText = nonWorkingDayCount.ToString();
-			
-			var ticks = new Tick[]
-			{
-				new(1, "Working"),
-				new(2, "Off")
-			};
-			
-			plot.Axes.Bottom.TickGenerator = new NumericManual(ticks);
-			plot.Axes.Bottom.MajorTickStyle.Length = 0;
-			plot.HideGrid();
-			
-			plot.Axes.Margins(bottom: 0);
-			plot.ShowLegend();
-			plot.Title(question, size: 10f);
+
+			var plot = PlotGenerator.BarsWithManualTicks(question,
+			[
+				new KeyValuePair<string, double>("Working", workingDayCount),
+				new KeyValuePair<string, double>("Non-Working", nonWorkingDayCount)
+			]);
 			
 			plot.SavePng(filePath, 960, 540);
 		}
@@ -1909,5 +1876,193 @@ namespace Celarix.JustForFun.GraphingPlayground.Logic
 			plot.Title(question);
 			plot.SavePng(filePath, 1920, 1080);
 		}
+
+		private void TotalVacationsTaken(string filePath)
+		{
+			const string question = "How many total vacations did I take?";
+			
+			var writer = OpenFile(filePath);
+			writer.WriteLine(question);
+			writer.WriteLine();
+			
+			var vacationCount = series.Count(s => s.SeriesType is MeijerDayType.PaidTimeOff or MeijerDayType.NonPaidTimeOff);
+			var paidVacationCount = series.Count(s => s.SeriesType == MeijerDayType.PaidTimeOff);
+			var nonPaidVacationCount = series.Count(s => s.SeriesType == MeijerDayType.NonPaidTimeOff);
+			writer.WriteLine($"Total: {vacationCount}");
+			writer.WriteLine($"Paid: {paidVacationCount}");
+			writer.WriteLine($"Non-Paid: {nonPaidVacationCount}");
+
+			writer.Close();
+		}
+
+		private void VacationsOnWeekdayCycle(string filePath)
+		{
+			const string question = "How many vacation days occured on each day of the week?";
+
+			var weekdaysAndVacationDays = Enum.GetValues<DayOfWeek>()
+				.ToDictionary(d => d,
+					_ => ((int PaidVacationDays, int NonPaidVacationDays))(0, 0));
+
+			foreach (var meijerDay in days)
+			{
+				var dayOfWeek = meijerDay.Date.DayOfWeek;
+
+				weekdaysAndVacationDays[dayOfWeek] = meijerDay.DayType switch
+				{
+					MeijerDayType.PaidTimeOff => (weekdaysAndVacationDays[dayOfWeek].PaidVacationDays + 1,
+						weekdaysAndVacationDays[dayOfWeek].NonPaidVacationDays),
+					MeijerDayType.NonPaidTimeOff => (weekdaysAndVacationDays[dayOfWeek].PaidVacationDays,
+						weekdaysAndVacationDays[dayOfWeek].NonPaidVacationDays + 1),
+					_ => weekdaysAndVacationDays[dayOfWeek]
+				};
+			}
+
+			var plot = new Plot();
+
+			for (int i = 0; i < 7; i++)
+			{
+				var dayOfWeek = (DayOfWeek)i;
+				var paidVacationDays = weekdaysAndVacationDays[dayOfWeek].PaidVacationDays;
+				var nonPaidVacationDays = weekdaysAndVacationDays[dayOfWeek].NonPaidVacationDays;
+				
+				var paidBar = new Bar
+				{
+					Position = i,
+					Value = paidVacationDays,
+					FillColor = Color.FromARGB(0xFF0000FFu),
+					Label = $"{paidVacationDays}",
+					CenterLabel = true
+				};
+
+				var nonPaidBar = new Bar
+				{
+					Position = i,
+					Value = paidVacationDays + nonPaidVacationDays,
+					ValueBase = paidVacationDays,
+					FillColor = Color.FromARGB(0xFF00FF00u),
+					Label = $"{nonPaidVacationDays}",
+					CenterLabel = true
+				};
+
+				plot.Add.Bar(paidBar);
+				plot.Add.Bar(nonPaidBar);
+			}
+
+			plot.Legend.ManualItems.Add(new LegendItem
+			{
+				LabelText = "Paid",
+				FillColor = Color.FromARGB(0xFF0000FFu)
+			});
+
+			plot.Legend.ManualItems.Add(new LegendItem
+			{
+				LabelText = "Non-Paid",
+				FillColor = Color.FromARGB(0xFF00FF00u)
+			});
+			plot.Legend.Orientation = Orientation.Vertical;
+			plot.ShowLegend(Alignment.UpperLeft);
+
+			var tickGenerator = new NumericManual();
+
+			for (var i = 0; i < 7; i++)
+			{
+				tickGenerator.AddMajor(i, $"{(DayOfWeek)i}");
+			}
+			plot.Axes.Bottom.TickGenerator = tickGenerator;
+			plot.HideGrid();
+			plot.Axes.Margins(bottom: 0d);
+			plot.Title(question, 18f);
+
+			plot.SavePng(filePath, 1920, 1080);
+		}
+
+		// What was the 30-day window at each date of the inversion count (how many times each day flipped from being working to non-working)?
+		//	- Inversion: A day on which the type flipped from working to non-working or vice versa
+		//  - 30-day window: 30 consecutive days, including the day of the inversion
+		//	- Count: The number of inversions in the 30-day window
+		//  - Motivation: what on earth was I wanting to know with this?
+
+		// What were the most likely days of the month I'd take for vacation?
+		//	- For each day of the month, how many times was I on vacation on that day?
+
+		// Over all vacations, what was the length of each vacation?
+
+		// How many hours did I work? What is the average number of hours worked per day?
+
+		// Over all shifts, what was the length of each shift?
+
+		// What was the distribution of shift starts by quarter-hour?
+
+		// What was the distribution of shift endings by quarter-hour?
+
+		// What was the distribution of shift length?
+
+		// Of the 96 quarter-hour intervals in a day, how many had a shift scheduled?
+
+		// How many close/open pairs did I work?
+
+		// What was the percentage of each kind of shift (open, mid, close)?
+
+		private void MappingOfAllQuarterHours(string filePath)
+		{
+			const string question = "What was the mapping of working vs. non-working for ALL quarter-hour intervals of my entire seniority?";
+			
+			HtmlQuilt.HtmlQuiltCell[] cellTypes =
+			[
+				new HtmlQuilt.HtmlQuiltCell("Working", "yellow"),
+				new HtmlQuilt.HtmlQuiltCell("Non-Working", "blue")
+			];
+
+			var columnHeaders = Enumerable.Range(0, 96)
+				.Select(q => TimeOnly.MinValue.AddMinutes(q * 15))
+				.Select(t => t.ToShortTimeString())
+				.ToArray();
+			
+			var rowHeaders = days
+				.OrderBy(d => d.Date)
+				.Select(d => d.Date.ToString("yyyy-MM-dd"))
+				.ToArray();
+			
+			var quilt = new HtmlQuilt(question, cellTypes, columnHeaders, rowHeaders);
+
+			var dayNumber = 0;
+			var quarterBuffer = new bool[96];
+			
+			foreach (var meijerDay in days.OrderBy(d => d.Date))
+			{
+				Array.Fill(quarterBuffer, false);
+				if (meijerDay.DayType is MeijerDayType.Working or MeijerDayType.Other)
+				{
+					for (int quarter = 0; quarter < 96; quarter++)
+					{
+						var quarterTime = TimeOnly.MinValue.AddMinutes(quarter * 15);
+						if (quarterTime >= meijerDay.ShiftStart && quarterTime < meijerDay.ShiftEnd)
+						{
+							quarterBuffer[quarter] = true;
+						}
+					}
+				}
+
+				for (int quarter = 0; quarter < 96; quarter++)
+				{
+					quilt.SetCell(dayNumber, quarter, quarterBuffer[quarter] ? "Working": "Non-Working");
+				}
+
+				dayNumber += 1;
+			}
+			
+			var html = quilt.BuildHtml();
+			File.WriteAllText(filePath, html);
+		}
+
+		// At each date, how many opens/mids/closes were scheduled for the next 30 days inclusive?
+
+		// How many hours did I work on average per day of the week?
+
+		// What was the average start time by day of the week?
+
+		// What was the average end time by day of the week?
+		
+		// How many hours did I wait?
 	}
 }

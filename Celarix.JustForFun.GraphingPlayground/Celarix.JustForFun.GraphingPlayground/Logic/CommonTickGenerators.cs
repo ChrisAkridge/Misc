@@ -46,5 +46,14 @@ namespace Celarix.JustForFun.GraphingPlayground.Logic
 			var date = firstDayOfSeniority.AddDays(dayNumber);
 			return date.ToString("yy-MM-dd");
 		}
+
+		public static Func<double, string> MakeDateTimeTickGeneratorFromBaseDate(DateTime baseDate)
+		{
+			return position =>
+			{
+				var date = baseDate.AddDays(position);
+				return date.ToString("yyyy-MM-dd");
+			};
+		}
 	}
 }

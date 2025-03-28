@@ -3,10 +3,6 @@
   "WorkspaceRootPath": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|f:\\documents\\github\\misc\\celarix.justforfun.graphingplayground\\celarix.justforfun.graphingplayground\\models\\graphproperties.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|solutionrelative:celarix.justforfun.graphingplayground\\models\\graphproperties.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|f:\\documents\\github\\misc\\celarix.justforfun.graphingplayground\\celarix.justforfun.graphingplayground\\playgrounds\\noaaclimatedataplayground.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|solutionrelative:celarix.justforfun.graphingplayground\\playgrounds\\noaaclimatedataplayground.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -33,6 +29,10 @@
     {
       "AbsoluteMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\celarix.justforfun.graphingplayground\\playgroundform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|solutionrelative:celarix.justforfun.graphingplayground\\playgroundform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|f:\\documents\\github\\misc\\celarix.justforfun.graphingplayground\\celarix.justforfun.graphingplayground\\models\\graphproperties.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A101A456-0184-42EC-9862-17AC0F99E5FE}|Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground.csproj|solutionrelative:celarix.justforfun.graphingplayground\\models\\graphproperties.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -42,7 +42,7 @@
       "DocumentGroups": [
         {
           "DockedHeight": 200,
-          "SelectedChildIndex": 8,
+          "SelectedChildIndex": 11,
           "Children": [
             {
               "$type": "Bookmark",
@@ -62,7 +62,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 3,
               "Title": "PlaygroundForm.cs",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\PlaygroundForm.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.GraphingPlayground\\PlaygroundForm.cs",
@@ -75,7 +75,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 6,
               "Title": "PlaygroundForm.cs [Design]",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\PlaygroundForm.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.GraphingPlayground\\PlaygroundForm.cs",
@@ -87,7 +87,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 5,
               "Title": "NoaaClimateDataMap.cs",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Models\\CSVMaps\\NoaaClimateDataMap.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.GraphingPlayground\\Models\\CSVMaps\\NoaaClimateDataMap.cs",
@@ -100,7 +100,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 4,
               "Title": "VErSatileBasicsPlayground.cs",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Playgrounds\\VErSatileBasicsPlayground.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.GraphingPlayground\\Playgrounds\\VErSatileBasicsPlayground.cs",
@@ -113,20 +113,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 7,
               "Title": "GraphProperties.cs",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Models\\GraphProperties.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.GraphingPlayground\\Models\\GraphProperties.cs",
               "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Models\\GraphProperties.cs",
               "RelativeToolTip": "Celarix.JustForFun.GraphingPlayground\\Models\\GraphProperties.cs",
-              "ViewState": "AgIAAB0AAAAAAAAAAAAywCUAAAADAAAAAAAAAA==",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAywGMAAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-14T00:22:58.325Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "CommonTickGenerators.cs",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Logic\\CommonTickGenerators.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.GraphingPlayground\\Logic\\CommonTickGenerators.cs",
@@ -139,7 +139,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "Helpers.cs",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Helpers.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.GraphingPlayground\\Helpers.cs",
@@ -152,13 +152,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "NoaaClimateDataPlayground.cs",
               "DocumentMoniker": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Playgrounds\\NoaaClimateDataPlayground.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.GraphingPlayground\\Playgrounds\\NoaaClimateDataPlayground.cs",
               "ToolTip": "F:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.GraphingPlayground\\Celarix.JustForFun.GraphingPlayground\\Playgrounds\\NoaaClimateDataPlayground.cs",
               "RelativeToolTip": "Celarix.JustForFun.GraphingPlayground\\Playgrounds\\NoaaClimateDataPlayground.cs",
-              "ViewState": "AgIAAJMAAAAAAAAAAAAuwEIAAABwAAAAAAAAAA==",
+              "ViewState": "AgIAACEAAAAAAAAAAAAowEIAAABwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-14T00:13:02.208Z",
               "EditorCaption": ""

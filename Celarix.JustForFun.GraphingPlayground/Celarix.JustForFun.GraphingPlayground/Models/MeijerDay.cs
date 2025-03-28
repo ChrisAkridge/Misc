@@ -24,5 +24,16 @@ namespace Celarix.JustForFun.GraphingPlayground.Models
 		public decimal? PaidHours { get; init; }
 		public decimal? UnpaidHours { get; init; }
 		public decimal? Pay { get; init; }
+
+		public MeijerShiftType ShiftType =>
+			DayType != MeijerDayType.Working
+				? MeijerShiftType.NonWorking
+				: ShiftEnd!.Value.Hour switch
+				{
+					< 12 => MeijerShiftType.ThirdShift,
+					>= 12 and < 18 => MeijerShiftType.Open,
+					>= 18 and < 21 => MeijerShiftType.Midshift,
+					>= 21 => MeijerShiftType.Closing
+				};
 	}
 }

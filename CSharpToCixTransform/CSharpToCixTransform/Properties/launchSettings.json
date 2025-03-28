@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CSharpToCixTransform": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\ChrisAckridge\\Personal OneDrive\\OneDrive\\Documents\\Programming\\C# to Cix\\AppointmentProvider.cs\" \"C:\\Users\\ChrisAckridge\\Personal OneDrive\\OneDrive\\Documents\\Programming\\C# to Cix\\AppointmentProvider.cix\""
+    }
+  }
+}
