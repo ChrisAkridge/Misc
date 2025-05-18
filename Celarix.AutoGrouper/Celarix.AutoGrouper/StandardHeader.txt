@@ -1,0 +1,33 @@
+using System;
+using System.Collections.Generic;
+
+[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+public sealed class SqlTableNameAttribute : Attribute
+{
+    public string SchemaName { get; }
+    public string TableName { get; }
+    public string JoinAliasName { get; }
+
+    public SqlTableNameAttribute(string schemaName, string tableName, string joinAliasName)
+    {
+        SchemaName = schemaName ?? throw new ArgumentNullException(nameof(schemaName));
+        TableName = tableName ?? throw new ArgumentNullException(nameof(tableName));
+        JoinAliasName = joinAliasName ?? throw new ArgumentNullException(nameof(joinAliasName));
+    }
+}
+
+[AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
+public sealed class ForeignKeyAttribute : Attribute
+{
+    public string ReferencedColumn { get; }
+
+    public ForeignKeyAttribute(string referencedColumn)
+    {
+        ReferencedColumn = referencedColumn ?? throw new ArgumentNullException(nameof(referencedColumn));
+    }
+}
+
+[AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
+public sealed class PrimaryKeyAttribute : Attribute
+{
+}
