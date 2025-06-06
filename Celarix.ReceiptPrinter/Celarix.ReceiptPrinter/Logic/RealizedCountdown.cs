@@ -26,5 +26,16 @@ namespace Celarix.ReceiptPrinter.Logic
             var durationSincePrevious = now - PreviousOccurence;
             return durationSincePrevious;
         }
+
+        public double DecibelSecondsUntil(ZonedDateTime now)
+        {
+            var totalSecondsUntil = DurationUntil(now).TotalSeconds;
+            if (totalSecondsUntil <= 0)
+            {
+                return double.NegativeInfinity;
+            }
+            var log10 = Math.Log10(totalSecondsUntil);
+            return 10d * log10;
+        }
     }
 }

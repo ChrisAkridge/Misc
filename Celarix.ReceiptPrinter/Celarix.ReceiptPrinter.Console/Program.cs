@@ -18,5 +18,16 @@ foreach (var line in countdownText)
     printer.Append(line);
 }
 
+var multiDateText = MultiDatePrinter.GetMultiDates(DateOnly.FromDateTime(DateTimeOffset.Now.Date));
+foreach (var line in multiDateText.ReplaceLineEndings().Split(Environment.NewLine))
+{
+    printer.Append(line);
+}
+
+//for (int i = 0; i < 10; i++)
+//{
+//    printer.Append("Hello World");
+//}
+
 printer.FullPaperCut();
 printer.PrintDocument();

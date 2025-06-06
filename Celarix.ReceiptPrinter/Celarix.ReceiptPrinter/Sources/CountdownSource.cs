@@ -11,18 +11,12 @@ using NodaTime;
 
 namespace Celarix.ReceiptPrinter.Sources
 {
-    public sealed class CountdownSource
+    public sealed class CountdownSource(IClock clock)
     {
         private const int MaxColumns = 48;
 
-        private readonly IClock clock;
-        private readonly DateTimeZone easternTime;
-
-        public CountdownSource(IClock clock)
-        {
-            this.clock = clock;
-            this.easternTime = DateTimeZoneProviders.Tzdb["America/New_York"];
-        }
+        private readonly IClock clock = clock;
+        private readonly DateTimeZone easternTime = DateTimeZoneProviders.Tzdb["America/New_York"];
 
         public string GetCountdowns(int maxCountdowns = -1)
         {
@@ -71,6 +65,8 @@ namespace Celarix.ReceiptPrinter.Sources
                 new NumberedAnniversaryCountdownWrapper("Michelle Akridge", new FixedDateCountdown("", 8, 16), 1965, NumberedAnniversaryKind.Birthday),
                 new NumberedAnniversaryCountdownWrapper("Chris Akridge", new FixedDateCountdown("", 9, 8), 1994, NumberedAnniversaryKind.Birthday),
                 new NumberedAnniversaryCountdownWrapper("Alex Akridge", new FixedDateCountdown("", 10, 8), 1996, NumberedAnniversaryKind.Birthday),
+                new NumberedAnniversaryCountdownWrapper("Mom and Dad's First Wedding", new FixedDateCountdown("", 6, 3), 1989, NumberedAnniversaryKind.Anniversary),
+                new NumberedAnniversaryCountdownWrapper("Mom and Dad's Second Wedding", new FixedDateCountdown("", 6, 17), 2014, NumberedAnniversaryKind.Anniversary),
                 new NumberedAnniversaryCountdownWrapper("Super Bowl", new WeekdayOfMonthCountdown("", 2, IsoDayOfWeek.Sunday, 2), 1966, NumberedAnniversaryKind.RomanNumeral),
                 new NumberedAnniversaryCountdownWrapper("Start at Meijer", new FixedDateCountdown("", 9, 17), 2013, NumberedAnniversaryKind.Anniversary),
                 new NumberedAnniversaryCountdownWrapper("Start at e-PulseTrak.com", new FixedDateCountdown("", 5, 21), 2018, NumberedAnniversaryKind.Anniversary),
@@ -117,7 +113,7 @@ namespace Celarix.ReceiptPrinter.Sources
 
                 // Hypoannual countdowns
                 new HypoannualCountdownWrapper(new WeekdayOfMonthCountdown("Presidential Election Day", 11, IsoDayOfWeek.Tuesday, 1), 2000, 4),
-                new HypoannualCountdownWrapper(new WeekdayOfMonthCountdown("Mid-Term Election Day", 11, IsoDayOfWeek.Tuesday, 1), 2002, 4),
+                new HypoannualCountdownWrapper(new WeekdayOfMonthCountdown("MidMid-Term Election Day", 11, IsoDayOfWeek.Tuesday, 1), 2002, 4),
                 new HypoannualCountdownWrapper(new WeekdayOfMonthCountdown("Summer Olympics (est.)", 7, IsoDayOfWeek.Saturday, 4), 2000, 4),
                 new HypoannualCountdownWrapper(new WeekdayOfMonthCountdown("Winter Olympics (est.)", 2, IsoDayOfWeek.Saturday, 2), 2002, 4),
                 new HypoannualCountdownWrapper(new FixedDateCountdown("Inauguration Day", 1, 20), 2000, 4),
@@ -141,7 +137,7 @@ namespace Celarix.ReceiptPrinter.Sources
             ];
         }
 
-        private RealizedCountdown RealizeCountdown(Countdown countdown, ZonedDateTime zonedDateTime)
+        private static RealizedCountdown RealizeCountdown(Countdown countdown, ZonedDateTime zonedDateTime)
         {
             return new RealizedCountdown
             {
@@ -151,13 +147,14 @@ namespace Celarix.ReceiptPrinter.Sources
             };
         }
 
-        private string GetExtendedCountdownString(RealizedCountdown countdown, ZonedDateTime now)
+        private static string GetExtendedCountdownString(RealizedCountdown countdown, ZonedDateTime now)
         {
             var durationUntil = countdown.DurationUntil(now);
             var daysUntil = durationUntil.Days;
+            var decibelSecondsUntil = countdown.DecibelSecondsUntil(now);
 
             var centeredName = countdown.Name.CenterText(MaxColumns);
-            var inDaysText = $"in {daysUntil} days".CenterText(MaxColumns);
+            var inDaysText = $"in {daysUntil} days ({decibelSecondsUntil:F4} dBs)".CenterText(MaxColumns);
 
             var nextOccurrence = countdown.NextOccurence;
             var previousOccurrence = countdown.PreviousOccurence;
@@ -187,11 +184,12 @@ namespace Celarix.ReceiptPrinter.Sources
             return builder.ToString();
         }
 
-        private string GetMinimialCountdownString(RealizedCountdown countdown, ZonedDateTime now)
+        private static string GetMinimialCountdownString(RealizedCountdown countdown, ZonedDateTime now)
         {
             var name = countdown.Name;
             var durationUntil = countdown.DurationUntil(now);
-            var daysText = $": {durationUntil.Days}d";
+            var decibelSecondsUntil = countdown.DecibelSecondsUntil(now);
+            var daysText = $": {durationUntil.Days}d ({decibelSecondsUntil:F4}dBs)";
             if (name.Length + daysText.Length > MaxColumns)
             {
                 return $"{name}\n{daysText.Substring(2).PadLeft(MaxColumns)}";

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Celarix.ReceiptPrinter.Extensions;
+using Celarix.ReceiptPrinter.Logic;
 
 namespace Celarix.ReceiptPrinter.Sources
 {
@@ -28,6 +30,21 @@ namespace Celarix.ReceiptPrinter.Sources
             var unixStart = new DateTimeOffset(date.Year, date.Month, date.Day, 0, 0, 0, TimeSpan.Zero).ToUnixTimeSeconds();
             var unixEnd = new DateTimeOffset(date.Year, date.Month, date.Day, 23, 59, 59, TimeSpan.Zero).ToUnixTimeSeconds();
             multiDateBuilder.AppendLine($"{unixStart} - {unixEnd}");
+
+            multiDateBuilder.AppendLine();
+
+            // Extended day:
+            var todayStartOfDay = DateTimeOffset.Now.Date;
+            var todayEndOfDay = todayStartOfDay.AddDays(1).AddTicks(-1);
+            var extendedTimeAtStartOfDay = new CelarianExtendedDateTime(todayStartOfDay);
+            var extendedTimeAtEndOfDay = new CelarianExtendedDateTime(todayEndOfDay);
+            multiDateBuilder.AppendLine($"Celarian Extended Day".CenterText(MaxColumns));
+            multiDateBuilder.AppendLine($"At midnight: {extendedTimeAtStartOfDay.ToISO8601StyleString()}");
+            multiDateBuilder.AppendLine($"{extendedTimeAtStartOfDay.GetDayCulture()}".PadLeft(MaxColumns));
+            multiDateBuilder.AppendLine($"{extendedTimeAtStartOfDay.GetTimeCulture()}".PadLeft(MaxColumns));
+            multiDateBuilder.AppendLine($"At end of day: {extendedTimeAtEndOfDay.ToISO8601StyleString()}");
+            multiDateBuilder.AppendLine($"{extendedTimeAtEndOfDay.GetDayCulture()}".PadLeft(MaxColumns));
+            multiDateBuilder.AppendLine($"{extendedTimeAtEndOfDay.GetTimeCulture()}".PadLeft(MaxColumns));
 
             multiDateBuilder.AppendLine();
 
