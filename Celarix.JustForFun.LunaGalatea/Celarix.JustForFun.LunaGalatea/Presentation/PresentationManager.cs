@@ -26,8 +26,7 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
 
             asyncPresenters = new List<IAsyncPresenter>
             {
-                new StockQuotePresenter(panel, y, out y),
-                new WeatherPresenter(panel, y, out y)
+                
             };
             
             // Add new presenters down here

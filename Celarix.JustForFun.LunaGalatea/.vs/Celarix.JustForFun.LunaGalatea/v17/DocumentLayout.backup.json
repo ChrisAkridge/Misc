@@ -3,10 +3,6 @@
   "WorkspaceRootPath": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|e:\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\presentation\\presentationmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\presentation\\presentationmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|e:\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\providers\\staticurlimageprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\providers\\staticurlimageprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -114,8 +110,21 @@
       "DocumentGroups": [
         {
           "DockedHeight": 200,
-          "SelectedChildIndex": 23,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "StaticURLImageProvider.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\StaticURLImageProvider.cs",
+              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Providers\\StaticURLImageProvider.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\StaticURLImageProvider.cs",
+              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Providers\\StaticURLImageProvider.cs",
+              "ViewState": "AgIAAPMAAAAAAAAAAAAQwAUBAABTAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-06T00:33:14.298Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
@@ -210,33 +219,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "PresentationManager.cs",
-              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\PresentationManager.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\PresentationManager.cs",
-              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\PresentationManager.cs",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Presentation\\PresentationManager.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAAAxwBwAAAAQAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-06T00:34:51.622Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "StaticURLImageProvider.cs",
-              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\StaticURLImageProvider.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Providers\\StaticURLImageProvider.cs",
-              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\StaticURLImageProvider.cs",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Providers\\StaticURLImageProvider.cs",
-              "ViewState": "AgIAAPMAAAAAAAAAAAAQwAUBAABTAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-06T00:33:14.298Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
               "Title": "Extensions.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Extensions.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Extensions.cs",
@@ -249,7 +232,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 3,
               "Title": "CountdownProvider.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\CountdownProvider.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Providers\\CountdownProvider.cs",
@@ -262,7 +245,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 5,
               "Title": "Enums.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Enums.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Enums.cs",
@@ -275,7 +258,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 6,
               "Title": "AdvancedCountdownFunctions.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\AdvancedCountdownFunctions.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\AdvancedCountdownFunctions.cs",
@@ -288,7 +271,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 7,
               "Title": "HypoannualCountdownWrapper.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\HypoannualCountdownWrapper.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\HypoannualCountdownWrapper.cs",
@@ -301,7 +284,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 8,
               "Title": "LeapDayCountdown.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\LeapDayCountdown.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\LeapDayCountdown.cs",
@@ -314,7 +297,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 4,
               "Title": "CountdownPresenter.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\CountdownPresenter.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\CountdownPresenter.cs",
@@ -327,7 +310,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "NumberedAnniversaryCountdownWrapper.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\NumberedAnniversaryCountdownWrapper.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\NumberedAnniversaryCountdownWrapper.cs",
@@ -340,7 +323,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 9,
               "Title": "MonthAndDayFunctionCountdown.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\MonthAndDayFunctionCountdown.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\MonthAndDayFunctionCountdown.cs",
@@ -353,7 +336,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 10,
               "Title": "NextPowerOf2And10Countdown.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\NextPowerOf2And10Countdown.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\NextPowerOf2And10Countdown.cs",
@@ -366,7 +349,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 11,
               "Title": "OffsetCountdownWrapper.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\OffsetCountdownWrapper.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\OffsetCountdownWrapper.cs",
@@ -379,7 +362,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 12,
               "Title": "OnceOffCountdown.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\OnceOffCountdown.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\OnceOffCountdown.cs",
@@ -392,7 +375,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 13,
               "Title": "WeekdayOfMonthCountdown.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\WeekdayOfMonthCountdown.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\WeekdayOfMonthCountdown.cs",
@@ -405,7 +388,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 14,
               "Title": "RealizedCountdown.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\RealizedCountdown.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\RealizedCountdown.cs",
@@ -418,7 +401,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 15,
               "Title": "FixedDateCountdown.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\FixedDateCountdown.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\FixedDateCountdown.cs",
@@ -431,7 +414,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 16,
               "Title": "Countdown.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\Countdown.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\Countdown\\CountdownKinds\\Countdown.cs",
@@ -444,7 +427,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 17,
               "Title": "WeatherPresenter.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\WeatherPresenter.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\WeatherPresenter.cs",
@@ -457,7 +440,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 20,
               "Title": "TimeDisplayProvider.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\TimeDisplayProvider.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Providers\\TimeDisplayProvider.cs",
@@ -469,7 +452,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 21,
               "Title": "TimeVisualizerProvider.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\TimeVisualizerProvider.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Providers\\TimeVisualizerProvider.cs",
@@ -481,7 +464,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 22,
               "Title": "TimeDisplayPresenter.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\TimeDisplayPresenter.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\TimeDisplayPresenter.cs",
@@ -493,7 +476,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 23,
               "Title": "Observation.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\NOAAWeatherModels\\Output\\Observation.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\NOAAWeatherModels\\Output\\Observation.cs",
@@ -505,7 +488,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 24,
               "Title": "WeatherResponse.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\NOAAWeatherModels\\Output\\WeatherResponse.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\NOAAWeatherModels\\Output\\WeatherResponse.cs",
@@ -517,7 +500,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 18,
               "Title": "WeatherProvider.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\WeatherProvider.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Providers\\WeatherProvider.cs",
@@ -529,7 +512,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 19,
               "Title": "WeatherData.cs",
               "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Logic\\WeatherData.cs",
               "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Logic\\WeatherData.cs",

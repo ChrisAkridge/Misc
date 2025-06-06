@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Celarix.JustForFun.LunaGalatea.Logic.Countdown.CountdownKinds;
+using Celarix.JustForFun.LunaGalatea.Logic.Countdown;
 using NodaTime;
 
 namespace Celarix.JustForFun.LunaGalatea.Providers
@@ -26,307 +28,131 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
         {
             var nowInstant = clock.GetCurrentInstant();
             var now = nowInstant.InZone(easternTime);
-
-            var countdowns = new List<string>
-            {
-                $"New Year's Day: {ForFixedDateEvent(nowInstant, now, 1, 1)}",
-                $"Computer Science Day: {ForFixedDateEvent(nowInstant, now, 2, 1)}",
-                $"Super Bowl: {ForFixedMonthEvent(nowInstant, now, 2, GetSuperBowlDay)}",
-                $"Valentine's Day: {ForFixedDateEvent(nowInstant, now, 2, 14)}",
-                $"Vernal Equinox: {ForFixedMonthEvent(nowInstant, now, 3, GetSpringEquinoxDay)}",
-                $"Easter: {ForUnfixedEvent(nowInstant, now, GetEasterMonthAndDay)}",
-                $"Thunder Over Louisville: {ForFixedMonthEvent(nowInstant, now, 4, GetThunderOverLouisvilleDay)}",
-                $"Kentucky Derby: {ForFixedMonthEvent(nowInstant, now, 5, GetKentuckyDerbyDay)}",
-                $"Mother's Day: {ForFixedMonthEvent(nowInstant, now, 5, GetMothersDayDay)}",
-                $"Memorial Day: {ForFixedMonthEvent(nowInstant, now, 5, GetMemorialDayDay)}",
-                $"Father's Day: {ForFixedMonthEvent(nowInstant, now, 6, GetFathersDayDay)}",
-                $"Summer Solstice: {ForFixedMonthEvent(nowInstant, now, 6, GetSummerSolsticeDay)}",
-                $"Independence Day: {ForFixedDateEvent(nowInstant, now, 7, 4)}",
-                $"Dad's Birthday: {ForFixedDateEvent(nowInstant, now, 7, 29)}",
-                $"Mom's Birthday: {ForFixedDateEvent(nowInstant, now, 8, 16)}",
-                $"Labor Day: {ForFixedMonthEvent(nowInstant, now, 9, GetLaborDayDay)}",
-                $"NFL Kickoff (est.): {ForFixedMonthEvent(nowInstant, now, 9, GetNFLKickoffEstimatedDay)}",
-                $"My Birthday: {ForFixedDateEvent(nowInstant, now, 9, 8)}",
-                $"Autumnal Equinox: {ForFixedMonthEvent(nowInstant, now, 9, GetAutumnEquinoxDay)}",
-                $"Holiday/Halloween Season: {ForFixedDateEvent(nowInstant, now, 10, 1)}",
-                $"Alex's Birthday: {ForFixedDateEvent(nowInstant, now, 10, 8)}",
-                $"Halloween: {ForFixedDateEvent(nowInstant, now, 10, 31)}",
-                $"Thanksgiving Season: {ForFixedDateEvent(nowInstant, now, 11, 1)}",
-                $"Election Day: {ForElectionDay(nowInstant, now)}",
-                $"Veterans Day: {ForFixedDateEvent(nowInstant, now, 11, 11)}",
-                $"Thanksgiving: {ForFixedMonthEvent(nowInstant, now, 11, GetThanksgivingDay)}",
-                $"Black Friday/Christmas Season: {ForFixedMonthEvent(nowInstant, now, 11, GetBlackFridayChristmasSeasonDay)}",
-                $"Winter Solstice: {ForFixedMonthEvent(nowInstant, now, 12, GetWinterSolsticeDay)}",
-                $"Christmas Eve: {ForFixedDateEvent(nowInstant, now, 12, 24)}",
-                $"Christmas Day: {ForFixedDateEvent(nowInstant, now, 12, 25)}",
-                $"New Year's Season: {ForFixedDateEvent(nowInstant, now, 12, 26)}",
-                $"New Year's Eve: {ForFixedDateEvent(nowInstant, now, 12, 31)}",
-                $"Great American Solar Eclipse: {ForOnceOffEvent(nowInstant, now, 2045, 8, 12)}"
-            };
-
-            // TODO: we could REALLY make this better in the future
-            return countdowns
-                .Select(c => c.Split(':'))
-                .Where(s => !string.IsNullOrWhiteSpace(s[1]))
-                .OrderBy(s => s[1].Contains("Today", StringComparison.InvariantCultureIgnoreCase) ? 0 : int.Parse(s[1][..s[1].IndexOf('d')]))
-                .Select(s => string.Join(":", s))
+            var countdowns = GetStandardCountdowns();
+            var realizedCountdowns = countdowns
+                .Select(c => RealizeCountdown(c, now))
+                .OrderBy(c => c.DurationUntil(now));
+            return realizedCountdowns
+                .Select(c => GetCountdownString(c, now))
                 .ToList();
         }
 
-        private string ForFixedDateEvent(Instant nowInstant, ZonedDateTime now, int eventMonth, int eventDay)
+        private Countdown[] GetStandardCountdowns()
         {
-            if (now.Month == eventMonth && now.Day == eventDay)
-            {
-                return "Today!";
-            }
+            return
+            [
+                // Fixed date countdowns
+                new FixedDateCountdown("New Year's Day", 1, 1),
+                new FixedDateCountdown("Computer Science Day", 2, 1),
+                new FixedDateCountdown("Groundhog Day", 2, 2),
+                new FixedDateCountdown("E Day", 2, 7),
+                new FixedDateCountdown("Valentine's Day", 2, 14),
+                new FixedDateCountdown("Pi Day", 3, 14),
+                new FixedDateCountdown("Tax Day", 4, 15),
+                new FixedDateCountdown("Independence Day", 7, 4),
+                new FixedDateCountdown("Holiday/Halloween Season", 10, 1),
+                new FixedDateCountdown("Halloween", 10, 31),
+                new FixedDateCountdown("Thanksgiving Season", 11, 1),
+                new FixedDateCountdown("Veteran's Day", 11, 11),
+                new FixedDateCountdown("Christmas Eve", 12, 24),
+                new FixedDateCountdown("Christmas Day", 12, 25),
+                new FixedDateCountdown("New Year's Season", 12, 26),
+                new FixedDateCountdown("New Year's Eve", 12, 31),
 
-            var nextEventYear = now.Month < eventMonth || (now.Month == eventMonth && now.Day < eventDay)
-                ? now.Year
-                : now.Year + 1;
-            var nextOccurrenceLocalDate = new LocalDateTime(nextEventYear, eventMonth, eventDay, 0, 0, 0);
-            var nextOccurrenceZonedDate = easternTime.AtStrictly(nextOccurrenceLocalDate);
-            return FormatDuration(nextOccurrenceZonedDate.ToInstant() - nowInstant);
+                // Numbered anniversaries
+                new NumberedAnniversaryCountdownWrapper("Bob Akridge", new FixedDateCountdown("", 7, 29), 1967, NumberedAnniversaryKind.Birthday),
+                new NumberedAnniversaryCountdownWrapper("Michelle Akridge", new FixedDateCountdown("", 8, 16), 1965, NumberedAnniversaryKind.Birthday),
+                new NumberedAnniversaryCountdownWrapper("Chris Akridge", new FixedDateCountdown("", 9, 8), 1994, NumberedAnniversaryKind.Birthday),
+                new NumberedAnniversaryCountdownWrapper("Alex Akridge", new FixedDateCountdown("", 10, 8), 1996, NumberedAnniversaryKind.Birthday),
+                new NumberedAnniversaryCountdownWrapper("Mom and Dad's First Wedding", new FixedDateCountdown("", 6, 3), 1989, NumberedAnniversaryKind.Anniversary),
+                new NumberedAnniversaryCountdownWrapper("Mom and Dad's Second Wedding", new FixedDateCountdown("", 6, 17), 2014, NumberedAnniversaryKind.Anniversary),
+                new NumberedAnniversaryCountdownWrapper("Super Bowl", new WeekdayOfMonthCountdown("", 2, IsoDayOfWeek.Sunday, 2), 1966, NumberedAnniversaryKind.RomanNumeral),
+                new NumberedAnniversaryCountdownWrapper("Start at Meijer", new FixedDateCountdown("", 9, 17), 2013, NumberedAnniversaryKind.Anniversary),
+                new NumberedAnniversaryCountdownWrapper("Start at e-PulseTrak.com", new FixedDateCountdown("", 5, 21), 2018, NumberedAnniversaryKind.Anniversary),
+                new NumberedAnniversaryCountdownWrapper("Start at RxLightning", new FixedDateCountdown("", 3, 3), 2025, NumberedAnniversaryKind.Anniversary),
+
+                // Weekday-of-month countdowns
+                new WeekdayOfMonthCountdown("NCAA-I College Football Playoff Championship", 1, IsoDayOfWeek.Monday, 2),
+                new WeekdayOfMonthCountdown("Martin Luther King Jr. Day", 1, IsoDayOfWeek.Monday, 3),
+                new WeekdayOfMonthCountdown("NFL All-Star Game", 1, IsoDayOfWeek.Sunday, 4),
+                new WeekdayOfMonthCountdown("NBA All-Star Game/Daytona 500", 2, IsoDayOfWeek.Sunday, 3),
+                new WeekdayOfMonthCountdown("Presidents' Day", 2, IsoDayOfWeek.Monday, 3),
+                new WeekdayOfMonthCountdown("Selection Sunday/DST Begins", 3, IsoDayOfWeek.Sunday, 2),
+                new WeekdayOfMonthCountdown("March Madness (est.)", 3, IsoDayOfWeek.Thursday, 2),
+                new WeekdayOfMonthCountdown("MLB Opening Day (est.)", 3, IsoDayOfWeek.Thursday, 4),
+                new WeekdayOfMonthCountdown("Final Four (est.)", 4, IsoDayOfWeek.Saturday, 1),
+                new WeekdayOfMonthCountdown("NHL Playoffs (est.)", 4, IsoDayOfWeek.Wednesday, 2),
+                new WeekdayOfMonthCountdown("NBA Playoffs (est.)", 4, IsoDayOfWeek.Saturday, 3),
+                new WeekdayOfMonthCountdown("Kentucky Derby", 5, IsoDayOfWeek.Saturday, 1),
+                new WeekdayOfMonthCountdown("Mother's Day", 5, IsoDayOfWeek.Sunday, 2),
+                new WeekdayOfMonthCountdown("Memorial Day", 5, IsoDayOfWeek.Monday, 4),
+                new WeekdayOfMonthCountdown("NHL Stanley Cup Finals (est.)", 6, IsoDayOfWeek.Wednesday, 1),
+                new WeekdayOfMonthCountdown("NBA Finals (est.)", 6, IsoDayOfWeek.Thursday, 1),
+                new WeekdayOfMonthCountdown("Father's Day", 6, IsoDayOfWeek.Sunday, 3),
+                new WeekdayOfMonthCountdown("NCAA-I Football Kickoff", 9, IsoDayOfWeek.Saturday, 1),
+                new WeekdayOfMonthCountdown("NASCAR Playoffs (est.)", 9, IsoDayOfWeek.Sunday, 1),
+                new WeekdayOfMonthCountdown("Labor Day", 9, IsoDayOfWeek.Monday, 1),
+                new WeekdayOfMonthCountdown("NFL Kickoff", 9, IsoDayOfWeek.Thursday, 1),
+                new WeekdayOfMonthCountdown("MLB Playoffs (est.)", 10, IsoDayOfWeek.Tuesday, 1),
+                new WeekdayOfMonthCountdown("NHL Opening Night (est.)", 10, IsoDayOfWeek.Wednesday, 1),
+                new WeekdayOfMonthCountdown("Columbus Day", 10, IsoDayOfWeek.Monday, 2),
+                new WeekdayOfMonthCountdown("NBA Opening Night (est.)", 10, IsoDayOfWeek.Tuesday, 3),
+                new WeekdayOfMonthCountdown("Homestead (NASCAR Championship)/DST Ends", 11, IsoDayOfWeek.Sunday, 1),
+                new WeekdayOfMonthCountdown("NCAA-I Basketball Season Tipoff", 11, IsoDayOfWeek.Monday, 2),
+                new WeekdayOfMonthCountdown("Thanksgiving Day", 11, IsoDayOfWeek.Thursday, 4),
+                new WeekdayOfMonthCountdown("Black Friday/Christmas Season", 11, IsoDayOfWeek.Friday, 4),
+                new WeekdayOfMonthCountdown("NCAA-I Football Conference Championships", 12, IsoDayOfWeek.Saturday, 1),
+
+                // Month-and-day function countdowns
+                new MonthAndDayFunctionCountdown("Spring Equinox", AdvancedCountdownFunctions.GetSpringEquinox),
+                new MonthAndDayFunctionCountdown("Easter", AdvancedCountdownFunctions.GetEasterMonthAndDay),
+                new MonthAndDayFunctionCountdown("Summer Solstice", AdvancedCountdownFunctions.GetSummerSolstice),
+                new MonthAndDayFunctionCountdown("Autumn Equinox", AdvancedCountdownFunctions.GetAutumnEquinox),
+                new MonthAndDayFunctionCountdown("Winter Solstice", AdvancedCountdownFunctions.GetWinterSolstice),
+
+                // Hypoannual countdowns
+                new HypoannualCountdownWrapper(new WeekdayOfMonthCountdown("Presidential Election Day", 11, IsoDayOfWeek.Tuesday, 1), 2000, 4),
+                new HypoannualCountdownWrapper(new WeekdayOfMonthCountdown("MidMid-Term Election Day", 11, IsoDayOfWeek.Tuesday, 1), 2002, 4),
+                new HypoannualCountdownWrapper(new WeekdayOfMonthCountdown("Summer Olympics (est.)", 7, IsoDayOfWeek.Saturday, 4), 2000, 4),
+                new HypoannualCountdownWrapper(new WeekdayOfMonthCountdown("Winter Olympics (est.)", 2, IsoDayOfWeek.Saturday, 2), 2002, 4),
+                new HypoannualCountdownWrapper(new FixedDateCountdown("Inauguration Day", 1, 20), 2000, 4),
+                new HypoannualCountdownWrapper(new FixedDateCountdown("Start of a Hexadecimal Decade", 1, 1), 2000, 16),
+
+                // Offset countdowns
+                new OffsetCountdownWrapper(new WeekdayOfMonthCountdown("Thunder Over Louisville", 5, IsoDayOfWeek.Saturday, 1), Duration.FromDays(-7 * 3)),
+                new OffsetCountdownWrapper(new WeekdayOfMonthCountdown("NFL Playoffs", 9, IsoDayOfWeek.Thursday, 1), Duration.FromDays(7 * 18)),
+                new OffsetCountdownWrapper(new WeekdayOfMonthCountdown("MLB All-Star Game", 7, IsoDayOfWeek.Tuesday, 2), Duration.FromDays(7 * 18)),
+                new OffsetCountdownWrapper(new WeekdayOfMonthCountdown("MLB World Series Start (est.)", 10, IsoDayOfWeek.Tuesday, 2), Duration.FromDays(24)),
+
+                // Once-off countdowns
+                new OnceOffCountdown("One Billions Seconds Since My Birth", new LocalDateTime(2026, 5, 17, 19, 48, 0).InZoneLeniently(easternTime)),
+                new OnceOffCountdown("Great American Solar Eclipse", new LocalDateTime(2045, 8, 12, 0, 0, 0).InZoneLeniently(easternTime)),
+                new OnceOffCountdown("Unix Timestamp Rollover", new LocalDateTime(2038, 1, 19, 3, 14, 7).InZoneLeniently(DateTimeZone.Utc)),
+                new OnceOffCountdown("Halley's Comet Returns", new LocalDateTime(2061, 7, 29, 0, 0, 0).InZoneLeniently(easternTime)),
+
+                // Extra countdowns
+                new LeapDayCountdown(),
+                new NextPowerOf2And10Countdown(DateTimeZoneProviders.Tzdb["America/Denver"], "My Birth", 1994, 9, 8, 16, 2, 0)
+            ];
         }
 
-        private string ForFixedMonthEvent(Instant nowInstant, ZonedDateTime now, int eventMonth, Func<int, int> eventDayFunc)
+        private static RealizedCountdown RealizeCountdown(Countdown countdown, ZonedDateTime zonedDateTime)
         {
-            var dayForThisYear = eventDayFunc(now.Year);
-            var dayForNextYear = eventDayFunc(now.Year + 1);
-
-            if (now.Month == eventMonth && now.Day == dayForThisYear)
+            return new RealizedCountdown
             {
-                return "Today!";
-            }
-
-            var nextOccurrenceLocalDate =
-                now.Month < eventMonth || (now.Month == eventMonth && now.Day < dayForThisYear)
-                    ? new LocalDateTime(now.Year, eventMonth, dayForThisYear, 0, 0, 0)
-                    : new LocalDateTime(now.Year + 1, eventMonth, dayForNextYear, 0, 0, 0);
-            var nextOccurrenceZonedDate = easternTime.AtStrictly(nextOccurrenceLocalDate);
-            return FormatDuration(nextOccurrenceZonedDate.ToInstant() - nowInstant);
-        }
-
-        private string ForElectionDay(Instant nowInstant, ZonedDateTime now)
-        {
-            var thisIsAnElectionYear = now.Year % 2 == 0;
-            var electionAlreadyPassed = !thisIsAnElectionYear
-                || (now.Month == 12 || (now.Month >= 11 && now.Day > GetElectionDayDay(now.Year)));
-            var nextElectionYear = electionAlreadyPassed
-                ? now.Year + 2
-                : now.Year;
-            
-            const int eventMonth = 11;
-            var eventDay = GetElectionDayDay(nextElectionYear);
-            
-            if (now.Month == eventMonth && now.Day == eventDay && !electionAlreadyPassed) { return "Today!"; }
-
-            var nextEventYear = now.Month < eventMonth || (now.Month == eventMonth && now.Day < eventDay)
-                ? now.Year
-                : now.Year + 2;
-            var nextOccurrenceLocalDate = new LocalDateTime(nextEventYear, eventMonth, eventDay, 0, 0, 0);
-            var nextOccurrenceZonedDate = easternTime.AtStrictly(nextOccurrenceLocalDate);
-            return FormatDuration(nextOccurrenceZonedDate.ToInstant() - nowInstant);
-        }
-
-        private string ForUnfixedEvent(Instant nowInstant,
-            ZonedDateTime now,
-            Func<int, (int Month, int Day)> eventMonthDayFunc)
-        {
-            var (monthForThisYear, dayForThisYear) = eventMonthDayFunc(now.Year);
-            var (monthForNextYear, dayForNextYear) = eventMonthDayFunc(now.Year + 1);
-
-            if (now.Month == monthForThisYear && now.Day == dayForThisYear)
-            {
-                return "Today!";
-            }
-
-            var nextOccurrenceLocalDate =
-                now.Month < monthForThisYear || (now.Month == monthForThisYear && now.Day < dayForThisYear)
-                    ? new LocalDateTime(now.Year, monthForThisYear, dayForThisYear, 0, 0, 0)
-                    : new LocalDateTime(now.Year + 1, monthForNextYear, dayForNextYear, 0, 0, 0);
-            var nextOccurrenceZonedDate = easternTime.AtStrictly(nextOccurrenceLocalDate);
-            return FormatDuration(nextOccurrenceZonedDate.ToInstant() - nowInstant);
-        }
-
-        private string? ForOnceOffEvent(Instant nowInstant,
-            ZonedDateTime now,
-            int eventYear,
-            int eventMonth,
-            int eventDay)
-        {
-            if (now.Year == eventYear
-                && now.Month == eventMonth
-                && now.Day == eventDay)
-            {
-                return "Today!";
-            }
-
-            if (now.Year > eventYear
-                || (now.Year == eventYear && now.Month == eventMonth)
-                || (now.Year == eventYear && now.Month == eventMonth && now.Day > eventDay))
-            {
-                return null;
-            }
-
-            var eventLocalDate = new LocalDateTime(eventYear, eventMonth, eventDay, 0, 0, 0);
-            var eventZonedDate = easternTime.AtStrictly(eventLocalDate);
-            return FormatDuration(eventZonedDate.ToInstant() - nowInstant);
-        }
-
-        private static string FormatDuration(Duration duration)
-        {
-            var durationString = duration.ToString("D'd'h'h'm'm's's'", CultureInfo.CurrentCulture);
-            var decibelSeconds = (duration.TotalSeconds > 0d)
-                ? (10d * Math.Log10(duration.TotalSeconds)).ToString("F4")
-                : "Right Now!";
-            return $"{durationString} ({decibelSeconds} dBsec)";
-        }
-
-        private static int GetSpringEquinoxDay(int year) =>
-            year switch
-            {
-                2022 => 20,
-                2023 => 20,
-                2024 => 19,
-                2025 => 20,
-                2026 => 20,
-                2027 => 20,
-                2028 => 19,
-                2029 => 20,
-                2030 => 20,
-                2031 => 20,
-                2032 => 19,
-                2033 => 20,
-                2034 => 20,
-                2035 => 20,
-                2036 => 19,
-                2037 => 20,
-                2038 => 20,
-                2039 => 20,
-                2040 => 19,
-                2041 => 20,
-                2042 => 20,
-                _ => throw new ArgumentOutOfRangeException(nameof(year))
+                Name = countdown.Name(zonedDateTime),
+                NextOccurence = countdown.NextInstance(zonedDateTime),
+                PreviousOccurence = countdown.PreviousInstance(zonedDateTime),
             };
+        }
 
-        private static int GetSummerSolsticeDay(int year) =>
-            year switch
-            {
-                2022 => 21,
-                2023 => 21,
-                2024 => 20,
-                2025 => 20,
-                2026 => 21,
-                2027 => 21,
-                2028 => 20,
-                2029 => 20,
-                2030 => 21,
-                2031 => 21,
-                2032 => 20,
-                2033 => 20,
-                2034 => 21,
-                2035 => 21,
-                2036 => 20,
-                2037 => 20,
-                2038 => 21,
-                2039 => 21,
-                2040 => 20,
-                2041 => 20,
-                2042 => 21,
-                _ => throw new ArgumentOutOfRangeException(nameof(year))
-            };
-
-        private static int GetAutumnEquinoxDay(int year) =>
-            year switch
-            {
-                2022 => 22,
-                2023 => 23,
-                2024 => 22,
-                2025 => 22,
-                2026 => 22,
-                2027 => 23,
-                2028 => 22,
-                2029 => 22,
-                2030 => 22,
-                2031 => 22,
-                2032 => 22,
-                2033 => 22,
-                2034 => 22,
-                2035 => 22,
-                2036 => 22,
-                2037 => 22,
-                2038 => 22,
-                2039 => 22,
-                2040 => 22,
-                2041 => 22,
-                2042 => 22,
-                _ => throw new ArgumentOutOfRangeException(nameof(year))
-            };
-
-        private static int GetWinterSolsticeDay(int year) =>
-            year switch
-            {
-                >= 2022 and <= 2042 => 21,
-                _ => throw new ArgumentOutOfRangeException(nameof(year))
-            };
-
-        private static int GetSuperBowlDay(int year) =>
-            LocalDate.FromYearMonthWeekAndDay(year, 2, 2, IsoDayOfWeek.Sunday).Day;
-        
-        private static (int Month, int Day) GetEasterMonthAndDay(int year) =>
-            year switch
-            {
-                2022 => (4, 17),
-                2023 => (4, 9),
-                2024 => (3, 31),
-                2025 => (4, 20),
-                2026 => (4, 6),
-                2027 => (3, 27),
-                2028 => (4, 16),
-                2029 => (4, 1),
-                2030 => (4, 21),
-                2031 => (4, 13),
-                2032 => (3, 28),
-                2033 => (4, 17),
-                2034 => (4, 9),
-                2035 => (3, 25),
-                2036 => (4, 13),
-                2037 => (4, 5),
-                2038 => (4, 25),
-                2039 => (4, 10),
-                2040 => (4, 1),
-                2041 => (4, 21),
-                2042 => (4, 6),
-                _ => throw new ArgumentOutOfRangeException(nameof(year))
-            };
-            
-        private static int GetThunderOverLouisvilleDay(int year) =>
-            LocalDate.FromYearMonthWeekAndDay(year, 5, 1, IsoDayOfWeek.Saturday).PlusWeeks(-2).Day;
-
-        private static int GetKentuckyDerbyDay(int year) =>
-            LocalDate.FromYearMonthWeekAndDay(year, 5, 1, IsoDayOfWeek.Saturday).Day;
-
-        private static int GetMothersDayDay(int year) =>
-            LocalDate.FromYearMonthWeekAndDay(year, 5, 2, IsoDayOfWeek.Sunday).Day;
-
-        private static int GetMemorialDayDay(int year) =>
-            LocalDate.FromYearMonthWeekAndDay(year, 5, 5, IsoDayOfWeek.Monday).Day;
-
-        private static int GetFathersDayDay(int year) =>
-            LocalDate.FromYearMonthWeekAndDay(year, 6, 3, IsoDayOfWeek.Sunday).Day;
-
-        private static int GetLaborDayDay(int year) =>
-            LocalDate.FromYearMonthWeekAndDay(year, 9, 1, IsoDayOfWeek.Monday).Day;
-
-        private static int GetNFLKickoffEstimatedDay(int year) =>
-            LocalDate.FromYearMonthWeekAndDay(year, 9, 1, IsoDayOfWeek.Monday).Day + 3;
-
-        private static int GetElectionDayDay(int year) => LocalDate.FromYearMonthWeekAndDay(year, 11, 1, IsoDayOfWeek.Monday).Day + 1;
-
-        private static int GetThanksgivingDay(int year) =>
-            LocalDate.FromYearMonthWeekAndDay(year, 11, 4, IsoDayOfWeek.Thursday).Day;
-
-        private static int GetBlackFridayChristmasSeasonDay(int year) =>
-            LocalDate.FromYearMonthWeekAndDay(year, 11, 4, IsoDayOfWeek.Friday).Day;
+        private static string GetCountdownString(RealizedCountdown countdown, ZonedDateTime now)
+        {
+            var name = countdown.Name;
+            var durationUntil = countdown.DurationUntil(now);
+            var decibelSecondsUntil = countdown.DecibelSecondsUntil(now);
+            var daysText = $": {durationUntil.Days}d ({decibelSecondsUntil:F4}dBs)";
+            return $"{name}{daysText}";
+        }
     }
 }

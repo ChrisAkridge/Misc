@@ -259,7 +259,8 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                 "akridge-pc" => @"C:\Users\ChrisAckridge\Pictures\TRIMARC",
                 "bluebell01" => @"C:\Users\celarix\Pictures\TRIMARC",
                 "chris-hp15" => @"C:\Users\cakri\Pictures\TRIMARC",
-				_ => throw new ArgumentOutOfRangeException()
+                "starflower08" => @"E:\Documents\Files\Pictures\Receiving\TRIMARC",
+                _ => throw new ArgumentOutOfRangeException()
             };
 
             var imageFolderPath = Path.GetFileNameWithoutExtension(url);
