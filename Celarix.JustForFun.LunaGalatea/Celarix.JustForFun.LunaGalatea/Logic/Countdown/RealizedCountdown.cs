@@ -11,12 +11,12 @@ namespace Celarix.JustForFun.LunaGalatea.Logic.Countdown
     {
         public required string Name { get; set; }
         public ZonedDateTime? PreviousOccurence { get; set; }
-        public ZonedDateTime NextOccurence { get; set; }
+        public ZonedDateTime NextOccurrence { get; set; }
 
         public Duration DurationUntil(ZonedDateTime now)
         {
             // Calculate the duration until the next occurrence
-            var durationUntilNext = NextOccurence - now;
+            var durationUntilNext = NextOccurrence - now;
             return durationUntilNext;
         }
 

@@ -18,6 +18,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         public DbSet<QuarterBoxScore> QuarterBoxScores { get; set; }
         public DbSet<TeamDriveRecord> TeamDriveRecords { get; set; }
         public DbSet<SimulatorSettings> SimulatorSettings { get; set; }
+        public DbSet<PhysicsParam> PhysicsParams { get; set; }
 
         public FootballContext()
         {

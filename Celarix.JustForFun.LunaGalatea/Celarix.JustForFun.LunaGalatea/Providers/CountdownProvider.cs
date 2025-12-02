@@ -13,7 +13,7 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
     public class CountdownProvider : IProvider<IReadOnlyList<string>>
     {
         private readonly IClock clock;
-        private readonly DateTimeZone easternTime;
+        private static readonly DateTimeZone easternTime = DateTimeZoneProviders.Tzdb["America/New_York"];
 
         public bool UseMonospaceFont => false;
 
@@ -21,7 +21,6 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
         public CountdownProvider(IClock clock)
         {
             this.clock = clock;
-            easternTime = DateTimeZoneProviders.Tzdb["America/New_York"];
         }
 
         public IReadOnlyList<string> GetDisplayObject()
@@ -37,7 +36,7 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                 .ToList();
         }
 
-        private Countdown[] GetStandardCountdowns()
+        internal static Countdown[] GetStandardCountdowns()
         {
             return
             [
@@ -74,7 +73,7 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                 // Weekday-of-month countdowns
                 new WeekdayOfMonthCountdown("NCAA-I College Football Playoff Championship", 1, IsoDayOfWeek.Monday, 2),
                 new WeekdayOfMonthCountdown("Martin Luther King Jr. Day", 1, IsoDayOfWeek.Monday, 3),
-                new WeekdayOfMonthCountdown("NFL All-Star Game", 1, IsoDayOfWeek.Sunday, 4),
+                new WeekdayOfMonthCountdown("NFL Pro Bowl Games", 2, IsoDayOfWeek.Sunday, 1),
                 new WeekdayOfMonthCountdown("NBA All-Star Game/Daytona 500", 2, IsoDayOfWeek.Sunday, 3),
                 new WeekdayOfMonthCountdown("Presidents' Day", 2, IsoDayOfWeek.Monday, 3),
                 new WeekdayOfMonthCountdown("Selection Sunday/DST Begins", 3, IsoDayOfWeek.Sunday, 2),
@@ -89,6 +88,7 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                 new WeekdayOfMonthCountdown("NHL Stanley Cup Finals (est.)", 6, IsoDayOfWeek.Wednesday, 1),
                 new WeekdayOfMonthCountdown("NBA Finals (est.)", 6, IsoDayOfWeek.Thursday, 1),
                 new WeekdayOfMonthCountdown("Father's Day", 6, IsoDayOfWeek.Sunday, 3),
+                new WeekdayOfMonthCountdown("MLB All-Star Game (est.)", 7, IsoDayOfWeek.Tuesday, 2),
                 new WeekdayOfMonthCountdown("NCAA-I Football Kickoff", 9, IsoDayOfWeek.Saturday, 1),
                 new WeekdayOfMonthCountdown("NASCAR Playoffs (est.)", 9, IsoDayOfWeek.Sunday, 1),
                 new WeekdayOfMonthCountdown("Labor Day", 9, IsoDayOfWeek.Monday, 1),
@@ -112,16 +112,15 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
 
                 // Hypoannual countdowns
                 new HypoannualCountdownWrapper(new WeekdayOfMonthCountdown("Presidential Election Day", 11, IsoDayOfWeek.Tuesday, 1), 2000, 4),
-                new HypoannualCountdownWrapper(new WeekdayOfMonthCountdown("MidMid-Term Election Day", 11, IsoDayOfWeek.Tuesday, 1), 2002, 4),
+                new HypoannualCountdownWrapper(new WeekdayOfMonthCountdown("Mid-Term Election Day", 11, IsoDayOfWeek.Tuesday, 1), 2002, 4),
                 new HypoannualCountdownWrapper(new WeekdayOfMonthCountdown("Summer Olympics (est.)", 7, IsoDayOfWeek.Saturday, 4), 2000, 4),
                 new HypoannualCountdownWrapper(new WeekdayOfMonthCountdown("Winter Olympics (est.)", 2, IsoDayOfWeek.Saturday, 2), 2002, 4),
-                new HypoannualCountdownWrapper(new FixedDateCountdown("Inauguration Day", 1, 20), 2000, 4),
+                new HypoannualCountdownWrapper(new FixedDateCountdown("Inauguration Day", 1, 20), 2001, 4),
                 new HypoannualCountdownWrapper(new FixedDateCountdown("Start of a Hexadecimal Decade", 1, 1), 2000, 16),
 
                 // Offset countdowns
                 new OffsetCountdownWrapper(new WeekdayOfMonthCountdown("Thunder Over Louisville", 5, IsoDayOfWeek.Saturday, 1), Duration.FromDays(-7 * 3)),
                 new OffsetCountdownWrapper(new WeekdayOfMonthCountdown("NFL Playoffs", 9, IsoDayOfWeek.Thursday, 1), Duration.FromDays(7 * 18)),
-                new OffsetCountdownWrapper(new WeekdayOfMonthCountdown("MLB All-Star Game", 7, IsoDayOfWeek.Tuesday, 2), Duration.FromDays(7 * 18)),
                 new OffsetCountdownWrapper(new WeekdayOfMonthCountdown("MLB World Series Start (est.)", 10, IsoDayOfWeek.Tuesday, 2), Duration.FromDays(24)),
 
                 // Once-off countdowns
@@ -136,12 +135,12 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
             ];
         }
 
-        private static RealizedCountdown RealizeCountdown(Countdown countdown, ZonedDateTime zonedDateTime)
+        internal static RealizedCountdown RealizeCountdown(Countdown countdown, ZonedDateTime zonedDateTime)
         {
             return new RealizedCountdown
             {
                 Name = countdown.Name(zonedDateTime),
-                NextOccurence = countdown.NextInstance(zonedDateTime),
+                NextOccurrence = countdown.NextInstance(zonedDateTime),
                 PreviousOccurence = countdown.PreviousInstance(zonedDateTime),
             };
         }

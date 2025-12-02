@@ -1,0 +1,529 @@
+Football Simulator: Main Gameplay Loop Decision and Outcome Tree
+
+NOTES
+
+- Base wind direction is set at the start of the game using an even random sample over the 0 to 360 degree range.
+- Base wind speed is set at the start of the game by a normal distribution (mean: the stadium's average wind speed, stddev: 10 MPH) [PARAM: StartWindSpeedStddev]
+- In terms of angles, 0 degrees always means "home endzone" and 180 degrees always means "away endzone".
+- We name our axes "yard" (the long axis, from goal line to goal line) and "cross" (the short axis, from sideline to sideline).
+- The end lines are at yards -10 and +110, the goal lines at 0 and 100, midfield at 50. 0 is the home team's goal line, 100 is the away team's goal line.
+- The center of the field is at cross 0, the left sideline is at -26.67, the right sideline at +26.67.
+- "Sampled evenly" here means a normal RNG is used to generate the number with no use of distributions.
+- The team has a set of objective strengths, but they can't know them; instead, they base their DECISIONS (not OUTCOMES) on estimated strengths, which are set at the start of the game as follows:
+	1. For each strength,
+		1. Sample from a normal distribution (mean: 0.05, stddev: 0.02) [PARAM: StrengthEstimatorOffsetMean, StrengthEstimatorOffsetStddev].
+		2. Change the number based on the team's disposition:
+			- Ultra-conservative: -0.2 [PARAM: StrengthEstimatorUltraConservativeAdjustment]
+			- Conservative: 0.0 [PARAM: StrengthEstimatorConservativeAdjustment]
+			- Insane: 0.1 [PARAM: StrengthEstimatorInsaneAdjustment]
+			- Hyper-insane: 0.8 [PARAM: StrengthEstimatorUltraInsaneAdjustment]
+		3. This number becomes the percentage added to the objective strength in either direction (so 0.05 becomes 100% +/- 5%, or 95%-105%).
+		4. A number is sampled evenly from that range as the estimated strength.
+- Teams also estimate their opponent's strengths in the same manner.
+- Objective strengths will decline as the game plays, simulating fatigue. Injuries reduce strengths by a lot.
+- A team is aware of their changing strengths and that of their opponent; their estimates of fatigue adjustments have a 50% chance of being noticed, and if they are, a random sample between 0 and the objective adjustment value is sampled evenly and applied to their estimates. This happens for their estimates of themselves and the other team. Injury adjustments are always noticed.
+- Teams also keep an estimated overall average strength (the average of all estimated strengths) for themselves and their opponent.
+- Field goal range is computed as 75% of the record distance of your best kicker, or the opponent's 35-yard line (line of scrimmage)/midfield (kicking location) if you cannot compute that.
+- Before any play:
+	- The PAT, 1-Point Safety, and Dual Possession on Play flags are cleared.
+	
+FUNCTIONS
+
+I. UNIVERSAL RUSHING
+	- Parameters: RealOffenseStrength, RealDefenseStrength
+	- Used: For all rushing plays, all kick returns, all fumble or interception returns, all yards-after-catch, any time anyone is running forward with the ball
+	- Output: Achieved yard location
+	1. Take RealOffenseStrength as the mean of a normal distribution with a standard deviation of 10. [PARAM: StandardStrengthStddev]
+	2. Take your RealDefenseStrength as the mean of a normal distribution with a standard deviation of 10. [PARAM: StandardStrengthStddev]
+	3. Determine your chance of fumbling again. At a RealOffenseStrength of 100, you have a 5% chance of fumbling, which goes down by half every time your RealOffenseStrength doubles, or doubles every time your RealOffenseStrength halves. Capped at 99% chance.
+	4. Determine if you fumble using the fumble odds; if you do, go to OUTCOME III.
+	5. Otherwise, is your RealOffenseStrength sample from step 1 higher than their RealDefenseStrength sample from step 2?
+		6. [Higher]: Take your RealOffenseStrength sample / their RealDefenseStrength sample, getting a number greater than 1. To determine your return distance, sample a normal distribution (mean: 15 yards, stddev: 5 yards * the ratio you computed). [PARAM: BaseFumbleReturnMean, BaseFumbleReturnStddev]
+		7. [Lower]: To determine your return distance (here, negative returns are not possible), sample evenly between 0 and 5 yards. [PARAM: MaxBadReturnDistance]
+
+DECISION TREE
+
+I. KICKOFF (at the start of each half and after each scoring play)
+	1. Kicking team disposition?
+		2. [Ultraconservative]: Always kick off normally, go to OUTCOME I.
+		3. [Conservative]: Are you in the lead or tied?
+			4. [Yes]: Kick off normally, go to OUTCOME I.
+			5. [No]: Are you losing by at least 1.5 points for every minute on the clock? [PARAM: OnsideKickPointsPerMinuteThreshold]
+				6. [Yes]: We need to get the ball back! Attempt an onside kick, go to 10.
+				7. [No]. Kick off normally, go to OUTCOME I.
+		8. [Insane or Hyperinsane]: Always onside kick, go to OUTCOME VII.
+	
+II. FREE KICK (after safeties)
+	1. Is your estimate of their KickReturnStrength higher than your estimated KickDefenseStrength?
+		2. [Yes]: Opt to do a placekick. Go to OUTCOME I.
+		3. [No]: Opt to punt. Go to OUTCOME IV.
+
+III. SIGNAL FAIR CATCH? (after kickoff, free kicks, and punts)
+	1. Is your disposition not Conservative?
+		2. [Ultra-conservative] Always fair catch, first down from where you are (or the 35-yard line on kickoffs, or the 25-yard line on punts, if you're in your own endzone).
+		3. [Insane or Ultra-insane] Always return. Go to OUTCOME VI.
+	4. Is your estimated KickReturnStrength at least 110% of your estimate of the opponent's KickDefenseStrength? [PARAM: KickReturnChoiceThreshold]
+		5. [Yes] Return the ball! Go to OUTCOME VI.
+		6. [No] Is there under 10 seconds left in the game and you are down by between 1 to 8 points? [PARAM: ReturnKickCloseGameTimeThreshold]
+			7. [Yes] Return the ball! Go to OUTCOME VI.
+			8. [No]. Signal fair catch. First down from where you are (or the 35-yard line on kickoffs, or the 25-yard line on punts, if you're in your own endzone).
+			
+IV. TOUCHDOWN
+	1. What is your disposition?
+		2. [Ultra-conservative]: Elect to kick an extra point, go to OUTCOME VIII.
+		3. [Conservative]: Sample a random number evenly between 0 and 1. Is it less than 0.05? [PARAM: AutomaticTwoPointAttemptChance]
+			4. [Yes]: Automatically elect to try for two, go to OUTCOME IX.
+			5. [No]: Are you losing by at least 1 point for every minute on the clock? [PARAM: TwoPointAttemptPointsPerMinuteThreshold]
+				6. [Yes] Elect to try for two, go to OUTCOME IX.
+				7. [No] Elect to kick an extra point, go to OUTCOME VIII.
+		4. [Insane or Ultra-insane]: Always elect to try for two, go to OUTCOME IX.
+
+V. MAIN GAME DECISION (First, second, third, or fourth down plays from scrimmage)
+	SUPER IMPORTANT THING I DON'T WANT TO ADD TO THE MAIN TREE BECAUSE LOOK HOW BIG IT IS: If a team is trailing in overtime and a field goal will not win the game or even tie it (losing by at least 3), they will NEVER kick a field goal and instead skip right to the run/pass decision tree wherever a real field goal attempt would be made.
+
+	This one deserves a bit of exposition. The basic idea here is that, given a lot of factors, you decide what kind of play to run. Here's all the ones I care about:
+		- Rushing play
+		- Pass attempt
+			- Short pass (up to 5 yards, can be negative and count on YAC) [PARAM: ShortPassDistanceThreshold]
+			- Medium pass (up to 15 yards) [PARAM: MediumPassDistanceThreshold]
+			- Long pass (up to 50 yards)
+			- Hail Mary
+		- Ball spike to stop clock
+		- QB sneak
+		- Punt
+		- Field goal attempt
+		- Fake punt
+		- Fake field goal attempt
+		- Victory formation
+	Let's see how we pick one of these. The basic idea is that we have a few general categories of variable we care about. 1st and 10 is different from 3rd and 14, or 4th and 1, and clock comes into play. We could go a lot more complex on clock management, but this'll do for the basics. First, declare the following clock zones:
+		- Standard period (first half down to 4:00 left in the 2nd and 4th, any OT period except when end of half)
+		- End of half (4:00 or less in the 2nd and 4th or any OT period)
+		- [PARAM: LowTimeInHalfThreshold]
+	And the following clock dispositions any team can pick from:
+		- Relaxed (not saving time nor burning it)
+		- Hurry-up (wants to score quickly)
+		- Two-minute drill (NEEDS to score quickly, will spike balls and burn downs to save time)
+		- Clock-chewing (wants to use up tons of clock)
+	Clock dispositions relate to team dispositions. Ultra-conservative always picks relaxed no matter what, with no overrides. Insane always picks hurry-up unless two-minute drill is picked. Ultra-insane always picks two-minute drill, but then they always Hail Mary even if spiking is a better option, so this doesn't matter. To decide the disposition:
+		1. Do you have the lead?
+			2. [Yes]: What zone is the clock in?
+				3. [Standard]: Is your estimate of your opponent's average strength at least 110% of your own? [PARAM: LeadingClockDispositionInStandardZoneOpponentStrengthMultiple]
+					4. [Yes]: Clock-chewing.
+					5. [No]: Relaxed.
+				6. [End of half]: Is your estimate of your opponent's average strength 95% or less of your own? [PARAM: LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultiple]
+					7. [Yes]: ...less than 40%? [PARAM: LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultipleForAggressivePlay]
+						8. [Yes]: Two-minute drill.
+						9. [No]: Hurry-up.
+					10. [No]: Relaxed.
+			11. [No]: What zone is the clock in?
+				12. [Standard]: Hurry-up.
+				13. [End of half]: Two-minute drill.
+	Now, for the actual play selection:
+		1. What is your clock disposition?
+			2. [Two-minute drill] Is the clock running?
+				3. [Yes] Fourth down?
+					4. [Yes] Go to THE MAIN DECIDING BLOCK FOR REAL THIS TIME GUYS on this tree.
+					5. [No] Are you within your own 2-yard line? [PARAM: SpikeBallYardLoss]
+						6. [Yes]: Go to THE MAIN DECIDING BLOCK FOR REAL THIS TIME GUYS on this tree.
+						7. [No]: Do you have any timeouts left?
+							a. [Yes]: Call a timeout! Rerun DECISION V from the top.
+							b. [No]: Spike the ball to stop the clock! This always works, so no outcome tree is needed. Loss of down, always a 2 yard loss. [PARAM: SpikeBallYardLoss]
+				4. [No] Store a tripled version of your estimated passing offense strength, we really need big clock-stopping plays and go to 1-3. [PARAM: TwoMinuteDrillPassDesirabilityMultiplier]
+			3. [All others] Is it fourth down?
+				4. [Yes]: 
+					1. Set two variables to be equal to 1: desire to go for it (A) and desire to not go for it (B).
+					2. If we're outside of field goal range, multiply B by 1.2.	[PARAM: FourthDownLongFieldUndesirabilityMultiplier]
+					3. If we're trailing by less than 17 points AND there's less than 5 minutes in regulation or overtime, multiply A by 2. [PARAM: FourthDownTrailingNearEndgamePointThreshold, FourthDownTrailingNearEndgameRemainingTimeThreshold, FourthDownTrailingNearEndgameDesirabilityMultiplier]
+					4. If we have less than 3 yards to the line to gain, multiply A by 1.2. [PARAM: FourthDownDistanceToGoThreshold, FourthDownDistanceToGoDesirabilityMultiplier]
+					5. If we find our efficiency at converting fourth downs is at least 60%, multiply A by 1.4. [PARAM: FourthDownHistoricalRateThreshold, FourthDownHistoricalRateDesirabilityMultiplier]
+					6. Compute (A / (A + B)) and draw a random number between 0 to 1. Is it less than what we computed?
+						7. [Yes] Go for it! Is the distance to go 1 yard? [PARAM: FourthDownQBSneakDistanceThreshold]
+							8. [Yes] QB sneak!
+							9. [No] Go to THE MAIN DECIDING BLOCK FOR REAL THIS TIME GUYS to decide on a normal play.
+						10. [No] Don't go for it. Are we in field goal range?
+							11. [Yes] Is your estimate of your opponent's average strength at least 150% of your own? [PARAM: FourthDownFakeFGStrengthThreshold]
+								12. [Yes] Is a random number between 0 and 1 less than 0.8? [PARAM: FourthDownFakeFieldGoalSelectionChance]
+									13. [Yes] Fake field goal try!
+									14. [No] Try for a field goal!
+								15. [No] Try for a field goal!
+							16. [No] Is your estimate of your opponent's average strength at least 150% of your own? [PARAM: FourthDownFakePuntStrengthThreshold]
+								17. [Yes] Is a random number between 0 and 1 less than 0.95? [PARAM: FourthDownFakePuntSelectionChance]
+									18. [Yes] Try for a fake punt!
+									19. [No] Punt!
+								20. [No] Punt!
+				21. [No]: Are we in overtime?
+					22. [Yes]: Is it the playoffs?
+						23. [Yes]: Go to THE MAIN DECIDING BLOCK FOR REAL THIS TIME GUYS to decide on a normal play - games end on scoring, not on end of period.
+						24. [No]: Continue.
+					25. [No]: Divide the remaining clock into 40-second chunks. Do we have more of those left in the game than we have downs before 4th down? (So, if it was 1st down, are there more than 120 seconds on the clock?)
+						26. [Yes] We need to keep playing. Go to THE MAIN DECIDING BLOCK FOR REAL THIS TIME GUYS.
+						27. [No] Are we in the lead?
+							28. [Yes] Victory formation!
+							29. [No] We need to keep playing. Go to THE MAIN DECIDING BLOCK FOR REAL THIS TIME GUYS.
+	THE MAIN DECIDING BLOCK FOR REAL THIS TIME GUYS:
+	1. Let R be the gap between your estimated running offense and your estimate of their running defense.
+	2. Let P be the gap between your estimated passing offense and your estimate of their passing defense.
+	3. Compute (P / (P + R)). Is a random number between 0 and 1 less than that?
+		4. [Yes] You opt to pass! Are there fewer than 10 seconds left in the game or overtime outside the playoffs?
+			5. [Yes] Are you in field goal range AND the deficit is 3 points or less?
+				6. [Yes] Try for a field goal!
+				7. [No] Hail Mary!
+			6. [No] What is your disposition?
+				7. [Ultra-conservative]: You opt to pass short 100% of the time.
+				8. [Conservative]: You opt to pass short 55% of the time, medium 35% of the time, and pass long 10% of the time. [PARAM: ConservativePassShortChance, ConservativePassMediumChance, ConservativePassLongChance]
+				9. [Insane]: You opt to pass long 100% of the time.
+				10. [Ultra-insane]: You opt to Hail Mary 100% of the time.
+		5. [No] You opt to run!
+		
+	Here are the outcome sections for each play type:
+		- Rushing play: OUTCOME XII
+		- Pass attempt
+			- Short pass: OUTCOME XIII
+			- Medium pass: OUTCOME XIV
+			- Long pass: OUTCOME XV
+			- Hail Mary: OUTCOME XVI
+		- Ball spike to stop clock: (always successful, loss of down and 2 yards)
+		- QB sneak: OUTCOME XVII
+		- Punt: OUTCOME IV
+		- Field goal attempt: OUTCOME VIII
+		- Fake punt: OUTCOME XVIII
+		- Fake field goal attempt: OUTCOME XIX
+		- Victory formation: OUTCOME XX
+
+VI. RETURNING A FUMBLED OR INTERCEPTED BALL
+	(I keep forgetting disposition first and I'm tired of renumbering. Ultra-conservative always takes a knee, Insane or Ultra-insane always return.)
+	1. Are the PAT Flag or the 1-Point Safety Flag set?
+		2. [Yes]: Always choose to return it. Go to OUTCOME X.
+		3. [No]: Are there less than 10 minutes in the game (4th quarter or overtime, always NO during overtime periods in playoff games due to no ties) and you are leading?
+			4. [Yes]: Choose to return it. Go to OUTCOME X.
+			5. [No]: Are you beyond your own 5 yard line where you recovered/intercepted the ball?
+				6. [Yes]: Is your estimated RunningOffenseStrength higher than your estimate of their RunningDefenseStrength?
+					7. [Yes]: Choose to return it. Go to OUTCOME X.
+					8. [No]: Are you losing by 1-8 points and are you losing by at least 1 point per minute remaining in the game? [PARAM: FumbleReturnPointsPerMinuteThreshold]
+						9. [Yes]: Choose to return it. Go to OUTCOME X.
+						10. [No]: Choose to take a knee. Go to OUTCOME XI.
+				11. [No]: Choose to take a knee. Go to OUTCOME XI.
+
+OUTCOME TREE
+
+I. NORMAL KICKOFF
+	1. Determine base kicking distance using a normal distribution (mean: (KickingStrength * 0.75) yards, stddev: 3 yards). [PARAM: KickoffDistanceMean, KickoffDistanceStddev]
+	2. Determine base kicking skew (0 being straight down the middle of the field, negative and positive meaning to the left and right, respectively; unit is yards). Sample a normal distribution:
+		- Mean: 10^(3 - log_10(KickingStrength)), goes down as KickingStrength goes up
+		- Standard deviation: 3 yards
+		- [PARAM: KickoffSkewMean, KickoffSkewStddev]
+		- There's a 50% chance this number is inverted, representing a skew in the other direction.
+	3. Set the desired kick direction of either 0 or 180 based on which endzone we're kicking toward.
+	4. Set the current wind angle using a normal distribution (mean: angle set at game start, stddev: 2 degrees). [PARAM: WindAngleVarianceStddev]
+	5. Set the current wind speed using a normal distribution (mean: speed set at game start, stddev: 4 MPH). [PARAM: WindSpeedVarianceStddev]
+	6. Determine the distance the ball is moved by wind.
+		1. Compute the adjusted wind angle (either the current wind angle or ((current wind angle + 180) % 360)) for the ball,
+		2. Compute the cross component, which is (current wind speed * sin(adjusted wind angle))
+		3. Compute the direct component, which is (current wind speed * cos(adjusted wind angle)).
+		4. Multiply both by 0.2. Final unit is yards, so a direct 10 MPH wind on the ball produces 2 yards of additional skew. [PARAM: BallWindYardsPerMPH]
+	7. The ball lands at the following location:
+		- Yard: Kickoff location + base kicking distance + direct wind component
+		- Cross: Kickoff location + base kicking skew + cross wind component
+	8. Outcome decision:
+		1. Where on the field did the ball land?
+			2. [On the field, x>20 yards from kickoff location or x<10 yards from kickoff location]: Kick returnable by receiving team. Go to Outcome II.
+			3. [On the field, 10<=x<=20 yards from kickoff location]: Kick returnable by either team. Go to Outcome III.
+			4. [Out the back of the receiving team's endzone]: Kickoff touchback, receiving team 1st and 10 from their own 35 yard line.
+			5. [Out the back of the kicking team's endzone]: SAFETY. Free kick follows. Go to Decision II.
+			6. [Out the sides of the field]: Penalty, kickoff out of bounds. Receiving team 1st and 10 from their own 45 yard line.
+
+II. RETURNABLE KICK (kickoff, free kick, or punt)
+	1. Can someone catch the ball? The chance of not catching the ball is a straight 1 - 10^(-(log_10(KickReturnStrength))), sampled evenly.
+		2. [Yes]: Player must choose to signal fair catch or not. Go to Decision III.
+		3. [No]: Ball hits ground, is live! Go to Outcome III.
+
+III. FUMBLED LIVE BALL (also includes live balls after kicks and intercepted balls)
+	Also before step 1
+		1. Is the team that just fumbled NOT the team who started this play? (That is, did team A have possession, then fumbled for a team B recovery and return, and then fumbled again for Team A to have a shot at recovering again?)
+			2. [Yes]: Set the Dual Possession on Play Flag.
+			3. [No]: Do nothing.
+
+	1. Sample a normal distribution (mean: your OffensiveLineStrength, stddev: 10). [PARAM: StandardStrengthStddev]
+	2. Sample a normal distribution (mean: their DefensiveLineStrength, stddev: 10). [PARAM: StandardStrengthStddev]
+	3. Add these two samples together, then compute (your sample) / (sum of samples). This is your fumble recovery chance.
+	4. Sample a normal distribution (mean: 5 yards, stddev: 2 yards). This is where, relative to the fumble's original location, the recovering team will recover the fumble.
+	5. Did you recover the fumble?
+		6. [Yes]: Were you NOT downed during the play?
+			7. [Yes]: Where did you recover the fumble, given the sample?
+				8. [Their endzone]: Is the PAT Flag set?
+					9. [Yes]: TWO-POINT CONVERSION! Go to DECISION I.
+					10. [No]: TOUCHDOWN! Go to DECISION IV.
+				11. [Anywhere else]: You may choose to return the recovered fumble. Go to DECISION VI.
+			12. [No]: Where did you recover the fumble, given the sample?
+				13. [Your endzone]: Is the PAT Flag set?
+					14. [Yes]: Is the 1-Point Safety Flag set?!
+						15. [Yes!]: ONE-POINT SAFETY! Go to DECISION II.
+						16. [No]: The play is dead, no points. Go to DECISION I.
+					17. [No]: SAFETY against you. Go to DECISION II.
+				18. [Their endzone]: Is the PAT Flag set?
+					19. [Yes]: TWO-POINT CONVERSION! Go to DECISION I.
+					20. [No]: TOUCHDOWN! Go to DECISION IV.
+				21. [Field of play]: Is the PAT Flag set?
+					22. [Yes]: The play is dead. Go to DECISION I.
+					23. [No]: Ball is dead where you recovered it, loss of down.
+		24. [No]: Were they NOT downed during the play?
+			25. [Yes]: Where did they recover the fumble, given the sample?
+				26. [Your endzone]: Is the PAT Flag set?
+					27. [Yes]: TWO POINTS FOR THEM! Go to DECISION I.
+					28. [No]: OH, NO! TOUCHDOWN! Go to DECISION IV.
+				29. [Anywhere else]: They may choose to return the recovered fumble. Go to DECISION VI.
+			30. [No]: Where did they recover the fumble, given the sample?
+				31. [Your endzone]: Is the PAT Flag set?
+					32. [Yes]: TWO POINTS FOR THEM! Go to DECISION I.
+					33. [No]: OH, NO! TOUCHDOWN! Go to DECISION IV.
+				34. [Their endzone]: Is the PAT Flag set?
+					35. [Yes]: ONE-POINT SAFETY AGAINST THEM! You get one point. Go to DECISION I.
+					36. [No]: SAFETY! You get two points. Go to DECISION II.
+				37. [Field of play]: Is the PAT Flag set?
+					38. [Yes]: The play is dead. Go to DECISION I.
+					39. [No]: Ball is dead where they recovered it, first down for them.
+
+IV. PUNT
+	1. Set the desired target yard line to be the opponent's 0.1 yard line in a cross range of the entire field.
+	2. Determine base kicking distance using a normal distribution (mean: (KickingStrength * 0.75) yards, stddev: 3 yards). [PARAM: PuntBaseDistanceMean, PuntBaseDistanceStddev]
+	3. Determine base kicking skew (0 being straight down the middle of the field, negative and positive meaning to the left and right, respectively; unit is yards). Sample a normal distribution:
+		- Mean: 10^(3 - log_10(KickingStrength)), goes down as KickingStrength goes up
+		- Standard deviation: 3 yards
+		- [PARAM: KickoffSkewMean, KickoffSkewStddev]
+		- There's a 50% chance this number is inverted, representing a skew in the other direction.
+	4. Set the desired kick direction of either 0 or 180 based on which endzone we're kicking toward.
+	5. Set the current wind angle using a normal distribution (mean: angle set at game start, stddev: 2 degrees). [PARAM: WindAngleVarianceStddev]
+	6. Set the current wind speed using a normal distribution (mean: speed set at game start, stddev: 4 MPH). [PARAM: WindSpeedVarianceStddev]
+	7. Determine the distance the ball is moved by wind.
+		1. Compute the adjusted wind angle (either the current wind angle or ((current wind angle + 180) % 360)) for the ball,
+		2. Compute the cross component, which is (current wind speed * sin(adjusted wind angle))
+		3. Compute the direct component, which is (current wind speed * cos(adjusted wind angle)).
+		4. Multiply both by 0.2. Final unit is yards, so a direct 10 MPH wind on the ball produces 2 yards of additional skew. [PARAM: BallWindYardsPerMPH]
+	8. The ball would ordinarily land at the following location:
+		- Yard: Punt location + base kicking distance + direct wind component
+		- Cross: Punt location + base kicking skew + cross wind component
+	9. Is this distance shorter than where the opponent's 0.1 yard line is? If so, then skip to the outcome decision on step 13.
+	10. If it is longer, the punter has the leg strength to get the ball to the target. But is he accurate enough? First, keep the cross location of the ball.
+	11. If the cross location of the ball is outside the field, the punt is out of bounds. Rather than going through the trouble of computing the kicking arc, we'll just compute where it went out of bounds as follows:
+		1. Envision the whole thing as a single straight line. Some portion of it is inbounds and some portion of it is out of bounds.
+		2. Given the cross location, figure out if it's to the left or to the right of the field (< -26.67 or > 26.67, respectively).
+		3. SUBTRACT that sideline coordinate from the cross location (so if it landed at -50, subtract -26.67 from it to get -23.33, or if it landed at +50, subtract +26.67 to get 23.33). This effectively moves the line such that the sideline it went out of is at 0 and the kick location is either 26.67 (out of left sideline) or -26.67 (out of right sideline)
+		4. Compute the percentage of the straight line that is out of bounds. The full length of the line is just the cross location since the punter is always at cross location 0. Thus, the out-of-bounds percentage is just (adjusted cross location) / (original cross location).
+		5. Compute the percentage of the straight line that is inbounds by taking 1 - (percentage that is out of bounds).
+		6. Multiply the yard line by this percentage. This becomes the new yard line for the next play, which is a first down for the receiving team.
+	12. Punter accuracy is envisioned as a normal distribution with lower and lower standard deviation around the mean, which is the desired target, the opponent's 0.1 yard line. At a KickingStrength of 100, the standard deviation is 5 yards, and each doubling of the strength halves the standard deviation. To compute the standard deviation:
+		1. Take log_2(KickingStrength) - log_2(100).
+		2. Invert it and add log_2(5).
+		3. Take 2 raised to that power.
+	13. Set the yard line to a sample from that normal distribution.
+	14. Outcome Decision:
+		1. Where on the field did the ball land?
+			2. [Anywhere on the field]: Kick is returnable by the receiving team. Go to Outcome V.
+			3. [Out the back of the receiving team's endzone]: Punt touchback. Receiving team gets 1st and 10 from their own 25.
+			4. [Out the back of the kicking team's endzone]: SAFETY. Free kick follows. Go to Decision II.
+
+V. RETURNABLE PUNT
+	1. Can someone catch the ball? The chance of not catching the ball is a straight 1 - 10^(-(log_10(KickReturnStrength))), sampled evenly.
+		2. [Yes]: Player must choose to signal fair catch or not. Go to Decision III.
+		3. [No]: Did any receiving team player touch the ball first without catching it? There is a 50% chance of this. [PARAM: UnrecoveredPuntTouchesReceivingTeamChance]
+			4. [Yes]: Ball is live! Go to Outcome IV.
+			5. [No]: Ball is rolling, sample a normal distribution (mean: 3 yards, stddev: 1 yard) to see how far it rolls, then there's a 50% chance it rolls backwards to the kicking team. Ball is dead where it stops, first down for the receiving team. [PARAM: GroundPuntRollDistanceMean, GroundPuntRollDistanceStddev, GroundPuntBouncesBackwardChance].
+			
+VI. KICK OR PUNT RETURN
+	1. Invoke FUNCTION I with your KickingOffenseStrength and their KickingDefenseStrength to figure out where you returned the ball to.
+	2. Outcome Decision:
+		1. Where were you brought down?
+			2. [Kicking team's endzone] TOUCHDOWN! Go to DECISION IV.
+			3. [Your endzone] SAFETY. Go to DECISION II.
+			4. [Field of play] First down from wherever you were brought down.
+
+VII. ONSIDE KICK ATTEMPT
+	1. Sample a normal distribution (mean: your KickingStrength, stddev: 10). [PARAM: StandardStrengthStddev]
+	2. Sample a normal distribution (mean: their DefensiveLineStrength [not sic], stddev: 10). [PARAM: StandardStrengthStddev]
+	3. Compute 1 - (sample from step 2 / sample from step 1), which is how many percentage points above or below the other team's sample you are.
+	4. Is the number from step 3 negative? (That is, is their sample better than yours?)
+		5. [Yes]: Invert the number from step 3 to make it positive. Then multiply it by 100 and take 2 to that power. Divide 0.05 by this number to get the odds that the onside kick succeeds. (That is, for every 1% better they are than you, your odds of recovery are halved, beginning at 5% if they're exactly matched to you.) [PARAM: BaseOnsideRecoveryChance]
+		6. [No]: Multiply the number by 5 and add it to 0.05, capped at 0.99. (That is, for every 1% better that you are over them, you get an extra 5% recovery chance, capped at 99%). [PARAM: BaseOnsideRecoveryChance, OnsidePositiveRecoveryMultiplier]
+		7. [Equal]: Your chance of recovery is a flat 5%. [PARAM: BaseOnsideRecoveryChance]
+	8. Do you recover the onside kick?
+		9. [Yes]: Sample a standard deviation (mean: 12.5, stddev: 1), which is how far from the kickoff location you recover the ball at, capped to at least 10 yards. You have 1st and 10 from this location. [Param: OnsideRecoveryDistanceMean, OnsideRecoveryDistanceStddev]
+		10. [No]: Sample a standard deviation (mean: 12.5, stddev: 1), which is how far from the kickoff location they recover the ball at. They have first down from this location. [Param: OnsideRecoveryDistanceMean, OnsideRecoveryDistanceStddev]
+		
+VIII. FIELD GOALS AND EXTRA POINT ATTEMPTS
+	Before step 1:
+	1. Is this an extra point attempt?
+		2. [Yes!]: Set the 1-Point Safety Flag!
+		3. [No]: Leave the 1-Point Safety Flag unchanged.
+
+	1. A lot of the existing code for a punt can be reused - it's basically a punt with a target of the uprights (yard -10 or 110, cross -3.08 to +3.08). Except it does have to have enough height to get there as well. Luckily, ChatGPT wrote a function for me that assumes a constant velocity, see FootballGame.KickClearsUprights.
+	2. Set the desired target yard line to be the opponent's 60 yard line in a cross range of -3.08 to +3.08 yards.
+	3. Determine base kicking distance using a normal distribution (mean: (KickingStrength * 0.75) yards, stddev: 3 yards). [PARAM: FieldGoalBaseDistanceMean, FieldGoalBaseDistanceStddev]
+	4. Determine base kicking skew (0 being straight down the middle of the field, negative and positive meaning to the left and right, respectively; unit is yards). Sample a normal distribution:
+		- Mean: 10^(3 - log_10(KickingStrength)), goes down as KickingStrength goes up
+		- Standard deviation: 3 yards
+		- [PARAM: KickoffSkewMean, KickoffSkewStddev]
+		- When kicking a field goal, kickers try to be much more straight than on other kinds of kicks, so we apply a 0.33 multiplier to the skew. [PARAM: FieldGoalKickingSkewMultiplier]
+		- There's a 50% chance this number is inverted, representing a skew in the other direction.
+	5. Set the desired kick direction of either 0 or 180 based on which endzone we're kicking toward.
+	6. Set the current wind angle using a normal distribution (mean: angle set at game start, stddev: 2 degrees). [PARAM: WindAngleVarianceStddev]
+	7. Set the current wind speed using a normal distribution (mean: speed set at game start, stddev: 4 MPH). [PARAM: WindSpeedVarianceStddev]
+	8. Set the kick location as up to 15 yards behind the line of scrimmage, capped at your own -9.9 yard line. If the kick location is within your own endzone, to simulate the handicap from having less space to kick, base kicking skew is multiplied by 1.2 for every yard deep you are. [PARAM: FieldGoalFromEndzoneSkewMultiplier]
+	9. Determine the distance the ball is moved by wind.
+		1. Compute the adjusted wind angle (either the current wind angle or ((current wind angle + 180) % 360)) for the ball,
+		2. Compute the cross component, which is (current wind speed * sin(adjusted wind angle))
+		3. Compute the direct component, which is (current wind speed * cos(adjusted wind angle)).
+		4. Multiply both by 0.2. Final unit is yards, so a direct 10 MPH wind on the ball produces 2 yards of additional skew. [PARAM: BallWindYardsPerMPH]
+	10. The ball would ordinarily land at the following location:
+		- Yard: Punt location + base kicking distance + direct wind component
+		- Cross: Punt location + base kicking skew + cross wind component
+	11. If the landing yard is at or beyond the target yard, and the skew is with the target cross location, use KickClearsUprights with the following arguments:
+		- The location of the kick
+		- The final landing yard of the ball
+		- The yard location of the goalpost (-10 or 110)
+	12. Outcome Decision:
+		1. Was the kick blocked? There is a 1% chance of a blocked kick up to 60 yards, where it increases by 0.5% per yard, sampled evenly.
+			2. [Yes]: Live ball! Go to OUTCOME III.
+			3. [No]: Did the field goal make it? (enough distance, not too much skew, enough height)
+				4. [Yes]: FIELD GOAL! Or EXTRA POINT! Go to DECISION I.
+				5. [No]: First down for the other team.
+				6. [Out the back of your own endzone]: SAFETY. 
+
+IX. TWO-POINT CONVERSION ATTEMPT
+	1. This is quite similar to a normal play from scrimmage, set at the 2-yard line, the only main difference is the point values for scoring and the lack of a second chance. Set the PAT Flag and 1-Point Safety Flag before continuing.
+	2. Compute the typical decision and outcome for a scrimmage play, set as 4th and Goal from the 2 (see DECISION V), and execute it.
+	3. Outcome Decision:
+		1. [Touchdown]: TWO-POINT ATTEMPT SUCCESSFUL! Go to DECISION I.
+		2. [Incomplete pass, failed rush attempt, basically any other outcome that isn't a turnover]: Attempt failed, no score. Go to DECISION I.
+		3. [Normal, non-safety touchdown by the defense]: TWO POINTS TO DEFENSE. Go to DECISION I, but the team scoring the touchdown still kicks off to the team that just scored two.
+		4. [Anything else]: The outcome logic for turnover scenarios already include safety computations, including the 1-point safety. Honor the result, but always go to DECISION I.
+
+X. FUMBLE OR INTERCEPTION RETURN
+	1. Invoke FUNCTION I using your RunningOffenseStrength and their RunningDefenseStrength to get the location you got the ball to.
+	2. Outcome Decision:
+		1. Where were you brought down?
+			2. [Fumbling team's endzone] Is the PAT Flag set?
+				3. [Yes]: TWO-POINT CONVERSION SUCCESSFUL. Go to DECISION I.
+				4. [No]: TOUCHDOWN! Go to DECISION IV.
+			5. [Recovering team's endzone] Is the PAT Flag set?
+				6. [Yes]: Is the 1-Point Safety Flag set?!
+					7. [Yes!]: ONE-POINT SAFETY! Go to DECISION II.
+					8. [No]: Play is dead, no points. Go to DECISION I.
+				9. [No]: SAFETY against you! Go to DECISION II.
+			10. [Field of play] First down from wherever you were brought down.
+			
+XI. TAKING A KNEE ON A FUMBLE OR INTERCEPTION
+	1. Where did you take a knee?
+		2. [Your endzone]: Touchback, ball is placed on your 25-yard line, first down.
+		3. [Field of play]: Is the Dual Possession on Play Flag set?
+			4. [Yes]: First down for you where you took the knee.
+			5. [No]: Did you recover your own fumble?
+				6. [Yes]: Loss of down for you.
+				7. [No]: First down for you where you took the knee.
+
+OUTCOME XII: STANDARD RUSHING PLAY
+	1. Invoke FUNCTION I using your RunningOffenseStrength and their RunningDefenseStrength to get the location you got the ball to.
+	2. Go to OUTCOME XXI.
+
+OUTCOME XIII: STANDARD PASSING PLAY (SHORT)
+	1. Take your PassingOffenseStrength as the mean of a normal distribution with a standard deviation of 10. [PARAM: StandardStrengthStddev]
+	2. Take their PassingDefenseStrength as the mean of a normal distribution with a standard deviation of 10. [PARAM: StandardStrengthStddev]
+	3. Compute the ratio of these two samples, (our sample / their sample), called P. P < 1 if we're worse at passing than they are defending the pass, P > 1 if we're better than they are.
+	5. Compute the other ratio, (their sample / our sample) = (1 / P), called Q.
+	6. The interception chance at P = 1 is 1.5% on short passes. For P < 1 (we're worse), every additional 0.4 Q is above 1 means a doubling of this interception chance, capped at 99%. For P > 1 (we're better), every additional 0.4 P is above 1 means a halving of this chance, capped at 0% [PARAM: BaseShortPassInterceptionChance, ShortPassInterceptionDoublingCost]
+	7. Assuming no interceptions, the completion chance at P = 1 is 75% on short passes. For P < 1 (we're worse), every additional 0.1 Q means this chance is multiplied by 0.9. For P > 1 (we're better), every additional 0.1 P means this chance is multiplied by 1.1, capped at 100%. [PARAM: BaseShortPassCompletionChance, ShortPassCompletionMultiplicationCost, ShortPassCompletionMultiplierIfBad, ShortPassCompletionMultiplierIfGood]
+	8. Assuming completion, the chance the receiver can continue to run with the ball is 90% on short passes. For P < 1, every additional 0.1 Q means this chance is multiplied by 0.9. For P > 1, every additional 0.1 P means this chance is multiplied by 1.1, capped at 100% [PARAM: BaseShortPassYACChance, BaseShortPassYACMultiplicationCost, BaseShortPassYACMultiplierIfBad, BaseShortPassYACMultiplierIfGood]
+	9. Outcome Decision:
+		1. Where we intercepted?
+			2. [Yes] Go to OUTCOME III.
+			3. [No] Did we complete the pass?
+				4. [Yes]
+					5. Select an evenly-chosen random number between -5 and +5. This becomes the distance to the receiver. [PARAM: ShortPassDistanceThreshold]
+					6. Can the receiver continue to run the ball after the catch?
+						7. [Yes] Invoke FUNCTION I using your RunningOffenseStrength and their RunningDefenseStrength to get the location you got the ball to.
+							8. Go to OUTCOME XXI.
+						9. [No] Go to OUTCOME XXI.
+				10. [No]: Loss of down, no change in the line of scrimmage. Go to DECISION V.
+
+OUTCOME XIV: STANDARD PASSING PLAY (MEDIUM)
+	1. Take your PassingOffenseStrength as the mean of a normal distribution with a standard deviation of 10. [PARAM: StandardStrengthStddev]
+	2. Take their PassingDefenseStrength as the mean of a normal distribution with a standard deviation of 10. [PARAM: StandardStrengthStddev]
+	3. Compute the ratio of these two samples, (our sample / their sample), called P.
+	5. Compute the other ratio, (their sample / our sample) = (1 / P), called Q.
+	6. The interception chance at P = 1 is 2.25% on medium passes. For P < 1, every additional 0.35 Q is above 1 means a doubling of this interception chance, capped at 99%. For P > 1, every additional 0.35 P is above 1 means a halving of this chance, capped at 0% [PARAM: BaseMediumPassInterceptionChance, MediumPassInterceptionDoublingCost]
+	7. Assuming no interceptions, the completion chance at P = 1 is 50% on medium passes. For P < 1, every additional 0.1 Q means this chance is multiplied by 0.85. For P > 1, every additional 0.1 P means this chance is multiplied by 1.05, capped at 100%. [PARAM: BaseMediumPassCompletionChance, MediumPassCompletionMultiplicationCost, MediumPassCompletionMultiplierIfBad, MediumPassCompletionMultiplierIfGood]
+	8. Assuming completion, the chance the receiver can continue to run with the ball is 60% on medium passes. For P < 1, every additional 0.1 Q means this chance is multiplied by 0.85. For P > 1, every additional 0.1 P means this chance is multiplied by 1.05, capped at 100% [PARAM: BaseMediumPassYACChance, BaseMediumPassYACMultiplicationCost, BaseMediumPassYACMultiplierIfBad, BaseMediumPassYACMultiplierIfGood]
+	9. Outcome Decision:
+		1. Where we intercepted?
+			2. [Yes] Go to OUTCOME III.
+			3. [No] Did we complete the pass?
+				4. [Yes]
+					5. Select an evenly-chosen random number between +6 and +15. This becomes the distance to the receiver. [PARAM: MediumPassDistanceThreshold]
+					6. Can the receiver continue to run the ball after the catch?
+						7. [Yes] Invoke FUNCTION I using your RunningOffenseStrength and their RunningDefenseStrength to get the location you got the ball to.
+							8. Go to OUTCOME XXI.
+						9. [No] Go to OUTCOME XXI.
+				10. [No]: Loss of down, no change in the line of scrimmage. Go to DECISION V.
+
+OUTCOME XV: STANDARD PASSING PLAY (LONG)
+	1. Take your PassingOffenseStrength as the mean of a normal distribution with a standard deviation of 10. [PARAM: StandardStrengthStddev]
+	2. Take their PassingDefenseStrength as the mean of a normal distribution with a standard deviation of 10. [PARAM: StandardStrengthStddev]
+	3. Compute the ratio of these two samples, (our sample / their sample), called P.
+	5. Compute the other ratio, (their sample / our sample) = (1 / P), called Q.
+	6. The interception chance at P = 1 is 5% on long passes. For P < 1, every additional 0.2 Q is above 1 means a doubling of this interception chance, capped at 99%. For P > 1, every additional 0.2 P is above 1 means a halving of this chance, capped at 0% [PARAM: BaseLongPassInterceptionChance, LongPassInterceptionDoublingCost]
+	7. Assuming no interceptions, the completion chance at P = 1 is 25% on long passes. For P < 1, every additional 0.1 Q means this chance is multiplied by 0.55. For P > 1, every additional 0.1 P means this chance is multiplied by 1.001, capped at 100%. [PARAM: BaseLongPassCompletionChance, LongPassCompletionMultiplicationCost, LongPassCompletionMultiplierIfBad, LongPassCompletionMultiplierIfGood]
+	8. Assuming completion, the chance the receiver can continue to run with the ball is 30% on long passes. For P < 1, every additional 0.1 Q means this chance is multiplied by 0.85. For P > 1, every additional 0.1 P means this chance is multiplied by 1.01, capped at 100% [PARAM: BaseLongPassYACChance, BaseLongPassYACMultiplicationCost, BaseLongPassYACMultiplierIfBad, BaseLongPassYACMultiplierIfGood]
+	9. Outcome Decision:
+		1. Where we intercepted?
+			2. [Yes] Go to OUTCOME III.
+			3. [No] Did we complete the pass?
+				4. [Yes]
+					5. Select an evenly-chosen random number between +15 and +50. This becomes the distance to the receiver. [PARAM: MediumPassDistanceThreshold]
+					6. Can the receiver continue to run the ball after the catch?
+						7. [Yes] Invoke FUNCTION I using your RunningOffenseStrength and their RunningDefenseStrength to get the location you got the ball to.
+							8. Go to OUTCOME XXI.
+						9. [No] Go to OUTCOME XXI.
+				10. [No]: Loss of down, no change in the line of scrimmage. Go to DECISION V.
+
+OUTCOME XVI: STANDARD PASSING PLAY (HAIL MARY)
+	1. Take your PassingOffenseStrength as the mean of a normal distribution with a standard deviation of 10. [PARAM: StandardStrengthStddev]
+	2. Take their PassingDefenseStrength as the mean of a normal distribution with a standard deviation of 10. [PARAM: StandardStrengthStddev]
+	3. Compute the ratio of these two samples, (our sample / their sample), called P.
+	4. Compute the other ratio, (their sample / our sample) = (1 / P), called Q.
+	5. Compute the distance from the line of scrimmage to the target endzone, and then add 5 yards representing the quarterback's dropback. For distances under 50 yards, set a variable R to 1, for every yard beyond that, multiply R by 0.75 for each yard. [PARAM: HailMaryChanceMultiplierPerYard]
+	6. Outcome Decision:
+		1. Choose a random number between 0 and 1. Is it less than R?
+			2. [Yes] Somebody caught the ball in the endzone! Choose a random number between 0 and 1. Is it less than 0.5? [PARAM: HailMaryInterceptionChance]
+				3. [Yes] Intercepted! Go to OUTCOME III.
+				4. [No] We got it in the endzone! TOUCHDOWN! Go to DECISION IV.
+			5. [No] Try to get it as far downfield as we can. Run a simulated OUTCOME XVI and see the result:
+				6. [Interception] Go to OUTCOME III.
+				7. [Incompletion] Loss of down, no change in the line of scrimmage. Go to DECISION V.
+				8. [Completion of 45 to 50 yards] Use that as the real outcome, but who caught it? Choose a random number between 0 and 1. Is it less than 0.5? [PARAM: HailMaryInterceptionChance]
+					9. [Yes] Intercepted! Go to OUTCOME III.
+					10. [No] We got it! First down in all likelihood, or loss of down if not. Go to DECISION V.
+				11. [Completion of less] Treat it as incomplete. Loss of down, no change in the line of scrimmage. Go to DECISION V.
+
+OUTCOME XVII: QUARTERBACK SNEAK
+	1. Take your OffensiveLineStrength as the mean of a normal distribution with a standard deviation of 10. [PARAM: StandardStrengthStddev]
+	2. Take their DefensiveLineStrength as the mean of a normal distribution with a standard deviation of 10. [PARAM: StandardStrengthStddev]
+	3. Compute (your sample / (your sample + their sample)). This is the chance your sneak succeeds. Does it?
+		4. [Yes]: You gain exactly enough for a first down. Go to DECISION V.
+		5. [No]: Pick a random number evenly between 0 and 2. This is how many yards you lose on the attempt. Go to DECISION V.
+
+OUTCOME XVIII: FAKE PUNT
+	1. Set a simulated line of scrimmage to be up to 15 yards behind the real line of scrimmage, or wherever the back of your own endzone is.
+	2. Rerun DECISION V but forced to be a rushing or passing play to figure out what you really want to do here. Use the adjusted LOS.
+
+OUTCOME XIX: FAKE FIELD GOAL ATTEMPT
+	1. Set a simulated line of scrimmage to be up to 15 yards behind the real line of scrimmage, or wherever the back of your own endzone is.
+	2. Rerun DECISION V but forced to be a rushing or passing play to figure out what you really want to do here. Use the adjusted LOS.
+
+OUTCOME XX: VICTORY FORMATION
+	1. Loss of down and 2 yards. Go to DECISION V.
+
+OUTCOME XXI: STANDARD PLAY FROM SCRIMMAGE OUTCOME
+1. Where was the ball dead?
+	2. [Behind the line to gain]: Loss of down, go to DECISION V. (Turnover on downs would be 1st down for the other team, DECISION V for them).
+	3. [Beyond the line to gain]: First down, go to DECISION V.
+	4. [Their endzone] TOUCHDOWN! Go to DECISION IV.
+	5. [Your endzone] SAFETY. Go to DECISION II.+

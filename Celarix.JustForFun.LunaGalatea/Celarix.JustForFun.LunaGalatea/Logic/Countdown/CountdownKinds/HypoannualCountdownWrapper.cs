@@ -24,58 +24,52 @@ namespace Celarix.JustForFun.LunaGalatea.Logic.Countdown.CountdownKinds
 
         public override ZonedDateTime? PreviousInstance(ZonedDateTime zonedDateTime)
         {
-            var previousYearWithOccurrence = GetPreviousYearWithOccurrence(zonedDateTime.Year);
-            return wrappedCountdown.PreviousInstance(GetJanuary1stMidnightOfYear(zonedDateTime.Zone, previousYearWithOccurrence));
+            ZonedDateTime? previousInstance = wrappedCountdown.PreviousInstance(GetDateInYear(zonedDateTime, exampleYearContainingOccurrence));
+            ZonedDateTime? secondToLastInstance = null;
+
+            if (previousInstance == null)
+            {
+                return null;
+            }
+
+            var comparer = ZonedDateTime.Comparer.Instant;
+            int year = exampleYearContainingOccurrence;
+            while (comparer.Compare(previousInstance!.Value, zonedDateTime) < 0)
+            {
+                year += yearsBetweenOccurrences;
+                secondToLastInstance = previousInstance;
+                previousInstance = wrappedCountdown.PreviousInstance(GetDateInYear(zonedDateTime, year));
+            }
+            return secondToLastInstance;
         }
 
         public override ZonedDateTime NextInstance(ZonedDateTime zonedDateTime)
         {
-            var nextYearWithOccurrence = GetNextYearWithOccurrence(zonedDateTime.Year);
-            return wrappedCountdown.NextInstance(GetJanuary1stMidnightOfYear(zonedDateTime.Zone, nextYearWithOccurrence));
+            ZonedDateTime nextInstance = wrappedCountdown.NextInstance(GetJanuary1InYear(zonedDateTime, exampleYearContainingOccurrence));
+            var comparer = ZonedDateTime.Comparer.Instant;
+            int year = exampleYearContainingOccurrence;
+            while (comparer.Compare(nextInstance, zonedDateTime) <= 0)
+            {
+                year += yearsBetweenOccurrences;
+                nextInstance = wrappedCountdown.NextInstance(GetJanuary1InYear(zonedDateTime, year));
+            }
+            return nextInstance;
         }
 
-        private int GetPreviousYearWithOccurrence(int year)
+        private ZonedDateTime GetDateInYear(ZonedDateTime zonedDateTime, int year)
         {
-            if (IsOccurrenceYear(year))
+            if (zonedDateTime.Day == 29 && zonedDateTime.Month == 2 && !DateTime.IsLeapYear(year))
             {
-                return year;
+                // Handle leap day by going to Mar 1 in non-leap years.
+                return new LocalDateTime(year, 3, 1, 0, 0, 0).InZoneLeniently(zonedDateTime.Zone);
             }
 
-            int yearsSinceExampleYear = year - exampleYearContainingOccurrence;
-            int offset = yearsSinceExampleYear % yearsBetweenOccurrences;
-            if (offset < 0)
-            {
-                offset += yearsBetweenOccurrences;
-            }
-            return year - offset;
+            return new LocalDateTime(year, zonedDateTime.Month, zonedDateTime.Day, 0, 0, 0).InZoneLeniently(zonedDateTime.Zone);
         }
 
-        private int GetNextYearWithOccurrence(int year)
+        private ZonedDateTime GetJanuary1InYear(ZonedDateTime zonedDateTime, int year)
         {
-            if (IsOccurrenceYear(year))
-            {
-                return year;
-            }
-
-            int yearsSinceExampleYear = year - exampleYearContainingOccurrence;
-            int offset = yearsSinceExampleYear % yearsBetweenOccurrences;
-            if (offset < 0)
-            {
-                offset += yearsBetweenOccurrences;
-            }
-            return year + (yearsBetweenOccurrences - offset);
-        }
-
-        private bool IsOccurrenceYear(int year)
-        {
-            var yearsSinceExampleYear = year - exampleYearContainingOccurrence;
-            return yearsSinceExampleYear % yearsBetweenOccurrences == 0;
-        }
-
-        private ZonedDateTime GetJanuary1stMidnightOfYear(DateTimeZone zone, int year)
-        {
-            var date = new LocalDateTime(year, 1, 1, 0, 0, 0);
-            return date.InZoneLeniently(zone);
+            return new LocalDateTime(year, 1, 1, 0, 0, 0).InZoneLeniently(zonedDateTime.Zone);
         }
     }
 }

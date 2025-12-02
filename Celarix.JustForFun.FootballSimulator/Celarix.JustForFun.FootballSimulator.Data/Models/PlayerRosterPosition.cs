@@ -16,8 +16,9 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
 		public bool CurrentPlayer { get; set; }
 		public int JerseyNumber { get; set; }
 		public BasicPlayerPosition Position { get; set; }
+		public int? GamesUntilReturnFromInjury { get; set; }
 
-		public int TeamWins { get; set; }
+        public int TeamWins { get; set; }
 		public int TeamLosses { get; set; }
 		public int TeamTies { get; set; }
 
@@ -46,7 +47,8 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
 		public int TeamExtraPointsMade { get; set; }
 		public int TeamLongFieldGoal { get; set; }
 		
-		public float WinLossTieRecord => (TeamWins + (TeamTies / 2f)) / (TeamWins + TeamTies + TeamLosses);
+		public bool Injured => GamesUntilReturnFromInjury.HasValue;
+        public float WinLossTieRecord => (TeamWins + (TeamTies / 2f)) / (TeamWins + TeamTies + TeamLosses);
 		public float PassCompletionPercentage => TeamPassCompletions / (float)TeamPassAttempts;
 		public float RushingYardsPerAttempt => TeamRushingYards / (float)TeamRushingAttempts;
 		public float KickReturnYardsPerAttempt => TeamReturnYards / (float)TeamKickReturns;

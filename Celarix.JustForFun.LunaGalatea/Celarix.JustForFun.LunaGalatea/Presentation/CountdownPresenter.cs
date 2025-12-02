@@ -13,6 +13,7 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
         private const int PageSize = 10;
         
         private readonly CountdownProvider provider = new CountdownProvider(SystemClock.Instance);
+        private readonly Button detailsButton;
         private readonly Label countdownLabel;
         private readonly string[] currentPage = new string[PageSize];
         private int currentPageIndex = 0;
@@ -21,6 +22,15 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
 
         public CountdownPresenter(Panel panel, int startingY, out int endingY)
         {
+            detailsButton = new Button
+            {
+                Text = "Details",
+                Location = new Point(5, startingY),
+                Size = new Size(75, 23),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right
+            };
+            startingY += detailsButton.Height + 5;
+
             countdownLabel = new Label
             {
                 Location = new Point(5, startingY),
@@ -40,10 +50,17 @@ namespace Celarix.JustForFun.LunaGalatea.Presentation
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
             
+            panel.Controls.Add(detailsButton);
             panel.Controls.Add(countdownLabel);
             panel.Controls.Add(separatorLabel);
 
             endingY = startingY + separatorLabel.Height + 5;
+
+            detailsButton.Click += (_, _) =>
+            {
+                var detailsForm = new CountdownDetailsForm();
+                detailsForm.ShowDialog();
+            };
 
             countdownLabel.Click += (_, e) =>
             {

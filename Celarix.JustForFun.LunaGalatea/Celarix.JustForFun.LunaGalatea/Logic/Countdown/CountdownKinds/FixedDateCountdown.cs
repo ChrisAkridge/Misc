@@ -23,7 +23,7 @@ namespace Celarix.JustForFun.LunaGalatea.Logic.Countdown.CountdownKinds
 
         public override string Name(ZonedDateTime now) => name;
 
-        public override ZonedDateTime? PreviousInstance(ZonedDateTime zonedDateTime) => PreviousInstanceWithKnownDate(zonedDateTime, Month, Day);
+        public override ZonedDateTime? PreviousInstance(ZonedDateTime zonedDateTime) => PreviousInstanceWithKnownDate(zonedDateTime, zonedDateTime.Year, Month, Day);
 
         public override ZonedDateTime NextInstance(ZonedDateTime zonedDateTime) => NextInstanceWithKnownDate(zonedDateTime, Month, Day);
     }

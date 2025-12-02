@@ -1,0 +1,55 @@
+Football Simulator: Total System Loop
+
+PHASE I: INITIALIZATION
+	1. Initialize the database.
+	2. Generate and evaluate the schedule for the first season year.
+	3. Go to PHASE II.
+	
+PHASE II: GAMEPLAY
+	1. Select the next game to be played.
+	2. Initalize base parameters and team strength estimates.
+	3. Do a coin toss - just pick the team who possesses first in the first half by choosing a random number between 0 and 1 and see if it's less than 0.5 (home team to go first) or greater-than-or-equal-to (away team to go first). Remember who gets the second-half kickoff.
+	4. Go to DECISION I in the Gameplay Decision Tree for the first team to possess and run the gameplay. A single play will have at least one decision/outcome pair, but may have multiple.
+	5. Run plays until the end of the first half, then go to DECISION I for the second team. Run plays until the end of the fourth quarter.
+	6. If the game is tied, start an overtime period and follow the OT rules in Outer Game Logic. Another coin toss is needed and works the same. In the playoffs, should a game reach 3OT, 5OT, or any odd-numbered OT, a new coin toss is required.
+	7. The result of the game is recorded and the next game is selected to play, go to step 1.
+
+PHASE III: PLAYOFFS
+	1. After all regular season games are played, records are tallied and ties are broken to determine the playoffs:
+		- The winners of the 5 divisions in each conference are in, along with the 3 teams in each conference who remain and have the highest ranking amongst teams in their conference.
+		- The 5 division winners get the 1 through 5 seeds in order of their ranking amongst other division winners. Wild cards get 6 through 8 in the same manner.
+		- The playoff games are as follows:
+			- AFC Wild Card 1: #8 @ #1
+			- AFC Wild Card 2: #7 @ #2
+			- AFC Wild Card 3: #6 @ #3
+			- AFC Wild Card 4: #5 @ #4
+			- NFC Wild Card 1: #8 @ #1
+			- NFC Wild Card 2: #7 @ #2
+			- NFC Wild Card 3: #6 @ #3
+			- NFC Wild Card 4: #5 @ #4
+			- AFC Divisional Round 1: (lowest remaining seed) @ (highest remaining seed)
+			- AFC Divisional Round 2: (second lowest seed) @ (second highest seed)
+			- NFC Divisional Round 1: (lowest remaining seed) @ (highest remaining seed)
+			- NFC Divisional Round 2: (second lowest seed) @ (second highest seed)
+			- AFC Championship: (lowest remaining seed) @ (highest remaining seed)
+			- NFC Championship: (lowest remaining seed) @ (highest remaining seed)
+			- Super Bowl: (AFC winner) vs. (NFC Winner)
+		- The designated home team in the Super Bowl is the AFC in even-numbered years and the NFC in odd-numbered years. The actual stadium is any of the 40 chosen at random.
+		- Wild Card games are played on the Saturday and Sunday after Week 17, 4 games at 4:25pm and 4 games at 8:20pm, 4 per night.
+		- Divisional Round games are played on the next Saturday and Sunday, 2 games at 4:25pm and 2 games at 8:20pm, 2 per night.
+		- Conference Championship games are played on that next Sunday, the AFC game at 4:25pm and the NFC at 8:20pm.
+		- The Super Bowl is played two weeks later on that Sunday, at 6:05pm.
+	2. Create and save the game records for the Wild Card round and then play all the games as in PHASE II.
+	3. Once the Wild Card round is over, create and save the game records for the Divisional Round games, then play them all as in PHASE II.
+	4. Then do the Conference Championship in the same manner.
+	5. Then do the Super Bowl.
+
+PHASE IV: OFFSEASON
+	1. Run a draft per the rules in Outer Game Logic. The draft order is:
+		1. Super Bowl winner
+		2. Super Bowl loser
+		3-4. Conference championship losers in reverse ranking
+		5-8. Divisional round losers in reverse ranking
+		9-16. Wild Card round losers in reverse ranking
+		17-40. All other teams in reverse ranking
+	2. Create the next season's schedule, save the game records, then load the first game to play! Go to PHASE II.

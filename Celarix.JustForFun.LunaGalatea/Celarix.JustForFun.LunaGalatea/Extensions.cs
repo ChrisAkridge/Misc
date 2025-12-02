@@ -88,5 +88,23 @@ namespace Celarix.JustForFun.LunaGalatea
 
             return result.ToString();
         }
+
+        public static IEnumerable<T> Repeat<T>(this IEnumerable<T> sequence, int count)
+        {
+            ArgumentNullException.ThrowIfNull(sequence);
+
+            if (count < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), "Count must be non-negative.");
+            }
+
+            foreach (var item in sequence)
+            {
+                for (var i = 0; i < count; i++)
+                {
+                    yield return item;
+                }
+            } 
+        }
     }
 }

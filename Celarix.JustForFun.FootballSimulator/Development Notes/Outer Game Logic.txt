@@ -1,0 +1,90 @@
+Football Simulator: Outer Game Logic
+
+Down Progression
+	- On a typical possession, the team gets four downs. First down sets the line to gain as 10 yards ahead of the line of scrimmage, unless the end zone is less than 10 yards away, in which case it's goal-to-go.
+	- Unless a play from scrimmage ends beyond the line to gain, the downs progress from first to second to third to fourth.
+		- Other outcomes that instantly end a series of downs are any scoring play, any field goal attempt, any punt, or any turnover kept by the defense.
+	- If a fourth down play ends in the same way that would be a loss of down, a turnover on downs occur, which gives the other team first down and at most 10 yards to go.
+
+Injuries
+	- A player might be injured on any play. The chance of an injury are 1.7% on any single play. These chances are evaluated once per team per play. [PARAM: InjuryChancePerPlay]
+	- An injury on a team selects one player at random. A number is sampled from a normal distribution (mean: 1, stddev: 0.2), which becomes their GamesUntilReturnFromInjury. [PARAM: InjuryGamesUntilReturnMean, InjuryGamesUntilReturnStddev]
+		- After each game, all team players with this value set have it decremented, and if it becomes 0, it is set to null and they have recovered.
+		- At the end of each season, the value is set to null regardless of its value. This means that even if the sample is more than the number of games in the season, they're guaranteed to return next year... unless...
+	- Any injury has a 0.1% chance of being career-ending. The player's stint on a team is ended, their Retired flag is set, and another player is drafted (see Drafting and Trading below). [PARAM: InjuryCareerEndingChance]
+	- Injuries become more likely during temperatures players are unfamiliar with. Their "best" temperature at which the injury chance per play is unchanged is the team's home stadium's overall average temperature (the average of all temperatures).
+		- For every 10 degrees Fahrenheit away from this best temperature, the injury chance is multiplied by 1.1. [PARAM: InjuryChanceMultiplierAtTemperatureBand, InjuryTemperatureBandSize]
+		- Career-ending injuries are NOT more likely at extreme temperatures.
+
+Drafting and Trading
+	- The roster of each team consists of 23 players:
+		- 1 quarterback
+		- 1 kicker (who does punts, field goal and extra point attempts, and kickoffs)
+		- 10 offensive players
+		- 11 defensive players
+	- If a player is injured during a game, they can draft immediately from an inexhaustible pool of undrafted free agents (see Strength Adjustments below). Mid-game drafted players are only present for that game; they appear in the Player table and the PlayerRosterPosition table but the CurrentPlayer flag is cleared.
+	- If a player remains injured after each game, another UDFA is drafted at the beginning of each game for each missing roster member, for one game.
+	- After each Super Bowl, a draft occurs. The draft order is the typical NFL order that is well-documented. The player pool is made up of all the UDFAs signed mid-game and cut at the end, and the remaining slots are filled with random players.
+		- There are 7 rounds and 40 selections per round, making 280 slots per draft.
+	- Before the trade deadline on Week 8, teams can trade with each other.
+		- For each team, the team makes estimated strengths of all 39 other teams. Unlike in game, these have wider margins of error:
+			1. For each strength,
+				1. Sample from a normal distribution (mean: 0, stddev: 0.15) [PARAM: TradeStrengthEstimatorOffsetMean, TradeStrengthEstimatorOffsetStddev].
+				2. Change the number based on the team's disposition:
+					- Ultra-conservative: -0.2 [PARAM: StrengthEstimatorUltraConservativeAdjustment]
+					- Conservative: 0.0 [PARAM: StrengthEstimatorConservativeAdjustment]
+					- Insane: 0.1 [PARAM: StrengthEstimatorInsaneAdjustment]
+					- Hyper-insane: 0.8 [PARAM: StrengthEstimatorUltraInsaneAdjustment]
+				3. This number becomes the percentage added to the objective strength in either direction (so 0.15 becomes 100% +/- 15%, or 85%-115%).
+				4. A number is sampled evenly from that range as the estimated strength.
+		- The team also estimates its own strength, but using the same logic in the main gameplay loop (that is, the StrengthEstimatorOffsetXXX parameters instead of TradeStrengthEstimatorOffsetXXX).
+		- It then orders every team by each of the strengths, producing a set of 11 lists of 39 teams in order.
+		- These lists are filtered to the teams where that strength is at least 20% better than their own. If no teams remain, we don't trade. [PARAM: TradeOfferStrengthThreshold]
+		- Teams from all 11 lists are added into one big list and deduplicated. We also store which strength we chose them for. Any team where any team strength is at least 10% better than theirs are kept. [PARAM: TradeOfferOtherStrengthThreshold]
+		- We now have a trade offer: the strength we want, the strength we're offering. We make it to the other team.
+		- The other team makes an estimate of our strengths using the wider parameters. If they think that the strength we offer is at least 15% higher than theirs, they accept the offer. [PARAM: TradeOfferAcceptanceStrengthThreshold]
+		- To perform the actual trade:
+			- Depending on the strength, either an offensive or defensive player is picked from each team, including any position players.
+			- Their PlayerRosterPositions end and new ones start with each other's team.
+			- The team's actual strengths are adjusted:
+				1. Divide each strength by 11.
+				2. Use this as the mean of a normal distribution (stddev: 2% of the strength that's being changed) and sample it. [PARAM: TradeNewStrengthStddev]
+				3. Subtract 1/11th from each strength and then add the sample.
+
+Strength Adjustments
+	- Strength can be adjusted at many points during the program's run:
+		- On any play in a game, strengths generally go up a tiny amount unless there's an injury. Only the strengths used during a play will increase (i.e. a normal rush will improve both the offense's RunningOffenseStrength and also the defense's RunningDefenseStrength).
+			- The strengths improve regardless of the outcome of the play.
+			- Sample a normal distribution (mean: 0.00005, stddev: 0.00001), which is added to 1. That becomes the multiplier of the strength. [PARAM: PlayStrengthIncreaseMultiplierMean, PlayStrengthIncreaseMultiplierStddev]
+		- Injuries reduce the strength. Depending on which player was hurt, any of the strengths will be reduced by 1 / (the number of players in that position). Then, on the instant UDFA draft, a new random strength will be added back (see below).
+		- Winning a game adds 0.5% to all strengths for home games, 0.4% for away games, 1% for home playoff games, and 0.8% for away playoff games. [PARAM: VictoryStrengthBonusHome, VictoryStrengthBonusAway, VictoryStrengthBonusHomePlayoff, VictoryStrengthBonusAwayPlayoff]
+		- Losing a game removes 0.5% from all strengths for home games, 0.6% for away games, 1.2% for away playoff games, and 1.4% for away playoff games. [PARAM: LossStrengthBonusHome, LossStrengthBonusAway, LossStrengthBonusHomePlayoff, LossStrengthBonusAwayPlayoff]
+		- New random players, only when drafted, add a certain amount of strength to the team. Sample a normal distribution (mean: 25, stddev: 4) and that becomes the strength added.
+	- Strength changes based on player position are as follows:
+		- RunningOffenseStrength: Changed by offensive player
+		- RunningDefenseStrength: Changed by defensive player
+		- PassingOffenseStrength: Changed by offensive player and quarterback
+		- PassingDefenseStrength: Changed by defensive player
+		- OffensiveLineStrength: Changed by offensive player
+		- DefensiveLineStrength: Changed by defensive player
+		- KickingStrength: Changed by kicker
+		- FieldGoalStrength: Changed by kicker
+		- KickReturnStrength: Changed by offensive player
+		- KickDefenseStrength: Changed by defensive player
+
+The Game Clock
+	- The game clock advances during most plays - it only does not run during extra point attempts or 2-point attempts.
+	- To figure out the duration of a single play, sample a normal distribution (mean: 4, stddev: 2), which is the number of seconds it is. [PARAM: PlayDurationMean, PlayDurationStddev]
+	- If a play ends a quarter, it still counts.
+	- The amount of time passed after each play depends on the clock disposition of the team at the moment.
+		- Relaxed: 30 seconds, letting the play clock run to 10 each time.
+		- Hurry-up: 10 seconds, letting the play clock only run to 30 each time.
+		- Two-minute drill: Sample a random distribution (mean: 5 seconds, stddev: 2 seconds), which is how long it takes to get the snap off. Minimum is 0 seconds, maximum 40. [PARAM: TwoMinuteDrillTimeToSnapMean, TwoMinuteDrillTimeToSnapStddev]
+		- Clock-chewing: 40 seconds, letting the play clock run all the way down each time.
+	- Overtime periods are limited to 1 at the end of all games except post-season games.
+		- If the score is tied at the end of this OT, the game is over as a tie; if one team scores, the other gets at least one chance to possess the ball.
+		- If the game ends without the score being tied, the leading team is automatically the winner.
+		- If the second possession ends by turnover or punt, the game ends immediately.
+		- If one team has scored, the next score automatically wins the game. The leading team is the victor.
+		- In the postseason, the same dual possession rules apply, except that if the first overtime period ends, regardless of score, the game continues into 2OT.
+			- If both possessions during a postseason game are concluded and the score is still tied in any manner, the game continues but next score wins.

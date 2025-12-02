@@ -25,7 +25,8 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
     {
         UltraConservative,
         Conservative,
-        Insane
+        Insane,
+        UltraInsane
     }
 
     public enum GameType

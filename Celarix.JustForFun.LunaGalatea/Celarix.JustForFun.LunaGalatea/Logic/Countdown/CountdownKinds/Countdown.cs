@@ -37,11 +37,24 @@ namespace Celarix.JustForFun.LunaGalatea.Logic.Countdown.CountdownKinds
             }
 
             var previousOccurrenceLocalDate = new LocalDateTime(countdownYear, countdownMonth, countdownDay, 0, 0, 0);
+
+            if (previousOccurrenceLocalDate > new LocalDateTime(dateAtMidnight.Year, dateAtMidnight.Month, dateAtMidnight.Day, 0, 0, 0))
+            {
+                // If the previous occurrence is after today, we need to go back one year.
+                previousOccurrenceLocalDate = previousOccurrenceLocalDate.PlusYears(-1);
+            }
+
             return previousOccurrenceLocalDate.InZoneLeniently(zonedDateTime.Zone);
         }
 
         protected ZonedDateTime NextInstanceWithKnownDate(ZonedDateTime zonedDateTime, int countdownMonth, int countdownDay)
         {
+            if (zonedDateTime.Month == countdownMonth && zonedDateTime.Day == countdownDay)
+            {
+                // Today!
+                return AtMidnight(zonedDateTime);
+            }
+
             return NextInstanceWithKnownDate(zonedDateTime, GetNextCountdownYear(zonedDateTime, countdownMonth, countdownDay), countdownMonth, countdownDay);
         }
 

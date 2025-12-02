@@ -14,8 +14,9 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
 		public string FirstName { get; set; }
 		public string LastName { get; set; }
 		public DateTimeOffset DateOfBirth { get; set; }
-		
-		public List<PlayerRosterPosition> RosterPositions { get; set; }
+		public bool Retired { get; set; }
+
+        public List<PlayerRosterPosition> RosterPositions { get; set; }
 		
 		public int CareerWins => RosterPositions.Sum(rp => rp.TeamWins);
 		public int CareerLosses => RosterPositions.Sum(rp => rp.TeamLosses);

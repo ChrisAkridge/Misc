@@ -1,0 +1,38 @@
+Football Simulator: Adapting the Gameplay Loop to Code
+
+Key functions and objects:
+	- double RandomDoubleInRangeExclusive(double min, double max)
+	- double SampleNormalDistribution(double mean, double stddev)
+	- bool InFieldGoalRange(GameTeam)
+	- bool InConversionAttempt { get; set; } (called the PAT Flag)
+	- bool CanOnePointOffensiveSafety { get; set; } (called the 1-Point Safety flag)
+	- bool BothTeamsPossessedThisPlay { get; set; } (called the Dual Possession flag)
+	- double UniversalRushAttemptAchievedYard(double offenseStrength, double defenseStrength, ...)
+	- double PointGapPerMinuteRemaining(GameTeam)
+	- double TeamYardToAbsoluteYard(double, GameTeam)
+	- Constants:
+		- HomeEndzoneAngle = 0d
+		- AwayEndzoneAngle = 180d
+		- HomeEndLineYard = -10d
+		- AwayEndLineYard = 110d
+		- HomeGoalLineYard = 0d
+		- AwayGoalLineYard = 100d
+		- MidfieldYard = 50d
+		- LeftSidelineCross = -(80d / 3d)
+		- RightSidelineCross = 80d / 3d
+		- KickoffTouchbackTeamYard = 35d;
+		- PuntTouchbackTeamYard = 25d;
+		- 
+		
+Types:
+	- Parameter: Name, Value, Unit, Description, Min, Max
+	- ParameterSet: Get value by name, save to DB
+	- FieldLocation: Yard, Cross
+	- TeamStrengthSet: All the strengths stored in the team's DB row, but also two properties:
+		- bool IsEstimate
+		- BasicTeamInfo? EstimateOfTeam: The team making the estimate
+		- BasicTeamInfo? EstimateForTeam: The team the estimate is about
+		- double OverallAverage
+		- double GetByName(string)
+		- void SetByName(string, double)
+		- void SaveToTeam(Team)
