@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         public Stadium HomeStadium { get; set; }
         public List<PlayerRosterPosition> FullHistoricalRoster { get; set; }
 
+        [NotMapped]
         public IEnumerable<PlayerRosterPosition> ActiveRoster => FullHistoricalRoster.Where(p => p.CurrentPlayer);
 
         /// <summary>Serves as the default hash function.</summary>

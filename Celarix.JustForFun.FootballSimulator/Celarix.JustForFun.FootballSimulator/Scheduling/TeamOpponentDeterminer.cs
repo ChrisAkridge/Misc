@@ -17,19 +17,22 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 		public TeamOpponentDeterminer(IReadOnlyList<BasicTeamInfo> teams) => this.teams = teams;
 		
 		public List<GameMatchup> GetTeamOpponentsForSeason(int cycleYear,
-			Dictionary<BasicTeamInfo, int>? previousSeasonDivisionRankings)
+			Dictionary<BasicTeamInfo, int>? previousSeasonDivisionRankings,
+			Dictionary<BasicTeamInfo, TeamScheduleDiagnostics> diagnostics)
 		{
 			var matchups = new List<GameMatchup>();
-			previousSeasonDivisionRankings ??= GetDefaultPreviousSeasonDivisionRankings();
+			previousSeasonDivisionRankings ??= GetDefaultPreviousSeasonDivisionRankings(teams);
 
 			LogPreviousSeasonRankings(previousSeasonDivisionRankings);
 
 			foreach (var team in teams)
 			{
-				AddIntradivisionGamesForTeam(team, matchups);
-				AddIntraconferenceMatchupsForTeam(cycleYear, team, matchups);
-				AddInterconferenceMatchupsForTeam(cycleYear, team, matchups);
-				AddRemainingIntraconferenceMatchupsForTeam(cycleYear, previousSeasonDivisionRankings, team, matchups);
+				var diagnostic = diagnostics[team];
+
+                AddIntradivisionGamesForTeam(team, matchups, diagnostic);
+				AddIntraconferenceMatchupsForTeam(cycleYear, team, matchups, diagnostic);
+				AddInterconferenceMatchupsForTeam(cycleYear, team, matchups, diagnostic);
+				AddRemainingIntraconferenceMatchupsForTeam(cycleYear, previousSeasonDivisionRankings, team, matchups, diagnostic);
 			}
 
 			ValidateOrThrow(matchups);
@@ -47,44 +50,44 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 				GameType = gameType
 			};
 
-		private void AddIntradivisionGamesForTeam(BasicTeamInfo team, List<GameMatchup> matchups)
+		private void AddIntradivisionGamesForTeam(BasicTeamInfo team, List<GameMatchup> matchups, TeamScheduleDiagnostics diagnostic)
 		{
 			// Intradivision: 2 games each against 3 division opponents (6 games total)
 			foreach (var intradivisionOpponent in GetTeamsInDivision(teams, team.Conference, team.Division)
-				         .Where(t => !comparer.Equals(t, team)))
+						 .Where(t => !comparer.Equals(t, team)))
 			{
-				AddMatchup(matchups, CreateMatchup(team, intradivisionOpponent, ScheduledGameType.IntradivisionalFirstSet));
-				AddMatchup(matchups, CreateMatchup(team, intradivisionOpponent, ScheduledGameType.IntradivisionalSecondSet));
+				AddMatchup(matchups, CreateMatchup(team, intradivisionOpponent, ScheduledGameType.IntradivisionalFirstSet), diagnostic);
+				AddMatchup(matchups, CreateMatchup(team, intradivisionOpponent, ScheduledGameType.IntradivisionalSecondSet), diagnostic);
 			}
 		}
 
-		private void AddIntraconferenceMatchupsForTeam(int cycleYear, BasicTeamInfo team, List<GameMatchup> matchups)
+		private void AddIntraconferenceMatchupsForTeam(int cycleYear, BasicTeamInfo team, List<GameMatchup> matchups, TeamScheduleDiagnostics diagnostic)
 		{
 			// Intraconference: 1 game against each of the 4 teams in another division in the same conference (4 games total)
-			var intraconferenceOpponents = GetIntraconferenceOpponentsForTeam(team, cycleYear).GroupBy(o => o.Name).ToArray();
+			var intraconferenceOpponents = GetIntraconferenceOpponentsForTeam(team, cycleYear, diagnostic).GroupBy(o => o.Name).ToArray();
 
 			if (intraconferenceOpponents.Length == 3)
 			{
 				var doubleOpponent = intraconferenceOpponents.First(g => g.Count() == 2).First();
-				AddMatchup(matchups, CreateMatchup(team, doubleOpponent, ScheduledGameType.IntraconferenceFirstSet));
-				AddMatchup(matchups, CreateMatchup(team, doubleOpponent, ScheduledGameType.IntraconferenceSecondSet));
+				AddMatchup(matchups, CreateMatchup(team, doubleOpponent, ScheduledGameType.IntraconferenceFirstSet), diagnostic);
+				AddMatchup(matchups, CreateMatchup(team, doubleOpponent, ScheduledGameType.IntraconferenceSecondSet), diagnostic);
 
-				var firstSetOpponents = intraconferenceOpponents.Where(g => g.Count() == 1)
+                var firstSetOpponents = intraconferenceOpponents.Where(g => g.Count() == 1)
 					.Select(g => g.First())
 					.Select((o, i) => CreateMatchup(team, o, ScheduledGameType.IntraconferenceFirstSet));
 
-				AddMatchupRange(matchups, firstSetOpponents);
+				AddMatchupRange(matchups, firstSetOpponents, diagnostic);
 			}
 			else
 			{
 				var firstSetOpponents = intraconferenceOpponents.SelectMany(g => g)
 					.Select((o, i) => CreateMatchup(team, o, ScheduledGameType.IntraconferenceFirstSet));
 
-				AddMatchupRange(matchups, firstSetOpponents);
+				AddMatchupRange(matchups, firstSetOpponents, diagnostic);
 			}
 		}
 
-		private void AddInterconferenceMatchupsForTeam(int cycleYear, BasicTeamInfo team, List<GameMatchup> matchups)
+		private void AddInterconferenceMatchupsForTeam(int cycleYear, BasicTeamInfo team, List<GameMatchup> matchups, TeamScheduleDiagnostics diagnostic)
 		{
 			// Interconference: 1 game against each of the 4 teams in a division in the other conference (4 games total)
 			var interconferenceMatchups = GetTeamsInDivision(teams,
@@ -92,26 +95,29 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 					DivisionMatchupCycles.GetInterconferenceOpponentDivision(cycleYear, team.Conference, team.Division))
 				.Select((o, i) => CreateMatchup(team, o, ScheduledGameType.Interconference));
 
-			AddMatchupRange(matchups, interconferenceMatchups);
+			AddMatchupRange(matchups, interconferenceMatchups, diagnostic);
 		}
 
 		private void AddRemainingIntraconferenceMatchupsForTeam(int cycleYear, Dictionary<BasicTeamInfo, int> previousSeasonDivisionRankings,
-			BasicTeamInfo team, List<GameMatchup> matchups)
+			BasicTeamInfo team, List<GameMatchup> matchups, TeamScheduleDiagnostics diagnostic)
 		{
 			// Remaining intraconference: 1 game against 2 teams in 2 other divisions that finished in the same position as the team did (2 games total)
-			var remainingIntraconferenceOpponents = GetRemainingIntraconferenceOpponentTeams(team, cycleYear, previousSeasonDivisionRankings).ToArray();
+			var remainingIntraconferenceOpponents = GetRemainingIntraconferenceOpponentTeams(team,
+				cycleYear,
+				previousSeasonDivisionRankings,
+				diagnostic).ToArray();
 
 			if (comparer.Equals(remainingIntraconferenceOpponents[0], remainingIntraconferenceOpponents[1]))
 			{
 				// We're in the year when the division plays itself for the remaining intraconference games.
-				AddMatchup(matchups, CreateMatchup(team, remainingIntraconferenceOpponents[0], ScheduledGameType.RemainingIntraconferenceFirstSet));
-				AddMatchup(matchups, CreateMatchup(team, remainingIntraconferenceOpponents[0], ScheduledGameType.RemainingIntraconferenceSecondSet));
-			}
+				AddMatchup(matchups, CreateMatchup(team, remainingIntraconferenceOpponents[0], ScheduledGameType.RemainingIntraconferenceFirstSet), diagnostic);
+				AddMatchup(matchups, CreateMatchup(team, remainingIntraconferenceOpponents[0], ScheduledGameType.RemainingIntraconferenceSecondSet), diagnostic);
+            }
 			else
 			{
 				var remainingIntraconferenceFirstSetMatchups = remainingIntraconferenceOpponents
 					.Select((o, i) => CreateMatchup(team, o, ScheduledGameType.RemainingIntraconferenceFirstSet));
-				AddMatchupRange(matchups, remainingIntraconferenceFirstSetMatchups);
+				AddMatchupRange(matchups, remainingIntraconferenceFirstSetMatchups, diagnostic);
 			}
 		}
 
@@ -139,58 +145,33 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 			Log.Information(rankingsForLogging);
 		}
 
-		private static void AddMatchup(ICollection<GameMatchup> matchups, GameMatchup matchup)
-		{
+		private static void AddMatchup(ICollection<GameMatchup> matchups, GameMatchup matchup, TeamScheduleDiagnostics diagnostic)
+        {
 			Log.Information("Adding matchup #{GameNumber}: {TeamA} vs. {TeamB} ({GameType})",
 				matchups.Count, matchup.TeamA.Name, matchup.TeamB.Name, matchup.GameType);
 
 			matchups.Add(matchup);
-		}
+			diagnostic.AddMatchup(matchup.GameType, matchup.TeamB);
+        }
 		
-		private static void AddMatchupRange(ICollection<GameMatchup> matchups, IEnumerable<GameMatchup> newMatchups)
-		{
+		private static void AddMatchupRange(ICollection<GameMatchup> matchups, IEnumerable<GameMatchup> newMatchups, TeamScheduleDiagnostics diagnostic)
+        {
 			foreach (var matchup in newMatchups)
 			{
-				AddMatchup(matchups, matchup);
-			}
+				AddMatchup(matchups, matchup, diagnostic);
+            }
 		}
 
-		private Dictionary<BasicTeamInfo, int> GetDefaultPreviousSeasonDivisionRankings()
-		{
-			Log.Information("No previous season division rankings available, generating default...");
-
-			var random = new Random(-1528635010);
-			var rankings = new Dictionary<BasicTeamInfo, int>();
-
-			var conferences = new[]
-			{
-				Conference.AFC, Conference.NFC
-			};
-
-			var divisions = new[]
-			{
-				Division.East, Division.North, Division.South, Division.West, Division.Extra
-			};
-
-			foreach (var divisionTeams in conferences.SelectMany(c => divisions.Select(d => GetTeamsInDivision(teams, c, d).ToList())))
-			{
-				divisionTeams.Shuffle(random);
-
-				for (int i = 0; i < 4; i++) { rankings[divisionTeams[i]] = i + 1; }
-			}
-
-			return rankings;
-		}
-
-		private IEnumerable<BasicTeamInfo> GetIntraconferenceOpponentsForTeam(BasicTeamInfo team, int cycleYear)
+		private IEnumerable<BasicTeamInfo> GetIntraconferenceOpponentsForTeam(BasicTeamInfo team, int cycleYear, TeamScheduleDiagnostics diagnostic)
 		{
 			var opponentDivision = DivisionMatchupCycles.GetIntraconferenceOpponentDivision(cycleYear, team.Division);
 			if (opponentDivision == team.Division)
 			{
-				// Intraconference games fill 4 slots, but we can't play ourselves.
-				// So we need to play 1 game against 2 opponents and 2 games against the third.
-				// We'd like to choose semi-randomly. Let's start by seeding an RNG with the cycle year.
-				var random = new Random(cycleYear);
+				diagnostic.TeamDivisionPlaysSelfForIntraconference = true;
+                // Intraconference games fill 4 slots, but we can't play ourselves.
+                // So we need to play 1 game against 2 opponents and 2 games against the third.
+                // We'd like to choose semi-randomly. Let's start by seeding an RNG with the cycle year.
+                var random = new Random(SchedulingRandomSeed);
 
 				// There are 16 symmetric slots to fill for these teams in this division:
 				// Colts   . . . . 
@@ -243,7 +224,8 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 
 		private IEnumerable<BasicTeamInfo> GetRemainingIntraconferenceOpponentTeams(BasicTeamInfo team,
 			int cycleYear,
-			IReadOnlyDictionary<BasicTeamInfo, int> previousSeasonDivisionRankings)
+			IReadOnlyDictionary<BasicTeamInfo, int> previousSeasonDivisionRankings,
+			TeamScheduleDiagnostics diagnostic)
 		{
 			var opponentDivisions = DivisionMatchupCycles.GetRemainingIntraconferenceOpponentDivisions(cycleYear, team.Division);
 
@@ -257,7 +239,8 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 			}
 
 			// A team faces its own division again every five years. #4 plays #1 and #3 plays #2 twice.
-			var divisionTeams = GetTeamsInDivision(teams, team.Conference, team.Division).ToArray();
+			diagnostic.TeamDivisionPlaysSelfForRemainingIntraconference = true;
+            var divisionTeams = GetTeamsInDivision(teams, team.Conference, team.Division).ToArray();
 
 			return Enumerable.Repeat(previousSeasonDivisionRankings[team] switch
 			{
@@ -285,7 +268,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 			}
 		}
 		
-		private string Has640Matchups(ICollection<GameMatchup> matchups) =>
+		private static string Has640Matchups(ICollection<GameMatchup> matchups) =>
 			matchups.Count == 640
 				? string.Empty
 				: $"Expected 640 matchups, but found {matchups.Count}";
@@ -295,7 +278,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 				? string.Empty
 				: "Each team should appear 32 times in the matchups";
 
-		private string EachTeamHasProperNumberOfGameTypes(ICollection<GameMatchup> matchups)
+		private static string EachTeamHasProperNumberOfGameTypes(ICollection<GameMatchup> matchups)
 		{
 			var matchupsByTeam = matchups.GroupBy(m => m.TeamA);
 			var allTeamsHaveCorrectNumberOfGamesByType = true;

@@ -24,17 +24,24 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
         public List<GameRecord> GenerateScheduleForYear(int year,
             Dictionary<BasicTeamInfo, Team> dataTeams,
             Dictionary<BasicTeamInfo, int>? previousSeasonDivisionRankings,
-            BasicTeamInfo? previousSuperBowlWinner)
+            BasicTeamInfo? previousSuperBowlWinner,
+            out IReadOnlyList<TeamScheduleDiagnostics> diagnostics)
         {
             var cycleYear = (year - YearZero) % 5;
-            
+            var diagnosticDictionary = dataTeams.ToDictionary(kvp => kvp.Key,
+                kvp => new TeamScheduleDiagnostics { Team = kvp.Key });
+
             Log.Information("Generating schedule for {Year} (cycle year {CycleYear})", year, cycleYear);
 
-            previousSuperBowlWinner ??= teams[new Random(Helpers.SchedulingRandomSeed)
-	            .Next(0, 40)];
+            if (previousSuperBowlWinner == null)
+            {
+                previousSuperBowlWinner = teams[new Random(Helpers.SchedulingRandomSeed).Next(0, 40)];
+                Log.Information("No previous Super Bowl winner provided; randomly selected {Team} as winner", previousSuperBowlWinner.Name);
+            }
             
             var teamOpponents = new TeamOpponentDeterminer(teams).GetTeamOpponentsForSeason(cycleYear,
-	            previousSeasonDivisionRankings);
+	            previousSeasonDivisionRankings,
+                diagnosticDictionary);
             new HomeTeamAssigner(teams, teamOpponents).AssignHomeTeams();
             var scheduledGames = GetRegularSeasonGameRecords(teamOpponents, dataTeams);
             AssignWeekNumbers(scheduledGames);
@@ -42,8 +49,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
             ScheduleGamesToTimeslots(scheduledGames, year, previousSuperBowlWinner);
             var preseasonGames = GetPreseasonGamesForYear(year, dataTeams);
 
-            // WYLO: we're generating 97 preseason games for 2014, instead of 80
-            // also cycle year 3 gives us 118 home games, instead of 120
+            diagnostics = diagnosticDictionary.Values.ToArray();
             return preseasonGames.Concat(scheduledGames.Select(g => g.GameRecord))
                 .OrderBy(g => g.KickoffTime)
                 .ToList();

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -55,6 +56,19 @@ namespace Celarix.JustForFun.FootballSimulator
                     yield return item;
                 }
             }
+        }
+
+        public static int PopulationCount(this BitArray bitArray)
+        {
+            int count = 0;
+            for (int i = 0; i < bitArray.Length; i++)
+            {
+                if (bitArray.Get(i))
+                {
+                    count++;
+                }
+            }
+            return count;
         }
     }
 }

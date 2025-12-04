@@ -56,8 +56,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 			
 			while (shuffles < shuffleIterations && bestTotalError != 0)
 			{
-				// Pick a random game and swap the home team.
-				var bestSwapIndex = BestSwapIndex();
+                var bestSwapIndex = BestSwapIndex();
 				var matchup = uniqueMatchups[bestSwapIndex];
 				matchup.HomeTeamIsTeamA = !matchup.HomeTeamIsTeamA;
 				teamAIsHomeTeamArray.Set(bestSwapIndex, matchup.HomeTeamIsTeamA == true);

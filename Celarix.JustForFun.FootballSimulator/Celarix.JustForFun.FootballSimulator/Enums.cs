@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Celarix.JustForFun.FootballSimulator;
 
-internal enum ScheduledGameType
+public enum ScheduledGameType
 {
     IntradivisionalFirstSet,
     IntradivisionalSecondSet,
@@ -56,7 +56,7 @@ internal enum PlayResultKind
     KickRecovered
 }
 
-internal enum DriveDirection
+public enum DriveDirection
 {
     // Toward internal yard 0
     TowardHomeEndzone,

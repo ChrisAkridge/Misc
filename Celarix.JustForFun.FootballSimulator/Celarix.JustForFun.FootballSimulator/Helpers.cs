@@ -1,23 +1,51 @@
-﻿using System;
+﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
+using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Scheduling;
+using MathNet.Numerics.Distributions;
+using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Celarix.JustForFun.FootballSimulator.Data.Models;
-using Celarix.JustForFun.FootballSimulator.Models;
-using Celarix.JustForFun.FootballSimulator.Scheduling;
-using MathNet.Numerics.Distributions;
 
 namespace Celarix.JustForFun.FootballSimulator
 {
-    internal static class Helpers
+    public static class Helpers
     {
 	    public static int SchedulingRandomSeed => -1039958483;
 
 		private static readonly Dictionary<(double mean, double standardDeviation), Normal> distributionCache =
             new Dictionary<(double mean, double standardDeviation), Normal>();
 
-		public static IEnumerable<BasicTeamInfo> GetTeamsInDivision(IEnumerable<BasicTeamInfo> teams, Conference conference, Division division) =>
+        public static Dictionary<BasicTeamInfo, int> GetDefaultPreviousSeasonDivisionRankings(IReadOnlyList<BasicTeamInfo> teams)
+        {
+            Log.Information("No previous season division rankings available, generating default...");
+
+            var random = new Random(SchedulingRandomSeed);
+            var rankings = new Dictionary<BasicTeamInfo, int>();
+
+            var conferences = new[]
+            {
+                Conference.AFC, Conference.NFC
+            };
+
+            var divisions = new[]
+            {
+                Division.East, Division.North, Division.South, Division.West, Division.Extra
+            };
+
+            foreach (var divisionTeams in conferences.SelectMany(c => divisions.Select(d => GetTeamsInDivision(teams, c, d).ToList())))
+            {
+                divisionTeams.Shuffle(random);
+
+                for (int i = 0; i < 4; i++) { rankings[divisionTeams[i]] = i + 1; }
+            }
+
+            return rankings;
+        }
+
+        public static IEnumerable<BasicTeamInfo> GetTeamsInDivision(IEnumerable<BasicTeamInfo> teams, Conference conference, Division division) =>
 			teams.Where(t => t.Conference == conference && t.Division == division);
 
 		public static GameTeam OtherTeam(GameTeam team) =>

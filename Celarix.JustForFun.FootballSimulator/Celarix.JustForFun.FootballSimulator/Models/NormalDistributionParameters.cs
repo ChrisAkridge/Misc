@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Celarix.JustForFun.FootballSimulator.Models
 {
-    internal sealed class NormalDistributionParameters
+    [Obsolete]
+    public sealed class NormalDistributionParameters
     {
         public double MeanAtZero { get; set; }
         public double StandardDeviationAtZero { get; set; }
