@@ -378,7 +378,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
         private static int GetTouchdownCountForTeamInGames(IEnumerable<GameRecord> games, string teamName) =>
             games.Sum(g => g.TeamDriveRecords
                 .Where(d => d.Team == GetHomeOrAwayForTeamInGame(g, teamName))
-                .Count(d => d.Result == DriveResult.Touchdown));
+                .Count(d => d.Result == DriveResult.TouchdownNoXP));
 
         private static bool GameHasTeamPlaying(GameRecord game, string teamName) =>
             game.AwayTeam.TeamName == teamName

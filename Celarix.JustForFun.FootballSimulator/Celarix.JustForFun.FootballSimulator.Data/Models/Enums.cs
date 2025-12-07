@@ -59,7 +59,13 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         Safety,
         FieldGoalMiss,
         FieldGoalSuccess,
-        Touchdown
+        TouchdownNoXP,
+        // Also represents a touchdown (6 points for the offense) and a defensive safety (1 point for the offense)
+        TouchdownWithXP,
+        TouchdownWithTwoPointConversion,
+        TouchdownWithOffensiveSafety,
+        TouchdownWithDefensiveScore,
+        EndOfHalf
     }
 
     public enum GameResult

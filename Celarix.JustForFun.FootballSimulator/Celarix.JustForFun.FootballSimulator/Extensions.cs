@@ -70,5 +70,30 @@ namespace Celarix.JustForFun.FootballSimulator
             }
             return count;
         }
+
+        public static double SampleNormalDistribution(this Random random, double mean, double standardDeviation) =>
+            Helpers.SampleNormalDistribution(mean, standardDeviation, random);
+
+        public static bool Chance(this Random random, double chance)
+        {
+            if (chance < 0 || chance > 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(chance), "Chance must be between 0 and 1.");
+            }
+
+            return random.NextDouble() < chance;
+        }
+
+        public static int Round(this double value) => (int)Math.Round(value);
+
+        public static GameTeam Opponent(this GameTeam team)
+        {
+            return team switch
+            {
+                GameTeam.Home => GameTeam.Away,
+                GameTeam.Away => GameTeam.Home,
+                _ => throw new ArgumentOutOfRangeException(nameof(team))
+            };
+        }
     }
 }

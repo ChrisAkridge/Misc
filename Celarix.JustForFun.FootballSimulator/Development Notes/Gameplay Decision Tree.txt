@@ -35,7 +35,7 @@ I. UNIVERSAL RUSHING
 	- Output: Achieved yard location
 	1. Take RealOffenseStrength as the mean of a normal distribution with a standard deviation of 10. [PARAM: StandardStrengthStddev]
 	2. Take your RealDefenseStrength as the mean of a normal distribution with a standard deviation of 10. [PARAM: StandardStrengthStddev]
-	3. Determine your chance of fumbling again. At a RealOffenseStrength of 100, you have a 5% chance of fumbling, which goes down by half every time your RealOffenseStrength doubles, or doubles every time your RealOffenseStrength halves. Capped at 99% chance.
+	3. Determine your chance of fumbling again. At a RealOffenseStrength of 100, you have a 5% chance of fumbling, which goes down by half every time your RealOffenseStrength doubles, or doubles every time your RealOffenseStrength halves. Capped at 99% chance. [PARAM: BaseRushingFumbleChance]
 	4. Determine if you fumble using the fumble odds; if you do, go to OUTCOME III.
 	5. Otherwise, is your RealOffenseStrength sample from step 1 higher than their RealDefenseStrength sample from step 2?
 		6. [Higher]: Take your RealOffenseStrength sample / their RealDefenseStrength sample, getting a number greater than 1. To determine your return distance, sample a normal distribution (mean: 15 yards, stddev: 5 yards * the ratio you computed). [PARAM: BaseFumbleReturnMean, BaseFumbleReturnStddev]
@@ -49,7 +49,7 @@ I. KICKOFF (at the start of each half and after each scoring play)
 		3. [Conservative]: Are you in the lead or tied?
 			4. [Yes]: Kick off normally, go to OUTCOME I.
 			5. [No]: Are you losing by at least 1.5 points for every minute on the clock? [PARAM: OnsideKickPointsPerMinuteThreshold]
-				6. [Yes]: We need to get the ball back! Attempt an onside kick, go to 10.
+				6. [Yes]: We need to get the ball back! Attempt an onside kick, go to OUTCOME VII.
 				7. [No]. Kick off normally, go to OUTCOME I.
 		8. [Insane or Hyperinsane]: Always onside kick, go to OUTCOME VII.
 	
@@ -86,7 +86,7 @@ V. MAIN GAME DECISION (First, second, third, or fourth down plays from scrimmage
 		- Pass attempt
 			- Short pass (up to 5 yards, can be negative and count on YAC) [PARAM: ShortPassDistanceThreshold]
 			- Medium pass (up to 15 yards) [PARAM: MediumPassDistanceThreshold]
-			- Long pass (up to 50 yards)
+			- Long pass (up to 50 yards) [PARAM: LongPassDistanceThreshold]
 			- Hail Mary
 		- Ball spike to stop clock
 		- QB sneak
@@ -135,7 +135,7 @@ V. MAIN GAME DECISION (First, second, third, or fourth down plays from scrimmage
 					2. If we're outside of field goal range, multiply B by 1.2.	[PARAM: FourthDownLongFieldUndesirabilityMultiplier]
 					3. If we're trailing by less than 17 points AND there's less than 5 minutes in regulation or overtime, multiply A by 2. [PARAM: FourthDownTrailingNearEndgamePointThreshold, FourthDownTrailingNearEndgameRemainingTimeThreshold, FourthDownTrailingNearEndgameDesirabilityMultiplier]
 					4. If we have less than 3 yards to the line to gain, multiply A by 1.2. [PARAM: FourthDownDistanceToGoThreshold, FourthDownDistanceToGoDesirabilityMultiplier]
-					5. If we find our efficiency at converting fourth downs is at least 60%, multiply A by 1.4. [PARAM: FourthDownHistoricalRateThreshold, FourthDownHistoricalRateDesirabilityMultiplier]
+					5. If we find our efficiency at converting fourth downs is at least 60% in this game, multiply A by 1.4. [PARAM: FourthDownHistoricalRateThreshold, FourthDownHistoricalRateDesirabilityMultiplier]
 					6. Compute (A / (A + B)) and draw a random number between 0 to 1. Is it less than what we computed?
 						7. [Yes] Go for it! Is the distance to go 1 yard? [PARAM: FourthDownQBSneakDistanceThreshold]
 							8. [Yes] QB sneak!
@@ -211,7 +211,7 @@ I. NORMAL KICKOFF
 	2. Determine base kicking skew (0 being straight down the middle of the field, negative and positive meaning to the left and right, respectively; unit is yards). Sample a normal distribution:
 		- Mean: 10^(3 - log_10(KickingStrength)), goes down as KickingStrength goes up
 		- Standard deviation: 3 yards
-		- [PARAM: KickoffSkewMean, KickoffSkewStddev]
+		- [PARAM: KickoffSkewStddev]
 		- There's a 50% chance this number is inverted, representing a skew in the other direction.
 	3. Set the desired kick direction of either 0 or 180 based on which endzone we're kicking toward.
 	4. Set the current wind angle using a normal distribution (mean: angle set at game start, stddev: 2 degrees). [PARAM: WindAngleVarianceStddev]
@@ -289,7 +289,7 @@ IV. PUNT
 	3. Determine base kicking skew (0 being straight down the middle of the field, negative and positive meaning to the left and right, respectively; unit is yards). Sample a normal distribution:
 		- Mean: 10^(3 - log_10(KickingStrength)), goes down as KickingStrength goes up
 		- Standard deviation: 3 yards
-		- [PARAM: KickoffSkewMean, KickoffSkewStddev]
+		- [PARAM: KickoffSkewStddev]
 		- There's a 50% chance this number is inverted, representing a skew in the other direction.
 	4. Set the desired kick direction of either 0 or 180 based on which endzone we're kicking toward.
 	5. Set the current wind angle using a normal distribution (mean: angle set at game start, stddev: 2 degrees). [PARAM: WindAngleVarianceStddev]
@@ -302,7 +302,7 @@ IV. PUNT
 	8. The ball would ordinarily land at the following location:
 		- Yard: Punt location + base kicking distance + direct wind component
 		- Cross: Punt location + base kicking skew + cross wind component
-	9. Is this distance shorter than where the opponent's 0.1 yard line is? If so, then skip to the outcome decision on step 13.
+	9. Is this distance shorter than where the opponent's 0.1 yard line is? If so, then skip to the outcome decision on step 14.
 	10. If it is longer, the punter has the leg strength to get the ball to the target. But is he accurate enough? First, keep the cross location of the ball.
 	11. If the cross location of the ball is outside the field, the punt is out of bounds. Rather than going through the trouble of computing the kicking arc, we'll just compute where it went out of bounds as follows:
 		1. Envision the whole thing as a single straight line. Some portion of it is inbounds and some portion of it is out of bounds.
@@ -361,13 +361,13 @@ VIII. FIELD GOALS AND EXTRA POINT ATTEMPTS
 	4. Determine base kicking skew (0 being straight down the middle of the field, negative and positive meaning to the left and right, respectively; unit is yards). Sample a normal distribution:
 		- Mean: 10^(3 - log_10(KickingStrength)), goes down as KickingStrength goes up
 		- Standard deviation: 3 yards
-		- [PARAM: KickoffSkewMean, KickoffSkewStddev]
+		- [PARAM: KickoffSkewStddev]
 		- When kicking a field goal, kickers try to be much more straight than on other kinds of kicks, so we apply a 0.33 multiplier to the skew. [PARAM: FieldGoalKickingSkewMultiplier]
 		- There's a 50% chance this number is inverted, representing a skew in the other direction.
 	5. Set the desired kick direction of either 0 or 180 based on which endzone we're kicking toward.
 	6. Set the current wind angle using a normal distribution (mean: angle set at game start, stddev: 2 degrees). [PARAM: WindAngleVarianceStddev]
 	7. Set the current wind speed using a normal distribution (mean: speed set at game start, stddev: 4 MPH). [PARAM: WindSpeedVarianceStddev]
-	8. Set the kick location as up to 15 yards behind the line of scrimmage, capped at your own -9.9 yard line. If the kick location is within your own endzone, to simulate the handicap from having less space to kick, base kicking skew is multiplied by 1.2 for every yard deep you are. [PARAM: FieldGoalFromEndzoneSkewMultiplier]
+	8. Set the kick location as up to 15 yards behind the line of scrimmage, capped at your own -9.9 yard line. If the kick location is within your own endzone, to simulate the handicap from having less space to kick, base kicking skew is multiplied by 1.2 for every yard deep you are. [PARAM: FieldGoalFromEndzoneSkewMultiplierPerYard]
 	9. Determine the distance the ball is moved by wind.
 		1. Compute the adjusted wind angle (either the current wind angle or ((current wind angle + 180) % 360)) for the ball,
 		2. Compute the cross component, which is (current wind speed * sin(adjusted wind angle))
