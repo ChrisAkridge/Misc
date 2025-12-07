@@ -34,7 +34,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var receivingTeamTouchesBallButNotRecovers = parameters.Random.Chance(receivingTeamTouchesBallButNotRecoversChance);
             if (receivingTeamTouchesBallButNotRecovers)
             {
-                return FumbledLiveBallOutcome.Run(priorState,
+                return FumbledLiveBallOutcome.Run(priorState with
+                    {
+                        PossessionOnPlay = PossessionOnPlay.BothTeams
+                    },
                     parameters,
                     physicsParams,
                     priorState.LineOfScrimmage);
@@ -58,6 +61,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     var updatedState = priorState.WithScoreChange(lineOfScrimmageTeamYard.Team.Opponent(), 2) with
                     {
                         LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
+                        NextPlay = NextPlayKind.FreeKick,
+                        PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay()
                     };
                     return FreeKickDecision.Run(updatedState,
                         parameters,

@@ -95,5 +95,15 @@ namespace Celarix.JustForFun.FootballSimulator
                 _ => throw new ArgumentOutOfRangeException(nameof(team))
             };
         }
+
+        public static PossessionOnPlay ToPossessionOnPlay(this GameTeam team)
+        {
+            return team switch
+            {
+                GameTeam.Home => PossessionOnPlay.HomeTeamOnly,
+                GameTeam.Away => PossessionOnPlay.AwayTeamOnly,
+                _ => throw new ArgumentOutOfRangeException(nameof(team))
+            };
+        }
     }
 }

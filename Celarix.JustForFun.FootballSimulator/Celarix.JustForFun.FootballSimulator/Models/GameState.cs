@@ -20,6 +20,9 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         // Down-and-distance
         int LineOfScrimmage,
         int? LineToGain,
-        NextPlayKind NextPlay
+        NextPlayKind NextPlay,
+
+        // Internal properties
+        PossessionOnPlay PossessionOnPlay
     );
 }

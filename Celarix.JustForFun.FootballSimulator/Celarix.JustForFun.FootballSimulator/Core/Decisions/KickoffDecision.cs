@@ -1,4 +1,5 @@
-﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
+﻿using Celarix.JustForFun.FootballSimulator.Core.Outcomes;
+using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
 using System;
 using System.Collections.Generic;

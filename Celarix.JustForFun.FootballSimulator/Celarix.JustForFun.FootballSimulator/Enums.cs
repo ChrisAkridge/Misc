@@ -134,3 +134,12 @@ internal enum EndzoneBehavior
     /// </summary>
     ConversionAttempt
 }
+
+[Flags]
+internal enum PossessionOnPlay
+{
+    None = 0b0,
+    AwayTeamOnly = 0b1,
+    HomeTeamOnly = 0b10,
+    BothTeams = AwayTeamOnly | HomeTeamOnly
+}

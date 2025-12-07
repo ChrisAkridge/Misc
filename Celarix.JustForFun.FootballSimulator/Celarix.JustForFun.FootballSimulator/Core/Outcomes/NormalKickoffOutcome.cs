@@ -12,7 +12,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
            GameDecisionParameters parameters,
            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
-            GameTeam otherTeam = priorState.OtherTeam(priorState.TeamWithPossession);
+            GameTeam otherTeam = priorState.TeamWithPossession.Opponent();
 
             // Determine parameters for base kickoff distance
             double kickingStrength = parameters
@@ -97,6 +97,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     return priorState with
                     {
                         TeamWithPossession = otherTeam,
+                        PossessionOnPlay = otherTeam.ToPossessionOnPlay(),
                         LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 35),
                         LineToGain = priorState.TeamYardToInternalYard(otherTeam, 45),
                         NextPlay = NextPlayKind.FirstDown,
@@ -107,6 +108,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     // Safety, ball kicked out of own endzone
                     var updatedState = priorState.WithScoreChange(otherTeam, 2) with
                     {
+                        PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay(),
+                        NextPlay = NextPlayKind.FreeKick,
                         LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
                     };
                     return FreeKickDecision.Run(updatedState,
@@ -119,6 +122,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             return priorState with
             {
                 TeamWithPossession = otherTeam,
+                PossessionOnPlay = otherTeam.ToPossessionOnPlay(),
                 LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 45),
                 LineToGain = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 45),
                 NextPlay = NextPlayKind.FirstDown,

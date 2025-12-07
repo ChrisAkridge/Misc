@@ -1,4 +1,5 @@
-﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
+﻿using Celarix.JustForFun.FootballSimulator.Core.Outcomes;
+using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
 using System;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 priorState.TeamWithPossession);
             var receivingTeamEstimateOfOtherStrengths = parameters.GetEstimateOfTeamByTeam(
                 priorState.TeamWithPossession,
-                priorState.OtherTeam(priorState.TeamWithPossession));
+                priorState.TeamWithPossession.Opponent());
             var receivingKickReturnStrengthEstimate = receivingTeamEstimateOfOwnStrengths.KickReturnStrength;
             var kickingKickDefenseStrengthEstimate = receivingTeamEstimateOfOtherStrengths.KickDefenseStrength;
             var strengthRatio = receivingKickReturnStrengthEstimate / kickingKickDefenseStrengthEstimate;
@@ -61,6 +62,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 int lineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35);
                 return priorState with
                 {
+                    TeamWithPossession = priorState.TeamWithPossession.Opponent(),
+                    PossessionOnPlay = priorState.TeamWithPossession.Opponent().ToPossessionOnPlay(),
                     LineOfScrimmage = lineOfScrimmage,
                     LineToGain = priorState.AddYardsForPossessingTeam(lineOfScrimmage, 10).Round()
                 };
@@ -70,6 +73,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 // Fair catch on field
                 return priorState with
                 {
+                    TeamWithPossession = priorState.TeamWithPossession.Opponent(),
+                    PossessionOnPlay = priorState.TeamWithPossession.Opponent().ToPossessionOnPlay(),
                     LineToGain = priorState.AddYardsForPossessingTeam(priorState.LineOfScrimmage, 10).Round()
                 };
             }

@@ -101,7 +101,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 // Normal punt within the field of play
                 return ReturnablePuntOutcome.Run(priorState with
                 {
-                    LineOfScrimmage = kickActualYard.Round()
+                    LineOfScrimmage = kickActualYard.Round(),
+                    PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay()
                 },
                 parameters, physicsParams);
             }
@@ -113,6 +114,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 var updatedState = priorState.WithScoreChange(kickActualTeamYard.Team.Opponent(), 2) with
                 {
                     LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
+                    PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay()
                 };
                 return FreeKickDecision.Run(updatedState,
                     parameters,

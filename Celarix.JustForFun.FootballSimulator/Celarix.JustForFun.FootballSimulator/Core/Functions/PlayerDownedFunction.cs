@@ -1,4 +1,5 @@
-﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
+﻿using Celarix.JustForFun.FootballSimulator.Core.Decisions;
+using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
             GameTeam? teamAttemptingConversion)
         {
             var possessingTeam = priorState.TeamWithPossession;
-            var otherTeam = priorState.OtherTeam(possessingTeam);
+            var otherTeam = possessingTeam.Opponent();
             var newLineOfScrimmage = priorState.AddYardsForPossessingTeam(possessionStartYard, yardsGained);
             var gainedTeamYard = priorState.InternalYardToTeamYard(newLineOfScrimmage.Round());
 
@@ -41,7 +42,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         {
                             NextPlay = NextPlayKind.Kickoff,
                             LineOfScrimmage = priorState.TeamYardToInternalYard(possessingTeam, 35),
-                            LineToGain = null
+                            LineToGain = null,
+                            PossessionOnPlay = possessingTeam.ToPossessionOnPlay()
                         };
                     }
                     else
@@ -66,7 +68,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         {
                             NextPlay = NextPlayKind.ConversionAttempt,
                             LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 15),
-                            LineToGain = null
+                            LineToGain = null,
+                            PossessionOnPlay = possessingTeam.ToPossessionOnPlay()
                         };
                     }
                     else
@@ -76,7 +79,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         {
                             NextPlay = NextPlayKind.Kickoff,
                             LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 35),
-                            LineToGain = null
+                            LineToGain = null,
+                            PossessionOnPlay = possessingTeam.ToPossessionOnPlay()
                         };
                     }
                 }
@@ -90,7 +94,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                 {
                     NextPlay = NextPlayKind.Kickoff,
                     LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 35),
-                    LineToGain = null
+                    LineToGain = null,
+                    PossessionOnPlay = possessingTeam.ToPossessionOnPlay()
                 };
             }
             else if (priorState.NextPlay == NextPlayKind.FourthDown)
@@ -127,7 +132,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                     NextPlayKind.FreeKick => throw new InvalidOperationException("Unreachable code: Free kick should have been handled above."),
                     _ => throw new InvalidOperationException($"Unrecognized NextPlayKind: {priorState.NextPlay}.")
                 },
-                LineOfScrimmage = newLineOfScrimmage.Round()
+                LineOfScrimmage = newLineOfScrimmage.Round(),
+                PossessionOnPlay = possessingTeam.ToPossessionOnPlay()
             };
         }
     }

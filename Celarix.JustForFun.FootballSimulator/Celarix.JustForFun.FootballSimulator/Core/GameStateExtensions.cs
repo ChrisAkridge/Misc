@@ -131,6 +131,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 return state with
                 {
                     TeamWithPossession = team,
+                    PossessionOnPlay = team.ToPossessionOnPlay(),
                     NextPlay = NextPlayKind.FirstDown,
                     LineOfScrimmage = newLineOfScrimmage.Round(),
                     LineToGain = desiredLineToGain.Round()
