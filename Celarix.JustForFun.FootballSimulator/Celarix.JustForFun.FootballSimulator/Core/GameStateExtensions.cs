@@ -104,6 +104,19 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 }
             }
 
+            public string InternalYardToDisplayTeamYardString(int internalYard, GameDecisionParameters parameters)
+            {
+                var (team, teamYard) = state.InternalYardToTeamYard(internalYard);
+                var teamAbbreviation = team switch
+                {
+                    GameTeam.Away => parameters.AwayTeam.Abbreviation,
+                    GameTeam.Home => parameters.HomeTeam.Abbreviation,
+                    _ => throw new ArgumentOutOfRangeException(nameof(team), $"Unhandled team value: {team}")
+                };
+
+                return $"{teamAbbreviation} {teamYard}";
+            }
+
             public GameState WithScoreChange(GameTeam scoringTeam, int points)
             {
                 return scoringTeam switch
@@ -114,7 +127,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 };
             }
 
-            public GameState WithFirstDownLineOfScrimmage(double newLineOfScrimmage, GameTeam team)
+            public GameState WithFirstDownLineOfScrimmage(double newLineOfScrimmage, GameTeam team, string lastPlayDescriptionTemplate)
             {
                 var desiredLineToGain = AddYardsForTeam(newLineOfScrimmage, 10, team);
                 var desiredTeamLineToGain = InternalYardToTeamYard(state, desiredLineToGain.Round());
@@ -134,7 +147,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                     PossessionOnPlay = team.ToPossessionOnPlay(),
                     NextPlay = NextPlayKind.FirstDown,
                     LineOfScrimmage = newLineOfScrimmage.Round(),
-                    LineToGain = desiredLineToGain.Round()
+                    LineToGain = desiredLineToGain.Round(),
+                    LastPlayDescriptionTemplate = lastPlayDescriptionTemplate
                 };
             }
 
@@ -165,6 +179,40 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                     GameTeam.Away => startYard - addend,
                     GameTeam.Home => startYard + addend,
                     _ => throw new ArgumentOutOfRangeException(nameof(team), $"Unhandled team value: {team}")
+                };
+            }
+
+            public int TimeoutsRemainingForTeam(GameTeam team)
+            {
+                return team switch
+                {
+                    GameTeam.Away => state.AwayTimeoutsRemaining,
+                    GameTeam.Home => state.HomeTimeoutsRemaining,
+                    _ => throw new ArgumentOutOfRangeException(nameof(team), $"Unhandled team value: {team}")
+                };
+            }
+
+            public int? DistanceToGo()
+            {
+                if (state.LineToGain.HasValue)
+                {
+                    return state.DistanceForPossessingTeam(state.LineOfScrimmage, state.LineToGain.Value).Round();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            public GameState TakeTimeout(GameTeam team)
+            {
+                return state with
+                {
+                    AwayTimeoutsRemaining = team == GameTeam.Away ? state.AwayTimeoutsRemaining - 1 : state.AwayTimeoutsRemaining,
+                    HomeTimeoutsRemaining = team == GameTeam.Home ? state.HomeTimeoutsRemaining - 1 : state.HomeTimeoutsRemaining,
+                    TeamCallingTimeout = team,
+                    ClockRunning = false,
+                    LastPlayDescriptionTemplate = $"{(team == GameTeam.Away ? "Away team" : "Home team")} called a timeout."
                 };
             }
         }

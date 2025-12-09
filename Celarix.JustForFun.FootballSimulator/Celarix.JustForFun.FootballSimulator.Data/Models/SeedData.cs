@@ -271,7 +271,12 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
                 new PhysicsParam("BaseLongPassYACMultiplierIfGood", 1.05, "multiplier", "multiplier"),
                 new PhysicsParam("HailMaryChanceMultiplierPerYard", 0.75, "multiplier", "multiplier"),
                 new PhysicsParam("HailMaryInterceptionChance", 0.5, "multiplier", "multiplier"),
-                new PhysicsParam("BaseRushingFumbleChance", 0.05, "chance", "chance")
+                new PhysicsParam("BaseRushingFumbleChance", 0.05, "chance", "chance"),
+                new PhysicsParam("FumbleRecoveryDistanceMean", 5, "yard", "yards"),
+                new PhysicsParam("FumbleRecoveryDistanceStddev", 2, "yard", "yards"),
+                new PhysicsParam("FumbleRecoveredByOffenseChanceOfBeingDownedImmediately", 0.8, "chance", "chance"),
+                new PhysicsParam("FumbleRecoveredByDefenseChanceOfBeingDownedImmediately", 0.6, "chance", "chance"),
+                new PhysicsParam("FieldGoalRangeYard", 35, "yard", "yards"),
             };
         }
     }

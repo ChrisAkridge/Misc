@@ -16,13 +16,20 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         int HomeScore,
         int PeriodNumber,
         int SecondsLeftInPeriod,
+        bool ClockRunning,
+        int HomeTimeoutsRemaining,
+        int AwayTimeoutsRemaining,
 
         // Down-and-distance
         int LineOfScrimmage,
         int? LineToGain,
         NextPlayKind NextPlay,
 
+        // Display properties
+        string LastPlayDescriptionTemplate,
+
         // Internal properties
-        PossessionOnPlay PossessionOnPlay
+        PossessionOnPlay PossessionOnPlay,
+        GameTeam? TeamCallingTimeout
     );
 }

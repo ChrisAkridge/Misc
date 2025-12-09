@@ -132,7 +132,12 @@ internal enum EndzoneBehavior
     /// <summary>
     /// Being downed in the opponent's endzone results in a successful two-point conversion, your own is a safety.
     /// </summary>
-    ConversionAttempt
+    ConversionAttempt,
+
+    /// <summary>
+    /// Being downed in the opponent's endzone results in a touchdown, your own endzone is a touchback.
+    /// </summary>
+    FumbleOrInterceptionReturn
 }
 
 [Flags]
@@ -142,4 +147,34 @@ internal enum PossessionOnPlay
     AwayTeamOnly = 0b1,
     HomeTeamOnly = 0b10,
     BothTeams = AwayTeamOnly | HomeTeamOnly
+}
+
+internal enum OffensivePlayKind
+{
+    RushAttempt,
+    ShortPassAttempt,
+    MediumPassAttempt,
+    LongPassAttempt,
+    HailMaryAttempt,
+    Spike,
+    QBSneak,
+    Punt,
+    FieldGoalAttempt,
+    FakePunt,
+    FakeFieldGoalAttempt,
+    VictoryFormation
+}
+
+internal enum ClockZone
+{
+    Standard,
+    EndOfHalf
+}
+
+internal enum ClockDisposition
+{
+    Relaxed,
+    HurryUp,
+    TwoMinuteDrill,
+    ClockChewing
 }

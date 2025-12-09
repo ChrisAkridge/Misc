@@ -44,6 +44,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
 
         public GameLoop(FootballContext footballContext, Random random, GameRecord gameRecord)
         {
+            // TODO: Log GameState before and after single step
             this.footballContext = footballContext;
             this.random = random;
             this.gameRecord = gameRecord;

@@ -1,5 +1,7 @@
-﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
+﻿using Celarix.JustForFun.FootballSimulator.Core.Decisions;
+using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -22,16 +24,19 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 
             if (parameters.Random.Chance(kickRecoveryChance))
             {
+                Log.Verbose("ReturnableKickOutcome: Kick recovered cleanly by receiving team.");
                 return SignalFairCatchDecision.Run(priorState with
                     {
                         TeamWithPossession = receivingTeam,
-                        LineOfScrimmage = kickActualYard.Round()
-                    },
+                        LineOfScrimmage = kickActualYard.Round(),
+                        LastPlayDescriptionTemplate = "{DefAbbr} signals for a fair catch on the kick return."
+                },
                     parameters,
                     physicsParams);
             }
             else
             {
+                Log.Verbose("ReturnableKickOutcome: Kick not recovered cleanly by receiving team; live ball.");
                 return FumbledLiveBallOutcome.Run(priorState,
                         parameters,
                         physicsParams,

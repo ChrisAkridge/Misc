@@ -1,5 +1,7 @@
-﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
+﻿using Celarix.JustForFun.FootballSimulator.Core.Decisions;
+using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -73,6 +75,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     // Either a normal kickoff that can be fielded, or a kick so short it can't even be onsided
                     // We treat distances over 20 yards as hypothetically possible for the kicking team
                     // to recover, but in practice never possible.
+                    Log.Verbose("NormalKickoffOutcome: Normal kick either abnormally short or too far for the kicking team to recover.");
                     return ReturnableKickOutcome.Run(priorState,
                         parameters,
                         physicsParams,
@@ -80,20 +83,22 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 }
                 else if (kickDistanceFromKickoffSpot >= 10 && kickDistanceFromKickoffSpot <= 20)
                 {
-                    // Not intentionally an onside kick attempt, but so short that it can be recovered by
-                    // either team anyway
-                    return FumbledLiveBallOutcome.Run(priorState,
+                    Log.Verbose("NormalKickoffOutcome: Unintentionally short normal kick, can be recovered by either team.");
+                    return FumbledLiveBallOutcome.Run(priorState with
+                        {
+                            LineOfScrimmage = kickActualYard.Round()
+                        },
                         parameters,
-                        physicsParams,
-                        kickActualYard);
+                        physicsParams);
                 }
 
                 var kickActualTeamYard = priorState.InternalYardToTeamYard(kickActualYard.Round());
+                var kickActualTeamDisplayYard = priorState.InternalYardToDisplayTeamYardString(kickActualYard.Round(),
+                    parameters);
 
                 if (kickActualTeamYard.Team == otherTeam && kickActualTeamYard.TeamYard < -10d)
                 {
-                    // Touchback, ball kicked out of endzone
-                    
+                    Log.Verbose("NormalKickoffOutcome: Touchback on kickoff.");
                     return priorState with
                     {
                         TeamWithPossession = otherTeam,
@@ -101,16 +106,18 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                         LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 35),
                         LineToGain = priorState.TeamYardToInternalYard(otherTeam, 45),
                         NextPlay = NextPlayKind.FirstDown,
+                        LastPlayDescriptionTemplate = "{DefAbbr} touchback, ball placed at {LoS}."
                     };
                 }
                 else if (kickActualTeamYard.Team == priorState.TeamWithPossession && kickActualTeamYard.TeamYard < -10d)
                 {
-                    // Safety, ball kicked out of own endzone
+                    Log.Verbose("NormalKickoffOutcome: Kicking team safety on kickoff.");
                     var updatedState = priorState.WithScoreChange(otherTeam, 2) with
                     {
                         PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay(),
                         NextPlay = NextPlayKind.FreeKick,
                         LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
+                        LastPlayDescriptionTemplate = "{OffAbbr} kickoff results in kicking team safety. {DefAbbr} awarded 2 points. Free kick to follow from {LoS}."
                     };
                     return FreeKickDecision.Run(updatedState,
                         parameters,
@@ -118,7 +125,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 }
             }
 
-            // Out of bounds kickoff
+            Log.Verbose("NormalKickoffOutcome: Out of bounds kickoff.");
             return priorState with
             {
                 TeamWithPossession = otherTeam,
@@ -126,6 +133,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 45),
                 LineToGain = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 45),
                 NextPlay = NextPlayKind.FirstDown,
+                LastPlayDescriptionTemplate = "{OffAbbr} kickoff out of bounds, ball placed at {LoS}, first down."
             };
         }
     }

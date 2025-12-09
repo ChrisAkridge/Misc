@@ -43,7 +43,7 @@ I. UNIVERSAL RUSHING
 
 DECISION TREE
 
-I. KICKOFF (at the start of each half and after each scoring play)
+*I. KICKOFF (at the start of each half and after each scoring play)
 	1. Kicking team disposition?
 		2. [Ultraconservative]: Always kick off normally, go to OUTCOME I.
 		3. [Conservative]: Are you in the lead or tied?
@@ -53,12 +53,12 @@ I. KICKOFF (at the start of each half and after each scoring play)
 				7. [No]. Kick off normally, go to OUTCOME I.
 		8. [Insane or Hyperinsane]: Always onside kick, go to OUTCOME VII.
 	
-II. FREE KICK (after safeties)
+*II. FREE KICK (after safeties)
 	1. Is your estimate of their KickReturnStrength higher than your estimated KickDefenseStrength?
 		2. [Yes]: Opt to do a placekick. Go to OUTCOME I.
 		3. [No]: Opt to punt. Go to OUTCOME IV.
 
-III. SIGNAL FAIR CATCH? (after kickoff, free kicks, and punts)
+*III. SIGNAL FAIR CATCH? (after kickoff, free kicks, and punts)
 	1. Is your disposition not Conservative?
 		2. [Ultra-conservative] Always fair catch, first down from where you are (or the 35-yard line on kickoffs, or the 25-yard line on punts, if you're in your own endzone).
 		3. [Insane or Ultra-insane] Always return. Go to OUTCOME VI.
@@ -246,7 +246,7 @@ III. FUMBLED LIVE BALL (also includes live balls after kicks and intercepted bal
 	1. Sample a normal distribution (mean: your OffensiveLineStrength, stddev: 10). [PARAM: StandardStrengthStddev]
 	2. Sample a normal distribution (mean: their DefensiveLineStrength, stddev: 10). [PARAM: StandardStrengthStddev]
 	3. Add these two samples together, then compute (your sample) / (sum of samples). This is your fumble recovery chance.
-	4. Sample a normal distribution (mean: 5 yards, stddev: 2 yards). This is where, relative to the fumble's original location, the recovering team will recover the fumble.
+	4. Sample a normal distribution (mean: 5 yards, stddev: 2 yards). This is where, relative to the fumble's original location, the recovering team will recover the fumble. [PARAM: FumbleRecoveryDistanceMean, FumbleRecoveryDistanceStddev]
 	5. Did you recover the fumble?
 		6. [Yes]: Were you NOT downed during the play?
 			7. [Yes]: Where did you recover the fumble, given the sample?
@@ -356,7 +356,7 @@ VIII. FIELD GOALS AND EXTRA POINT ATTEMPTS
 		3. [No]: Leave the 1-Point Safety Flag unchanged.
 
 	1. A lot of the existing code for a punt can be reused - it's basically a punt with a target of the uprights (yard -10 or 110, cross -3.08 to +3.08). Except it does have to have enough height to get there as well. Luckily, ChatGPT wrote a function for me that assumes a constant velocity, see FootballGame.KickClearsUprights.
-	2. Set the desired target yard line to be the opponent's 60 yard line in a cross range of -3.08 to +3.08 yards.
+	2. Set the desired target yard line to be the opponent's -10 yard line in a cross range of -3.08 to +3.08 yards.
 	3. Determine base kicking distance using a normal distribution (mean: (KickingStrength * 0.75) yards, stddev: 3 yards). [PARAM: FieldGoalBaseDistanceMean, FieldGoalBaseDistanceStddev]
 	4. Determine base kicking skew (0 being straight down the middle of the field, negative and positive meaning to the left and right, respectively; unit is yards). Sample a normal distribution:
 		- Mean: 10^(3 - log_10(KickingStrength)), goes down as KickingStrength goes up

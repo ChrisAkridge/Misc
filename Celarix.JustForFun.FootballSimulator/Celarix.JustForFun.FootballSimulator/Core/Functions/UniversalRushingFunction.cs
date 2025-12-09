@@ -1,5 +1,6 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -28,6 +29,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
 
             if (random.Chance(baseFumbleProbaility))
             {
+                Log.Verbose("UniversalRushingFunction: Fumble occurred.");
                 return new RushingResult(WasFumbled: true, YardsGained: null);
             }
 
@@ -38,6 +40,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                 var mean = physicsParams["BaseFumbleReturnMean"].Value; // not sic - name reused for all running with the ball
                 var stddev = physicsParams["BaseFumbleReturnStddev"].Value * ratio;
                 var yardsGained = random.SampleNormalDistribution(mean, stddev);
+                Log.Verbose("UniversalRushingFunction: Successful rush for {YardsGained} yards.", yardsGained);
                 return new RushingResult(WasFumbled: false, YardsGained: yardsGained);
             }
             else
@@ -45,6 +48,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                 // Bad rushing attempt, we were weaker than them
                 var maxYardsGained = physicsParams["MaxBadReturnDistance"].Value;
                 var yardsGained = random.NextDouble() * maxYardsGained;
+                Log.Verbose("UniversalRushingFunction: Minimal rush for {YardsGained} yards.", yardsGained);
                 return new RushingResult(WasFumbled: false, YardsGained: yardsGained);
             }
         }

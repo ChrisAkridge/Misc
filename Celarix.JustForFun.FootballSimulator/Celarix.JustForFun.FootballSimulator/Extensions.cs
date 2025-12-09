@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Celarix.JustForFun.FootballSimulator.Core;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
+using Serilog;
 
 namespace Celarix.JustForFun.FootballSimulator
 {
@@ -71,8 +73,21 @@ namespace Celarix.JustForFun.FootballSimulator
             return count;
         }
 
-        public static double SampleNormalDistribution(this Random random, double mean, double standardDeviation) =>
-            Helpers.SampleNormalDistribution(mean, standardDeviation, random);
+        public static double SampleNormalDistribution(this Random random, double mean, double standardDeviation)
+        {
+            if (random.NextDouble() < Constants.ChaosMultiplierChance)
+            {
+                Log.Information("Chaos multiplier triggered! Sampling from normal distribution with mean 0 and stddev {StdDev} * {Multiplier}", standardDeviation,
+                    Constants.ChaosMultiplier);
+                return Helpers.SampleNormalDistribution(0, standardDeviation * Constants.ChaosMultiplier, random);
+            }
+
+            var result = Helpers.SampleNormalDistribution(mean, standardDeviation, random);
+            var resultStandardDeviationsFromMean = (result - mean) / standardDeviation;
+            Log.Verbose("Sampled normal distribution (mean: {Mean}, stddev: {StdDev}) = {Result} ({StdDevsFromMean}σ)", mean, standardDeviation, result,
+                resultStandardDeviationsFromMean.WithPlusSign());
+            return result;
+        }
 
         public static bool Chance(this Random random, double chance)
         {
@@ -81,7 +96,9 @@ namespace Celarix.JustForFun.FootballSimulator
                 throw new ArgumentOutOfRangeException(nameof(chance), "Chance must be between 0 and 1.");
             }
 
-            return random.NextDouble() < chance;
+            bool succeeds = random.NextDouble() < chance;
+            Log.Verbose("Chance check for {Chance:P2} {Result}", chance, succeeds ? "succeeded" : "failed");
+            return succeeds;
         }
 
         public static int Round(this double value) => (int)Math.Round(value);
@@ -104,6 +121,11 @@ namespace Celarix.JustForFun.FootballSimulator
                 GameTeam.Away => PossessionOnPlay.AwayTeamOnly,
                 _ => throw new ArgumentOutOfRangeException(nameof(team))
             };
+        }
+
+        public static string WithPlusSign(this double value)
+        {
+            return value >= 0 ? $"+{value}" : value.ToString();
         }
     }
 }

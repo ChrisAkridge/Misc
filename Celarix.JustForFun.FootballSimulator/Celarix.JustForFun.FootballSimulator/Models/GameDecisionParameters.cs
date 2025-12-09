@@ -19,6 +19,8 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         public TeamStrengthSet HomeTeamEstimateOfAway { get; set; }
         public TeamStrengthSet HomeTeamEstimateOfHome { get; set; }
 
+        public GameType GameType { get; init; }
+
         public Team GetTeam(GameTeam team) =>
             team == GameTeam.Away ? AwayTeam : HomeTeam;
 
