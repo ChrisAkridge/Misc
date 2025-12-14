@@ -28,10 +28,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 {
                     Log.Verbose("Hail, Mary, full of grace, the Lord is with thee. Blessed art thou amongst women and blessed is the fruit of thy womb, Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.");
                 }
-                return HailMaryOutcome.Run(priorState, parameters, physicsParams);
+                return priorState.WithNextState(GameplayNextState.HailMaryOutcome);
             }
 
-            var clockDisposition = GetClockDisposition(priorState, parameters, physicsParams);
+            var isFakePlay = priorState.GetAdditionalParameterOrDefault<bool?>("IsFakePlay") == true;
+
+            var clockDisposition = ClockDispositionFunction.Get(priorState, parameters, physicsParams);
             var selfEstimateOfSelf = parameters.GetEstimateOfTeamByTeam(self, self);
             var selfEstimateOfOpponent = parameters.GetEstimateOfTeamByTeam(self, opponent);
             var selfEstimatedAverage = selfEstimateOfSelf.OverallAverageStrength;
@@ -125,13 +127,13 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                         if (distanceToFirstDown <= qbSneakDistance)
                         {
                             Log.Verbose("MainGameDecision: Going for it on fourth down with a QB sneak!");
-                            return QuarterbackSneakOutcome.Run(priorState, parameters, physicsParams);
+                            return priorState.WithNextState(GameplayNextState.QBSneakOutcome);
                         }
                         Log.Verbose("MainGameDecision: Going for it on fourth down with a standard play!");
                         return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
                     }
 
-                    if (CanAttemptFieldGoal(priorState) && inFieldGoalRange)
+                    if (CanAttemptFieldGoal(priorState) && !isFakePlay && inFieldGoalRange)
                     {
                         var fakeFieldGoalThreshold = physicsParams["FourthDownFakeFGStrengthThreshold"].Value;
                         if (estimatedStrengthRatio >= fakeFieldGoalThreshold)
@@ -140,13 +142,13 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                             if (parameters.Random.Chance(selectionChance))
                             {
                                 Log.Verbose("MainGameDecision: Attempting a fake field goal on fourth down!");
-                                return FakeFieldGoalOutcome.Run(priorState, parameters, physicsParams);
+                                return priorState.WithNextState(GameplayNextState.FakeFieldGoalOutcome);
                             }
                         }
                         Log.Verbose("MainGameDecision: Attempting a field goal on fourth down.");
                         return FieldGoalAttemptOutcome.Run(priorState, parameters, physicsParams);
                     }
-                    else
+                    else if (!isFakePlay)
                     {
                         var fakePuntThreshold = physicsParams["FourthDownFakePuntStrengthThreshold"].Value;
                         if (estimatedStrengthRatio >= fakePuntThreshold)
@@ -155,12 +157,13 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                             if (parameters.Random.Chance(selectionChance))
                             {
                                 Log.Verbose("MainGameDecision: Attempting a fake punt on fourth down!");
-                                return FakePuntOutcome.Run(priorState, parameters, physicsParams);
+                                return priorState.WithNextState(GameplayNextState.FakePuntOutcome);
                             }
                         }
                         Log.Verbose("MainGameDecision: Punting on fourth down.");
-                        return PuntOutcome.Run(priorState, parameters, physicsParams);
+                        return priorState.WithNextState(GameplayNextState.PuntOutcome);
                     }
+                    return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
                 }
                 else if (priorState.PeriodNumber > 4)
                 {
@@ -216,6 +219,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             var selfEstimateOfSelf = parameters.GetEstimateOfTeamByTeam(self, self);
             var selfEstimateOfOpponent = parameters.GetEstimateOfTeamByTeam(self, opponent);
             var lineOfScrimmageTeamYard = priorState.InternalYardToTeamYard(priorState.LineOfScrimmage);
+            var isFakePlay = priorState.GetAdditionalParameterOrDefault<bool?>("IsFakePlay") == true;
 
             var r = Math.Abs(selfEstimateOfSelf.RunningOffenseStrength - selfEstimateOfOpponent.RunningDefenseStrength);
             var p = Math.Abs(adjustedSelfPassingStrength - selfEstimateOfOpponent.PassingDefenseStrength);
@@ -230,25 +234,25 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                     var fieldGoalRangeYard = physicsParams["FieldGoalRangeYard"].Value.Round();
                     bool inFieldGoalRange = lineOfScrimmageTeamYard.Team == opponent
                         && lineOfScrimmageTeamYard.TeamYard <= fieldGoalRangeYard;
-                    if (inFieldGoalRange && CanAttemptFieldGoal(priorState))
+                    if (!isFakePlay && inFieldGoalRange && CanAttemptFieldGoal(priorState))
                     {
                         Log.Verbose("MainGameDecision: Late-game passing play in field goal range, attempting field goal.");
                         return FieldGoalAttemptOutcome.Run(priorState, parameters, physicsParams);
                     }
                     Log.Verbose("MainGameDecision: Late-game passing play but not in field goal range, attempting Hail Mary.");
-                    return HailMaryOutcome.Run(priorState, parameters, physicsParams);
+                    return priorState.WithNextState(GameplayNextState.HailMaryOutcome);
                 }
 
                 var selfDisposition = parameters.GetDispositionForTeam(self);
                 if (selfDisposition == TeamDisposition.UltraConservative)
                 {
                     Log.Verbose("MainGameDecision: Ultra-conservative team disposition, opting for a short pass.");
-                    return ShortPassOutcome.Run(priorState, parameters, physicsParams);
+                    return priorState.WithNextState(GameplayNextState.StandardShortPassingPlayOutcome);
                 }
                 else if (selfDisposition == TeamDisposition.Insane)
                 {
                     Log.Verbose("MainGameDecision: Insane team disposition, opting for a long pass.");
-                    return LongPassOutcome.Run(priorState, parameters, physicsParams);
+                    return priorState.WithNextState(GameplayNextState.StandardLongPassingPlayOutcome);
                 }
 
                 var shortPassChance = physicsParams["ConservativePassShortChance"].Value;
@@ -259,131 +263,17 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 if (nextDouble < shortPassChance)
                 {
                     Log.Verbose("MainGameDecision: Conservative team disposition, selected a medium pass.");
-                    return MediumPassOutcome.Run(priorState, parameters, physicsParams);
+                    return priorState.WithNextState(GameplayNextState.StandardMediumPassingPlayOutcome);
                 }
                 else if (nextDouble < mediumPassChance)
                 {
                     Log.Verbose("MainGameDecision: Conservative team disposition, selected a long pass.");
-                    return LongPassOutcome.Run(priorState, parameters, physicsParams);
+                    return priorState.WithNextState(GameplayNextState.StandardLongPassingPlayOutcome);
                 }
             }
 
             Log.Verbose("MainGameDecision: Selected a rushing play.");
-            return RunningPlayOutcome.Run(priorState, parameters, physicsParams);
-        }
-
-        /// <summary>
-        /// Determines the appropriate clock management disposition (for example, hurry-up
-        /// or clock-chewing) for the team in possession based on the current game state,
-        /// team dispositions and tuning parameters.
-        /// </summary>
-        /// <param name="priorState">The game state used to evaluate score, possession and time.</param>
-        /// <param name="parameters">Decision parameters that include team dispositions and team strength estimates.</param>
-        /// <param name="physicsParams">
-        /// Dictionary of physics/tuning parameters. Expected keys used by this method:
-        /// "LeadingClockDispositionInStandardZoneOpponentStrengthMultiple",
-        /// "LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultiple",
-        /// "LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultipleForAggressivePlay".
-        /// </param>
-        /// <returns>The chosen <see cref="ClockDisposition"/> for the possessing team.</returns>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when an unexpected <see cref="ClockZone"/> value is encountered.
-        /// </exception>
-        private static ClockDisposition GetClockDisposition(GameState priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
-        {
-            GameTeam self = priorState.TeamWithPossession;
-            GameTeam opponent = self.Opponent();
-            var clockZone = GetClockZone(priorState, physicsParams);
-
-            var possessingTeamDisposition = parameters.GetDispositionForTeam(self);
-            if (possessingTeamDisposition is TeamDisposition.UltraInsane)
-            {
-                return ClockDisposition.TwoMinuteDrill;
-            }
-
-            ClockDisposition selectedClockDisposition;
-            if (priorState.GetScoreForTeam(self) > priorState.GetScoreForTeam(opponent))
-            {
-                var selfEstimateOfSelf = parameters.GetEstimateOfTeamByTeam(self, self);
-                var selfEstimateOfOpponent = parameters.GetEstimateOfTeamByTeam(self, opponent);
-                var averageRatio = selfEstimateOfSelf.OverallAverageStrength / selfEstimateOfOpponent.OverallAverageStrength;
-                var highThreshold = physicsParams["LeadingClockDispositionInStandardZoneOpponentStrengthMultiple"].Value;
-                var mediumThreshold = physicsParams["LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultiple"].Value;
-                var lowThreshold = physicsParams["LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultipleForAggressivePlay"].Value;
-
-                if (clockZone == ClockZone.Standard)
-                {
-                    if (averageRatio > highThreshold)
-                    {
-                        selectedClockDisposition = ClockDisposition.ClockChewing;
-                    }
-                    else
-                    {
-                        selectedClockDisposition = ClockDisposition.Relaxed;
-                    }
-                }
-                else if (averageRatio > mediumThreshold)
-                {
-                    if (averageRatio > lowThreshold)
-                    {
-                        selectedClockDisposition = ClockDisposition.TwoMinuteDrill;
-                    }
-                    else
-                    {
-                        selectedClockDisposition = ClockDisposition.HurryUp;
-                    }
-                }
-                else
-                {
-                    selectedClockDisposition = ClockDisposition.Relaxed;
-                }
-            }
-            else
-            {
-                selectedClockDisposition = clockZone switch
-                {
-                    ClockZone.Standard => ClockDisposition.HurryUp,
-                    ClockZone.EndOfHalf => ClockDisposition.TwoMinuteDrill,
-                    _ => throw new InvalidOperationException($"Unexpected clock zone {clockZone}.")
-                };
-            }
-
-            if (possessingTeamDisposition == TeamDisposition.Insane &&
-                    selectedClockDisposition is ClockDisposition.Relaxed or ClockDisposition.ClockChewing)
-            {
-                return ClockDisposition.HurryUp;
-            }
-            return selectedClockDisposition;
-        }
-
-        /// <summary>
-        /// Classifies the current game time into a <see cref="ClockZone"/>. Uses the current
-        /// period and the configured low-time threshold to determine if the game is in the
-        /// standard time zone or the end-of-half time zone.
-        /// </summary>
-        /// <param name="priorState">The current game state used to obtain period and remaining time.</param>
-        /// <param name="physicsParams">
-        /// Dictionary of physics/tuning parameters. Expected key used by this method:
-        /// "LowTimeInHalfThreshold".
-        /// </param>
-        /// <returns>The <see cref="ClockZone"/> representing whether the game is in standard play or end-of-half time.</returns>
-        private static ClockZone GetClockZone(GameState priorState,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
-        {
-            if (priorState.PeriodNumber is 1 or 3)
-            {
-                return ClockZone.Standard;
-            }
-
-            var threshold = physicsParams["LowTimeInHalfThreshold"].Value.Round();
-            var secondsLeftInGame = priorState.TotalSecondsLeftInGame();
-            if (secondsLeftInGame <= threshold)
-            {
-                return ClockZone.EndOfHalf;
-            }
-            return ClockZone.Standard;
+            return priorState.WithNextState(GameplayNextState.StandardRushingPlayOutcome);
         }
 
         /// <summary>

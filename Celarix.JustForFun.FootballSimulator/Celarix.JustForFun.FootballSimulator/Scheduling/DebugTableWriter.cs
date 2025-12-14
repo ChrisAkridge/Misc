@@ -4,20 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Celarix.JustForFun.FootballSimulator.Collections;
+using Celarix.JustForFun.FootballSimulator.Random;
 
 namespace Celarix.JustForFun.FootballSimulator.Scheduling
 {
 	internal sealed class DebugTableWriter
 	{
 		private StringBuilder htmlBuilder;
-		private readonly Random random = new Random();
+		private readonly IRandom random;
 		
-		public DebugTableWriter()
+		public DebugTableWriter(IRandom random)
 		{
 			htmlBuilder = new StringBuilder();
-			
-			// Write a basic HTML header to the builder.
-			htmlBuilder.AppendLine("<!DOCTYPE html>");
+			this.random = random;
+
+            // Write a basic HTML header to the builder.
+            htmlBuilder.AppendLine("<!DOCTYPE html>");
 			htmlBuilder.AppendLine("<html>");
 			htmlBuilder.AppendLine("<head>");
 			htmlBuilder.AppendLine("<title>Debug Table</title>");

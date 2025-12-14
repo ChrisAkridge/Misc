@@ -6,9 +6,16 @@ using System.Text;
 namespace Celarix.JustForFun.FootballSimulator.Models
 {
     internal sealed record GameState(
+        // State machine
+        long Version,
+        GameplayNextState NextState,
+        IReadOnlyList<AdditionalParameter<object>> AdditionalParameters,
+        IReadOnlyList<StateHistoryEntry> StateHistory,
+
         // Weather conditions
         double BaseWindDirection,
         double BaseWindSpeed,
+        double AirTemperature,
 
         // Game status
         GameTeam TeamWithPossession,
@@ -31,5 +38,17 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         // Internal properties
         PossessionOnPlay PossessionOnPlay,
         GameTeam? TeamCallingTimeout
+    );
+
+    internal sealed record AdditionalParameter<T>(
+        string Key,
+        T Value,
+        long AddedInVersion
+    );
+
+    internal sealed record StateHistoryEntry(
+        GameplayNextState State,
+        GameTeam TeamWithPossession,
+        long Version
     );
 }

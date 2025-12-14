@@ -1,6 +1,7 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Collections;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Random;
 using Serilog;
 
 namespace Celarix.JustForFun.FootballSimulator.Scheduling
@@ -10,8 +11,9 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
         private const int YearZero = 2014;
 
 		private readonly BasicTeamInfo[] teams;
+        private readonly IRandomFactory randomFactory;
 
-        public ScheduleGenerator3(BasicTeamInfo[] teams)
+        public ScheduleGenerator3(BasicTeamInfo[] teams, IRandomFactory randomFactory)
         {
             if (teams.Length != 40)
             {
@@ -19,6 +21,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
             }
 
             this.teams = teams;
+            this.randomFactory = randomFactory;
         }
 
         public List<GameRecord> GenerateScheduleForYear(int year,
@@ -35,14 +38,14 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 
             if (previousSuperBowlWinner == null)
             {
-                previousSuperBowlWinner = teams[new Random(Helpers.SchedulingRandomSeed).Next(0, 40)];
+                previousSuperBowlWinner = teams[randomFactory.Create(Helpers.SchedulingRandomSeed).Next(0, 40)];
                 Log.Information("No previous Super Bowl winner provided; randomly selected {Team} as winner", previousSuperBowlWinner.Name);
             }
             
             var teamOpponents = new TeamOpponentDeterminer(teams).GetTeamOpponentsForSeason(cycleYear,
 	            previousSeasonDivisionRankings,
                 diagnosticDictionary);
-            new HomeTeamAssigner(teams, teamOpponents).AssignHomeTeams();
+            new HomeTeamAssigner(teams, teamOpponents, randomFactory).AssignHomeTeams();
             var scheduledGames = GetRegularSeasonGameRecords(teamOpponents, dataTeams);
             AssignWeekNumbers(scheduledGames);
             ChooseByeGames(scheduledGames);
@@ -105,7 +108,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
             return gameRecords;
         }
 
-        private static void AssignWeekNumbers(List<ScheduledGame> scheduledGames)
+        private void AssignWeekNumbers(List<ScheduledGame> scheduledGames)
         {
             // Algorithm by Bill Lindley from the Kentucky Open Source Society.
             // We miss you, buddy!
@@ -122,9 +125,9 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 				throw new ArgumentException("There must be exactly 320 games in the season.", nameof(scheduledGames));
 			}
             
-            var random = new Random(Helpers.SchedulingRandomSeed);
+            var random = randomFactory.Create(Helpers.SchedulingRandomSeed);
             var shuffledGames = new List<ScheduledGame>(scheduledGames);
-            shuffledGames.Shuffle(random);
+            random.Shuffle(shuffledGames);
 
             var gameAssignmentTable = new GameWeekSlotType[320, 16];
 
@@ -251,11 +254,11 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
         private void ChooseByeGames(List<ScheduledGame> scheduledGames)
         {
 	        var byeChosenForTeam = teams.ToDictionary(t => t, _ => false);
-	        var random = new Random(Helpers.SchedulingRandomSeed);
+	        var random = randomFactory.Create(Helpers.SchedulingRandomSeed);
 
-	        scheduledGames.Shuffle(random);
+	        random.Shuffle(scheduledGames);
 
-	        foreach (var game in scheduledGames.Where(g => g.GameType is ScheduledGameType.IntradivisionalFirstSet or ScheduledGameType.IntradivisionalSecondSet))
+            foreach (var game in scheduledGames.Where(g => g.GameType is ScheduledGameType.IntradivisionalFirstSet or ScheduledGameType.IntradivisionalSecondSet))
 	        {
 		        if (byeChosenForTeam[game.HomeTeamInfo] || byeChosenForTeam[game.AwayTeamInfo]) { continue; }
 		        byeChosenForTeam[game.HomeTeamInfo] = true;
@@ -275,11 +278,16 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 
         private void ScheduleGamesToTimeslots(List<ScheduledGame> scheduledGames, int year, BasicTeamInfo previousSuperBowlWinner)
         {
-			var random = new Random(Helpers.SchedulingRandomSeed);
+			var random = randomFactory.Create(Helpers.SchedulingRandomSeed);
 			var gamesByWeek = scheduledGames
                 .GroupBy(g => g.GameRecord.WeekNumber)
                 .OrderBy(g => g.Key)
-                .Select(gr => gr.ToList().Shuffle(random))
+                .Select(gr =>
+                {
+                    var gamesInWeek = gr.ToList();
+                    random.Shuffle(gamesInWeek);
+                    return gamesInWeek;
+                })
                 .ToArray();
             var weekStartMidnight = GetNFLKickoffDayForYear(year);
             
@@ -348,7 +356,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
             
             var teamComparer = new BasicTeamInfoComparer();
             var preseasonOpponents = SymmetricTable<BasicTeamInfo?>.FromRowKeys(teams, 4, teamComparer);
-            var random = new Random(Helpers.SchedulingRandomSeed);
+            var random = randomFactory.Create(Helpers.SchedulingRandomSeed);
 
             foreach (var team in teams)
             {

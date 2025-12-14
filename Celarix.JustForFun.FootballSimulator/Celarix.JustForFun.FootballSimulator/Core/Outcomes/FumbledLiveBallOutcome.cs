@@ -15,6 +15,36 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
+            var wasInterception = priorState.GetAdditionalParameterOrDefault<bool?>("WasIntercepted");
+            if (wasInterception == true)
+            {
+                // Interception! Check if we're in their endzone already.
+                Log.Verbose("FumbledLiveBallOutcome: Interception occurred during passing play.");
+                var interceptionInternalYard = priorState.LineOfScrimmage;
+                var interceptionTeamYard = priorState.InternalYardToTeamYard(interceptionInternalYard);
+                if (interceptionTeamYard.TeamYard is < 0 && interceptionTeamYard.Team == priorState.TeamWithPossession)
+                {
+                    Log.Verbose("FumbledLiveBallOutcome: Interception occurred inside offense's endzone, either a touchdown or successful two-point conversion for the defense!");
+                    return RunPlayerDownedFunction(priorState with
+                    {
+                        TeamWithPossession = priorState.TeamWithPossession.Opponent(),
+                        PossessionOnPlay = PossessionOnPlay.BothTeams,
+                        LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} pass intercepted by {OffPlayer0} inside {DefAbbr} endzone!"
+                    }, parameters, physicsParams, priorState.TeamWithPossession, interceptionInternalYard);
+                }
+                else
+                {
+                    Log.Verbose("FumbledLiveBallOutcome: Interception occurred outside offense's endzone.");
+                    return FumbleOrInteceptionRecoveredByDefense(priorState with
+                    {
+                        TeamWithPossession = priorState.TeamWithPossession.Opponent(),
+                        PossessionOnPlay = PossessionOnPlay.BothTeams,
+                        LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} pass intercepted."
+                    }, parameters, physicsParams, priorState.TeamWithPossession, priorState.TeamWithPossession.Opponent(),
+                    fumbleDownedImmediately: false, priorState.LineOfScrimmage, interceptionTeamYard);
+                }
+            }
+
             var possessingTeamBeforeFumble = priorState.TeamWithPossession;
             var standardStrengthStddev = physicsParams["StandardStrengthStddev"].Value;
             var offensiveLineStrength = parameters.Random.SampleNormalDistribution(
@@ -66,49 +96,64 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 }
 
                 Log.Verbose("FumbledLiveBallOutcome: Fumble recovered by offense, eligible to return.");
-                return ReturnFumbledOrInterceptedBallDecision.Run(priorState with
+                return priorState.WithNextState(GameplayNextState.ReturnFumbledOrInterceptedBallDecision) with
                 {
                     LineOfScrimmage = fumbleRecoveryInternalYard.Round(),
+                    ClockRunning = true,
                     LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} fumbled but {OffPlayer1} recovered at {LoS}."
-                }, parameters, physicsParams);
+                };
             }
             else
             {
-                if (fumbleDownedImmediately)
-                {
-                    Log.Verbose("FumbledLiveBallOutcome: Fumble recovered by defense and downed immediately at {Yard} yard line",
-                        priorState.InternalYardToDisplayTeamYardString(fumbleRecoveryInternalYard.Round(), parameters));
-                    return RunPlayerDownedFunction(priorState with
-                    {
-                        TeamWithPossession = fumbleRecoveryTeam,
-                        PossessionOnPlay = PossessionOnPlay.BothTeams,
-                        LineOfScrimmage = fumbleRecoveryInternalYard.Round(),
-                        LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} fumbled, {DefAbbr} {DefPlayer0} recovered fumble at {LoS}."
-                    }, parameters, physicsParams, possessingTeamBeforeFumble, fumbleRecoveryInternalYard);
-                }
+                return FumbleOrInteceptionRecoveredByDefense(priorState, parameters, physicsParams, possessingTeamBeforeFumble, fumbleRecoveryTeam, fumbleDownedImmediately, fumbleRecoveryInternalYard, fumbleRecoveryTeamYard);
+            }
+        }
 
-                if (fumbleRecoveryTeamYard.Team == fumbleRecoveryTeam.Opponent()
-                    && fumbleRecoveryTeamYard.TeamYard <= 0)
-                {
-                    Log.Verbose("FumbledLiveBallOutcome: Fumble recovered by defense inside offense's endzone, either a touchdown or successful two-point conversion for the defense!");
-                    return RunPlayerDownedFunction(priorState with
-                    {
-                        TeamWithPossession = fumbleRecoveryTeam,
-                        PossessionOnPlay = PossessionOnPlay.BothTeams,
-                        LineOfScrimmage = fumbleRecoveryInternalYard.Round(),
-                        LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} fumbled, {DefAbbr} {DefPlayer0} recovered fumble inside {OffAbbr} endzone."
-                    }, parameters, physicsParams, possessingTeamBeforeFumble, fumbleRecoveryInternalYard);
-                }
-
-                Log.Verbose("FumbledLiveBallOutcome: Fumble recovered by defense, eligible to return.");
-                return ReturnFumbledOrInterceptedBallDecision.Run(priorState with
+        private static GameState FumbleOrInteceptionRecoveredByDefense(GameState priorState,
+            GameDecisionParameters parameters,
+            IReadOnlyDictionary<string, PhysicsParam> physicsParams,
+            GameTeam possessingTeamBeforeFumble,
+            GameTeam fumbleRecoveryTeam,
+            bool fumbleDownedImmediately,
+            double fumbleRecoveryInternalYard,
+            (GameTeam Team, int TeamYard) fumbleRecoveryTeamYard)
+        {
+            if (fumbleDownedImmediately)
+            {
+                Log.Verbose("FumbledLiveBallOutcome: Fumble recovered by defense and downed immediately at {Yard} yard line",
+                    priorState.InternalYardToDisplayTeamYardString(fumbleRecoveryInternalYard.Round(), parameters));
+                return RunPlayerDownedFunction(priorState with
                 {
                     TeamWithPossession = fumbleRecoveryTeam,
                     PossessionOnPlay = PossessionOnPlay.BothTeams,
                     LineOfScrimmage = fumbleRecoveryInternalYard.Round(),
+                    ClockRunning = false,
                     LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} fumbled, {DefAbbr} {DefPlayer0} recovered fumble at {LoS}."
-                }, parameters, physicsParams);
+                }, parameters, physicsParams, possessingTeamBeforeFumble, fumbleRecoveryInternalYard);
             }
+
+            if (fumbleRecoveryTeamYard.Team == fumbleRecoveryTeam.Opponent()
+                && fumbleRecoveryTeamYard.TeamYard <= 0)
+            {
+                Log.Verbose("FumbledLiveBallOutcome: Fumble recovered by defense inside offense's endzone, either a touchdown or successful two-point conversion for the defense!");
+                return RunPlayerDownedFunction(priorState with
+                {
+                    TeamWithPossession = fumbleRecoveryTeam,
+                    PossessionOnPlay = PossessionOnPlay.BothTeams,
+                    LineOfScrimmage = fumbleRecoveryInternalYard.Round(),
+                    ClockRunning = false,
+                    LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} fumbled, {DefAbbr} {DefPlayer0} recovered fumble inside {OffAbbr} endzone."
+                }, parameters, physicsParams, possessingTeamBeforeFumble, fumbleRecoveryInternalYard);
+            }
+
+            Log.Verbose("FumbledLiveBallOutcome: Fumble recovered by defense, eligible to return.");
+            return priorState.WithNextState(GameplayNextState.ReturnFumbledOrInterceptedBallDecision) with
+            {
+                TeamWithPossession = fumbleRecoveryTeam,
+                PossessionOnPlay = PossessionOnPlay.BothTeams,
+                LineOfScrimmage = fumbleRecoveryInternalYard.Round(),
+                LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} fumbled, {DefAbbr} {DefPlayer0} recovered fumble at {LoS}."
+            };
         }
 
         private static GameState RunPlayerDownedFunction(GameState priorState,

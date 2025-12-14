@@ -22,7 +22,7 @@ namespace Celarix.JustForFun.FootballSimulator
         {
             Log.Information("No previous season division rankings available, generating default...");
 
-            var random = new Random(SchedulingRandomSeed);
+            var random = new System.Random(SchedulingRandomSeed);
             var rankings = new Dictionary<BasicTeamInfo, int>();
 
             var conferences = new[]
@@ -89,7 +89,7 @@ namespace Celarix.JustForFun.FootballSimulator
 
         public static double StandardAsymptoticFunction(double x, double growthDecelerator) => x / (x + growthDecelerator);
 
-        public static double SampleNormalDistribution(double mean, double standardDeviation, Random random)
+        public static double SampleNormalDistribution(double mean, double standardDeviation, System.Random random)
         {
             standardDeviation = Math.Abs(standardDeviation);
             
@@ -103,7 +103,7 @@ namespace Celarix.JustForFun.FootballSimulator
             return normalDistribution.Sample();
         }
 
-        public static double SampleNormalDistribution(NormalDistributionParameters parameters, double value, Random random) =>
+        public static double SampleNormalDistribution(NormalDistributionParameters parameters, double value, System.Random random) =>
             value < 0d
                 ? SampleNormalDistribution(parameters.MeanAtZero - (parameters.MeanReductionPerUnitValue * Math.Abs(value)),
                     parameters.StandardDeviationAtZero, random)

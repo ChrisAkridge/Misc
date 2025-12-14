@@ -526,4 +526,4 @@ OUTCOME XXI: STANDARD PLAY FROM SCRIMMAGE OUTCOME
 	2. [Behind the line to gain]: Loss of down, go to DECISION V. (Turnover on downs would be 1st down for the other team, DECISION V for them).
 	3. [Beyond the line to gain]: First down, go to DECISION V.
 	4. [Their endzone] TOUCHDOWN! Go to DECISION IV.
-	5. [Your endzone] SAFETY. Go to DECISION II.+
+	5. [Your endzone] SAFETY. Go to DECISION II.

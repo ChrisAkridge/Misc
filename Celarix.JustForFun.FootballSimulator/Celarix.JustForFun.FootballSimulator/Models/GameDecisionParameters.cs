@@ -1,4 +1,5 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
+using Celarix.JustForFun.FootballSimulator.Random;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,7 +8,7 @@ namespace Celarix.JustForFun.FootballSimulator.Models
 {
     internal sealed class GameDecisionParameters
     {
-        public Random Random { get; init; }
+        public IRandom Random { get; init; }
 
         public Team AwayTeam { get; init; }
         public Team HomeTeam { get; init; }

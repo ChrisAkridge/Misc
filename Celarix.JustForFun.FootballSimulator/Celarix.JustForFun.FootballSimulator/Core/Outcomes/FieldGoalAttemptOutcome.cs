@@ -91,7 +91,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (kickBlocked)
             {
                 Log.Verbose("FieldGoalAttemptOutcome: Kick was blocked, ball is live!");
-                return FumbledLiveBallOutcome.Run(priorState, parameters, physicsParams);
+                return priorState.WithNextState(GameplayNextState.FumbledLiveBallOutcome);
             }
 
             if (priorState.NextPlay != NextPlayKind.ConversionAttempt)
@@ -99,11 +99,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 if (kickSuccessful)
                 {
                     Log.Verbose("FieldGoalAttemptOutcome: Field goal kick was good!");
-                    return priorState.WithScoreChange(priorState.TeamWithPossession, 3) with
+                    return priorState.WithScoreChange(priorState.TeamWithPossession, 3)
+                        .WithNextState(GameplayNextState.PlayEvaluationComplete)
+                    with
                     {
                         NextPlay = NextPlayKind.Kickoff,
                         LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
                         LineToGain = null,
+                        ClockRunning = false,
                         LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} made a field goal from {FGKickDistance} yards."
                     };
                 }
@@ -118,11 +121,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (kickSuccessful)
             {
                 Log.Verbose("FieldGoalAttemptOutcome: Extra point kick was good!");
-                return priorState.WithScoreChange(priorState.TeamWithPossession, 1) with
+                return priorState.WithScoreChange(priorState.TeamWithPossession, 1)
+                    .WithNextState(GameplayNextState.PlayEvaluationComplete)
+                with
                 {
                     NextPlay = NextPlayKind.Kickoff,
                     LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
                     LineToGain = null,
+                    ClockRunning = false,
                     LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} made the extra point."
                 };
 
@@ -130,11 +136,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             else
             {
                 Log.Verbose("FieldGoalAttemptOutcome: Extra point kick was no good.");
-                return priorState with
+                return priorState.WithNextState(GameplayNextState.PlayEvaluationComplete) with
                 {
                     NextPlay = NextPlayKind.Kickoff,
                     LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
                     LineToGain = null,
+                    ClockRunning = false,
                     LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} missed the extra point."
                 };
             }

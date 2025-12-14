@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Celarix.JustForFun.FootballSimulator.Collections;
+using Celarix.JustForFun.FootballSimulator.Random;
 
 namespace Celarix.JustForFun.FootballSimulator.Scheduling
 {
@@ -20,9 +21,9 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
         private readonly IList<T> list;
         private readonly Func<T, int, int> itemScorer;
         private readonly Stack<SwapEvent> shuffleHistory;
-        private readonly Random random;
+        private readonly IRandom random;
 
-        public BacktrackingHillClimber(IList<T> list, Func<T, int, int> itemScorer, Random random)
+        public BacktrackingHillClimber(IList<T> list, Func<T, int, int> itemScorer, IRandom random)
         {
             this.list = list;
             this.itemScorer = itemScorer;

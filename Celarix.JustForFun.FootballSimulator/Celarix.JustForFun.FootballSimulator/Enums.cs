@@ -74,6 +74,48 @@ internal enum GameResultForTeam
     Tie
 }
 
+internal enum GameplayNextState
+{
+    Start,
+    KickoffDecision,
+    FreeKickDecision,
+    SignalFairCatchDecision,
+    TouchdownDecision,
+    MainGameDecision,
+    ReturnFumbledOrInterceptedBallDecision,
+    NormalKickoffOutcome,
+    ReturnableKickOutcome,
+    FumbledLiveBallOutcome,
+    PuntOutcome,
+    ReturnablePuntOutcome,
+    KickOrPuntReturnOutcome,
+    OnsideKickAttemptOutcome,
+    FieldGoalsAndExtraPointAttemptOutcome,
+    TwoPointConversionAttemptOutcome,
+    FumbleOrInterceptionReturnOutcome,
+    StandardRushingPlayOutcome,
+    StandardShortPassingPlayOutcome,
+    StandardMediumPassingPlayOutcome,
+    StandardLongPassingPlayOutcome,
+    HailMaryOutcome,
+    QBSneakOutcome,
+    FakePuntOutcome,
+    FakeFieldGoalOutcome,
+    VictoryFormationOutcome,
+
+    /// <summary>
+    /// The state reached when all evaluations for a play have been completed and the game state
+    /// is ready for post-play processing.
+    /// </summary>
+    PlayEvaluationComplete,
+
+    /// <summary>
+    /// The state reached when the clock hits zero at the end of the second quarter, fourth quarter,
+    /// or any even overtime period.
+    /// </summary>
+    EndOfHalf
+}
+
 internal enum NextPlayKind
 {
     Kickoff,
@@ -177,4 +219,11 @@ internal enum ClockDisposition
     HurryUp,
     TwoMinuteDrill,
     ClockChewing
+}
+
+internal enum PassAttemptDistance
+{
+    Short,
+    Medium,
+    Long
 }

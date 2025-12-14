@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
+using Celarix.JustForFun.FootballSimulator.Random;
 using Serilog;
 using static Celarix.JustForFun.FootballSimulator.Helpers;
 
@@ -13,10 +14,15 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 	{
 		private readonly IReadOnlyList<BasicTeamInfo> teams;
 		private readonly BasicTeamInfoComparer comparer = new();
-		
-		public TeamOpponentDeterminer(IReadOnlyList<BasicTeamInfo> teams) => this.teams = teams;
-		
-		public List<GameMatchup> GetTeamOpponentsForSeason(int cycleYear,
+		private readonly IRandomFactory randomFactory = new RandomFactory();
+
+        public TeamOpponentDeterminer(IReadOnlyList<BasicTeamInfo> teams, IRandomFactory randomFactory)
+        {
+            this.teams = teams;
+            this.randomFactory = randomFactory;
+        }
+
+        public List<GameMatchup> GetTeamOpponentsForSeason(int cycleYear,
 			Dictionary<BasicTeamInfo, int>? previousSeasonDivisionRankings,
 			Dictionary<BasicTeamInfo, TeamScheduleDiagnostics> diagnostics)
 		{
@@ -171,7 +177,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
                 // Intraconference games fill 4 slots, but we can't play ourselves.
                 // So we need to play 1 game against 2 opponents and 2 games against the third.
                 // We'd like to choose semi-randomly. Let's start by seeding an RNG with the cycle year.
-                var random = new Random(SchedulingRandomSeed);
+                var random = randomFactory.Create(SchedulingRandomSeed);
 
 				// There are 16 symmetric slots to fill for these teams in this division:
 				// Colts   . . . . 
@@ -185,7 +191,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 				// That leaves us with two teams, the Titans and the Texans, who play against each other twice.
 				// Let's start by shuffling the teams using the random number generator.
 				var divisionTeams = GetTeamsInDivision(teams, team.Conference, team.Division).ToList();
-				divisionTeams.Shuffle(random);
+				random.Shuffle(divisionTeams);
 
 				// Now we have the four teams in a pseudo-random order. We can pair them up.
 				// The team at index 0 will play twice against the team at index 1 and the

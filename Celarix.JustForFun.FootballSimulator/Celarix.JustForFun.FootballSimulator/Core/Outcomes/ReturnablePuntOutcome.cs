@@ -29,7 +29,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (receivingTeamRecovers)
             {
                 Log.Verbose("ReturnablePuntOutcome: Punt recovered by receiving team.");
-                return SignalFairCatchDecision.Run(priorState, parameters, physicsParams);
+                return priorState.WithNextState(GameplayNextState.SignalFairCatchDecision);
             }
 
             var receivingTeamTouchesBallButNotRecoversChance = physicsParams["UnrecoveredPuntTouchesReceivingTeamChance"].Value;
@@ -37,14 +37,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (receivingTeamTouchesBallButNotRecovers)
             {
                 Log.Verbose("ReturnablePuntOutcome: Punt touched by receiving team but not recovered.");
-                return FumbledLiveBallOutcome.Run(priorState with
-                    {
-                        PossessionOnPlay = PossessionOnPlay.BothTeams,
-                        LastPlayDescriptionTemplate = "The {OffAbbr} punt was touched by the receiving team but not secured!"
-                    },
-                    parameters,
-                    physicsParams,
-                    priorState.LineOfScrimmage);
+                return priorState.WithNextState(GameplayNextState.FumbledLiveBallOutcome)
+                    .WithAdditionalParameter("KickActualYard", priorState.LineOfScrimmage);
             }
 
             // Ball is rolling, calculate where it ends up
@@ -67,21 +61,20 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                         LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
                         NextPlay = NextPlayKind.FreeKick,
                         PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay(),
+                        ClockRunning = false,
                         LastPlayDescriptionTemplate = "The {OffAbbr} punt rolled into their own endzone for a safety!"
                     };
-                    return FreeKickDecision.Run(updatedState,
-                        parameters,
-                        physicsParams);
+                    return updatedState.WithNextState(GameplayNextState.FreeKickDecision);
                 }
                 
                 Log.Verbose("ReturnablePuntOutcome: Punt rolled into receiving team's endzone; touchback.");
                 return priorState.WithFirstDownLineOfScrimmage(25d, lineOfScrimmageTeamYard.Team.Opponent(),
-                    "{DefAbbr} touchback, ball placed at {LoS}.");
+                    "{DefAbbr} touchback, ball placed at {LoS}.", clockRunning: false);
             }
 
             Log.Verbose("ReturnablePuntOutcome: Punt landed in bounds and rolled to new line of scrimmage untouched by receiving team.");
             return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, lineOfScrimmageTeamYard.Team.Opponent(),
-                "{OffAbbr} punt downed at {LoS}, first down for {DefAbbr}.");
+                "{OffAbbr} punt downed at {LoS}, first down for {DefAbbr}.", clockRunning: false);
         }
     }
 }

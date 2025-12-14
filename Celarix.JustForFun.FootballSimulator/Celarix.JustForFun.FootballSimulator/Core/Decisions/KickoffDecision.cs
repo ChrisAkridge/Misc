@@ -26,7 +26,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             if (kickingTeamDisposition == TeamDisposition.UltraConservative)
             {
                 Log.Verbose("KickoffDecision: Kicking team disposition is UltraConservative; performing normal kickoff.");
-                return NormalKickoffOutcome.Run(priorState, parameters, physicsParams);
+                return priorState.WithNextState(GameplayNextState.NormalKickoffOutcome);
             }
             else if (kickingTeamDisposition == TeamDisposition.Conservative)
             {
@@ -37,18 +37,18 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                     && Math.Abs(scoreDifference) / minutesLeftInGame >= pointsPerMinuteThreshold)
                 {
                     Log.Verbose("KickoffDecision: Down by a lot with little time left; performing onside kick attempt.");
-                    return OnsideKickAttemptOutcome.Run(priorState, parameters, physicsParams);
+                    return priorState.WithNextState(GameplayNextState.OnsideKickAttemptOutcome);
                 }
                 else
                 {
                     Log.Verbose("KickoffDecision: Performing normal kickoff.");
-                    return NormalKickoffOutcome.Run(priorState, parameters, physicsParams);
+                    return priorState.WithNextState(GameplayNextState.NormalKickoffOutcome);
                 }
             }
             else
             {
                 Log.Verbose("KickoffDecision: Kicking team disposition is Insane or UltraInsane; performing onside kick attempt.");
-                return OnsideKickAttemptOutcome.Run(priorState, parameters, physicsParams);
+                return priorState.WithNextState(GameplayNextState.OnsideKickAttemptOutcome);
             }
         }
     }

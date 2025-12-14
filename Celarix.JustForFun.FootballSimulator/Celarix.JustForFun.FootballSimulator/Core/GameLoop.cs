@@ -1,6 +1,10 @@
-﻿using Celarix.JustForFun.FootballSimulator.Data;
+﻿using Celarix.JustForFun.FootballSimulator.Core.Decisions;
+using Celarix.JustForFun.FootballSimulator.Core.Outcomes;
+using Celarix.JustForFun.FootballSimulator.Core.PostPlay;
+using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Random;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -9,40 +13,18 @@ using System.Threading.Tasks;
 
 namespace Celarix.JustForFun.FootballSimulator.Core
 {
-    internal sealed class GameLoop
+    internal sealed partial class GameLoop
     {
-        private Random random;
+        private IRandom random;
         private FootballContext footballContext;
         private GameRecord gameRecord;
         private readonly IReadOnlyDictionary<string, PhysicsParam> physicsParams;
 
-        // Game clock
-        private int periodNumber;
-        private int secondsRemainingInPeriod;
+        private GameState currentState;
+        private GameDecisionParameters currentParameters;
+        private GameTeam firstPossessingTeam;
 
-        // Game scoreboard
-        private int awayTeamScore;
-        private int homeTeamScore;
-        private int awayTimeoutsRemaining;
-        private int homeTimeoutsRemaining;
-        private GameTeam possessingTeam;
-
-        // Simulation parameters
-        private double baseWindDirection;
-        private double baseWindSpeed;
-        private TeamStrengthSet awayTeamActualStrengths;
-        private TeamStrengthSet homeTeamActualStrengths;
-        private TeamStrengthSet awayTeamEstimateOfAway;
-        private TeamStrengthSet awayTeamEstimateOfHome;
-        private TeamStrengthSet homeTeamEstimateOfAway;
-        private TeamStrengthSet homeTeamEstimateOfHome;
-
-        // Gameplay flags
-        private bool pointAfterTouchdownFlag;
-        private bool onePointOffensiveSafetyFlag;
-        private bool dualPossessionFlag;
-
-        public GameLoop(FootballContext footballContext, Random random, GameRecord gameRecord)
+        public GameLoop(FootballContext footballContext, IRandom random, GameRecord gameRecord)
         {
             // TODO: Log GameState before and after single step
             this.footballContext = footballContext;
@@ -56,201 +38,92 @@ namespace Celarix.JustForFun.FootballSimulator.Core
             }
         }
 
-        public void Initialize()
+        // Main Loop
+        public void MoveNext()
         {
-            SetupClockForPartiallyCompletedGame();
-
-            if (periodNumber == 1 && secondsRemainingInPeriod == Constants.SecondsPerQuarter)
+            do
             {
-                // New game initialization
-                awayTeamScore = 0;
-                homeTeamScore = 0;
-                possessingTeam = random.Next(2) == 0 ? GameTeam.Away : GameTeam.Home;
-            }
-            else
-            {
-                // Load existing game state from gameRecord
-                SetupScoreForPartiallyCompletedGame();
-
-                // We only write completed drives to the database, so the possessing team is the team
-                // that DIDN'T have possession on the last drive.
-                possessingTeam = gameRecord.TeamDriveRecords.Last().Team.Equals(gameRecord.HomeTeam)
-                    ? GameTeam.Away
-                    : GameTeam.Home;
-            }
-
-            // We don't store timeouts used in the database, so always start with 3 per team
-            awayTimeoutsRemaining = 3;
-            homeTimeoutsRemaining = 3;
-
-            // Initialize weather conditions
-            baseWindDirection = random.NextDouble() * 360.0;
-            Log.Information("Initialized base wind direction to {WindDirection} degrees (0 = toward home, 180 = toward away).", baseWindDirection);
-            baseWindSpeed = random.SampleNormalDistribution(gameRecord.Stadium.AverageWindSpeed, physicsParams["StartWindSpeedStddev"].Value);
-            Log.Information("Initialized base wind speed to {WindSpeed} mph.", baseWindSpeed);
-
-            // Initialize team strength sets
-            awayTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(gameRecord.AwayTeam, GameTeam.Away);
-            homeTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(gameRecord.HomeTeam, GameTeam.Home);
-            awayTeamEstimateOfAway = EstimateStrengthSetForTeam(gameRecord.AwayTeam, gameRecord.AwayTeam);
-            awayTeamEstimateOfHome = EstimateStrengthSetForTeam(gameRecord.HomeTeam, gameRecord.AwayTeam);
-            homeTeamEstimateOfAway = EstimateStrengthSetForTeam(gameRecord.AwayTeam, gameRecord.HomeTeam);
-            homeTeamEstimateOfHome = EstimateStrengthSetForTeam(gameRecord.HomeTeam, gameRecord.HomeTeam);
-        }
-
-        private void SetupClockForPartiallyCompletedGame()
-        {
-            if (gameRecord.TeamDriveRecords.Count == 0)
-            {
-                Log.Information("No drive records found for current game. Starting from beginning of game.");
-                periodNumber = 1;
-                secondsRemainingInPeriod = Constants.SecondsPerQuarter;
-                return;
-            }
-
-            var drivesByQuarter = gameRecord.TeamDriveRecords
-                .GroupBy(d => d.QuarterNumber)
-                .ToDictionary(g => g.Key, g => g.ToArray());
-
-            // Sanity check: the sum of durations of all drives in the second quarter, fourth quarter, or
-            // any overtime period n % 2 == 1 cannot exceed 15 minutes
-            foreach (var quarterDrives in drivesByQuarter.Where(kvp => kvp.Key % 2 == 1))
-            {
-                var quarterNumber = quarterDrives.Key;
-                var drives = quarterDrives.Value;
-                var totalDriveDuration = drives.Sum(d => d.DriveDurationSeconds);
-                var maximumAllowedDuration = quarterNumber <= 4
-                    ? Constants.SecondsPerQuarter
-                    : Constants.SecondsPerOvertimePeriod;
-                if (totalDriveDuration > maximumAllowedDuration)
+                currentState = currentState.NextState switch
                 {
-                    throw new InvalidOperationException(
-                        $"Total drive duration {totalDriveDuration} in quarter {quarterNumber} exceeds maximum allowed {maximumAllowedDuration} (game ID {gameRecord.GameID}.");
+                    GameplayNextState.Start => throw new InvalidOperationException("uh... shouldn't be here yet, I think?"),
+                    GameplayNextState.KickoffDecision => KickoffDecision.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.FreeKickDecision => FreeKickDecision.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.SignalFairCatchDecision => SignalFairCatchDecision.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.TouchdownDecision => TouchdownDecision.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.MainGameDecision => MainGameDecision.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.ReturnFumbledOrInterceptedBallDecision => ReturnFumbledOrInterceptedBallDecision.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.NormalKickoffOutcome => NormalKickoffOutcome.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.ReturnableKickOutcome => ReturnableKickOutcome.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.FumbledLiveBallOutcome => FumbledLiveBallOutcome.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.PuntOutcome => PuntOutcome.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.ReturnablePuntOutcome => ReturnablePuntOutcome.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.KickOrPuntReturnOutcome => KickOrPuntReturnOutcome.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.OnsideKickAttemptOutcome => OnsideKickAttemptOutcome.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.FieldGoalsAndExtraPointAttemptOutcome => FieldGoalAttemptOutcome.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.TwoPointConversionAttemptOutcome => TwoPointConversionAttemptOutcome.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.StandardRushingPlayOutcome => StandardRushingPlayOutcome.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.StandardShortPassingPlayOutcome => StandardPassingPlayOutcome.Run(currentState, currentParameters, physicsParams, PassAttemptDistance.Short),
+                    GameplayNextState.StandardMediumPassingPlayOutcome => StandardPassingPlayOutcome.Run(currentState, currentParameters, physicsParams, PassAttemptDistance.Medium),
+                    GameplayNextState.StandardLongPassingPlayOutcome => StandardPassingPlayOutcome.Run(currentState, currentParameters, physicsParams, PassAttemptDistance.Long),
+                    GameplayNextState.HailMaryOutcome => HailMaryOutcome.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.QBSneakOutcome => QBSneakOutcome.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.FakePuntOutcome => FakePuntOrFieldGoalOutcome.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.FakeFieldGoalOutcome => FakePuntOrFieldGoalOutcome.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.VictoryFormationOutcome => VictoryFormationOutcome.Run(currentState, currentParameters, physicsParams),
+                    _ => throw new InvalidOperationException($"Unhandled gameplay next state {currentState.NextState}.")
+                };
+
+                currentState = currentState with
+                {
+                    Version = currentState.Version + 1
+                };
+
+                Log.Verbose("Advanced to next game state: {GameState}.", currentState.NextState);
+            } while (currentState.NextState != GameplayNextState.PlayEvaluationComplete);
+
+            Log.Verbose("Play evaluation complete, running post-play processing.");
+
+            // TODO: compute update to game clock
+            currentState = GameClockAdjuster.Adjust(currentState, currentParameters, physicsParams);
+            if (currentState.NextState == GameplayNextState.EndOfHalf)
+            {
+                if (currentState.PeriodNumber % 4 == 3)
+                {
+                    // At the start of the 3rd quarter and every 4 quarters after that, switch possession and set up a kickoff
+                    currentState = currentState with
+                    {
+                        // The first possessing team gets to kick off to the other team for the 2nd half
+                        TeamWithPossession = firstPossessingTeam,
+                        NextPlay = NextPlayKind.Kickoff,
+                        ClockRunning = false,
+                        LineOfScrimmage = currentState.TeamYardToInternalYard(firstPossessingTeam, 35),
+                        LastPlayDescriptionTemplate = "Start of {Period}. {OffAbbr} kickoff to {DefAbbr}.",
+                        PossessionOnPlay = firstPossessingTeam.ToPossessionOnPlay()
+                    };
+                }
+                else if (currentState.PeriodNumber % 4 == 1)
+                {
+                    // At the start of the 1st quarter and every 4 quarters after that, do another coinflip.
+                    firstPossessingTeam = random.Chance(0.5)
+                        ? GameTeam.Away
+                        : GameTeam.Home;
+                    currentState = currentState with
+                    {
+                        // The first possessing team gets to kick off to the other team for the 2nd half
+                        TeamWithPossession = firstPossessingTeam.Opponent(),
+                        NextPlay = NextPlayKind.Kickoff,
+                        ClockRunning = false,
+                        LineOfScrimmage = currentState.TeamYardToInternalYard(firstPossessingTeam.Opponent(), 35),
+                        LastPlayDescriptionTemplate = "Start of {Period}, {DefAbbr} wins coin toss and takes possession. {OffAbbr} kickoff to {DefAbbr}.",
+                        PossessionOnPlay = firstPossessingTeam.ToPossessionOnPlay()
+                    };
                 }
             }
 
-            var totalDurationOfAllDrives = gameRecord.TeamDriveRecords.Sum(d => d.DriveDurationSeconds);
-            int secondsIntoPeriod;
-
-            if (totalDurationOfAllDrives <= Constants.SecondsPerQuarter * 4)
-            {
-                periodNumber = (totalDurationOfAllDrives / Constants.SecondsPerQuarter) + 1;
-                secondsIntoPeriod = totalDurationOfAllDrives % Constants.SecondsPerQuarter;
-            }
-            else
-            {
-                var overtimeDuration = totalDurationOfAllDrives - (Constants.SecondsPerQuarter * 4);
-                periodNumber = 4 + (overtimeDuration / Constants.SecondsPerOvertimePeriod) + 1;
-                secondsIntoPeriod = overtimeDuration % Constants.SecondsPerOvertimePeriod;
-            }
-
-            secondsRemainingInPeriod = (periodNumber <= 4
-                ? Constants.SecondsPerQuarter
-                : Constants.SecondsPerOvertimePeriod) - secondsIntoPeriod;
-            Log.Information("Resuming game {GameID} from period {PeriodNumber} with {SecondsRemaining} seconds remaining in period.",
-                gameRecord.GameID, periodNumber, secondsRemainingInPeriod);;
-        }
-
-        private void SetupScoreForPartiallyCompletedGame()
-        {
-            DriveResult[] scoringDriveResults = [
-                DriveResult.FieldGoalSuccess,
-                DriveResult.TouchdownNoXP,
-                DriveResult.TouchdownWithXP,
-                DriveResult.TouchdownWithTwoPointConversion,
-                DriveResult.TouchdownWithOffensiveSafety
-            ];
-
-            foreach (var drive in gameRecord.TeamDriveRecords.Where(r => scoringDriveResults.Contains(r.Result)))
-            {
-                var scoringTeam = drive.Team.Equals(gameRecord.HomeTeam) ? GameTeam.Home : GameTeam.Away;
-                var otherTeam = scoringTeam == GameTeam.Home ? GameTeam.Away : GameTeam.Home;
-                var scoringTeamScore = drive.Result switch
-                {
-                    DriveResult.Safety => 0,
-                    DriveResult.FieldGoalSuccess => 3,
-                    DriveResult.TouchdownNoXP => 6,
-                    DriveResult.TouchdownWithXP => 7,
-                    DriveResult.TouchdownWithTwoPointConversion => 8,
-                    DriveResult.TouchdownWithOffensiveSafety => 6,
-                    DriveResult.TouchdownWithDefensiveScore => 6,
-                    _ => throw new InvalidOperationException("Impossible code path; got non-scoring drive despite filtering them out.")
-                };
-                var otherTeamScore = drive.Result switch
-                {
-                    DriveResult.Safety => 2,
-                    DriveResult.TouchdownWithOffensiveSafety => 1,
-                    DriveResult.TouchdownWithDefensiveScore => 2,
-                    _ => 0
-                };
-
-                homeTeamScore += scoringTeam == GameTeam.Home ? scoringTeamScore : otherTeamScore;
-                awayTeamScore += scoringTeam == GameTeam.Away ? scoringTeamScore : otherTeamScore;
-            }
-
-            Log.Information("Resuming game {GameID} with score {AwayAbbreviation} {AwayTeamScore} @ {HomeTeamScore} {HomeAbbreviation}.",
-                gameRecord.GameID,
-                gameRecord.AwayTeam.Abbreviation,
-                awayTeamScore,
-                homeTeamScore,
-                gameRecord.HomeTeam.Abbreviation);
-        }
-
-        private TeamStrengthSet EstimateStrengthSetForTeam(Team team, Team requestingTeam)
-        {
-            double[] strengths = [
-                team.RunningOffenseStrength,
-                team.RunningDefenseStrength,
-                team.PassingOffenseStrength,
-                team.PassingDefenseStrength,
-                team.OffensiveLineStrength,
-                team.DefensiveLineStrength,
-                team.KickingStrength,
-                team.FieldGoalStrength,
-                team.KickReturnStrength,
-                team.KickDefenseStrength,
-                team.ClockManagementStrength
-            ];
-
-            for (var i = 0; i < strengths.Length; i++)
-            {
-                var strengthRange = random.SampleNormalDistribution(physicsParams["StrengthEstimatorOffsetMean"].Value,
-                    physicsParams["StrengthEstimatorOffsetStddev"].Value);
-                strengthRange += team.Disposition switch
-                {
-                    TeamDisposition.UltraConservative => physicsParams["StrengthEstimatorUltraConservativeAdjustment"].Value,
-                    TeamDisposition.Conservative => physicsParams["StrengthEstimatorConservativeAdjustment"].Value,
-                    TeamDisposition.Insane => physicsParams["StrengthEstimatorInsaneAdjustment"].Value,
-                    TeamDisposition.UltraInsane => physicsParams["StrengthEstimatorUltraInsaneAdjustment"].Value,
-                    _ => throw new InvalidOperationException($"Team {team.TeamName} has invalid disposition {team.Disposition}.")
-                };
-                var rangeSample = random.NextDouble() * strengthRange;
-                var shouldAdjustDownward = random.Chance(0.5);
-                var strengthMultiplier = shouldAdjustDownward
-                    ? 1.0 - rangeSample
-                    : 1.0 + rangeSample;
-                strengths[i] *= strengthMultiplier;
-            }
-
-            return new TeamStrengthSet
-            {
-                IsEstimate = true,
-                Team = team.Equals(gameRecord.HomeTeam) ? GameTeam.Home : GameTeam.Away,
-                StrengthSetKind = team.Equals(requestingTeam)
-                    ? StrengthSetKind.TeamOfItself
-                    : StrengthSetKind.TeamOfOpponent,
-                RunningOffenseStrength = strengths[0],
-                RunningDefenseStrength = strengths[1],
-                PassingOffenseStrength = strengths[2],
-                PassingDefenseStrength = strengths[3],
-                OffensiveLineStrength = strengths[4],
-                DefensiveLineStrength = strengths[5],
-                KickingStrength = strengths[6],
-                FieldGoalStrength = strengths[7],
-                KickReturnStrength = strengths[8],
-                KickDefenseStrength = strengths[9],
-                ClockManagementStrength = strengths[10]
-            };
+            // TODO: compute injury chances and UDFA drafting
+            // TODO: increase strengths based on play results
+            // TODO: on change of possession or score, build and save drive record
+            // TODO: update outgoing status messages
         }
     }
 }

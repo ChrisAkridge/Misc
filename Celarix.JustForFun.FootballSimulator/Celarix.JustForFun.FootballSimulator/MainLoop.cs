@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Gameplay;
+using Celarix.JustForFun.FootballSimulator.Random;
 using Celarix.JustForFun.FootballSimulator.Scheduling;
 using Celarix.JustForFun.FootballSimulator.Tiebreaking;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,8 @@ public sealed class MainLoop
 {
     private readonly FootballContext context;
     private FootballGame? currentGame;
-    
+    private readonly IRandomFactory randomFactory = new RandomFactory();
+
     public string StatusMessage { get; private set; }
 
     public MainLoop() => context = new FootballContext();
@@ -73,7 +75,7 @@ public sealed class MainLoop
                 .Include(g => g.SeasonRecord)
                 .Where(g => g.SeasonRecord.Year == previousSeasonYear)
             : Enumerable.Empty<GameRecord>();
-        var divisionTiebreaker = new DivisionTiebreaker(context.Teams.ToList(), previousSeasonGames);
+        var divisionTiebreaker = new DivisionTiebreaker(context.Teams.ToList(), previousSeasonGames, randomFactory.Create());
         Dictionary<string, int>? previousSeasonTeamPositions = null;
 
         if (previousSeasonYear != null)

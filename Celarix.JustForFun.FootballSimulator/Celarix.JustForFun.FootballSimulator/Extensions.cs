@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Celarix.JustForFun.FootballSimulator.Core;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
+using Celarix.JustForFun.FootballSimulator.Random;
 using Serilog;
 
 namespace Celarix.JustForFun.FootballSimulator
@@ -30,7 +31,7 @@ namespace Celarix.JustForFun.FootballSimulator
         }
 
         // https://stackoverflow.com/a/69455054/2709212
-        public static IList<T> Shuffle<T>(this IList<T> items, Random random)
+        public static IList<T> Shuffle<T>(this IList<T> items, System.Random random)
         {
             for (int i = 0; i < items.Count - 1; i++)
             {
@@ -73,7 +74,7 @@ namespace Celarix.JustForFun.FootballSimulator
             return count;
         }
 
-        public static double SampleNormalDistribution(this Random random, double mean, double standardDeviation)
+        public static double SampleNormalDistribution(this System.Random random, double mean, double standardDeviation)
         {
             if (random.NextDouble() < Constants.ChaosMultiplierChance)
             {
@@ -89,7 +90,7 @@ namespace Celarix.JustForFun.FootballSimulator
             return result;
         }
 
-        public static bool Chance(this Random random, double chance)
+        public static bool Chance(this System.Random random, double chance)
         {
             if (chance < 0 || chance > 1)
             {

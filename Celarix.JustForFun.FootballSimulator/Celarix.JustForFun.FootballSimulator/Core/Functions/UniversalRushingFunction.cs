@@ -1,5 +1,6 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Random;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
         public static RushingResult Get(double rushingOffenseStrength,
             double rushingDefenseStrength,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams,
-            Random random)
+            IRandom random)
         {
             var standardStrengthStddev = physicsParams["StandardStrengthStddev"].Value;
             var offenseSample = random.SampleNormalDistribution(rushingOffenseStrength, standardStrengthStddev);

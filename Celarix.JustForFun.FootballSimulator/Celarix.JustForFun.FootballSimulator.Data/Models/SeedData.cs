@@ -177,7 +177,8 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         {
             return new List<PhysicsParam>
             {
-                new PhysicsParam("StardWindSpeedStddev", 10, "mph", "mph"),
+                new PhysicsParam("StartWindSpeedStddev", 10, "mph", "mph"),
+                new PhysicsParam("StartTemperatureStddev", 12, "degree", "degrees"),
                 new PhysicsParam("StrengthEstimatorOffsetMean", 0.05, "multiplier", "multiplier"),
                 new PhysicsParam("StrengthEstimatorOffsetStddev", 0.02, "multiplier", "multiplier"),
                 new PhysicsParam("StrengthEstimatorUltraConservativeAdjustment", -0.2, "addend", "addend"),
@@ -277,6 +278,13 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
                 new PhysicsParam("FumbleRecoveredByOffenseChanceOfBeingDownedImmediately", 0.8, "chance", "chance"),
                 new PhysicsParam("FumbleRecoveredByDefenseChanceOfBeingDownedImmediately", 0.6, "chance", "chance"),
                 new PhysicsParam("FieldGoalRangeYard", 35, "yard", "yards"),
+                new PhysicsParam("PlayTimeSecondsMean", 3, "second", "seconds"),
+                new PhysicsParam("PlayTimeSecondsStddev", 1, "second", "seconds"),
+                new PhysicsParam("TimeBetweenPlaysRelaxed", 30, "second", "seconds"),
+                new PhysicsParam("TimeBetweenPlaysHurryUp", 15, "second", "seconds"),
+                new PhysicsParam("TimeBetweenPlaysTwoMinuteDrill", 8, "second", "seconds"),
+                new PhysicsParam("TimeBetweenPlaysClockChewing", 39, "second", "seconds"),
+                new PhysicsParam("BaseInjuryChancePerPlay", 0.0023, "chance", "chance"),
             };
         }
     }

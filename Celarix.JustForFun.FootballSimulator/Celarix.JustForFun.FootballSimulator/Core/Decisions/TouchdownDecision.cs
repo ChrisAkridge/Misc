@@ -17,16 +17,19 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             var possessingTeamDisposition = parameters.GetDispositionForTeam(priorState.TeamWithPossession);
             if (possessingTeamDisposition == TeamDisposition.UltraConservative)
             {
+                Log.Verbose("TouchdownDecision: Team disposition is UltraConservative; opting for an extra point attempt.");
                 return AttemptExtraPoint(priorState, parameters, physicsParams);
             }
             else if (possessingTeamDisposition is TeamDisposition.Insane or TeamDisposition.UltraInsane)
             {
+                Log.Verbose("TouchdownDecision: Team disposition is Insane or UltraInsane; opting for a two-point conversion attempt.");
                 return AttemptTwoPointConversion(priorState, parameters, physicsParams);
             }
 
             var automaticTwoPointAttemptChance = physicsParams["AutomaticTwoPointAttemptChance"].Value;
             if (parameters.Random.Chance(automaticTwoPointAttemptChance))
             {
+                Log.Verbose("TouchdownDecision: Random chance triggered automatic two-point conversion attempt.");
                 return AttemptTwoPointConversion(priorState, parameters, physicsParams);
             }
 
@@ -35,32 +38,31 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             var attemptThreshold = physicsParams["TwoPointAttemptPointsPerMinuteThreshold"].Value;
             if (minutesLeftInGame < 0 && Math.Abs(scoreDifference) / minutesLeftInGame > attemptThreshold)
             {
+                Log.Verbose("TouchdownDecision: Score difference and time remaining thresholds met for two-point conversion attempt.");
                 return AttemptTwoPointConversion(priorState, parameters, physicsParams);
-
             }
+            Log.Verbose("TouchdownDecision: Defaulting to extra point attempt.");
             return AttemptExtraPoint(priorState, parameters, physicsParams);
         }
 
         private static GameState AttemptTwoPointConversion(GameState priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
-            Log.Verbose("TouchdownDecision: Team disposition is Insane or UltraInsane; opting for a two-point conversion attempt.");
-            return TwoPointConversionAttemptOutcome.Run(priorState with
+            return priorState.WithNextState(GameplayNextState.TwoPointConversionAttemptOutcome) with
             {
                 LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 2),
                 NextPlay = NextPlayKind.ConversionAttempt,
                 LastPlayDescriptionTemplate = "{OffAbbr} attempts a two-point conversion."
-            }, parameters, physicsParams);
+            };
         }
 
         private static GameState AttemptExtraPoint(GameState priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
-            Log.Verbose("TouchdownDecision: Team disposition is UltraConservative; opting for an extra point attempt.");
-            return FieldGoalAttemptOutcome.Run(priorState with
+            return priorState.WithNextState(GameplayNextState.FieldGoalsAndExtraPointAttemptOutcome) with
             {
-                LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 15),
+                LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 15),
                 NextPlay = NextPlayKind.ConversionAttempt,
                 LastPlayDescriptionTemplate = "{OffAbbr} attempts an extra point."
-            }, parameters, physicsParams);
+            };
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
     {
         private readonly FootballContext context;
         private readonly GameRecord currentGameRecord;
-        private readonly Random random;
+        private readonly System.Random random;
 
         private InGameTeamStrengths homeTeamStrengths;
         private InGameTeamStrengths awayTeamStrengths;
@@ -61,7 +61,7 @@ namespace Celarix.JustForFun.FootballSimulator.Gameplay
         {
             this.context = context;
             this.currentGameRecord = currentGameRecord;
-            random = new Random();
+            random = new System.Random();
             
             homeTeamStrengths = InGameTeamStrengths.FromTeam(currentGameRecord.HomeTeam);
             awayTeamStrengths = InGameTeamStrengths.FromTeam(currentGameRecord.AwayTeam);

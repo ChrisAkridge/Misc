@@ -29,7 +29,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 else
                 {
                     Log.Verbose("SignalFairCatchDecision: Team disposition is Insane or UltraInsane, always return.");
-                    return KickOrPuntReturnOutcome.Run(priorState, parameters, physicsParams);
+                    return priorState.WithNextState(GameplayNextState.KickOrPuntReturnOutcome);
                 }
             }
 
@@ -47,7 +47,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 Log.Verbose("SignalFairCatchDecision: Strength ratio {StrengthRatio:F2} exceeds threshold {Threshold:F2}, returning kick.",
                     strengthRatio,
                     threshold);
-                return KickOrPuntReturnOutcome.Run(priorState, parameters, physicsParams);
+                return priorState.WithNextState(GameplayNextState.KickOrPuntReturnOutcome);
             }
 
             var gameCloseToEndingThreshold = physicsParams["ReturnKickCloseGameTimeThreshold"].Value;
@@ -56,7 +56,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 Log.Verbose("SignalFairCatchDecision: Game not close to ending (time left {TimeLeft:F2}s exceeds threshold {Threshold:F2}s), returning kick.",
                     priorState.TotalSecondsLeftInGame(),
                     gameCloseToEndingThreshold);
-                return KickOrPuntReturnOutcome.Run(priorState, parameters, physicsParams);
+                return priorState.WithNextState(GameplayNextState.KickOrPuntReturnOutcome);
             }
             return FairCatch(priorState);
         }
@@ -67,7 +67,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             {
                 // Touchback
                 int lineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35);
-                return priorState with
+                return priorState.WithNextState(GameplayNextState.PlayEvaluationComplete) with
                 {
                     TeamWithPossession = priorState.TeamWithPossession.Opponent(),
                     PossessionOnPlay = priorState.TeamWithPossession.Opponent().ToPossessionOnPlay(),
@@ -79,7 +79,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             else
             {
                 // Fair catch on field
-                return priorState with
+                return priorState.WithNextState(GameplayNextState.PlayEvaluationComplete) with
                 {
                     TeamWithPossession = priorState.TeamWithPossession.Opponent(),
                     PossessionOnPlay = priorState.TeamWithPossession.Opponent().ToPossessionOnPlay(),

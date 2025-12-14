@@ -26,9 +26,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (rushAttemptResult.WasFumbled)
             {
                 Log.Verbose("Fumble on fumble/interception return!");
-                return FumbledLiveBallOutcome.Run(priorState,
-                    parameters,
-                    physicsParams);
+                return priorState.WithNextState(GameplayNextState.FumbledLiveBallOutcome);
             }
 
             var yardsGained = rushAttemptResult.YardsGained ?? throw new InvalidOperationException("Rushing function specified no yards gained value, but ball was not fumbled; must have value.");

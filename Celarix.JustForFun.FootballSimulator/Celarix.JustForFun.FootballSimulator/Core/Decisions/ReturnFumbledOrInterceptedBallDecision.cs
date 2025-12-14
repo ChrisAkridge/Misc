@@ -20,7 +20,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             {
                 Log.Verbose("ReturnFumbledOrInterceptedBallDecision: Team with possession is {Disposition}, attempting return.",
                     possessingTeamDisposition);
-                return FumbleOrInterceptionReturnOutcome.Run(priorState, parameters, physicsParams);
+                return priorState.WithNextState(GameplayNextState.FumbleOrInterceptionReturnOutcome);
             }
             else if (possessingTeamDisposition == TeamDisposition.UltraConservative)
             {
@@ -32,7 +32,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             else if (priorState.NextPlay == NextPlayKind.ConversionAttempt)
             {
                 Log.Verbose("ReturnFumbledOrInterceptedBallDecision: On conversion attempt, attempting return.");
-                return FumbleOrInterceptionReturnOutcome.Run(priorState, parameters, physicsParams);
+                return priorState.WithNextState(GameplayNextState.FumbleOrInterceptionReturnOutcome);
             }
             
             var secondsLeftInGame = priorState.TotalSecondsLeftInGame();
@@ -41,7 +41,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             {
                 // yeah I wonder if I typoed here, if we really mean to return here
                 Log.Verbose("ReturnFumbledOrInterceptedBallDecision: Late in game with lead, attempting return.");
-                return FumbleOrInterceptionReturnOutcome.Run(priorState, parameters, physicsParams);
+                return priorState.WithNextState(GameplayNextState.FumbleOrInterceptionReturnOutcome);
             }
 
             var teamYard = priorState.InternalYardToTeamYard(priorState.LineOfScrimmage);
@@ -59,7 +59,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                     Log.Verbose("ReturnFumbledOrInterceptedBallDecision: Estimated running offense strength ({OffStr}) > estimated running defense strength ({DefStr}), attempting return.",
                         estimatedRunningOffenseStrength,
                         estimatedRunningDefenseStrength);
-                    return FumbleOrInterceptionReturnOutcome.Run(priorState, parameters, physicsParams);
+                    return priorState.WithNextState(GameplayNextState.FumbleOrInterceptionReturnOutcome);
                 }
 
                 var scoreMargin = priorState.GetScoreDifferenceForTeam(priorState.TeamWithPossession);
@@ -67,7 +67,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 if (scoreMargin <= -1 && scoreMargin >= -8 && Math.Abs(scoreMarginPointsPerMinute) >= 1d)
                 {
                     Log.Verbose("ReturnFumbledOrInterceptedBallDecision: Possessing team is trailing by 1-8 points with at least 1 point per minute pace, attempting return.");
-                    return FumbleOrInterceptionReturnOutcome.Run(priorState, parameters, physicsParams);
+                    return priorState.WithNextState(GameplayNextState.FumbleOrInterceptionReturnOutcome);
                 }
             }
             Log.Verbose("ReturnFumbledOrInterceptedBallDecision: Not attempting return.");

@@ -2,6 +2,7 @@
 using Celarix.JustForFun.FootballSimulator.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Text;
 
 namespace Celarix.JustForFun.FootballSimulator.Core
@@ -10,6 +11,49 @@ namespace Celarix.JustForFun.FootballSimulator.Core
     {
         extension(GameState state)
         {
+            public GameState WithNextState(GameplayNextState nextState)
+            {
+                return state with
+                {
+                    NextState = nextState,
+                    StateHistory = ImmutableList.CreateRange(state.StateHistory
+                        .Append(new StateHistoryEntry(state.NextState, state.TeamWithPossession, state.Version)))
+                };
+            }
+
+            public GameState WithAdditionalParameter<T>(string key, T value)
+            {
+                return state with
+                {
+                    AdditionalParameters = ImmutableList.CreateRange(state.AdditionalParameters
+                        .Append(new AdditionalParameter<object>(key, value!, state.Version)))
+                };
+            }
+
+            public bool HasAdditionalParameter(string key)
+            {
+                if (state.AdditionalParameters != null)
+                {
+                    var match = state.AdditionalParameters.SingleOrDefault(p => p.Key == key && p.AddedInVersion >= state.Version - 1);
+                    return match != null;
+                }
+                return false;
+            }
+
+            public T? GetAdditionalParameterOrDefault<T>(string key)
+            {
+                if (state.AdditionalParameters != null)
+                {
+                    var match = state.AdditionalParameters.SingleOrDefault(p => p.Key == key && p.AddedInVersion >= state.Version - 1);
+
+                    if (match != null)
+                    {
+                        return (T)match.Value;
+                    }
+                }
+                return default;
+            }
+
             public int GetScoreForTeam(GameTeam team)
             {
                 return team switch
@@ -127,7 +171,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 };
             }
 
-            public GameState WithFirstDownLineOfScrimmage(double newLineOfScrimmage, GameTeam team, string lastPlayDescriptionTemplate)
+            public GameState WithFirstDownLineOfScrimmage(double newLineOfScrimmage, GameTeam team, string lastPlayDescriptionTemplate,
+                bool? clockRunning = null)
             {
                 var desiredLineToGain = AddYardsForTeam(newLineOfScrimmage, 10, team);
                 var desiredTeamLineToGain = InternalYardToTeamYard(state, desiredLineToGain.Round());
@@ -141,13 +186,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                     };
                 }
 
-                return state with
+                return state.WithNextState(GameplayNextState.PlayEvaluationComplete) with
                 {
                     TeamWithPossession = team,
                     PossessionOnPlay = team.ToPossessionOnPlay(),
                     NextPlay = NextPlayKind.FirstDown,
                     LineOfScrimmage = newLineOfScrimmage.Round(),
                     LineToGain = desiredLineToGain.Round(),
+                    ClockRunning = clockRunning.HasValue ? true : clockRunning.Value,
                     LastPlayDescriptionTemplate = lastPlayDescriptionTemplate
                 };
             }
@@ -206,7 +252,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
 
             public GameState TakeTimeout(GameTeam team)
             {
-                return state with
+                return state.WithNextState(GameplayNextState.PlayEvaluationComplete) with
                 {
                     AwayTimeoutsRemaining = team == GameTeam.Away ? state.AwayTimeoutsRemaining - 1 : state.AwayTimeoutsRemaining,
                     HomeTimeoutsRemaining = team == GameTeam.Home ? state.HomeTimeoutsRemaining - 1 : state.HomeTimeoutsRemaining,

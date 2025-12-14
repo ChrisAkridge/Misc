@@ -41,6 +41,27 @@ namespace Celarix.JustForFun.FootballSimulator.Data
                     .AsNoTracking()
                     .ToDictionary(pp => pp.Name, pp => pp);
             }
+
+            public IReadOnlyList<Player> GetActivePlayersForTeam(int teamId)
+            {
+                return context.Players
+                .Include(p => p.RosterPositions.Where(rp => rp.TeamID == teamId && rp.CurrentPlayer))
+                .Where(p => p.RosterPositions.Any(rp => rp.TeamID == teamId && rp.CurrentPlayer))
+                .ToList();
+            }
+        }
+
+        extension(Player player)
+        {
+            public Player CurrentRosterPositionOnly()
+            {
+                player.RosterPositions = [.. player.RosterPositions.Where(rp => rp.CurrentPlayer)];
+                if (player.RosterPositions.Count > 1)
+                {
+                    throw new InvalidOperationException($"Player {player.PlayerID} has multiple current roster positions.");
+                }
+                return player;
+            }
         }
     }
 }

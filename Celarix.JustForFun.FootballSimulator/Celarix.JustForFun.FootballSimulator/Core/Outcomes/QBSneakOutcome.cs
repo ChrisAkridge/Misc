@@ -1,0 +1,42 @@
+﻿using Celarix.JustForFun.FootballSimulator.Core.Functions;
+using Celarix.JustForFun.FootballSimulator.Data.Models;
+using Celarix.JustForFun.FootballSimulator.Models;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
+{
+    internal static class QBSneakOutcome
+    {
+        public static GameState Run(GameState priorState,
+            GameDecisionParameters parameters,
+            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        {
+            var offensiveLineStrength = parameters
+                .GetActualStrengthsForTeam(priorState.TeamWithPossession)
+                .OffensiveLineStrength;
+            var defensiveLineStrength = parameters
+                .GetActualStrengthsForTeam(priorState.TeamWithPossession.Opponent())
+                .DefensiveLineStrength;
+            var standardStrengthStddev = physicsParams["StandardStrengthStddev"].Value;
+            var selfSample = parameters.Random.SampleNormalDistribution(offensiveLineStrength, standardStrengthStddev);
+            var opponentSample = parameters.Random.SampleNormalDistribution(defensiveLineStrength, standardStrengthStddev);
+            var sneakSuccessChance = selfSample / (selfSample + opponentSample);
+            var sneakSucceeded = parameters.Random.Chance(sneakSuccessChance);
+
+            if (sneakSucceeded)
+            {
+                return priorState.WithFirstDownLineOfScrimmage(priorState.LineToGain!.Value, priorState.TeamWithPossession,
+                    "{OffAbbr} QB sneak by {OffPlayer0} successful for a first down at {LoS}!");
+            }
+
+            var yardsLost = -(parameters.Random.NextDouble() * 2);
+            var newLineOfScrimmage = priorState.AddYardsForPossessingTeam(priorState.LineOfScrimmage, yardsLost);
+            return PlayerDownedFunction.Get(priorState with
+            {
+                LineOfScrimmage = newLineOfScrimmage.Round()
+            }, parameters, physicsParams, priorState.LineOfScrimmage, yardsLost.Round(), EndzoneBehavior.StandardGameplay, null);
+        }
+    }
+}

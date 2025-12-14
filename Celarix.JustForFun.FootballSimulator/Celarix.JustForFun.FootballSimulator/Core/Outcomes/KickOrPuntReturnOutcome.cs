@@ -26,9 +26,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (rushAttemptResult.WasFumbled)
             {
                 Log.Verbose("Fumble on kick/punt return!");
-                return FumbledLiveBallOutcome.Run(priorState,
-                    parameters,
-                    physicsParams);
+                return priorState.WithNextState(GameplayNextState.FumbledLiveBallOutcome);
             }
 
             var yardsGained = rushAttemptResult.YardsGained ?? throw new InvalidOperationException("Rushing function specified no yards gained value, but ball was not fumbled; must have value.");
@@ -36,6 +34,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             {
                 TeamWithPossession = priorState.TeamWithPossession.Opponent(),
                 LastPlayDescriptionTemplate = "{OffTeam} {OffPlayer0} returned ball to the {LoS}.",
+                ClockRunning = true
             };
             var newLineOfScrimmage = newState.AddYardsForPossessingTeam(priorState.LineOfScrimmage, yardsGained);
             return PlayerDownedFunction.Get(newState, parameters, physicsParams, priorState.LineOfScrimmage, yardsGained.Round(), EndzoneBehavior.StandardGameplay, null);

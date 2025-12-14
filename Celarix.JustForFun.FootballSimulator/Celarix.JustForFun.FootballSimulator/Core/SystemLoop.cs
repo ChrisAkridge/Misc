@@ -1,6 +1,7 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Random;
 using Celarix.JustForFun.FootballSimulator.Scheduling;
 using Serilog;
 using System;
@@ -11,14 +12,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core
 {
     public sealed partial class SystemLoop
     {
-        private Random random;
+        private IRandom random;
         private FootballContext footballContext;
         private GameLoop? currentGameLoop;
 
         public CurrentSystemState CurrentState { get; private set; }
         public SystemStatus SystemStatus { get; private set; }
 
-        public SystemLoop(Random random)
+        public SystemLoop(IRandom random)
         {
             footballContext = new FootballContext();
             CurrentState = CurrentSystemState.Initialization;

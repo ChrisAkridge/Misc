@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Celarix.JustForFun.FootballSimulator.Random;
 using Serilog;
 
 namespace Celarix.JustForFun.FootballSimulator.Scheduling
@@ -14,12 +15,16 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 		private readonly List<GameMatchup> uniqueMatchups;
 		private readonly Dictionary<BasicTeamInfo, int> teamHomeGameCounts;
 		private readonly BasicTeamInfoComparer comparer = new();
-		private readonly Random random = new(Helpers.SchedulingRandomSeed);
+		private readonly IRandom random;
 		
-		public HomeTeamAssigner(IEnumerable<BasicTeamInfo> teams, IEnumerable<GameMatchup> matchups)
+		public HomeTeamAssigner(IEnumerable<BasicTeamInfo> teams,
+			IEnumerable<GameMatchup> matchups,
+			IRandomFactory randomFactory)
 		{
 			this.teams = teams.ToList();
-			var matchupsToPair = matchups.ToList();
+			random = randomFactory.Create(Helpers.SchedulingRandomSeed);
+
+            var matchupsToPair = matchups.ToList();
 			uniqueMatchups = new List<GameMatchup>(matchupsToPair.Count / 2);
 			teamHomeGameCounts = this.teams.ToDictionary(t => t, t => 0, comparer);
 

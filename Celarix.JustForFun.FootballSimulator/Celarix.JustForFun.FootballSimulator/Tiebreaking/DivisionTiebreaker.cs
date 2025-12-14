@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Random;
 
 namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
 {
@@ -12,13 +13,13 @@ namespace Celarix.JustForFun.FootballSimulator.Tiebreaking
     {
         private IReadOnlyList<Team> teams;
         private IReadOnlyList<GameRecord> allSeasonGames;
-        private Random random;
+        private IRandom random;
 
-        public DivisionTiebreaker(IEnumerable<Team> teams, IEnumerable<GameRecord> allSeasonGames)
+        public DivisionTiebreaker(IEnumerable<Team> teams, IEnumerable<GameRecord> allSeasonGames, IRandom random)
         {
             this.teams = teams.ToList();
             this.allSeasonGames = allSeasonGames.ToList();
-            random = new Random();
+            this.random = random;
         }
 
         public Dictionary<ConferenceAndDivision, Team[]> GetTeamsInDivisionStandingsOrder()
