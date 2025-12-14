@@ -128,5 +128,26 @@ namespace Celarix.JustForFun.FootballSimulator
         {
             return value >= 0 ? $"+{value}" : value.ToString();
         }
+
+        public static string ToMinuteSecondString(this int totalSeconds)
+        {
+            var minutes = totalSeconds / 60;
+            var seconds = totalSeconds % 60;
+            return $"{minutes:D2}:{seconds:D2}";
+        }
+
+        public static string ToPeriodDisplayString(this int periodNumber)
+        {
+            return periodNumber switch
+            {
+                1 => "Q1",
+                2 => "Q2",
+                3 => "Q3",
+                4 => "Q4",
+                5 => "OT",
+                > 6 => $"{periodNumber - 4}OT",
+                _ => throw new ArgumentOutOfRangeException(nameof(periodNumber))
+            };
+        }
     }
 }

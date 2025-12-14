@@ -42,7 +42,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
                 Log.Information("No previous Super Bowl winner provided; randomly selected {Team} as winner", previousSuperBowlWinner.Name);
             }
             
-            var teamOpponents = new TeamOpponentDeterminer(teams).GetTeamOpponentsForSeason(cycleYear,
+            var teamOpponents = new TeamOpponentDeterminer(teams, randomFactory).GetTeamOpponentsForSeason(cycleYear,
 	            previousSeasonDivisionRankings,
                 diagnosticDictionary);
             new HomeTeamAssigner(teams, teamOpponents, randomFactory).AssignHomeTeams();

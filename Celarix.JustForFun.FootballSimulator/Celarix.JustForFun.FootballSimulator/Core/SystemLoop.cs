@@ -12,14 +12,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core
 {
     public sealed partial class SystemLoop
     {
-        private IRandom random;
+        private IRandomFactory randomFactory;
         private FootballContext footballContext;
         private GameLoop? currentGameLoop;
 
         public CurrentSystemState CurrentState { get; private set; }
         public SystemStatus SystemStatus { get; private set; }
 
-        public SystemLoop(IRandom random)
+        public SystemLoop(IRandomFactory randomFactory)
         {
             footballContext = new FootballContext();
             CurrentState = CurrentSystemState.Initialization;
@@ -28,7 +28,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 CurrentState = CurrentState,
                 StatusMessage = "Football Simulator started."
             };
-            this.random = random;
+            this.randomFactory = randomFactory;
         }
 
         public void MoveNext()

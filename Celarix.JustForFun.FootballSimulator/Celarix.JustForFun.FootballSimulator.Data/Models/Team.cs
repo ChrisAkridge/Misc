@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Celarix.JustForFun.FootballSimulator.Data.Models
 {
-    public class Team
+    public class Team : IStrengths
     {
         [Key]
         public int TeamID { get; set; }

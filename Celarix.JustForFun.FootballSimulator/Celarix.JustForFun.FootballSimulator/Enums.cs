@@ -113,7 +113,16 @@ internal enum GameplayNextState
     /// The state reached when the clock hits zero at the end of the second quarter, fourth quarter,
     /// or any even overtime period.
     /// </summary>
-    EndOfHalf
+    EndOfHalf,
+
+    /// <summary>
+    /// The state reached when the clock hits zero at:
+    ///     - The end of the fourth quarter when one team has a lead
+    ///     - The end of any first overtime period during a regular season game
+    ///     - The end of any overtime period during a playoff game when one team has a lead and both teams have
+    ///       at least one possession in overtime.
+    /// </summary>
+    EndOfGame
 }
 
 internal enum NextPlayKind

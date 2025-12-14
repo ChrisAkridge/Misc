@@ -64,7 +64,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
         {
             var teams = footballContext.Teams.ToList();
             var dataTeams = teams.ToDictionary(t => new BasicTeamInfo(t.TeamName, t.Conference, t.Division), t => t);
-            var scheduleGenerator = new ScheduleGenerator3([.. dataTeams.Keys]);
+            var scheduleGenerator = new ScheduleGenerator3([.. dataTeams.Keys], randomFactory);
             var schedule = scheduleGenerator.GenerateScheduleForYear(year, dataTeams, null, null, out _);
         }
 
@@ -74,8 +74,18 @@ namespace Celarix.JustForFun.FootballSimulator.Core
 
             var currentSeasonId = footballContext.GetCurrentSeasonId();
             var currentGame = footballContext.GetCurrentGameRecord(currentSeasonId);
-            currentGameLoop = new GameLoop(footballContext, random, currentGame);
+            currentGameLoop = new GameLoop(footballContext, randomFactory.Create(), currentGame, CreatePlayerManager());
             currentGameLoop.Initialize();
+        }
+
+        private PlayerManager CreatePlayerManager()
+        {
+            // Get a list of first and last names from two files
+            // in the build directory: "firstNames.txt" and "lastNames.txt"
+            // They're newline-separated lists of names.
+            var firstNames = File.ReadAllLines("firstNames.txt");
+            var lastNames = File.ReadAllLines("lastNames.txt");
+            return new PlayerManager(firstNames, lastNames);
         }
     }
 }

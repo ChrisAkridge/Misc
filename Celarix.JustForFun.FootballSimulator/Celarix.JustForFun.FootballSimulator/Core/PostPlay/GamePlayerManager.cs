@@ -2,6 +2,7 @@
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
 using Celarix.JustForFun.FootballSimulator.Random;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,20 +11,59 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
 {
     internal sealed class GamePlayerManager
     {
+        public sealed class PlayerCounts
+        {
+            // 10 + quarterback, who is stored separately
+            public const int MaxOffensivePlayers = 10;
+            public const int MaxDefensivePlayers = 11;
+
+            private int offensiveCount;
+            private int defensiveCount;
+
+            public int OffensiveCount => offensiveCount;
+            public int DefensiveCount => defensiveCount;
+            public bool Quarterback { get; set; }
+            public bool Kicker { get; set; }
+
+            public bool Empty => offensiveCount == 0 && defensiveCount == 0 && !Quarterback && !Kicker;
+
+            public void AddOffensive(int count)
+            {
+                offensiveCount = Math.Min(offensiveCount + count, MaxOffensivePlayers);
+            }
+
+            public void AddDefensive(int count)
+            {
+                defensiveCount = Math.Min(defensiveCount + count, MaxDefensivePlayers);
+            }
+
+            public override string ToString()
+            {
+                return $"{OffensiveCount} offense, {DefensiveCount} defense, QB: {Quarterback}, K: {Kicker}";
+            }
+        }
+
+        private readonly FootballContext context;
         private List<Player> awayRoster;
         private List<Player> homeRoster;
+        private double awayAverageAcclimatedTemperature;
+        private double homeAverageAcclimatedTemperature;
         private List<Player> newPlayersForGame = new();
         private int awayTeamId;
         private int homeTeamId;
         private IRandom random;
         private PlayerManager manager;
 
+        public double StadiumCurrentTemperature { get; set; }
+
         public GamePlayerManager(FootballContext context,
             int awayTeamId,
             int homeTeamId,
             IRandom random,
-            PlayerManager manager)
+            PlayerManager manager,
+            int gameStadiumID)
         {
+            this.context = context;
             this.awayTeamId = awayTeamId;
             this.homeTeamId = homeTeamId;
             this.random = random;
@@ -34,6 +74,149 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
 
             FillRosterIfNeeded(awayRoster, context, awayTeamId);
             FillRosterIfNeeded(homeRoster, context, homeTeamId);
+            context.SaveChanges();
+
+            var gameStadium = context.Stadiums.Single(s => s.StadiumID == gameStadiumID);
+            var awayTeamHomeStadium = context.GetHomeStadiumForTeam(awayTeamId);
+            var homeTeamHomeStadium = context.GetHomeStadiumForTeam(homeTeamId);
+            awayAverageAcclimatedTemperature = GetAverageAcclimatedTemperatureForStadium(awayTeamHomeStadium);
+            homeAverageAcclimatedTemperature = GetAverageAcclimatedTemperatureForStadium(homeTeamHomeStadium);
+        }
+
+        public IEnumerable<Player> ChoosePlayersForPlayHistory(IEnumerable<StateHistoryEntry> history)
+        {
+            var awayPlayerRequirements = new PlayerCounts();
+            var homePlayerRequirements = new PlayerCounts();
+
+            foreach (var entry in history)
+            {
+                var adjustments = GetPlayerRequirementsForState(entry.State);
+
+                if (entry.TeamWithPossession == GameTeam.Away)
+                {
+                    awayPlayerRequirements.AddOffensive(adjustments.OffensivePlayers);
+                    homePlayerRequirements.AddDefensive(adjustments.DefensivePlayers);
+                    awayPlayerRequirements.Quarterback |= adjustments.Quarterback;
+                    awayPlayerRequirements.Kicker |= adjustments.Kicker;
+                }
+                else
+                {
+                    homePlayerRequirements.AddOffensive(adjustments.OffensivePlayers);
+                    awayPlayerRequirements.AddDefensive(adjustments.DefensivePlayers);
+                    homePlayerRequirements.Quarterback |= adjustments.Quarterback;
+                    homePlayerRequirements.Kicker |= adjustments.Kicker;
+                }
+            }
+
+            var awaySelectedPlayers = SelectPlayers(awayRoster, awayPlayerRequirements);
+            var homeSelectedPlayers = SelectPlayers(homeRoster, homePlayerRequirements);
+
+            return awaySelectedPlayers.Concat(homeSelectedPlayers);
+        }
+
+        public (PlayerCounts AwayTeamInjuredCount, PlayerCounts HomeTeamInjuredCount) DoInjuryCheck(IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        {
+            // 0. Start a PlayerCounts object to return
+            var awayInjuredCount = new PlayerCounts();
+            var homeInjuredCount = new PlayerCounts();
+
+            // 1. Get BaseInjuryChancePerPlay physics param
+            var baseInjuryChanceParam = physicsParams["BaseInjuryChancePerPlay"].Value;
+
+            var awayTemperatureDifference = Math.Abs(StadiumCurrentTemperature - awayAverageAcclimatedTemperature);
+            var awayInjuryChance = baseInjuryChanceParam * Math.Pow(1.1, awayTemperatureDifference / 5.0);
+            var injuredAwayPlayers = new List<Player>();
+
+            foreach (var player in awayRoster)
+            {
+                if (random.NextDouble() < awayInjuryChance)
+                {
+                    injuredAwayPlayers.Add(player);
+                }
+            }
+
+            foreach (var player in injuredAwayPlayers)
+            {
+                var position = player.RosterPositions.Single().Position;
+                if (position == BasicPlayerPosition.Offense)
+                {
+                    awayInjuredCount.AddOffensive(1);
+                }
+                else if (position == BasicPlayerPosition.Defense)
+                {
+                    awayInjuredCount.AddDefensive(1);
+                }
+                else if (position == BasicPlayerPosition.Quarterback)
+                {
+                    awayInjuredCount.Quarterback = true;
+                }
+                else if (position == BasicPlayerPosition.Kicker)
+                {
+                    awayInjuredCount.Kicker = true;
+                }
+            }
+            Log.Verbose("Injury: {InjuredCount} for away", awayInjuredCount);
+
+            var homeTemperatureDifference = Math.Abs(StadiumCurrentTemperature - homeAverageAcclimatedTemperature);
+            var homeInjuryChance = baseInjuryChanceParam * Math.Pow(1.1, homeTemperatureDifference / 5.0);
+            var injuredHomePlayers = new List<Player>();
+
+            foreach (var player in homeRoster)
+            {
+                if (random.NextDouble() < homeInjuryChance)
+                {
+                    injuredHomePlayers.Add(player);
+                }
+            }
+
+            foreach (var player in injuredHomePlayers)
+            {
+                var position = player.RosterPositions.Single().Position;
+                if (position == BasicPlayerPosition.Offense)
+                {
+                    homeInjuredCount.AddOffensive(1);
+                }
+                else if (position == BasicPlayerPosition.Defense)
+                {
+                    homeInjuredCount.AddDefensive(1);
+                }
+                else if (position == BasicPlayerPosition.Quarterback)
+                {
+                    homeInjuredCount.Quarterback = true;
+                }
+                else if (position == BasicPlayerPosition.Kicker)
+                {
+                    homeInjuredCount.Kicker = true;
+                }
+            }
+            Log.Verbose("Injury: {InjuredCount} for home", homeInjuredCount);
+
+            foreach (var player in injuredAwayPlayers)
+            {
+                InjurePlayer(player, physicsParams);
+                awayRoster.Remove(player);
+            }
+
+            foreach (var player in injuredHomePlayers)
+            {
+                InjurePlayer(player, physicsParams);
+                homeRoster.Remove(player);
+            }
+
+            FillRosterIfNeeded(awayRoster, context, awayTeamId);
+            FillRosterIfNeeded(homeRoster, context, homeTeamId);
+            context.SaveChanges();
+            return (awayInjuredCount, homeInjuredCount);
+        }
+
+        public void CompleteGame()
+        {
+            foreach (var player in newPlayersForGame)
+            {
+                var rosterPosition = player.RosterPositions.Single();
+                rosterPosition.CurrentPlayer = false;
+            }
+
             context.SaveChanges();
         }
 
@@ -64,7 +247,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
             var newPlayers = neededPositions
                 .Select(p =>
                 {
-                    var newPlayer = manager.CreateNewPlayer(random);
+                    var newPlayer = manager.CreateNewPlayer(random, undraftedFreeAgent: true);
                     PlayerManager.AssignPlayerToTeam(newPlayer, teamId, p, random);
                     return newPlayer;
                 });
@@ -72,35 +255,13 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
             newPlayersForGame.AddRange(newPlayers);
         }
 
-        public IEnumerable<Player> ChoosePlayersForPlayHistory(IEnumerable<StateHistoryEntry> history)
+        private static double GetAverageAcclimatedTemperatureForStadium(Stadium stadium)
         {
-            var awayPlayerRequirements = new PlayerRequirements();
-            var homePlayerRequirements = new PlayerRequirements();
-
-            foreach (var entry in history)
-            {
-                var adjustments = GetPlayerRequirementsForState(entry.State);
-                
-                if (entry.TeamWithPossession == GameTeam.Away)
-                {
-                    awayPlayerRequirements.AddOffensive(adjustments.OffensivePlayers);
-                    homePlayerRequirements.AddDefensive(adjustments.DefensivePlayers);
-                    awayPlayerRequirements.NeedsQuarterback |= adjustments.Quarterback;
-                    awayPlayerRequirements.NeedsKicker |= adjustments.Kicker;
-                }
-                else
-                {
-                    homePlayerRequirements.AddOffensive(adjustments.OffensivePlayers);
-                    awayPlayerRequirements.AddDefensive(adjustments.DefensivePlayers);
-                    homePlayerRequirements.NeedsQuarterback |= adjustments.Quarterback;
-                    homePlayerRequirements.NeedsKicker |= adjustments.Kicker;
-                }
-            }
-
-            var awaySelectedPlayers = SelectPlayers(awayRoster, awayPlayerRequirements);
-            var homeSelectedPlayers = SelectPlayers(homeRoster, homePlayerRequirements);
-
-            return awaySelectedPlayers.Concat(homeSelectedPlayers);
+            var monthlyTemperatures = stadium.AverageTemperatures
+                .Split(',')
+                .Select(double.Parse)
+                .ToList();
+            return monthlyTemperatures.Average();
         }
 
         private static (int OffensivePlayers, int DefensivePlayers, bool Quarterback, bool Kicker) GetPlayerRequirementsForState(GameplayNextState state) => state switch
@@ -136,7 +297,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
             _ => (0, 0, false, false)
         };
 
-        private static List<Player> SelectPlayers(List<Player> roster, PlayerRequirements requirements)
+        private static List<Player> SelectPlayers(List<Player> roster, PlayerCounts requirements)
         {
             var selectedPlayers = new List<Player>();
             var availablePlayers = new List<Player>(roster);
@@ -144,12 +305,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
             AddPlayersByPosition(selectedPlayers, availablePlayers, BasicPlayerPosition.Offense, requirements.OffensiveCount);
             AddPlayersByPosition(selectedPlayers, availablePlayers, BasicPlayerPosition.Defense, requirements.DefensiveCount);
             
-            if (requirements.NeedsQuarterback)
+            if (requirements.Quarterback)
             {
                 selectedPlayers.Add(GetPlayerByPosition(availablePlayers, BasicPlayerPosition.Quarterback));
             }
             
-            if (requirements.NeedsKicker)
+            if (requirements.Kicker)
             {
                 selectedPlayers.Add(GetPlayerByPosition(availablePlayers, BasicPlayerPosition.Kicker));
             }
@@ -169,31 +330,28 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
         {
             var player = availablePlayers.Where(p => p.RosterPositions.Single().Position == position).First();
             availablePlayers.Remove(player);
+            Log.Verbose("Selected player {FirstName} {LastName} ({Position})", player.FirstName, player.LastName, position);
             return player;
         }
 
-        private sealed class PlayerRequirements
+        private void InjurePlayer(Player player, IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
-            private const int MaxOffensivePlayers = 10;
-            private const int MaxDefensivePlayers = 11;
+            // Sorry!
 
-            private int offensiveCount;
-            private int defensiveCount;
+            var falloff = physicsParams["InjuryDurationAdditionalWeekFalloff"].Value;
+            var injuryDurationWeeks = 1;
+            var chance = falloff;
 
-            public int OffensiveCount => offensiveCount;
-            public int DefensiveCount => defensiveCount;
-            public bool NeedsQuarterback { get; set; }
-            public bool NeedsKicker { get; set; }
-
-            public void AddOffensive(int count)
+            while (random.Chance(chance))
             {
-                offensiveCount = Math.Min(offensiveCount + count, MaxOffensivePlayers);
+                injuryDurationWeeks++;
+                chance *= falloff;
             }
 
-            public void AddDefensive(int count)
-            {
-                defensiveCount = Math.Min(defensiveCount + count, MaxDefensivePlayers);
-            }
+            var currentRosterPosition = player.RosterPositions.Single();
+            currentRosterPosition.GamesUntilReturnFromInjury = injuryDurationWeeks;
+            Log.Verbose("Injury: Player {FirstName} {LastName} (team #{TeamName}) injured for {Duration} weeks",
+                player.FirstName, player.LastName, currentRosterPosition.TeamID, injuryDurationWeeks);
         }
     }
 }

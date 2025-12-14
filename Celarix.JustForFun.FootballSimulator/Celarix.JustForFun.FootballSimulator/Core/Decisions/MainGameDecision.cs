@@ -76,135 +76,139 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                     var desirabilityMultiplier = physicsParams["TwoMinuteDrillPassDesirabilityMultiplier"].Value;
                     adjustedPassingEstimate *= desirabilityMultiplier;
                 }
-
-                if (priorState.NextPlay == NextPlayKind.FourthDown)
+            }
+            else if (priorState.NextPlay == NextPlayKind.FourthDown)
+            {
+                var desireToGoForIt = 1.0;
+                var desireToNotGoForIt = 1.0;
+                var lineOfScrimmageTeamYard = priorState.InternalYardToTeamYard(priorState.LineOfScrimmage);
+                var fieldGoalRangeYard = physicsParams["FieldGoalRangeYard"].Value.Round();
+                bool inFieldGoalRange = lineOfScrimmageTeamYard.Team == opponent
+                    && lineOfScrimmageTeamYard.TeamYard <= fieldGoalRangeYard;
+                if (inFieldGoalRange)
                 {
-                    var desireToGoForIt = 1.0;
-                    var desireToNotGoForIt = 1.0;
-                    var lineOfScrimmageTeamYard = priorState.InternalYardToTeamYard(priorState.LineOfScrimmage);
-                    var fieldGoalRangeYard = physicsParams["FieldGoalRangeYard"].Value.Round();
-                    bool inFieldGoalRange = lineOfScrimmageTeamYard.Team == opponent
-                        && lineOfScrimmageTeamYard.TeamYard <= fieldGoalRangeYard;
-                    if (inFieldGoalRange)
-                    {
-                        var undesirabilityMultiplier = physicsParams["FourthDownLongFieldUndesirabilityMultiplier"].Value;
-                        desireToNotGoForIt *= undesirabilityMultiplier;
-                    }
+                    var undesirabilityMultiplier = physicsParams["FourthDownLongFieldUndesirabilityMultiplier"].Value;
+                    desireToNotGoForIt *= undesirabilityMultiplier;
+                }
 
-                    var desirabilityThresholdAlpha = physicsParams["FourthDownTrailingNearEndgamePointThreshold"].Value.Round();
-                    var desirabilityThresholdBeta = physicsParams["FourthDownTrailingNearEndgameRemainingTimeThreshold"].Value;
-                    var desirabilityMultiplier = physicsParams["FourthDownTrailingNearEndgameDesirabilityMultiplier"].Value;
-                    var scoreDifference = priorState.GetScoreDifferenceForTeam(self);
-                    if (scoreDifference > desirabilityThresholdAlpha && priorState.TotalSecondsLeftInGame() < desirabilityThresholdBeta)
-                    {
-                        desireToGoForIt *= desirabilityMultiplier;
-                    }
+                var desirabilityThresholdAlpha = physicsParams["FourthDownTrailingNearEndgamePointThreshold"].Value.Round();
+                var desirabilityThresholdBeta = physicsParams["FourthDownTrailingNearEndgameRemainingTimeThreshold"].Value;
+                var desirabilityMultiplier = physicsParams["FourthDownTrailingNearEndgameDesirabilityMultiplier"].Value;
+                var scoreDifference = priorState.GetScoreDifferenceForTeam(self);
+                if (scoreDifference > desirabilityThresholdAlpha && priorState.TotalSecondsLeftInGame() < desirabilityThresholdBeta)
+                {
+                    desireToGoForIt *= desirabilityMultiplier;
+                }
 
-                    var desirabilityThresholdGamma = physicsParams["FourthDownDistanceToGoThreshold"].Value;
-                    desirabilityMultiplier = physicsParams["FourthDownDistanceToGoDesirabilityMultiplier"].Value;
-                    var distanceToFirstDown = priorState.DistanceToGo();
-                    if (!distanceToFirstDown.HasValue)
-                    {
-                        throw new InvalidOperationException("Distance to first down is null on fourth down.");
-                    }
-                    if (distanceToFirstDown.Value < desirabilityThresholdGamma)
-                    {
-                        desireToGoForIt *= desirabilityMultiplier;
-                    }
+                var desirabilityThresholdGamma = physicsParams["FourthDownDistanceToGoThreshold"].Value;
+                desirabilityMultiplier = physicsParams["FourthDownDistanceToGoDesirabilityMultiplier"].Value;
+                var distanceToFirstDown = priorState.DistanceToGo();
+                if (!distanceToFirstDown.HasValue)
+                {
+                    throw new InvalidOperationException("Distance to first down is null on fourth down.");
+                }
+                if (distanceToFirstDown.Value < desirabilityThresholdGamma)
+                {
+                    desireToGoForIt *= desirabilityMultiplier;
+                }
 
-                    var desirabilityThresholdDelta = physicsParams["FourthDownHistoricalRateThreshold"].Value;
-                    desirabilityMultiplier = physicsParams["FourthDownHistoricalRateDesirabilityMultiplier"].Value;
-                    if (parameters.GetFourthDownConversionRate(self) > desirabilityThresholdDelta)
-                    {
-                        desireToGoForIt *= desirabilityMultiplier;
-                    }
+                var desirabilityThresholdDelta = physicsParams["FourthDownHistoricalRateThreshold"].Value;
+                desirabilityMultiplier = physicsParams["FourthDownHistoricalRateDesirabilityMultiplier"].Value;
+                if (parameters.GetFourthDownConversionRate(self) > desirabilityThresholdDelta)
+                {
+                    desireToGoForIt *= desirabilityMultiplier;
+                }
 
-                    var ratio = desireToGoForIt / (desireToGoForIt + desireToNotGoForIt);
-                    var goForIt = parameters.Random.Chance(ratio);
-                    if (goForIt)
+                var ratio = desireToGoForIt / (desireToGoForIt + desireToNotGoForIt);
+                var goForIt = parameters.Random.Chance(ratio);
+                if (goForIt)
+                {
+                    var qbSneakDistance = physicsParams["FourthDownQBSneakDistanceThreshold"].Value;
+                    if (distanceToFirstDown <= qbSneakDistance)
                     {
-                        var qbSneakDistance = physicsParams["FourthDownQBSneakDistanceThreshold"].Value;
-                        if (distanceToFirstDown <= qbSneakDistance)
-                        {
-                            Log.Verbose("MainGameDecision: Going for it on fourth down with a QB sneak!");
-                            return priorState.WithNextState(GameplayNextState.QBSneakOutcome);
-                        }
-                        Log.Verbose("MainGameDecision: Going for it on fourth down with a standard play!");
-                        return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
+                        Log.Verbose("MainGameDecision: Going for it on fourth down with a QB sneak!");
+                        return priorState.WithNextState(GameplayNextState.QBSneakOutcome);
                     }
-
-                    if (CanAttemptFieldGoal(priorState) && !isFakePlay && inFieldGoalRange)
-                    {
-                        var fakeFieldGoalThreshold = physicsParams["FourthDownFakeFGStrengthThreshold"].Value;
-                        if (estimatedStrengthRatio >= fakeFieldGoalThreshold)
-                        {
-                            var selectionChance = physicsParams["FourthDownFakeFieldGoalSelectionChance"].Value;
-                            if (parameters.Random.Chance(selectionChance))
-                            {
-                                Log.Verbose("MainGameDecision: Attempting a fake field goal on fourth down!");
-                                return priorState.WithNextState(GameplayNextState.FakeFieldGoalOutcome);
-                            }
-                        }
-                        Log.Verbose("MainGameDecision: Attempting a field goal on fourth down.");
-                        return FieldGoalAttemptOutcome.Run(priorState, parameters, physicsParams);
-                    }
-                    else if (!isFakePlay)
-                    {
-                        var fakePuntThreshold = physicsParams["FourthDownFakePuntStrengthThreshold"].Value;
-                        if (estimatedStrengthRatio >= fakePuntThreshold)
-                        {
-                            var selectionChance = physicsParams["FourthDownFakePuntSelectionChance"].Value;
-                            if (parameters.Random.Chance(selectionChance))
-                            {
-                                Log.Verbose("MainGameDecision: Attempting a fake punt on fourth down!");
-                                return priorState.WithNextState(GameplayNextState.FakePuntOutcome);
-                            }
-                        }
-                        Log.Verbose("MainGameDecision: Punting on fourth down.");
-                        return priorState.WithNextState(GameplayNextState.PuntOutcome);
-                    }
+                    Log.Verbose("MainGameDecision: Going for it on fourth down with a standard play!");
                     return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
                 }
-                else if (priorState.PeriodNumber > 4)
+
+                if (CanAttemptFieldGoal(priorState) && !isFakePlay && inFieldGoalRange)
                 {
-                    if (parameters.GameType == GameType.Postseason)
+                    var fakeFieldGoalThreshold = physicsParams["FourthDownFakeFGStrengthThreshold"].Value;
+                    if (estimatedStrengthRatio >= fakeFieldGoalThreshold)
                     {
-                        Log.Verbose("MainGameDecision: Overtime in postseason, running play.");
+                        var selectionChance = physicsParams["FourthDownFakeFieldGoalSelectionChance"].Value;
+                        if (parameters.Random.Chance(selectionChance))
+                        {
+                            Log.Verbose("MainGameDecision: Attempting a fake field goal on fourth down!");
+                            return priorState.WithNextState(GameplayNextState.FakeFieldGoalOutcome);
+                        }
+                    }
+                    Log.Verbose("MainGameDecision: Attempting a field goal on fourth down.");
+                    return FieldGoalAttemptOutcome.Run(priorState, parameters, physicsParams);
+                }
+                else if (!isFakePlay)
+                {
+                    var fakePuntThreshold = physicsParams["FourthDownFakePuntStrengthThreshold"].Value;
+                    if (estimatedStrengthRatio >= fakePuntThreshold)
+                    {
+                        var selectionChance = physicsParams["FourthDownFakePuntSelectionChance"].Value;
+                        if (parameters.Random.Chance(selectionChance))
+                        {
+                            Log.Verbose("MainGameDecision: Attempting a fake punt on fourth down!");
+                            return priorState.WithNextState(GameplayNextState.FakePuntOutcome);
+                        }
+                    }
+                    Log.Verbose("MainGameDecision: Punting on fourth down.");
+                    return priorState.WithNextState(GameplayNextState.PuntOutcome);
+                }
+                return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
+            }
+            else if (priorState.PeriodNumber > 4)
+            {
+                if (parameters.GameType == GameType.Postseason)
+                {
+                    Log.Verbose("MainGameDecision: Overtime in postseason, running play.");
+                    return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
+                }
+
+                var secondsLeft = priorState.TotalSecondsLeftInGame();
+                var fortySecondChunks = Math.Ceiling(secondsLeft / 40.0);
+                var downsLeft = priorState.NextPlay switch
+                {
+                    NextPlayKind.FirstDown => 3,
+                    NextPlayKind.SecondDown => 2,
+                    NextPlayKind.ThirdDown => 1,
+                    _ => 0
+                };
+
+                if (fortySecondChunks >= downsLeft)
+                {
+                    Log.Verbose("MainGameDecision: Overtime with clock to burn, running play.");
+                    return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
+                }
+                else if (priorState.GetScoreDifferenceForTeam(self) > 0)
+                {
+                    var lineOfScrimmageTeamYard = priorState.InternalYardToTeamYard(priorState.LineOfScrimmage);
+                    if (lineOfScrimmageTeamYard.Team == self && lineOfScrimmageTeamYard.TeamYard >= fortySecondChunks)
+                    {
+                        Log.Verbose("MainGameDecision: Want to take victory formation but too close to own endzone, running play.");
                         return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
                     }
-
-                    var secondsLeft = priorState.TotalSecondsLeftInGame();
-                    var fortySecondChunks = Math.Ceiling(secondsLeft / 40.0);
-                    var downsLeft = priorState.NextPlay switch
+                    else
                     {
-                        NextPlayKind.FirstDown => 3,
-                        NextPlayKind.SecondDown => 2,
-                        NextPlayKind.ThirdDown => 1,
-                        _ => 0
-                    };
-
-                    if (fortySecondChunks >= downsLeft)
-                    {
-                        Log.Verbose("MainGameDecision: Overtime with clock to burn, running play.");
-                        return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
-                    }
-                    else if (priorState.GetScoreDifferenceForTeam(self) > 0)
-                    {
-                        var lineOfScrimmageTeamYard = priorState.InternalYardToTeamYard(priorState.LineOfScrimmage);
-                        if (lineOfScrimmageTeamYard.Team == self && lineOfScrimmageTeamYard.TeamYard >= fortySecondChunks)
-                        {
-                            Log.Verbose("MainGameDecision: Want to take victory formation but too close to own endzone, running play.");
-                            return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
-                        }
-                        else
-                        {
-                            Log.Verbose("MainGameDecision: Overtime leading and there's not enough time for opponent to win. Victory formation!");
-                            return PlayerDownedFunction.Get(priorState, parameters, physicsParams, priorState.LineOfScrimmage, -1,
-                                EndzoneBehavior.StandardGameplay, null);
-                        }
+                        Log.Verbose("MainGameDecision: Overtime leading and there's not enough time for opponent to win. Victory formation!");
+                        return PlayerDownedFunction.Get(priorState, parameters, physicsParams, priorState.LineOfScrimmage, -1,
+                            EndzoneBehavior.StandardGameplay, null);
                     }
                 }
             }
+
+            // Future self! If you're getting odd results here, that's because this call to RunCore
+            // is a total guess because I didn't seem to finish this part of the tree in the design
+            // document.
+            return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
         }
 
         private static GameState RunCore(GameState priorState,

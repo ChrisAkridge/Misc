@@ -18,7 +18,7 @@ namespace Celarix.JustForFun.FootballSimulator
             this.lastNames = [.. lastNames];
         }
 
-        public Player CreateNewPlayer(IRandom random)
+        public Player CreateNewPlayer(IRandom random, bool undraftedFreeAgent)
         {
             // Choose a name
             var firstName = random.Choice(firstNames);
@@ -41,6 +41,7 @@ namespace Celarix.JustForFun.FootballSimulator
                 LastName = lastName,
                 DateOfBirth = dateOfBirth,
                 Retired = false,
+                UndraftedFreeAgent = undraftedFreeAgent,
                 RosterPositions = []
             };
         }

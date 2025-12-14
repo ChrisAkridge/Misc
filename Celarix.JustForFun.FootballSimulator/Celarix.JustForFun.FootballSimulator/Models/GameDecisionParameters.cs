@@ -50,5 +50,10 @@ namespace Celarix.JustForFun.FootballSimulator.Models
                 _ => throw new ArgumentOutOfRangeException(nameof(estimatingTeam), "Invalid GameTeam value")
             };
         }
+
+        public double GetFourthDownConversionRate(GameTeam team)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -49,6 +49,29 @@ namespace Celarix.JustForFun.FootballSimulator.Data
                 .Where(p => p.RosterPositions.Any(rp => rp.TeamID == teamId && rp.CurrentPlayer))
                 .ToList();
             }
+
+            public Stadium GetHomeStadiumForTeam(int teamID)
+            {
+                return context.Teams
+                    .Include(t => t.HomeStadium)
+                    .First(t => t.TeamID == teamID)
+                    .HomeStadium;
+            }
+
+            public void HealAllPlayers()
+            {
+                // Remove 1 week from GamesUntilReturnFromInjury for all players who have it set
+                var injuredPlayers = context.PlayerRosterPositions
+                    .Where(prp => prp.GamesUntilReturnFromInjury.HasValue)
+                    .ToList();
+
+                foreach (var player in injuredPlayers)
+                {
+                    player.GamesUntilReturnFromInjury--;
+                }
+
+                context.SaveChanges();
+            }
         }
 
         extension(Player player)

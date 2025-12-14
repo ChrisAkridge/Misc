@@ -1,5 +1,7 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
+using Celarix.JustForFun.FootballSimulator.Random;
 using Celarix.JustForFun.FootballSimulator.Scheduling;
+using Moq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,7 +27,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests
             }
             var teams = context.Teams.ToList();
             var dataTeams = teams.ToDictionary(t => new BasicTeamInfo(t.TeamName, t.Conference, t.Division), t => t);
-            var scheduleGenerator = new ScheduleGenerator3(dataTeams.Keys.ToArray());
+            var scheduleGenerator = new ScheduleGenerator3(dataTeams.Keys.ToArray(), new RandomFactory());
             var schedule = scheduleGenerator.GenerateScheduleForYear(year, dataTeams, null, null, out var diagnostics);
             return new(schedule, diagnostics);
         }

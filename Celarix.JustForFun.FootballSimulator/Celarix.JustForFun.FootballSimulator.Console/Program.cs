@@ -1,6 +1,7 @@
 ﻿using Celarix.JustForFun.FootballSimulator;
 using Celarix.JustForFun.FootballSimulator.Collections;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
+using Celarix.JustForFun.FootballSimulator.Random;
 using Celarix.JustForFun.FootballSimulator.Scheduling;
 using Serilog;
 
@@ -43,7 +44,7 @@ if (settings?.SeedDataInitialized != true)
 
 var teams = context.Teams.ToList();
 var dataTeams = teams.ToDictionary(t => new BasicTeamInfo(t.TeamName, t.Conference, t.Division), t => t);
-var scheduleGenerator = new ScheduleGenerator3(dataTeams.Keys.ToArray());
+var scheduleGenerator = new ScheduleGenerator3(dataTeams.Keys.ToArray(), new RandomFactory());
 var schedule = scheduleGenerator.GenerateScheduleForYear(2014, dataTeams, null, null, out _);
 
 return;

@@ -1,11 +1,12 @@
-﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
+﻿using Celarix.JustForFun.FootballSimulator.Data;
+using Celarix.JustForFun.FootballSimulator.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Celarix.JustForFun.FootballSimulator.Models
 {
-    internal sealed class TeamStrengthSet
+    internal sealed class TeamStrengthSet : IStrengths
     {
         public bool IsEstimate { get; init; }
         public GameTeam Team { get; init; }

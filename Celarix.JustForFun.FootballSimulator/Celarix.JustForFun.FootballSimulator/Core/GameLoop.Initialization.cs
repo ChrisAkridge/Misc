@@ -12,6 +12,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
     {
         public void Initialize()
         {
+            double airTemperature = GetTemperatureForGame(gameRecord, physicsParams);
             currentState = new GameState(
                 Version: 0L,
                 NextState: GameplayNextState.Start,
@@ -19,7 +20,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 AdditionalParameters: ImmutableList<AdditionalParameter<object>>.Empty,
                 BaseWindDirection: random.NextDouble() * 360.0,
                 BaseWindSpeed: random.SampleNormalDistribution(gameRecord.Stadium.AverageWindSpeed, physicsParams["StartWindSpeedStddev"].Value),
-                AirTemperature: GetTemperatureForGame(gameRecord, physicsParams),
+                AirTemperature: airTemperature,
                 TeamWithPossession: GameTeam.Home,
                 AwayScore: 0,
                 HomeScore: 0,
@@ -35,6 +36,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 PossessionOnPlay: PossessionOnPlay.None,
                 TeamCallingTimeout: null
             );
+            gamePlayerManager.StadiumCurrentTemperature = airTemperature;
 
             currentState = SetupClockForPartiallyCompletedGame(currentState, gameRecord);
 

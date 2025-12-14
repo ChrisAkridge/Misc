@@ -15,6 +15,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
 		public string LastName { get; set; }
 		public DateTimeOffset DateOfBirth { get; set; }
 		public bool Retired { get; set; }
+		public bool UndraftedFreeAgent { get; set; }
 
         public List<PlayerRosterPosition> RosterPositions { get; set; }
 		

@@ -14,6 +14,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         public DbSet<Team> Teams { get; set; }
         public DbSet<Player> Players { get; set; }
         public DbSet<PlayerRosterPosition> PlayerRosterPositions { get; set; }
+        public DbSet<Stadium> Stadiums { get; set; }
         public DbSet<SeasonRecord> SeasonRecords { get; set; }
         public DbSet<GameRecord> GameRecords { get; set; }
         public DbSet<TeamGameRecord> TeamGameRecords { get; set; }
