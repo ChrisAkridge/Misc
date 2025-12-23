@@ -176,7 +176,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 				diagnostic.TeamDivisionPlaysSelfForIntraconference = true;
                 // Intraconference games fill 4 slots, but we can't play ourselves.
                 // So we need to play 1 game against 2 opponents and 2 games against the third.
-                // We'd like to choose semi-randomly. Let's start by seeding an RNG with the cycle year.
+                // We'd like to choose semi-randomly. Let's start by seeding an RNG with a known seed.
                 var random = randomFactory.Create(SchedulingRandomSeed);
 
 				// There are 16 symmetric slots to fill for these teams in this division:

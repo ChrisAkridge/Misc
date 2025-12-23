@@ -145,7 +145,7 @@ namespace Celarix.JustForFun.FootballSimulator
                 3 => "Q3",
                 4 => "Q4",
                 5 => "OT",
-                > 6 => $"{periodNumber - 4}OT",
+                >= 6 => $"{periodNumber - 4}OT",
                 _ => throw new ArgumentOutOfRangeException(nameof(periodNumber))
             };
         }
