@@ -30,7 +30,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 
             if (parameters.Random.Chance(kickRecoveryChance))
             {
-                Log.Verbose("ReturnableKickOutcome: Kick recovered cleanly by receiving team.");
+                Log.Information("ReturnableKickOutcome: Kick recovered cleanly by receiving team.");
                 return priorState.WithNextState(GameplayNextState.SignalFairCatchDecision) with
                 {
                     TeamWithPossession = receivingTeam,
@@ -41,7 +41,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             }
             else
             {
-                Log.Verbose("ReturnableKickOutcome: Kick not recovered cleanly by receiving team; live ball.");
+                Log.Information("ReturnableKickOutcome: Kick not recovered cleanly by receiving team; live ball.");
                 return priorState.WithNextState(GameplayNextState.FumbledLiveBallOutcome);
             }
         }

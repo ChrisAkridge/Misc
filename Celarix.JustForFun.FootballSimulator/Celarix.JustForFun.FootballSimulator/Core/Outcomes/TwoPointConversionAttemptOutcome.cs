@@ -27,7 +27,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (newPossessingTeamScore - possessingTeamScore == 6)
             {
                 // Play was a touchdown, rewrite history and make it a two-point conversion
-                Log.Verbose("TwoPointConversionAttemptOutcome: Successful two-point conversion.");
+                Log.Information("TwoPointConversionAttemptOutcome: Successful two-point conversion.");
                 return priorState.WithScoreChange(priorState.TeamWithPossession, 2)
                     .WithNextState(GameplayNextState.PlayEvaluationComplete)    
                 with
@@ -42,7 +42,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             else if (newPossessingTeamScore - possessingTeamScore == 2)
             {
                 // Play was a defensive safety, rewrite history and make it a one-point defensive safety
-                Log.Verbose("TwoPointConversionAttemptOutcome: Defensive safety on two-point conversion attempt.");
+                Log.Information("TwoPointConversionAttemptOutcome: Defensive safety on two-point conversion attempt.");
                 return priorState.WithScoreChange(priorState.TeamWithPossession, 1)
                     .WithNextState(GameplayNextState.PlayEvaluationComplete)
                 with
@@ -57,7 +57,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             else if (newOpposingTeamScore - opposingTeamScore == 2)
             {
                 // Play was an offensive safety, rewrite history and make it a one-point offensive safety!
-                Log.Verbose("TwoPointConversionAttemptOutcome: Offensive safety on two-point conversion attempt.");
+                Log.Information("TwoPointConversionAttemptOutcome: Offensive safety on two-point conversion attempt.");
                 return priorState.WithScoreChange(priorState.TeamWithPossession.Opponent(), 1)
                     .WithNextState(GameplayNextState.PlayEvaluationComplete)
                 with
@@ -72,7 +72,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             else if (newOpposingTeamScore != opposingTeamScore)
             {
                 // Play was a defensive score, rewrite history and make it a two-point defensive score
-                Log.Verbose("TwoPointConversionAttemptOutcome: Defensive score on two-point conversion attempt.");
+                Log.Information("TwoPointConversionAttemptOutcome: Defensive score on two-point conversion attempt.");
                 return priorState.WithScoreChange(priorState.TeamWithPossession.Opponent(), 2)
                     .WithNextState(GameplayNextState.PlayEvaluationComplete)
                 with
@@ -86,7 +86,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             }
 
             // Play was an unsuccessful two-point conversion attempt
-            Log.Verbose("TwoPointConversionAttemptOutcome: Unsuccessful two-point conversion attempt.");
+            Log.Information("TwoPointConversionAttemptOutcome: Unsuccessful two-point conversion attempt.");
             return priorState.WithNextState(GameplayNextState.PlayEvaluationComplete) with
             {
                 NextPlay = NextPlayKind.Kickoff,

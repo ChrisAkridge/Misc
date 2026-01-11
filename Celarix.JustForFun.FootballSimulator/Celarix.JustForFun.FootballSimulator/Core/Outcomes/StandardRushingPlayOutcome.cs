@@ -1,6 +1,7 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Core.Functions;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,13 +20,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var opposingRushingDefenseStrength = parameters
                 .GetActualStrengthsForTeam(priorState.TeamWithPossession.Opponent())
                 .RunningDefenseStrength;
-            var rushResult = UniversalRushingFunction.Get(selfRushingStrength,
+            var rushResult = UniversalRushingFunction.Get(priorState.LineOfScrimmage, selfRushingStrength,
                 opposingRushingDefenseStrength,
                 physicsParams,
                 parameters.Random);
 
             if (rushResult.WasFumbled)
             {
+                Log.Information("StandardRushingPlayOutcome: Fumble occurred during rushing play.");
                 return priorState.WithNextState(GameplayNextState.FumbledLiveBallOutcome);
             }
 

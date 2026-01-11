@@ -31,8 +31,8 @@ namespace SortFilesByDate
 			}
 
             string today = DateTime.Today.ToString("yyyyMMdd");
-            string inputFileLogPath = $@"G:\Documents\Files\Unclassified Files\SortFilesByDate\{today}_in.txt";
-            string outputFileLogPath = $@"G:\Documents\Files\Unclassified Files\SortFilesByDate\{today}_out.txt";
+            string inputFileLogPath = $@"E:\Documents\Files\Unclassified Files\SortFilesByDate\{today}_in.txt";
+            string outputFileLogPath = $@"E:\Documents\Files\Unclassified Files\SortFilesByDate\{today}_out.txt";
 
             var inputWriter = new StreamWriter(File.OpenWrite(inputFileLogPath));
             var outputWriter = new StreamWriter(File.OpenWrite(outputFileLogPath));
@@ -63,13 +63,13 @@ namespace SortFilesByDate
 
 			foreach (FileInfo fileInfo in filesInfo.Values)
             {
-				// https://stackoverflow.com/a/39839380/2709212
-				var metadataDirectories = ImageMetadataReader.ReadMetadata(fileInfo.FullName);
-                var subIfdDirectory = metadataDirectories.OfType<ExifSubIfdDirectory>().FirstOrDefault();
                 DateTime dateTaken;
-
+				
                 try
                 {
+                    // https://stackoverflow.com/a/39839380/2709212
+                    var metadataDirectories = ImageMetadataReader.ReadMetadata(fileInfo.FullName);
+                    var subIfdDirectory = metadataDirectories.OfType<ExifSubIfdDirectory>().FirstOrDefault();
                     dateTaken = subIfdDirectory?.GetDateTime(ExifDirectoryBase.TagDateTimeOriginal)
                         ?? fileInfo.CreationTime;
                 }
@@ -89,7 +89,7 @@ namespace SortFilesByDate
                 inputWriter.WriteLine($"Added {fileInfo.FullName} to {dateTaken.ToShortDateString()}");
 			}
 
-			Console.WriteLine("\tSorted into {0} days", sortedFiles.Count);
+			 Console.WriteLine("\tSorted into {0} days", sortedFiles.Count);
 
 			// Copy the files
 			Console.WriteLine("Copying files...");

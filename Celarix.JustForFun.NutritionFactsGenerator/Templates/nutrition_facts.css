@@ -1,0 +1,47 @@
+#navigation-well {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    flex-direction: row;
+}
+
+.nav-button {
+    background-color: lightgray;
+    color: darkgray;
+    width: 75px;
+    height: 75px;
+    font-size: 30px;
+    user-select: none;
+    border: 1px solid gray;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-button-active {
+    background-color: white;
+    color: black;
+}
+
+    .nav-button-active:hover {
+        background-color: lightblue;
+        cursor: default;
+    }
+
+.panel-hidden {
+    display: none;
+}
+
+.panel-shown {
+    display: block;
+}
+
+.grid-block-0 td {
+    background-color: lightgray;
+}
+
+.grid-block-1 td {
+    background-color: white;
+}

@@ -1,0 +1,305 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\data\\calorieinfodata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:data\\calorieinfodata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\data\\servinginfomassdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:data\\servinginfomassdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\models\\table.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:models\\table.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\templatesubstitution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:templatesubstitution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\htmlgeneration\\htmlelement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:htmlgeneration\\htmlelement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\templates\\nutrition_facts.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:templates\\nutrition_facts.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\htmlgeneration\\inputtablegenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:htmlgeneration\\inputtablegenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\models\\tablecolumn.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:models\\tablecolumn.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\data\\nutritionfactsinputs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:data\\nutritionfactsinputs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\models\\tablerow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:models\\tablerow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\models\\computeddescription.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:models\\computeddescription.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\htmlgeneration\\htmlattribute.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:htmlgeneration\\htmlattribute.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\models\\inputdescription.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:models\\inputdescription.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\extensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:extensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.nutritionfactsgenerator\\templates\\nutrition_facts.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E2DE24B5-E3BF-84BA-BCD0-F25CED985C7A}|Celarix.JustForFun.NutritionFactsGenerator.csproj|solutionrelative:templates\\nutrition_facts.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 1,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedHeight": 200,
+          "SelectedChildIndex": 8,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ServingInfoMassData.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Data\\ServingInfoMassData.cs",
+              "RelativeDocumentMoniker": "Data\\ServingInfoMassData.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Data\\ServingInfoMassData.cs",
+              "RelativeToolTip": "Data\\ServingInfoMassData.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAABxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T23:37:24.401Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "CalorieInfoData.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Data\\CalorieInfoData.cs",
+              "RelativeDocumentMoniker": "Data\\CalorieInfoData.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Data\\CalorieInfoData.cs",
+              "RelativeToolTip": "Data\\CalorieInfoData.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAABMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T23:25:27.469Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Table.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Models\\Table.cs",
+              "RelativeDocumentMoniker": "Models\\Table.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Models\\Table.cs",
+              "RelativeToolTip": "Models\\Table.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAcwCIAAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T22:26:25.388Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAABAAAAAAAAAAAAAgwCoAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T01:57:48.467Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "TemplateSubstitution.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\TemplateSubstitution.cs",
+              "RelativeDocumentMoniker": "TemplateSubstitution.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\TemplateSubstitution.cs",
+              "RelativeToolTip": "TemplateSubstitution.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAABLAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T01:57:12.407Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "HtmlElement.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\HtmlGeneration\\HtmlElement.cs",
+              "RelativeDocumentMoniker": "HtmlGeneration\\HtmlElement.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\HtmlGeneration\\HtmlElement.cs",
+              "RelativeToolTip": "HtmlGeneration\\HtmlElement.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAAcwCIAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T01:55:38.411Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "nutrition_facts.js",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Templates\\nutrition_facts.js",
+              "RelativeDocumentMoniker": "Templates\\nutrition_facts.js",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Templates\\nutrition_facts.js",
+              "RelativeToolTip": "Templates\\nutrition_facts.js",
+              "ViewState": "AgIAAIYAAAAAAAAAAAApwKcAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-12-25T01:53:51.379Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "InputTableGenerator.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\HtmlGeneration\\InputTableGenerator.cs",
+              "RelativeDocumentMoniker": "HtmlGeneration\\InputTableGenerator.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\HtmlGeneration\\InputTableGenerator.cs",
+              "RelativeToolTip": "HtmlGeneration\\InputTableGenerator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwBUAAABGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T01:50:32.825Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "TableColumn.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Models\\TableColumn.cs",
+              "RelativeDocumentMoniker": "Models\\TableColumn.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Models\\TableColumn.cs",
+              "RelativeToolTip": "Models\\TableColumn.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAApwD4AAAB4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T19:39:41.508Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "NutritionFactsInputs.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Data\\NutritionFactsInputs.cs",
+              "RelativeDocumentMoniker": "Data\\NutritionFactsInputs.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Data\\NutritionFactsInputs.cs",
+              "RelativeToolTip": "Data\\NutritionFactsInputs.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADEAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T02:09:48.011Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "TableRow.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Models\\TableRow.cs",
+              "RelativeDocumentMoniker": "Models\\TableRow.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Models\\TableRow.cs",
+              "RelativeToolTip": "Models\\TableRow.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAABBAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T22:27:47.049Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "ComputedDescription.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Models\\ComputedDescription.cs",
+              "RelativeDocumentMoniker": "Models\\ComputedDescription.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Models\\ComputedDescription.cs",
+              "RelativeToolTip": "Models\\ComputedDescription.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAC0AAABVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T02:08:30.061Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "HtmlAttribute.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\HtmlGeneration\\HtmlAttribute.cs",
+              "RelativeDocumentMoniker": "HtmlGeneration\\HtmlAttribute.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\HtmlGeneration\\HtmlAttribute.cs",
+              "RelativeToolTip": "HtmlGeneration\\HtmlAttribute.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T01:55:20.015Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "InputDescription.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Models\\InputDescription.cs",
+              "RelativeDocumentMoniker": "Models\\InputDescription.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Models\\InputDescription.cs",
+              "RelativeToolTip": "Models\\InputDescription.cs",
+              "ViewState": "AgIAABEAAAAAAAAAAADwvzIAAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T02:05:18.48Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Extensions.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Extensions.cs",
+              "RelativeDocumentMoniker": "Extensions.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Extensions.cs",
+              "RelativeToolTip": "Extensions.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T02:07:31.134Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "nutrition_facts.html",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Templates\\nutrition_facts.html",
+              "RelativeDocumentMoniker": "Templates\\nutrition_facts.html",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.NutritionFactsGenerator\\Templates\\nutrition_facts.html",
+              "RelativeToolTip": "Templates\\nutrition_facts.html",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2025-12-25T01:54:39.003Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

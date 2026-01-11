@@ -18,14 +18,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 .KickingStrength;
             var kickDefenseStrength = parameters.GetActualStrengthsForTeam(priorState.TeamWithPossession.Opponent())
                 .KickDefenseStrength;
-            var rushAttemptResult = UniversalRushingFunction.Get(kickingStrength,
+            var rushAttemptResult = UniversalRushingFunction.Get(priorState.LineOfScrimmage, kickingStrength,
                 kickDefenseStrength,
                 physicsParams,
                 parameters.Random);
 
             if (rushAttemptResult.WasFumbled)
             {
-                Log.Verbose("Fumble on kick/punt return!");
+                Log.Information("KickOrPuntReturnOutcome: Fumble on kick/punt return!");
                 return priorState.WithNextState(GameplayNextState.FumbledLiveBallOutcome);
             }
 
@@ -37,6 +37,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 ClockRunning = true
             };
             var newLineOfScrimmage = newState.AddYardsForPossessingTeam(priorState.LineOfScrimmage, yardsGained);
+            Log.Information("KickOrPuntReturnOutcome: Returned kick/punt for {YardsGained} yards.", yardsGained);
             return PlayerDownedFunction.Get(newState, parameters, physicsParams, priorState.LineOfScrimmage, yardsGained.Round(), EndzoneBehavior.StandardGameplay, null);
         }
     }

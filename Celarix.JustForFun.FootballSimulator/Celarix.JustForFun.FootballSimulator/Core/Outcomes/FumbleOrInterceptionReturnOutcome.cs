@@ -18,14 +18,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                .KickingStrength;
             var kickDefenseStrength = parameters.GetActualStrengthsForTeam(priorState.TeamWithPossession.Opponent())
                 .KickDefenseStrength;
-            var rushAttemptResult = UniversalRushingFunction.Get(kickingStrength,
+            var rushAttemptResult = UniversalRushingFunction.Get(priorState.LineOfScrimmage, kickingStrength,
                 kickDefenseStrength,
                 physicsParams,
                 parameters.Random);
 
             if (rushAttemptResult.WasFumbled)
             {
-                Log.Verbose("Fumble on fumble/interception return!");
+                Log.Information("Fumble on fumble/interception return!");
                 return priorState.WithNextState(GameplayNextState.FumbledLiveBallOutcome);
             }
 

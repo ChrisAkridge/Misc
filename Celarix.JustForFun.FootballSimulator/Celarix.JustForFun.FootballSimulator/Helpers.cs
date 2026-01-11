@@ -120,5 +120,15 @@ namespace Celarix.JustForFun.FootballSimulator
             }.Contains(subject.ToLowerInvariant()[0])
                 ? "an"
                 : "a";
+
+        public static double AddYardsForTeam(double startYard, double addend, GameTeam team)
+        {
+            return team switch
+            {
+                GameTeam.Away => startYard - addend,
+                GameTeam.Home => startYard + addend,
+                _ => throw new ArgumentOutOfRangeException(nameof(team), $"Unhandled team value: {team}")
+            };
+        }
     }
 }

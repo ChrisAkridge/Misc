@@ -19,12 +19,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (wasInterception == true)
             {
                 // Interception! Check if we're in their endzone already.
-                Log.Verbose("FumbledLiveBallOutcome: Interception occurred during passing play.");
+                Log.Information("FumbledLiveBallOutcome: Interception occurred during passing play.");
                 var interceptionInternalYard = priorState.LineOfScrimmage;
                 var interceptionTeamYard = priorState.InternalYardToTeamYard(interceptionInternalYard);
                 if (interceptionTeamYard.TeamYard is < 0 && interceptionTeamYard.Team == priorState.TeamWithPossession)
                 {
-                    Log.Verbose("FumbledLiveBallOutcome: Interception occurred inside offense's endzone, either a touchdown or successful two-point conversion for the defense!");
+                    Log.Information("FumbledLiveBallOutcome: Interception occurred inside offense's endzone, either a touchdown or successful two-point conversion for the defense!");
                     return RunPlayerDownedFunction(priorState with
                     {
                         TeamWithPossession = priorState.TeamWithPossession.Opponent(),
@@ -34,7 +34,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 }
                 else
                 {
-                    Log.Verbose("FumbledLiveBallOutcome: Interception occurred outside offense's endzone.");
+                    Log.Information("FumbledLiveBallOutcome: Interception occurred outside offense's endzone.");
                     return FumbleOrInteceptionRecoveredByDefense(priorState with
                     {
                         TeamWithPossession = priorState.TeamWithPossession.Opponent(),
@@ -82,7 +82,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             {
                 if (fumbleDownedImmediately)
                 {
-                    Log.Verbose("FumbledLiveBallOutcome: Fumble recovered by offense and downed immediately at {Yard} yard line",
+                    Log.Information("FumbledLiveBallOutcome: Fumble recovered by offense and downed immediately at {Yard} yard line",
                         priorState.InternalYardToDisplayTeamYardString(fumbleRecoveryInternalYard.Round(), parameters));
                     return RunPlayerDownedFunction(priorState, parameters, physicsParams, possessingTeamBeforeFumble, fumbleRecoveryInternalYard);
                 }
@@ -90,12 +90,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 if (fumbleRecoveryTeamYard.Team == fumbleRecoveryTeam.Opponent()
                     && fumbleRecoveryTeamYard.TeamYard <= 0)
                 {
-                    Log.Verbose("FumbledLiveBallOutcome: Fumble recovered by offense inside defense's endzone, either a touchdown or successful two-point conversion!");
+                    Log.Information("FumbledLiveBallOutcome: Fumble recovered by offense inside defense's endzone, either a touchdown or successful two-point conversion!");
                     return RunPlayerDownedFunction(priorState, parameters, physicsParams, possessingTeamBeforeFumble,
                         fumbleRecoveryInternalYard);
                 }
 
-                Log.Verbose("FumbledLiveBallOutcome: Fumble recovered by offense, eligible to return.");
+                Log.Information("FumbledLiveBallOutcome: Fumble recovered by offense, eligible to return.");
                 return priorState.WithNextState(GameplayNextState.ReturnFumbledOrInterceptedBallDecision) with
                 {
                     LineOfScrimmage = fumbleRecoveryInternalYard.Round(),
@@ -120,7 +120,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
         {
             if (fumbleDownedImmediately)
             {
-                Log.Verbose("FumbledLiveBallOutcome: Fumble recovered by defense and downed immediately at {Yard} yard line",
+                Log.Information("FumbledLiveBallOutcome: Fumble recovered by defense and downed immediately at {Yard} yard line",
                     priorState.InternalYardToDisplayTeamYardString(fumbleRecoveryInternalYard.Round(), parameters));
                 return RunPlayerDownedFunction(priorState with
                 {
@@ -135,7 +135,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (fumbleRecoveryTeamYard.Team == fumbleRecoveryTeam.Opponent()
                 && fumbleRecoveryTeamYard.TeamYard <= 0)
             {
-                Log.Verbose("FumbledLiveBallOutcome: Fumble recovered by defense inside offense's endzone, either a touchdown or successful two-point conversion for the defense!");
+                Log.Information("FumbledLiveBallOutcome: Fumble recovered by defense inside offense's endzone, either a touchdown or successful two-point conversion for the defense!");
                 return RunPlayerDownedFunction(priorState with
                 {
                     TeamWithPossession = fumbleRecoveryTeam,
@@ -146,7 +146,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 }, parameters, physicsParams, possessingTeamBeforeFumble, fumbleRecoveryInternalYard);
             }
 
-            Log.Verbose("FumbledLiveBallOutcome: Fumble recovered by defense, eligible to return.");
+            Log.Information("FumbledLiveBallOutcome: Fumble recovered by defense, eligible to return.");
             return priorState.WithNextState(GameplayNextState.ReturnFumbledOrInterceptedBallDecision) with
             {
                 TeamWithPossession = fumbleRecoveryTeam,

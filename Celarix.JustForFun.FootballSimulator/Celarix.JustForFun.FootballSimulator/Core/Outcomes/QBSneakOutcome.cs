@@ -1,6 +1,7 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Core.Functions;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,6 +28,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 
             if (sneakSucceeded)
             {
+                Log.Information("QBSneakOutcome: QB sneak successful, first down.");
                 return priorState.WithFirstDownLineOfScrimmage(priorState.LineToGain!.Value, priorState.TeamWithPossession,
                     "{OffAbbr} QB sneak by {OffPlayer0} successful for a first down at {LoS}!");
             }

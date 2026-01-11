@@ -8,6 +8,11 @@ namespace Celarix.JustForFun.FootballSimulator.Models
 {
     internal sealed class GameDecisionParameters
     {
+        private int awayTeamFourthDownTries = 0;
+        private int homeTeamFourthDownTries = 0;
+        private int awayTeamFourthDownConversions = 0;
+        private int homeTeamFourthDownConversions = 0;
+
         public IRandom Random { get; init; }
 
         public Team AwayTeam { get; init; }
@@ -53,7 +58,38 @@ namespace Celarix.JustForFun.FootballSimulator.Models
 
         public double GetFourthDownConversionRate(GameTeam team)
         {
-            throw new NotImplementedException();
+            if (team == GameTeam.Away)
+            {
+                return awayTeamFourthDownTries == 0
+                    ? 0
+                    : (double)awayTeamFourthDownConversions / awayTeamFourthDownTries;
+            }
+            else
+            {
+                return homeTeamFourthDownTries == 0
+                    ? 0
+                    : (double)homeTeamFourthDownConversions / homeTeamFourthDownTries;
+            }
+        }
+
+        public void RecordFourthDownAttempt(GameTeam team, bool converted)
+        {
+            if (team == GameTeam.Away)
+            {
+                awayTeamFourthDownTries++;
+                if (converted)
+                {
+                    awayTeamFourthDownConversions++;
+                }
+            }
+            else
+            {
+                homeTeamFourthDownTries++;
+                if (converted)
+                {
+                    homeTeamFourthDownConversions++;
+                }
+            }
         }
     }
 }

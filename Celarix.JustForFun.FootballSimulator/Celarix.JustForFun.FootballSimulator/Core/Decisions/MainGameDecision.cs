@@ -24,7 +24,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             var selfDisposition = parameters.GetDispositionForTeam(self);
             if (selfDisposition == TeamDisposition.UltraInsane)
             {
-                Log.Verbose("MainGameDecision: Ultra-insane team disposition, ALWAYS Hail Mary!");
+                Log.Information("MainGameDecision: Ultra-insane team disposition, ALWAYS Hail Mary!");
                 for (var i = 0; i < 10; i++)
                 {
                     Log.Verbose("Hail, Mary, full of grace, the Lord is with thee. Blessed art thou amongst women and blessed is the fruit of thy womb, Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.");
@@ -82,7 +82,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
         {
             if (priorState.NextPlay == NextPlayKind.FourthDown)
             {
-                Log.Verbose("MainGameDecision: Clock running during two-minute drill on fourth down, running play to avoid turnover on downs.");
+                Log.Information("MainGameDecision: Clock running during two-minute drill on fourth down, running play to avoid turnover on downs.");
                 return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
             }
 
@@ -90,18 +90,18 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             var spikeBallYardLoss = physicsParams["SpikeBallYardLoss"].Value;
             if (lineOfScrimmageTeamYard.Team == self && lineOfScrimmageTeamYard.TeamYard <= spikeBallYardLoss)
             {
-                Log.Verbose("MainGameDecision: Clock running during two-minute drill, but spiking the ball would result in a safety. Running play instead.");
+                Log.Information("MainGameDecision: Clock running during two-minute drill, but spiking the ball would result in a safety. Running play instead.");
                 return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
             }
 
             var selfTimeoutsRemaining = priorState.TimeoutsRemainingForTeam(self);
             if (selfTimeoutsRemaining > 1)
             {
-                Log.Verbose("MainGameDecision: Clock running during two-minute drill, calling a timeout.");
+                Log.Information("MainGameDecision: Clock running during two-minute drill, calling a timeout.");
                 return priorState.TakeTimeout(self);
             }
 
-            Log.Verbose("MainGameDecision: Spiking ball to stop the clock!");
+            Log.Information("MainGameDecision: Spiking ball to stop the clock!");
             return PlayerDownedFunction.Get(priorState, parameters, physicsParams, priorState.LineOfScrimmage, -2,
                 priorState.NextPlay == NextPlayKind.ConversionAttempt ? EndzoneBehavior.ConversionAttempt : EndzoneBehavior.StandardGameplay,
                 priorState.NextPlay == NextPlayKind.ConversionAttempt ? self : null);
@@ -130,6 +130,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             {
                 return FakeOrRealPunt(priorState, parameters, physicsParams, estimatedStrengthRatio);
             }
+
+            // This code path only runs if it's a fake play already, so just run the play.
             return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
         }
 
@@ -180,13 +182,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
         {
             var desirabilityThresholdGamma = physicsParams["FourthDownDistanceToGoThreshold"].Value;
             var desirabilityMultiplier = physicsParams["FourthDownDistanceToGoDesirabilityMultiplier"].Value;
-            var distanceToFirstDown = priorState.DistanceToGo();
-            if (!distanceToFirstDown.HasValue)
-            {
-                throw new InvalidOperationException("Distance to first down is null on fourth down.");
-            }
+            var distanceToFirstDown = priorState.DistanceToEndzone();
 
-            if (distanceToFirstDown.Value < desirabilityThresholdGamma)
+            if (distanceToFirstDown < desirabilityThresholdGamma)
             {
                 return desirabilityMultiplier;
             }
@@ -211,10 +209,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             var qbSneakDistance = physicsParams["FourthDownQBSneakDistanceThreshold"].Value;
             if (priorState.DistanceToGo() <= qbSneakDistance)
             {
-                Log.Verbose("MainGameDecision: Going for it on fourth down with a QB sneak!");
+                Log.Information("MainGameDecision: Going for it on fourth down with a QB sneak!");
                 return priorState.WithNextState(GameplayNextState.QBSneakOutcome);
             }
-            Log.Verbose("MainGameDecision: Going for it on fourth down with a standard play!");
+            Log.Information("MainGameDecision: Going for it on fourth down with a standard play!");
             return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
         }
 
@@ -226,11 +224,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 var selectionChance = physicsParams["FourthDownFakeFieldGoalSelectionChance"].Value;
                 if (parameters.Random.Chance(selectionChance))
                 {
-                    Log.Verbose("MainGameDecision: Attempting a fake field goal on fourth down!");
+                    Log.Information("MainGameDecision: Attempting a fake field goal on fourth down!");
                     return priorState.WithNextState(GameplayNextState.FakeFieldGoalOutcome);
                 }
             }
-            Log.Verbose("MainGameDecision: Attempting a field goal on fourth down.");
+            Log.Information("MainGameDecision: Attempting a field goal on fourth down.");
             return FieldGoalAttemptOutcome.Run(priorState, parameters, physicsParams);
         }
 
@@ -242,11 +240,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 var selectionChance = physicsParams["FourthDownFakePuntSelectionChance"].Value;
                 if (parameters.Random.Chance(selectionChance))
                 {
-                    Log.Verbose("MainGameDecision: Attempting a fake punt on fourth down!");
+                    Log.Information("MainGameDecision: Attempting a fake punt on fourth down!");
                     return priorState.WithNextState(GameplayNextState.FakePuntOutcome);
                 }
             }
-            Log.Verbose("MainGameDecision: Punting on fourth down.");
+            Log.Information("MainGameDecision: Punting on fourth down.");
             return priorState.WithNextState(GameplayNextState.PuntOutcome);
         }
 
@@ -254,7 +252,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
         {
             if (parameters.GameType == GameType.Postseason)
             {
-                Log.Verbose("MainGameDecision: Overtime in postseason, running play.");
+                Log.Information("MainGameDecision: Overtime in postseason, running play.");
                 return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
             }
 
@@ -270,7 +268,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
 
             if (fortySecondChunks >= downsLeft)
             {
-                Log.Verbose("MainGameDecision: Overtime with clock to burn, running play.");
+                Log.Information("MainGameDecision: Overtime with clock to burn, running play.");
                 return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
             }
             else if (priorState.GetScoreDifferenceForTeam(self) > 0)
@@ -278,12 +276,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 var lineOfScrimmageTeamYard = priorState.InternalYardToTeamYard(priorState.LineOfScrimmage);
                 if (lineOfScrimmageTeamYard.Team == self && lineOfScrimmageTeamYard.TeamYard >= fortySecondChunks)
                 {
-                    Log.Verbose("MainGameDecision: Want to take victory formation but too close to own endzone, running play.");
+                    Log.Information("MainGameDecision: Want to take victory formation but too close to own endzone, running play.");
                     return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
                 }
                 else
                 {
-                    Log.Verbose("MainGameDecision: Overtime leading and there's not enough time for opponent to win. Victory formation!");
+                    Log.Information("MainGameDecision: Overtime leading and there's not enough time for opponent to win. Victory formation!");
                     return PlayerDownedFunction.Get(priorState, parameters, physicsParams, priorState.LineOfScrimmage, -1,
                         EndzoneBehavior.StandardGameplay, null);
                 }
@@ -318,7 +316,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 return PassingPlay(priorState, parameters, physicsParams, self, opponent, isFakePlay);
             }
 
-            Log.Verbose("MainGameDecision: Selected a rushing play.");
+            Log.Information("MainGameDecision: Selected a rushing play.");
             return priorState.WithNextState(GameplayNextState.StandardRushingPlayOutcome);
         }
 
@@ -333,12 +331,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             var selfDisposition = parameters.GetDispositionForTeam(self);
             if (selfDisposition == TeamDisposition.UltraConservative)
             {
-                Log.Verbose("MainGameDecision: Ultra-conservative team disposition, opting for a short pass.");
+                Log.Information("MainGameDecision: Ultra-conservative team disposition, opting for a short pass.");
                 return priorState.WithNextState(GameplayNextState.StandardShortPassingPlayOutcome);
             }
             else if (selfDisposition == TeamDisposition.Insane)
             {
-                Log.Verbose("MainGameDecision: Insane team disposition, opting for a long pass.");
+                Log.Information("MainGameDecision: Insane team disposition, opting for a long pass.");
                 return priorState.WithNextState(GameplayNextState.StandardLongPassingPlayOutcome);
             }
 
@@ -349,15 +347,16 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
 
             if (nextDouble < shortPassChance)
             {
-                Log.Verbose("MainGameDecision: Conservative team disposition, selected a short pass.");
+                Log.Information("MainGameDecision: Conservative team disposition, selected a short pass.");
                 return priorState.WithNextState(GameplayNextState.StandardShortPassingPlayOutcome);
             }
             else if (nextDouble < mediumPassChance)
             {
-                Log.Verbose("MainGameDecision: Conservative team disposition, selected a medium pass.");
+                Log.Information("MainGameDecision: Conservative team disposition, selected a medium pass.");
                 return priorState.WithNextState(GameplayNextState.StandardMediumPassingPlayOutcome);
             }
 
+            Log.Information("MainGameDecision: Conservative team disposition, selected a long pass.");
             return priorState.WithNextState(GameplayNextState.StandardLongPassingPlayOutcome);
         }
 
@@ -365,10 +364,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
         {
             if (!isFakePlay && InFieldGoalRange(priorState, physicsParams, opponent) && CanAttemptFieldGoal(priorState))
             {
-                Log.Verbose("MainGameDecision: Late-game passing play in field goal range, attempting field goal.");
+                Log.Information("MainGameDecision: Late-game passing play in field goal range, attempting field goal.");
                 return FieldGoalAttemptOutcome.Run(priorState, parameters, physicsParams);
             }
-            Log.Verbose("MainGameDecision: Late-game passing play but not in field goal range, attempting Hail Mary.");
+            Log.Information("MainGameDecision: Late-game passing play but not in field goal range, attempting Hail Mary.");
             return priorState.WithNextState(GameplayNextState.HailMaryOutcome);
         }
         #endregion
@@ -397,6 +396,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
         {
             if (gameState.NextPlay == NextPlayKind.ConversionAttempt)
             {
+                // Yes, a field goal attempt on a conversion attempt is just an extra point attempt,
+                // but if we got to this point in the logic tree, it's because we decided earlier
+                // to go for two.
                 return false;
             }
 

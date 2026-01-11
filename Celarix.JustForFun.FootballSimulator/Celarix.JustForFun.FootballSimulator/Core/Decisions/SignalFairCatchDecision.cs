@@ -23,12 +23,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             {
                 if (receivingTeamDisposition == TeamDisposition.UltraConservative)
                 {
-                    Log.Verbose("SignalFairCatchDecision: Team disposition is UltraConservative, always fair catch.");
+                    Log.Information("SignalFairCatchDecision: Team disposition is UltraConservative, always fair catch.");
                     return FairCatch(priorState);
                 }
                 else
                 {
-                    Log.Verbose("SignalFairCatchDecision: Team disposition is Insane or UltraInsane, always return.");
+                    Log.Information("SignalFairCatchDecision: Team disposition is Insane or UltraInsane, always return.");
                     return priorState.WithNextState(GameplayNextState.KickOrPuntReturnOutcome);
                 }
             }
@@ -44,7 +44,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             var threshold = physicsParams["KickReturnChoiceThreshold"].Value;
             if (strengthRatio > threshold)
             {
-                Log.Verbose("SignalFairCatchDecision: Strength ratio {StrengthRatio:F2} exceeds threshold {Threshold:F2}, returning kick.",
+                Log.Information("SignalFairCatchDecision: Strength ratio {StrengthRatio:F2} exceeds threshold {Threshold:F2}, returning kick.",
                     strengthRatio,
                     threshold);
                 return priorState.WithNextState(GameplayNextState.KickOrPuntReturnOutcome);
@@ -53,7 +53,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             var gameCloseToEndingThreshold = physicsParams["ReturnKickCloseGameTimeThreshold"].Value;
             if (gameCloseToEndingThreshold < priorState.TotalSecondsLeftInGame())
             {
-                Log.Verbose("SignalFairCatchDecision: Game not close to ending (time left {TimeLeft:F2}s exceeds threshold {Threshold:F2}s), returning kick.",
+                Log.Information("SignalFairCatchDecision: Game not close to ending (time left {TimeLeft:F2}s exceeds threshold {Threshold:F2}s), returning kick.",
                     priorState.TotalSecondsLeftInGame(),
                     gameCloseToEndingThreshold);
                 return priorState.WithNextState(GameplayNextState.KickOrPuntReturnOutcome);
@@ -67,6 +67,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             {
                 // Touchback
                 int lineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35);
+                Log.Information("SignalFairCatchDecision: Fair catch in end zone, touchback to {LoS}.",
+                    lineOfScrimmage);
                 return priorState.WithNextState(GameplayNextState.PlayEvaluationComplete) with
                 {
                     TeamWithPossession = priorState.TeamWithPossession.Opponent(),
@@ -79,6 +81,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             else
             {
                 // Fair catch on field
+                Log.Information("SignalFairCatchDecision: Fair catch on field at {LoS}.",
+                    priorState.LineOfScrimmage);
                 return priorState.WithNextState(GameplayNextState.PlayEvaluationComplete) with
                 {
                     TeamWithPossession = priorState.TeamWithPossession.Opponent(),

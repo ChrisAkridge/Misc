@@ -12,10 +12,11 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         IReadOnlyList<AdditionalParameter<object>> AdditionalParameters,
         IReadOnlyList<StateHistoryEntry> StateHistory,
 
-        // Weather conditions
+        // Initial conditions
         double BaseWindDirection,
         double BaseWindSpeed,
         double AirTemperature,
+        GameTeam CoinFlipWinner,
 
         // Game status
         GameTeam TeamWithPossession,
@@ -31,6 +32,11 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         int LineOfScrimmage,
         int? LineToGain,
         NextPlayKind NextPlay,
+
+        // Start-of-drive properties
+        int DriveStartingFieldPosition,
+        int DriveStartingPeriodNumber,
+        int DriveStartingSecondsLeftInPeriod,
 
         // Display properties
         string LastPlayDescriptionTemplate,

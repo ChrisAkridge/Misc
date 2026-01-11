@@ -22,7 +22,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
 
             // Step 1: Compute how long the play took
             var playTimeSecondsMean = physicsParam["PlayTimeSecondsMean"].Value;
-            var playTimeSecondsStdDev = physicsParam["PlayTimeSecondsStdDev"].Value;
+            var playTimeSecondsStdDev = physicsParam["PlayTimeSecondsStddev"].Value;
             var playDuration = parameters.Random.SampleNormalDistribution(playTimeSecondsMean, playTimeSecondsStdDev);
             Log.Verbose("Clock: Play took {PlayDuration:F2} seconds", playDuration);
 

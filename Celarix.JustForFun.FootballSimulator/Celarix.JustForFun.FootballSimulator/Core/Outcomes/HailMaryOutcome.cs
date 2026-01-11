@@ -16,7 +16,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var possessingTeam = priorState.TeamWithPossession;
             var selfStrengths = parameters.GetActualStrengthsForTeam(priorState.TeamWithPossession);
             var opponentStrengths = parameters.GetActualStrengthsForTeam(priorState.TeamWithPossession.Opponent());
-            var standardStrengthStddev = physicsParams["StandardStrengthStdDev"].Value;
+            var standardStrengthStddev = physicsParams["StandardStrengthStddev"].Value;
             var selfSample = parameters.Random.SampleNormalDistribution(selfStrengths.PassingOffenseStrength, standardStrengthStddev);
             var opponentSample = parameters.Random.SampleNormalDistribution(opponentStrengths.PassingDefenseStrength, standardStrengthStddev);
             var ratio = selfSample / opponentSample;
@@ -33,7 +33,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var throwingYardLocation = priorState.InternalYardToTeamYard(priorState.AddYardsForPossessingTeam(priorState.LineOfScrimmage, -5).Round());
             if (throwingYardLocation.Team == possessingTeam && throwingYardLocation.TeamYard <= -10)
             {
-                Log.Verbose("PlayerDownedFunction: Safety on Hail Mary from own endzone!");
+                Log.Information("PlayerDownedFunction: Safety on Hail Mary from own endzone!");
                 return priorState.WithScoreChange(possessingTeam.Opponent(), 2)
                     .WithNextState(GameplayNextState.PlayEvaluationComplete)
                 with
@@ -61,6 +61,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var wasIntercepted = someoneCaughtIt && parameters.Random.Chance(interceptionChance);
             if (wasIntercepted)
             {
+                Log.Information("PlayerDownedFunction: Interception on Hail Mary!");
                 return priorState.WithAdditionalParameter<bool?>("WasIntercepted", true)
                     .WithNextState(GameplayNextState.FumbledLiveBallOutcome)
                 with
@@ -71,7 +72,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             }
             else if (someoneCaughtIt)
             {
-                Log.Verbose("PlayerDownedFunction: Touchdown on Hail Mary!");
+                Log.Information("PlayerDownedFunction: Touchdown on Hail Mary!");
                 return priorState.WithScoreChange(possessingTeam, 6)
                     .WithNextState(GameplayNextState.PlayEvaluationComplete)
                 with

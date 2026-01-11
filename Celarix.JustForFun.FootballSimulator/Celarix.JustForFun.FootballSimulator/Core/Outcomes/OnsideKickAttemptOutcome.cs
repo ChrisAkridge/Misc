@@ -1,5 +1,6 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -48,9 +49,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var newLineOfScrimmage = priorState.AddYardsForPossessingTeam(priorState.LineOfScrimmage, recoveryDistance.Round());
             if (kickRecovered)
             {
+                Log.Information("OnsideKickAttemptOutcome: Kicking team recovers own onside kick.");
                 return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, priorState.TeamWithPossession,
                     "{OffAbbr} recovers the onside kick at {LoS}!", clockRunning: false);
             }
+            Log.Information("OnsideKickAttemptOutcome: Receiving team recovers onside kick.");
             return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, priorState.TeamWithPossession.Opponent(),
                 "{OffAbbr} recovers the onside kick of {DefAbbr} at {LoS}!", clockRunning: false);
         }

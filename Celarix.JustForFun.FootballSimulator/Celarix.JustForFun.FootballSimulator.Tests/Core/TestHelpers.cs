@@ -34,5 +34,13 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
 
         public static IReadOnlyDictionary<string, PhysicsParam> EmptyPhysicsParams =>
             new Dictionary<string, PhysicsParam>();
+
+        public static IReadOnlyDictionary<string, PhysicsParam> CreatePhysicsParams(string key, double value)
+        {
+            return new Dictionary<string, PhysicsParam>
+            {
+                { key, new PhysicsParam(key, value, "", "") }
+            };
+        }
     }
 }

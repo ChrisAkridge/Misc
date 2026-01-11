@@ -149,5 +149,15 @@ namespace Celarix.JustForFun.FootballSimulator
                 _ => throw new ArgumentOutOfRangeException(nameof(periodNumber))
             };
         }
+
+        public static double ClampWithinField(this double yard)
+        {
+            return Math.Clamp(yard, Constants.HomeEndLineYard, Constants.AwayEndLineYard);
+        }
+
+        public static double Clamp(this double value, double min, double max)
+        {
+            return Math.Clamp(value, min, max);
+        }
     }
 }

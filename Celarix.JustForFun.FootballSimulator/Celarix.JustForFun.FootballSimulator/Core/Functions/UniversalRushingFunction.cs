@@ -10,10 +10,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
 {
     internal static class UniversalRushingFunction
     {
-        public static RushingResult Get(double rushingOffenseStrength,
+        public static RushingResult Get(double lineOfScrimmage,
+            double rushingOffenseStrength,
             double rushingDefenseStrength,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams,
-            IRandom random)
+            IReadOnlyDictionary<string, PhysicsParam> physicsParams, IRandom random)
         {
             var standardStrengthStddev = physicsParams["StandardStrengthStddev"].Value;
             var offenseSample = random.SampleNormalDistribution(rushingOffenseStrength, standardStrengthStddev);
@@ -30,28 +30,41 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
 
             if (random.Chance(baseFumbleProbaility))
             {
-                Log.Verbose("UniversalRushingFunction: Fumble occurred.");
+                Log.Information("UniversalRushingFunction: Fumble occurred.");
                 return new RushingResult(WasFumbled: true, YardsGained: null);
             }
 
+            double yardsGained;
             if (offenseSample > defenseSample)
             {
                 // Good rushing attempt, this time, we were stronger than them
                 var ratio = offenseSample / defenseSample;
                 var mean = physicsParams["BaseFumbleReturnMean"].Value; // not sic - name reused for all running with the ball
                 var stddev = physicsParams["BaseFumbleReturnStddev"].Value * ratio;
-                var yardsGained = random.SampleNormalDistribution(mean, stddev);
-                Log.Verbose("UniversalRushingFunction: Successful rush for {YardsGained} yards.", yardsGained);
-                return new RushingResult(WasFumbled: false, YardsGained: yardsGained);
+                yardsGained = Math.Abs(random.SampleNormalDistribution(mean, stddev));
+                Log.Information("UniversalRushingFunction: Successful rush for {YardsGained} yards.", yardsGained);
             }
             else
             {
                 // Bad rushing attempt, we were weaker than them
                 var maxYardsGained = physicsParams["MaxBadReturnDistance"].Value;
-                var yardsGained = random.NextDouble() * maxYardsGained;
-                Log.Verbose("UniversalRushingFunction: Minimal rush for {YardsGained} yards.", yardsGained);
-                return new RushingResult(WasFumbled: false, YardsGained: yardsGained);
+                yardsGained = random.NextDouble() * maxYardsGained;
+                Log.Information("UniversalRushingFunction: Minimal rush for {YardsGained} yards.", yardsGained);
             }
+
+            // Clamp yards gained so that the new LoS is somewhere on the field, including the endzones
+            var newLineOfScrimmage = lineOfScrimmage + yardsGained;
+            if (newLineOfScrimmage < Constants.HomeEndLineYard)
+            {
+                // Figure out how far we could go to reach the end line
+                yardsGained = Constants.HomeEndLineYard - lineOfScrimmage;
+            }
+            else if (newLineOfScrimmage > Constants.AwayEndLineYard)
+            {
+                yardsGained = Constants.AwayEndLineYard - lineOfScrimmage;
+            }
+
+            return new RushingResult(WasFumbled: false, YardsGained: yardsGained);
         }
     }
 }

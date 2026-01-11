@@ -22,6 +22,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         public DbSet<TeamDriveRecord> TeamDriveRecords { get; set; }
         public DbSet<SimulatorSettings> SimulatorSettings { get; set; }
         public DbSet<PhysicsParam> PhysicsParams { get; set; }
+        public DbSet<Summary> Summaries { get; set; }
 
         public FootballContext()
         {

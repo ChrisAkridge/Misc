@@ -1,6 +1,7 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Core.Functions;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO.Pipelines;
@@ -134,6 +135,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (!wasCompleted)
             {
                 // Incomplete passes will be treated as 0-yard rushing gains.
+                Log.Information("StandardPassingPlayOutcome: Incomplete pass.");
                 return PlayerDownedFunction.Get(priorState, parameters, physicsParams,
                     priorState.LineOfScrimmage,
                     0,
@@ -186,6 +188,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 
             if (!hadYAC)
             {
+                Log.Information("StandardPassingPlayOutcome: Ball caught for a gain of {YardsGained} but receiver brought down immediately.", yardsGained.Round());
                 return PlayerDownedFunction.Get(priorState, parameters, physicsParams,
                     priorState.LineOfScrimmage,
                     yardsGained.Round(),
@@ -193,21 +196,24 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     null);
             }
 
-            var yardsAfterCatch = UniversalRushingFunction.Get(selfStrengths.RunningOffenseStrength,
+            var yardsAfterCatch = UniversalRushingFunction.Get(priorState.LineOfScrimmage, selfStrengths.RunningOffenseStrength,
                 opponentStrengths.RunningDefenseStrength,
                 physicsParams,
                 parameters.Random);
 
             if (yardsAfterCatch.WasFumbled)
             {
+                Log.Information("StandardPassingPlayOutcome: Fumble after a catch for {YardsGained}.", yardsAfterCatch.YardsGained);
                 return priorState.WithNextState(GameplayNextState.FumbledLiveBallOutcome);
             }
 
+            int yardsPlusYAC = Math.Clamp(yardsGained + (yardsAfterCatch.YardsGained ?? 0),
+                    Constants.HomeEndLineYard,
+                    Constants.AwayEndLineYard).Round();
+            Log.Information("StandardPassingPlayOutcome: Completed pass with YAC, total gain {YardsGained}.", yardsPlusYAC);
             return PlayerDownedFunction.Get(priorState, parameters, physicsParams,
                 priorState.LineOfScrimmage,
-                Math.Clamp(yardsGained + (yardsAfterCatch.YardsGained ?? 0),
-                    Constants.HomeEndLineYard,
-                    Constants.AwayEndLineYard).Round(),
+                yardsPlusYAC,
                 EndzoneBehavior.StandardGameplay,
                 null);
         }

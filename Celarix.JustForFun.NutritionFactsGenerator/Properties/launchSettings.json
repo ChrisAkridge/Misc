@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Celarix.JustForFun.NutritionFactsGenerator": {
+      "commandName": "Project",
+      "commandLineArgs": "E:\\Documents\\GitHub\\chrisakridge.github.io\\nutrition_facts"
+    }
+  }
+}

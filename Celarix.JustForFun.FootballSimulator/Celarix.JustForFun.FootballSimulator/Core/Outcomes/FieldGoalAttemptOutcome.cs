@@ -17,7 +17,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var desiredCrossRangeMinimum = -3.08;
             var desiredCrossRangeMaximum = 3.08;
             var fieldGoalBaseDistanceMeanMultiplier = physicsParams["FieldGoalBaseDistanceMean"].Value;
-            var fieldGoalBaseDistanceStdDev = physicsParams["FieldGoalBaseDistanceStdDev"].Value;
+            var fieldGoalBaseDistanceStdDev = physicsParams["FieldGoalBaseDistanceStddev"].Value;
             var kickingTeamActualStrengths = parameters.GetActualStrengthsForTeam(priorState.TeamWithPossession);
             var kickingStrength = kickingTeamActualStrengths.KickingStrength;
 
@@ -29,7 +29,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var alpha = Math.Log10(kickingStrength);
             var beta = 3 - alpha;
             var fieldGoalSkewMean = Math.Pow(10, beta);
-            var fieldGoalSkewStdDev = physicsParams["FieldGoalSkewStdDev"].Value;
+            var fieldGoalSkewStdDev = physicsParams["KickoffSkewStddev"].Value;
             var fieldGoalSkew = parameters.Random.SampleNormalDistribution(fieldGoalSkewMean, fieldGoalSkewStdDev);
             var fieldGoalKickingSkewMultiplier = physicsParams["FieldGoalKickingSkewMultiplier"].Value;
             fieldGoalSkew *= fieldGoalKickingSkewMultiplier;
@@ -54,7 +54,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 
             if (actualKickLocation < 0 || actualKickLocation > 100)
             {
-                Log.Verbose("FieldGoalAttemptOutcome: Applying endzone skew penalty");
+                Log.Information("FieldGoalAttemptOutcome: Applying endzone skew penalty");
                 var yardsDeepInOwnEndzone = actualKickLocation < 0
                     ? -actualKickLocation
                     : actualKickLocation - 100.0;
@@ -90,7 +90,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 
             if (kickBlocked)
             {
-                Log.Verbose("FieldGoalAttemptOutcome: Kick was blocked, ball is live!");
+                Log.Information("FieldGoalAttemptOutcome: Kick was blocked, ball is live!");
                 return priorState.WithNextState(GameplayNextState.FumbledLiveBallOutcome);
             }
 
@@ -98,7 +98,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             {
                 if (kickSuccessful)
                 {
-                    Log.Verbose("FieldGoalAttemptOutcome: Field goal kick was good!");
+                    Log.Information("FieldGoalAttemptOutcome: Field goal kick was good!");
                     return priorState.WithScoreChange(priorState.TeamWithPossession, 3)
                         .WithNextState(GameplayNextState.PlayEvaluationComplete)
                     with
@@ -112,7 +112,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 }
                 else
                 {
-                    Log.Verbose("FieldGoalAttemptOutcome: Field goal kick was no good.");
+                    Log.Information("FieldGoalAttemptOutcome: Field goal kick was no good.");
                     return priorState.WithFirstDownLineOfScrimmage(priorState.LineOfScrimmage, priorState.TeamWithPossession.Opponent(),
                         "{DefAbbr} {DefPlayer0} missed a field goal from {FGKickDistance} yards, first down for {OffAbbr}.");
                 }
@@ -120,7 +120,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 
             if (kickSuccessful)
             {
-                Log.Verbose("FieldGoalAttemptOutcome: Extra point kick was good!");
+                Log.Information("FieldGoalAttemptOutcome: Extra point kick was good!");
                 return priorState.WithScoreChange(priorState.TeamWithPossession, 1)
                     .WithNextState(GameplayNextState.PlayEvaluationComplete)
                 with
@@ -135,7 +135,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             }
             else
             {
-                Log.Verbose("FieldGoalAttemptOutcome: Extra point kick was no good.");
+                Log.Information("FieldGoalAttemptOutcome: Extra point kick was no good.");
                 return priorState.WithNextState(GameplayNextState.PlayEvaluationComplete) with
                 {
                     NextPlay = NextPlayKind.Kickoff,

@@ -6,6 +6,22 @@ using System.Threading.Tasks;
 
 namespace Celarix.JustForFun.FootballSimulator;
 
+public enum SystemState
+{
+    Start,
+    PrepareForGame,
+    InitializeDatabase,
+    InitializeNextSeason,
+    InitializePlayoffs,
+    ResumePartialGame,
+    LoadGame,
+    InGame,
+    PostGame,
+    WriteSummaryForGame,
+    WriteSummaryForSeason,
+    Error
+}
+
 public enum CurrentSystemState
 {
     /// <summary>

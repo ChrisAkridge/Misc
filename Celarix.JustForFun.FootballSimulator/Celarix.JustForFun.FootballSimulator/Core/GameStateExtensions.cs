@@ -1,5 +1,6 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -174,6 +175,13 @@ namespace Celarix.JustForFun.FootballSimulator.Core
             public GameState WithFirstDownLineOfScrimmage(double newLineOfScrimmage, GameTeam team, string lastPlayDescriptionTemplate,
                 bool? clockRunning = null)
             {
+                var teamYard = InternalYardToTeamYard(state, newLineOfScrimmage.Round());
+                if (teamYard.TeamYard is <= 0 && teamYard.Team == team.Opponent())
+                {
+                    // Did not return ball out of opponent's endzone, touchback.
+                    return state.WithFirstDownLineOfScrimmage(state.TeamYardToInternalYard(team, 20), team, lastPlayDescriptionTemplate, clockRunning);
+                }
+
                 var desiredLineToGain = AddYardsForTeam(newLineOfScrimmage, 10, team);
                 var desiredTeamLineToGain = InternalYardToTeamYard(state, desiredLineToGain.Round());
                 if (desiredTeamLineToGain.TeamYard < 0)
@@ -193,7 +201,6 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                     NextPlay = NextPlayKind.FirstDown,
                     LineOfScrimmage = newLineOfScrimmage.Round(),
                     LineToGain = desiredLineToGain.Round(),
-                    ClockRunning = clockRunning.HasValue ? true : clockRunning.Value,
                     LastPlayDescriptionTemplate = lastPlayDescriptionTemplate
                 };
             }
@@ -218,7 +225,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 };
             }
 
-            private static double AddYardsForTeam(double startYard, double addend, GameTeam team)
+            internal static double AddYardsForTeam(double startYard, double addend, GameTeam team)
             {
                 return team switch
                 {
@@ -250,6 +257,16 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 }
             }
 
+            public int DistanceToEndzone()
+            {
+                return state.TeamWithPossession switch
+                {
+                    GameTeam.Away => state.LineOfScrimmage,
+                    GameTeam.Home => (100 - state.LineOfScrimmage),
+                    _ => throw new ArgumentOutOfRangeException(nameof(state.TeamWithPossession), $"Unhandled team value: {state.TeamWithPossession}")
+                };
+            }
+
             public GameState TakeTimeout(GameTeam team)
             {
                 return state.WithNextState(GameplayNextState.PlayEvaluationComplete) with
@@ -260,6 +277,90 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                     ClockRunning = false,
                     LastPlayDescriptionTemplate = $"{(team == GameTeam.Away ? "Away team" : "Home team")} called a timeout."
                 };
+            }
+
+            public string GetDescription(GameDecisionParameters parameters)
+            {
+                const char possessionSymbol = '⬭';
+                var sb = new StringBuilder();
+
+                if (state.TeamWithPossession == GameTeam.Away)
+                {
+                    sb.Append(parameters.AwayTeam.Abbreviation + ' ');
+                    sb.Append(possessionSymbol);
+                }
+                else
+                {
+                    sb.Append(parameters.AwayTeam.Abbreviation + ' ');
+                }
+
+                sb.Append(' ');
+                sb.Append(state.AwayScore);
+                sb.Append(" - ");
+                sb.Append(state.HomeScore + ' ');
+
+                if (state.TeamWithPossession == GameTeam.Home)
+                {
+                    sb.Append(possessionSymbol);
+                    sb.Append(' ' + parameters.HomeTeam.Abbreviation);
+                }
+                else
+                {
+                    sb.Append(' ' + parameters.HomeTeam.Abbreviation);
+                }
+
+                sb.Append(", ");
+
+                sb.Append(state.NextPlay switch
+                {
+                    NextPlayKind.FirstDown => "1st and ",
+                    NextPlayKind.SecondDown => "2nd and ",
+                    NextPlayKind.ThirdDown => "3rd and ",
+                    NextPlayKind.FourthDown => "4th and ",
+                    NextPlayKind.Kickoff => "Kickoff ",
+                    NextPlayKind.ConversionAttempt => "XPA ",
+                    NextPlayKind.FreeKick => "Free Kick ",
+                    _ => throw new InvalidOperationException($"Unexpected NextPlayKind value: {state.NextPlay}")
+                });
+
+                if (state.LineToGain != null)
+                {
+                    var distanceToGain = state.DistanceForPossessingTeam(state.LineOfScrimmage, state.LineToGain.Value).Round();
+                    if (distanceToGain == 0)
+                    {
+                        sb.Append("inches");
+                    }
+                    else
+                    {
+                        sb.Append(distanceToGain);
+                    }
+                }
+                else if (state.NextPlay is NextPlayKind.FirstDown or NextPlayKind.SecondDown or NextPlayKind.ThirdDown or NextPlayKind.FourthDown)
+                {
+                    sb.Append("Goal");
+                }
+
+                sb.Append(" @ ");
+                sb.Append(state.InternalYardToDisplayTeamYardString(state.LineOfScrimmage, parameters) + ", ");
+                
+                if (state.PeriodNumber <= 4)
+                {
+                    sb.Append($"Q{state.PeriodNumber} ");
+                }
+                else if (state.PeriodNumber == 5)
+                {
+                    sb.Append("OT ");
+                }
+                else
+                {
+                    sb.Append($"{state.PeriodNumber - 4}OT ");
+                }
+
+                var minutes = state.SecondsLeftInPeriod / 60;
+                var seconds = state.SecondsLeftInPeriod % 60;
+                sb.Append($"{minutes}:{seconds:D2}");
+
+                return sb.ToString();
             }
         }
     }

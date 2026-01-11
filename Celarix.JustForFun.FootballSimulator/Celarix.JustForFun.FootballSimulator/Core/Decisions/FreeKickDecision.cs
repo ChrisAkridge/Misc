@@ -23,10 +23,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
 
             if (kickingTeamSelfEstimate.KickDefenseStrength >= kickingTeamOtherEstimate.KickReturnStrength)
             {
-                Log.Verbose("FreeKickDecision: We're better at kick defense, choosing normal kickoff outcome.");
+                Log.Information("FreeKickDecision: We're better at kick defense, choosing normal kickoff outcome.");
                 return priorState.WithNextState(GameplayNextState.NormalKickoffOutcome);
             }
-            Log.Verbose("FreeKickDecision: They're better at kick returns, choosing punt outcome.");
+            Log.Information("FreeKickDecision: They're better at kick returns, choosing punt outcome.");
             return priorState.WithNextState(GameplayNextState.PuntOutcome);
         }
     }

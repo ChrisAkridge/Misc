@@ -51,8 +51,13 @@ namespace Celarix.JustForFun.FootballSimulator.Core
         // Main Loop
         public void MoveNext()
         {
+            var initialTeamWithPossession = currentState.TeamWithPossession;
+            var nextPlay = currentState.NextPlay;
+
             do
             {
+                Log.Information(currentState.GetDescription(currentParameters));
+
                 currentState = currentState.NextState switch
                 {
                     GameplayNextState.Start => throw new InvalidOperationException("uh... shouldn't be here yet, I think?"),
@@ -68,6 +73,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                     GameplayNextState.PuntOutcome => PuntOutcome.Run(currentState, currentParameters, physicsParams),
                     GameplayNextState.ReturnablePuntOutcome => ReturnablePuntOutcome.Run(currentState, currentParameters, physicsParams),
                     GameplayNextState.KickOrPuntReturnOutcome => KickOrPuntReturnOutcome.Run(currentState, currentParameters, physicsParams),
+                    GameplayNextState.FumbleOrInterceptionReturnOutcome => FumbleOrInterceptionReturnOutcome.Run(currentState, currentParameters, physicsParams),
                     GameplayNextState.OnsideKickAttemptOutcome => OnsideKickAttemptOutcome.Run(currentState, currentParameters, physicsParams),
                     GameplayNextState.FieldGoalsAndExtraPointAttemptOutcome => FieldGoalAttemptOutcome.Run(currentState, currentParameters, physicsParams),
                     GameplayNextState.TwoPointConversionAttemptOutcome => TwoPointConversionAttemptOutcome.Run(currentState, currentParameters, physicsParams),
@@ -87,11 +93,17 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 {
                     Version = currentState.Version + 1
                 };
-
-                Log.Verbose("Advanced to next game state: {GameState}.", currentState.NextState);
             } while (currentState.NextState != GameplayNextState.PlayEvaluationComplete);
 
             Log.Verbose("Play evaluation complete, running post-play processing.");
+
+            if (nextPlay == NextPlayKind.FourthDown)
+            {
+                var converted = (currentState.NextPlay is NextPlayKind.FirstDown
+                    or NextPlayKind.ConversionAttempt)
+                    && currentState.TeamWithPossession == initialTeamWithPossession;
+                currentParameters.RecordFourthDownAttempt(initialTeamWithPossession, converted);
+            }
 
             // Game clock adjustment
             currentState = GameClockAdjuster.Adjust(currentState, currentParameters, physicsParams, gameRecord);
@@ -313,7 +325,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
 
                 // Step 3: For each new player added to replace injured players...
                 var udfaStrengthMultiplierMean = physicsParams["UDFAStrengthMultiplierMean"].Value;
-                var udfaStrengthMultiplierStdDev = physicsParams["UDFAStrengthMultiplierStdDev"].Value;
+                var udfaStrengthMultiplierStdDev = physicsParams["UDFAStrengthMultiplierStddev"].Value;
                 for (int j = 0; j < injuredPlayerCount; j++)
                 {
                     var udfaMultiplier = random.SampleNormalDistribution(udfaStrengthMultiplierMean, udfaStrengthMultiplierStdDev);

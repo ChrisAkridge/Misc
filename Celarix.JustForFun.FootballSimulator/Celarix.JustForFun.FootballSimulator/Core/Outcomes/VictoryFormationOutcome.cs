@@ -14,7 +14,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
-            Log.Verbose("Processing victory formation outcome.");
+            Log.Information("VictoryFormationOutcome: Taking victory formation.");
             return PlayerDownedFunction.Get(priorState,
                 parameters,
                 physicsParams,

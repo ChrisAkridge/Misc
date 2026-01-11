@@ -17,19 +17,19 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             var possessingTeamDisposition = parameters.GetDispositionForTeam(priorState.TeamWithPossession);
             if (possessingTeamDisposition == TeamDisposition.UltraConservative)
             {
-                Log.Verbose("TouchdownDecision: Team disposition is UltraConservative; opting for an extra point attempt.");
+                Log.Information("TouchdownDecision: Team disposition is UltraConservative; opting for an extra point attempt.");
                 return AttemptExtraPoint(priorState, parameters, physicsParams);
             }
             else if (possessingTeamDisposition is TeamDisposition.Insane or TeamDisposition.UltraInsane)
             {
-                Log.Verbose("TouchdownDecision: Team disposition is Insane or UltraInsane; opting for a two-point conversion attempt.");
+                Log.Information("TouchdownDecision: Team disposition is Insane or UltraInsane; opting for a two-point conversion attempt.");
                 return AttemptTwoPointConversion(priorState, parameters, physicsParams);
             }
 
             var automaticTwoPointAttemptChance = physicsParams["AutomaticTwoPointAttemptChance"].Value;
             if (parameters.Random.Chance(automaticTwoPointAttemptChance))
             {
-                Log.Verbose("TouchdownDecision: Random chance triggered automatic two-point conversion attempt.");
+                Log.Information("TouchdownDecision: Random chance triggered automatic two-point conversion attempt.");
                 return AttemptTwoPointConversion(priorState, parameters, physicsParams);
             }
 
@@ -38,10 +38,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             var attemptThreshold = physicsParams["TwoPointAttemptPointsPerMinuteThreshold"].Value;
             if (minutesLeftInGame < 0 && Math.Abs(scoreDifference) / minutesLeftInGame > attemptThreshold)
             {
-                Log.Verbose("TouchdownDecision: Score difference and time remaining thresholds met for two-point conversion attempt.");
+                Log.Information("TouchdownDecision: Score difference and time remaining thresholds met for two-point conversion attempt.");
                 return AttemptTwoPointConversion(priorState, parameters, physicsParams);
             }
-            Log.Verbose("TouchdownDecision: Defaulting to extra point attempt.");
+            Log.Information("TouchdownDecision: Defaulting to extra point attempt.");
             return AttemptExtraPoint(priorState, parameters, physicsParams);
         }
 
