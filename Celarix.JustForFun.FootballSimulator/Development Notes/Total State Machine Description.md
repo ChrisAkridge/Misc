@@ -62,7 +62,7 @@ If `CoinToss || CoinTossLoserReceives`, the current drive ends.
 	- **GameCompleted**: The game has completed. Go to **PostGame**.
 - **PostGame**: The game record is updated in the database. We set `Recovered` on all recovered injuries. Go to **WriteSummaryForGame**, unless this game was the season's Super Bowl, in which case go to **WriteSummaryForSeason**.
 - **WriteSummaryForGame**: Given the `TeamDriveRecords`, write a summary for the game to the database. If this step fails, we write a basic summary instead. Go to **PrepareForGame**.
-- **WriteSummaryForSeason**: Given a condensed list of game results for all 40 teams, write a summary for the season to the database, then mark the season as complete. If this step fails, we write a basic summary instead. Go to **PrepareForGame**.
+- **WriteSummaryForSeason**: Given a condensed list of game results for all 40 teams, write a summary for the season to the database, perform trades, handle retirements, then mark the season as complete. If this step fails, we write a basic summary instead. Go to **PrepareForGame**.
 - **Error**: An unrecoverable error has occurred at any point in any of the state machines. This is a terminal state. Any failure to read or write to the database causes this state immediately.
 
 ## The Game State Machine

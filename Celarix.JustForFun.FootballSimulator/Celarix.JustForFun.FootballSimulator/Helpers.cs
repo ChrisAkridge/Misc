@@ -239,5 +239,65 @@ namespace Celarix.JustForFun.FootballSimulator
             var temperatureStddev = physicsParams["StartTemperatureStddev"].Value;
             return random.SampleNormalDistribution(averageTemperatureThisMonth, temperatureStddev);
         }
+
+        public static TeamStrengthSet EstimateStrengthSetForTeam(Team team, Team requestingTeam,
+            GameRecord gameRecord,
+            IRandom random,
+            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        {
+            double[] strengths = [
+                team.RunningOffenseStrength,
+                team.RunningDefenseStrength,
+                team.PassingOffenseStrength,
+                team.PassingDefenseStrength,
+                team.OffensiveLineStrength,
+                team.DefensiveLineStrength,
+                team.KickingStrength,
+                team.FieldGoalStrength,
+                team.KickReturnStrength,
+                team.KickDefenseStrength,
+                team.ClockManagementStrength
+            ];
+
+            for (var i = 0; i < strengths.Length; i++)
+            {
+                var strengthRange = random.SampleNormalDistribution(physicsParams["StrengthEstimatorOffsetMean"].Value,
+                    physicsParams["StrengthEstimatorOffsetStddev"].Value);
+                strengthRange += team.Disposition switch
+                {
+                    TeamDisposition.UltraConservative => physicsParams["StrengthEstimatorUltraConservativeAdjustment"].Value,
+                    TeamDisposition.Conservative => physicsParams["StrengthEstimatorConservativeAdjustment"].Value,
+                    TeamDisposition.Insane => physicsParams["StrengthEstimatorInsaneAdjustment"].Value,
+                    TeamDisposition.UltraInsane => physicsParams["StrengthEstimatorUltraInsaneAdjustment"].Value,
+                    _ => throw new InvalidOperationException($"Team {team.TeamName} has invalid disposition {team.Disposition}.")
+                };
+                var rangeSample = random.NextDouble() * strengthRange;
+                var shouldAdjustDownward = random.Chance(0.5);
+                var strengthMultiplier = shouldAdjustDownward
+                    ? 1.0 - rangeSample
+                    : 1.0 + rangeSample;
+                strengths[i] *= strengthMultiplier;
+            }
+
+            return new TeamStrengthSet
+            {
+                IsEstimate = true,
+                Team = team.Equals(gameRecord.HomeTeam) ? GameTeam.Home : GameTeam.Away,
+                StrengthSetKind = team.Equals(requestingTeam)
+                    ? StrengthSetKind.TeamOfItself
+                    : StrengthSetKind.TeamOfOpponent,
+                RunningOffenseStrength = strengths[0],
+                RunningDefenseStrength = strengths[1],
+                PassingOffenseStrength = strengths[2],
+                PassingDefenseStrength = strengths[3],
+                OffensiveLineStrength = strengths[4],
+                DefensiveLineStrength = strengths[5],
+                KickingStrength = strengths[6],
+                FieldGoalStrength = strengths[7],
+                KickReturnStrength = strengths[8],
+                KickDefenseStrength = strengths[9],
+                ClockManagementStrength = strengths[10]
+            };
+        }
     }
 }

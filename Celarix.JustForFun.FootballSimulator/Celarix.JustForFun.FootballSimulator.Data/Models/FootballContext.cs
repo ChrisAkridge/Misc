@@ -24,6 +24,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         public DbSet<PhysicsParam> PhysicsParams { get; set; }
         public DbSet<Summary> Summaries { get; set; }
         public DbSet<TeamPlayoffSeed> TeamPlayoffSeeds { get; set; }
+        public DbSet<InjuryRecovery> InjuryRecoveries { get; set; }
 
         public FootballContext()
         {
