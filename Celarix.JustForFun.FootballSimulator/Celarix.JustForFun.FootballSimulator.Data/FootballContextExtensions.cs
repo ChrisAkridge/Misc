@@ -86,5 +86,56 @@ namespace Celarix.JustForFun.FootballSimulator.Data
                 return player;
             }
         }
+
+        extension(GameRecord game)
+        {
+            public int GetScoreForTeam(GameTeam team)
+            {
+                var quarterBoxScoresForTeam = game.QuarterBoxScores
+                    .Where(qbs => qbs.Team == team);
+                return quarterBoxScoresForTeam.Sum(qbs => qbs.Score);
+            }
+
+            public GameTeam? GetWinningTeam()
+            {
+                var homeScore = GetScoreForTeam(game, GameTeam.Home);
+                var awayScore = GetScoreForTeam(game, GameTeam.Away);
+                if (homeScore > awayScore)
+                {
+                    return GameTeam.Home;
+                }
+                else if (awayScore > homeScore)
+                {
+                    return GameTeam.Away;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        extension(Team team)
+        {
+            public string GetStrengthJson()
+            {
+                var strengths = new
+                {
+                    team.RunningOffenseStrength,
+                    team.RunningDefenseStrength,
+                    team.PassingOffenseStrength,
+                    team.PassingDefenseStrength,
+                    team.OffensiveLineStrength,
+                    team.DefensiveLineStrength,
+                    team.KickingStrength,
+                    team.FieldGoalStrength,
+                    team.KickReturnStrength,
+                    team.KickDefenseStrength,
+                    team.ClockManagementStrength
+                };
+
+                return System.Text.Json.JsonSerializer.Serialize(strengths);
+            }
+        }
     }
 }

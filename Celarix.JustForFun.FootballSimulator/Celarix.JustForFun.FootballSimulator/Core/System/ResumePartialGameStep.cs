@@ -1,0 +1,294 @@
+﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
+using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Random;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Text;
+
+namespace Celarix.JustForFun.FootballSimulator.Core.System
+{
+    internal static class ResumePartialGameStep
+    {
+        public static SystemContext Run(SystemContext context)
+        {
+            var footballContext = context.Environment.FootballContext;
+            var physicsParams = footballContext.PhysicsParams
+                .ToDictionary(p => p.Name, p => p);
+            var random = context.Environment.RandomFactory.Create();
+            var gameRecord = footballContext.GameRecords
+                .Include(g => g.Stadium)
+                .Include(g => g.TeamDriveRecords)
+                .Single(g => !g.GameComplete && g.TeamDriveRecords.Count > 0);
+
+            var airTemperature = Helpers.GetTemperatureForGame(gameRecord, physicsParams, random);
+            var resumingPlayContext = Helpers.CreateInitialPlayContext(random,
+                gameRecord,
+                physicsParams["StartWindSpeedStddev"].Value,
+                airTemperature);
+            Log.Information("ResumePartialGameStep: Initialized base wind direction to {WindDirection} degrees (0 = toward home, 180 = toward away).", resumingPlayContext.BaseWindDirection);
+            Log.Information("ResumePartialGameStep: Initialized base wind speed to {WindSpeed} mph.", resumingPlayContext.BaseWindSpeed);
+            resumingPlayContext = SetupClockForPartialGame(resumingPlayContext, gameRecord);
+            resumingPlayContext = SetupScoreForPartialGame(resumingPlayContext, gameRecord);
+            resumingPlayContext = SetupNextPlayAndNextStateForPartiallyCompletedGame(resumingPlayContext, gameRecord);
+
+            // We only write completed drives to the database, so the possessing team is the team
+            // that DIDN'T have possession on the last drive.
+            resumingPlayContext = resumingPlayContext with
+            {
+                TeamWithPossession = gameRecord.TeamDriveRecords.Last().Team.Equals(gameRecord.HomeTeam)
+                    ? GameTeam.Away
+                    : GameTeam.Home
+            };
+
+            var playEnvironment = new PlayEnvironment
+            {
+                DecisionParameters = new GameDecisionParameters
+                {
+                    Random = random,
+                    AwayTeam = gameRecord.AwayTeam,
+                    HomeTeam = gameRecord.HomeTeam,
+                    GameType = gameRecord.GameType,
+                    AwayTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(gameRecord.AwayTeam, GameTeam.Away),
+                    HomeTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(gameRecord.HomeTeam, GameTeam.Home),
+                    AwayTeamEstimateOfAway = EstimateStrengthSetForTeam(gameRecord.AwayTeam, gameRecord.AwayTeam, gameRecord, random, physicsParams),
+                    AwayTeamEstimateOfHome = EstimateStrengthSetForTeam(gameRecord.HomeTeam, gameRecord.AwayTeam, gameRecord, random, physicsParams),
+                    HomeTeamEstimateOfAway = EstimateStrengthSetForTeam(gameRecord.AwayTeam, gameRecord.HomeTeam, gameRecord, random, physicsParams),
+                    HomeTeamEstimateOfHome = EstimateStrengthSetForTeam(gameRecord.HomeTeam, gameRecord.HomeTeam, gameRecord, random, physicsParams),
+                },
+                PhysicsParams = physicsParams
+            };
+            resumingPlayContext = resumingPlayContext with
+            {
+                Environment = playEnvironment
+            };
+
+            context.Environment.CurrentGameRecord = gameRecord;
+            context.Environment.CurrentGameContext = new GameContext(
+                Version: 0L,
+                NextState: GameState.Start,
+                Environment: new GameEnvironment
+                {
+                    PhysicsParams = physicsParams,
+                    CurrentPlayContext = resumingPlayContext
+                });
+
+            Log.Information("ResumePartialGameStep: Resumed partial game {GameID}.",
+                gameRecord.GameID);
+            return context.WithNextState(SystemState.InGame);
+        }
+
+        internal static PlayContext SetupClockForPartialGame(PlayContext playContext, GameRecord gameRecord)
+        {
+            var drivesByQuarter = gameRecord.TeamDriveRecords
+                .GroupBy(d => d.QuarterNumber)
+                .ToDictionary(g => g.Key, g => g.ToArray());
+
+            // Sanity check: the sum of durations of all drives in the second quarter, fourth quarter, or
+            // any overtime period n % 2 == 1 cannot exceed 15 minutes
+            foreach (var quarterDrives in drivesByQuarter.Where(kvp => kvp.Key % 2 == 1))
+            {
+                var quarterNumber = quarterDrives.Key;
+                var drives = quarterDrives.Value;
+                var totalDriveDuration = drives.Sum(d => d.DriveDurationSeconds);
+                var maximumAllowedDuration = quarterNumber <= 4
+                    ? Constants.SecondsPerQuarter
+                    : Constants.SecondsPerOvertimePeriod;
+                if (totalDriveDuration > maximumAllowedDuration)
+                {
+                    throw new InvalidOperationException(
+                        $"Total drive duration {totalDriveDuration} in quarter {quarterNumber} exceeds maximum allowed {maximumAllowedDuration} (game ID {gameRecord.GameID}.");
+                }
+            }
+
+            var totalDurationOfAllDrives = gameRecord.TeamDriveRecords.Sum(d => d.DriveDurationSeconds);
+            int secondsIntoPeriod;
+            int periodNumber;
+
+            if (totalDurationOfAllDrives <= Constants.SecondsPerQuarter * 4)
+            {
+                periodNumber = (totalDurationOfAllDrives / Constants.SecondsPerQuarter) + 1;
+                secondsIntoPeriod = totalDurationOfAllDrives % Constants.SecondsPerQuarter;
+            }
+            else
+            {
+                var overtimeDuration = totalDurationOfAllDrives - (Constants.SecondsPerQuarter * 4);
+                periodNumber = 4 + (overtimeDuration / Constants.SecondsPerOvertimePeriod) + 1;
+                secondsIntoPeriod = overtimeDuration % Constants.SecondsPerOvertimePeriod;
+            }
+
+            int secondsRemainingInPeriod = (periodNumber <= 4
+                ? Constants.SecondsPerQuarter
+                : Constants.SecondsPerOvertimePeriod) - secondsIntoPeriod;
+            Log.Information("ResumePartialGameStep: Resuming game {GameID} from period {PeriodNumber} with {SecondsRemaining} seconds remaining in period.",
+                gameRecord.GameID, periodNumber, secondsRemainingInPeriod);
+            return playContext with
+            {
+                PeriodNumber = periodNumber,
+                SecondsLeftInPeriod = secondsRemainingInPeriod
+            };
+        }
+
+        internal static PlayContext SetupScoreForPartialGame(PlayContext playContext, GameRecord gameRecord)
+        {
+            DriveResult[] scoringDriveResults = [
+                DriveResult.FieldGoalSuccess,
+                DriveResult.TouchdownNoXP,
+                DriveResult.TouchdownWithXP,
+                DriveResult.TouchdownWithTwoPointConversion,
+                DriveResult.TouchdownWithOffensiveSafety
+            ];
+
+            int homeTeamScore = 0;
+            int awayTeamScore = 0;
+
+            foreach (var drive in gameRecord.TeamDriveRecords.Where(r => scoringDriveResults.Contains(r.Result)))
+            {
+                var scoringTeam = drive.Team.Equals(gameRecord.HomeTeam) ? GameTeam.Home : GameTeam.Away;
+                var otherTeam = scoringTeam == GameTeam.Home ? GameTeam.Away : GameTeam.Home;
+                var scoringTeamScore = drive.Result switch
+                {
+                    DriveResult.Safety => 0,
+                    DriveResult.FieldGoalSuccess => 3,
+                    DriveResult.TouchdownNoXP => 6,
+                    DriveResult.TouchdownWithXP => 7,
+                    DriveResult.TouchdownWithTwoPointConversion => 8,
+                    DriveResult.TouchdownWithOffensiveSafety => 6,
+                    DriveResult.TouchdownWithDefensiveScore => 6,
+                    _ => throw new InvalidOperationException("Impossible code path; got non-scoring drive despite filtering them out.")
+                };
+                var otherTeamScore = drive.Result switch
+                {
+                    DriveResult.Safety => 2,
+                    DriveResult.TouchdownWithOffensiveSafety => 1,
+                    DriveResult.TouchdownWithDefensiveScore => 2,
+                    _ => 0
+                };
+
+                homeTeamScore += scoringTeam == GameTeam.Home ? scoringTeamScore : otherTeamScore;
+                awayTeamScore += scoringTeam == GameTeam.Away ? scoringTeamScore : otherTeamScore;
+            }
+
+            Log.Information("ResumePartialGameStep: Resuming game {GameID} with score {AwayAbbreviation} {AwayTeamScore} @ {HomeTeamScore} {HomeAbbreviation}.",
+                gameRecord.GameID,
+                gameRecord.AwayTeam.Abbreviation,
+                awayTeamScore,
+                homeTeamScore,
+                gameRecord.HomeTeam.Abbreviation);
+            return playContext with
+            {
+                HomeScore = homeTeamScore,
+                AwayScore = awayTeamScore
+            };
+        }
+
+        internal static PlayContext SetupNextPlayAndNextStateForPartiallyCompletedGame(PlayContext playContext, GameRecord gameRecord)
+        {
+            var lastDrive = gameRecord.TeamDriveRecords.Last();
+
+            // Drive results that would be a first down for the team receiving possession
+            if (lastDrive.Result is DriveResult.FieldGoalMiss or
+                DriveResult.FumbleLost or
+                DriveResult.Interception or
+                DriveResult.Punt or
+                DriveResult.Safety or
+                DriveResult.TurnoverOnDowns)
+            {
+                Log.Information("ResumePartialGameStep: Resuming game {GameID} with next play kind FirstDown after defensive change of possession.",
+                    gameRecord.GameID);
+                // Kind of a hacky way to actually kick off the main loop.
+                return playContext.WithFirstDownLineOfScrimmage(playContext.TeamYardToInternalYard(playContext.TeamWithPossession, 25),
+                    playContext.TeamWithPossession,
+                    "Resuming game. {OffAbbr} has first down at their own 25.",
+                    startOfDrive: true)
+                    .WithNextState(PlayEvaluationState.MainGameDecision);
+            }
+
+            var nextPlayKind = lastDrive.Result switch
+            {
+                DriveResult.FieldGoalSuccess => NextPlayKind.Kickoff,
+                DriveResult.TouchdownNoXP => NextPlayKind.Kickoff,
+                DriveResult.TouchdownWithXP => NextPlayKind.Kickoff,
+                DriveResult.TouchdownWithTwoPointConversion => NextPlayKind.Kickoff,
+                DriveResult.TouchdownWithOffensiveSafety => NextPlayKind.Kickoff,
+                DriveResult.TouchdownWithDefensiveScore => NextPlayKind.Kickoff,
+                DriveResult.Safety => NextPlayKind.FreeKick,
+                DriveResult.EndOfHalf => NextPlayKind.Kickoff,
+                _ => throw new InvalidOperationException("Impossible code path; got unknown drive result.")
+            };
+
+            var nextState = nextPlayKind == NextPlayKind.Kickoff
+                ? PlayEvaluationState.KickoffDecision
+                : PlayEvaluationState.FreeKickDecision;
+
+            Log.Information("ResumePartialGameStep: Resuming game {GameID} with next play kind {NextPlayKind}.",
+                gameRecord.GameID, nextPlayKind);
+            return playContext.WithNextState(nextState) with
+            {
+                NextPlay = nextPlayKind
+            };
+        }
+
+        internal static TeamStrengthSet EstimateStrengthSetForTeam(Team team, Team requestingTeam,
+            GameRecord gameRecord,
+            IRandom random,
+            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        {
+            double[] strengths = [
+                team.RunningOffenseStrength,
+                team.RunningDefenseStrength,
+                team.PassingOffenseStrength,
+                team.PassingDefenseStrength,
+                team.OffensiveLineStrength,
+                team.DefensiveLineStrength,
+                team.KickingStrength,
+                team.FieldGoalStrength,
+                team.KickReturnStrength,
+                team.KickDefenseStrength,
+                team.ClockManagementStrength
+            ];
+
+            for (var i = 0; i < strengths.Length; i++)
+            {
+                var strengthRange = random.SampleNormalDistribution(physicsParams["StrengthEstimatorOffsetMean"].Value,
+                    physicsParams["StrengthEstimatorOffsetStddev"].Value);
+                strengthRange += team.Disposition switch
+                {
+                    TeamDisposition.UltraConservative => physicsParams["StrengthEstimatorUltraConservativeAdjustment"].Value,
+                    TeamDisposition.Conservative => physicsParams["StrengthEstimatorConservativeAdjustment"].Value,
+                    TeamDisposition.Insane => physicsParams["StrengthEstimatorInsaneAdjustment"].Value,
+                    TeamDisposition.UltraInsane => physicsParams["StrengthEstimatorUltraInsaneAdjustment"].Value,
+                    _ => throw new InvalidOperationException($"Team {team.TeamName} has invalid disposition {team.Disposition}.")
+                };
+                var rangeSample = random.NextDouble() * strengthRange;
+                var shouldAdjustDownward = random.Chance(0.5);
+                var strengthMultiplier = shouldAdjustDownward
+                    ? 1.0 - rangeSample
+                    : 1.0 + rangeSample;
+                strengths[i] *= strengthMultiplier;
+            }
+
+            return new TeamStrengthSet
+            {
+                IsEstimate = true,
+                Team = team.Equals(gameRecord.HomeTeam) ? GameTeam.Home : GameTeam.Away,
+                StrengthSetKind = team.Equals(requestingTeam)
+                    ? StrengthSetKind.TeamOfItself
+                    : StrengthSetKind.TeamOfOpponent,
+                RunningOffenseStrength = strengths[0],
+                RunningDefenseStrength = strengths[1],
+                PassingOffenseStrength = strengths[2],
+                PassingDefenseStrength = strengths[3],
+                OffensiveLineStrength = strengths[4],
+                DefensiveLineStrength = strengths[5],
+                KickingStrength = strengths[6],
+                FieldGoalStrength = strengths[7],
+                KickReturnStrength = strengths[8],
+                KickDefenseStrength = strengths[9],
+                ClockManagementStrength = strengths[10]
+            };
+        }
+    }
+}

@@ -12,7 +12,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
 {
     internal static class MainGameDecision
     {
-        public static GameState Run(GameState priorState,
+        public static PlayContext Run(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
@@ -29,7 +29,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 {
                     Log.Verbose("Hail, Mary, full of grace, the Lord is with thee. Blessed art thou amongst women and blessed is the fruit of thy womb, Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.");
                 }
-                return priorState.WithNextState(GameplayNextState.HailMaryOutcome);
+                return priorState.WithNextState(PlayEvaluationState.HailMaryOutcome);
             }
 
             var isFakePlay = priorState.GetAdditionalParameterOrDefault<bool?>("IsFakePlay") == true;
@@ -74,7 +74,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
         }
 
         #region Outer Logic
-        internal static GameState ClockRunningOnTwoMinuteDrill(GameState priorState,
+        internal static PlayContext ClockRunningOnTwoMinuteDrill(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams,
             double adjustedPassingEstimate,
@@ -107,7 +107,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 priorState.NextPlay == NextPlayKind.ConversionAttempt ? self : null);
         }
 
-        internal static GameState FourthDown(GameState priorState,
+        internal static PlayContext FourthDown(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams,
             double adjustedPassingEstimate,
@@ -135,7 +135,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
         }
 
-        private static bool GoForItOnFourthDown(GameState priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, GameTeam self, GameTeam opponent)
+        private static bool GoForItOnFourthDown(PlayContext priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, GameTeam self, GameTeam opponent)
         {
             double desireToGoForIt = 1.0;
             double desireToNotGoForIt = 1.0;
@@ -150,7 +150,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             return goForIt;
         }
         
-        internal static double GetFourthDownAntiDesireMultiplier_FieldGoalRange(GameState priorState,
+        internal static double GetFourthDownAntiDesireMultiplier_FieldGoalRange(PlayContext priorState,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams,
             GameTeam opponent)
         {
@@ -162,7 +162,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             return 1;
         }
 
-        internal static double GetFourthDownDesireMultiplier_TrailingCloseToEnd(GameState priorState,
+        internal static double GetFourthDownDesireMultiplier_TrailingCloseToEnd(PlayContext priorState,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams,
             GameTeam self)
         {
@@ -177,7 +177,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             return 1;
         }
 
-        internal static double GetFourthDownDesireMultiplier_DistanceToGo(GameState priorState,
+        internal static double GetFourthDownDesireMultiplier_DistanceToGo(PlayContext priorState,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
             var desirabilityThresholdGamma = physicsParams["FourthDownDistanceToGoThreshold"].Value;
@@ -204,19 +204,19 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             return 1;
         }
 
-        private static GameState QBSneakOrRunCore(GameState priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, double adjustedPassingEstimate)
+        private static PlayContext QBSneakOrRunCore(PlayContext priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, double adjustedPassingEstimate)
         {
             var qbSneakDistance = physicsParams["FourthDownQBSneakDistanceThreshold"].Value;
             if (priorState.DistanceToGo() <= qbSneakDistance)
             {
                 Log.Information("MainGameDecision: Going for it on fourth down with a QB sneak!");
-                return priorState.WithNextState(GameplayNextState.QBSneakOutcome);
+                return priorState.WithNextState(PlayEvaluationState.QBSneakOutcome);
             }
             Log.Information("MainGameDecision: Going for it on fourth down with a standard play!");
             return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
         }
 
-        private static GameState FakeOrRealFieldGoal(GameState priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, double estimatedStrengthRatio)
+        private static PlayContext FakeOrRealFieldGoal(PlayContext priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, double estimatedStrengthRatio)
         {
             var fakeFieldGoalThreshold = physicsParams["FourthDownFakeFGStrengthThreshold"].Value;
             if (estimatedStrengthRatio >= fakeFieldGoalThreshold)
@@ -225,14 +225,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 if (parameters.Random.Chance(selectionChance))
                 {
                     Log.Information("MainGameDecision: Attempting a fake field goal on fourth down!");
-                    return priorState.WithNextState(GameplayNextState.FakeFieldGoalOutcome);
+                    return priorState.WithNextState(PlayEvaluationState.FakeFieldGoalOutcome);
                 }
             }
             Log.Information("MainGameDecision: Attempting a field goal on fourth down.");
             return FieldGoalAttemptOutcome.Run(priorState, parameters, physicsParams);
         }
 
-        private static GameState FakeOrRealPunt(GameState priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, double estimatedStrengthRatio)
+        private static PlayContext FakeOrRealPunt(PlayContext priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, double estimatedStrengthRatio)
         {
             var fakePuntThreshold = physicsParams["FourthDownFakePuntStrengthThreshold"].Value;
             if (estimatedStrengthRatio >= fakePuntThreshold)
@@ -241,14 +241,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 if (parameters.Random.Chance(selectionChance))
                 {
                     Log.Information("MainGameDecision: Attempting a fake punt on fourth down!");
-                    return priorState.WithNextState(GameplayNextState.FakePuntOutcome);
+                    return priorState.WithNextState(PlayEvaluationState.FakePuntOutcome);
                 }
             }
             Log.Information("MainGameDecision: Punting on fourth down.");
-            return priorState.WithNextState(GameplayNextState.PuntOutcome);
+            return priorState.WithNextState(PlayEvaluationState.PuntOutcome);
         }
 
-        internal static GameState? Overtime(GameState priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, GameTeam self, double adjustedPassingEstimate)
+        internal static PlayContext? Overtime(PlayContext priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, GameTeam self, double adjustedPassingEstimate)
         {
             if (parameters.GameType == GameType.Postseason)
             {
@@ -292,7 +292,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
         #endregion
 
         #region Inner Logic
-        internal static GameState RunCore(GameState priorState,
+        internal static PlayContext RunCore(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams,
             double adjustedSelfPassingStrength)
@@ -317,10 +317,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             }
 
             Log.Information("MainGameDecision: Selected a rushing play.");
-            return priorState.WithNextState(GameplayNextState.StandardRushingPlayOutcome);
+            return priorState.WithNextState(PlayEvaluationState.StandardRushingPlayOutcome);
         }
 
-        internal static GameState PassingPlay(GameState priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, GameTeam self, GameTeam opponent, bool isFakePlay)
+        internal static PlayContext PassingPlay(PlayContext priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, GameTeam self, GameTeam opponent, bool isFakePlay)
         {
             if (priorState.TotalSecondsLeftInGame() < 10 &&
                                 (priorState.PeriodNumber == 4 || parameters.GameType != GameType.Postseason))
@@ -332,12 +332,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             if (selfDisposition == TeamDisposition.UltraConservative)
             {
                 Log.Information("MainGameDecision: Ultra-conservative team disposition, opting for a short pass.");
-                return priorState.WithNextState(GameplayNextState.StandardShortPassingPlayOutcome);
+                return priorState.WithNextState(PlayEvaluationState.StandardShortPassingPlayOutcome);
             }
             else if (selfDisposition == TeamDisposition.Insane)
             {
                 Log.Information("MainGameDecision: Insane team disposition, opting for a long pass.");
-                return priorState.WithNextState(GameplayNextState.StandardLongPassingPlayOutcome);
+                return priorState.WithNextState(PlayEvaluationState.StandardLongPassingPlayOutcome);
             }
 
             var shortPassChance = physicsParams["ConservativePassShortChance"].Value;
@@ -348,19 +348,19 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             if (nextDouble < shortPassChance)
             {
                 Log.Information("MainGameDecision: Conservative team disposition, selected a short pass.");
-                return priorState.WithNextState(GameplayNextState.StandardShortPassingPlayOutcome);
+                return priorState.WithNextState(PlayEvaluationState.StandardShortPassingPlayOutcome);
             }
             else if (nextDouble < mediumPassChance)
             {
                 Log.Information("MainGameDecision: Conservative team disposition, selected a medium pass.");
-                return priorState.WithNextState(GameplayNextState.StandardMediumPassingPlayOutcome);
+                return priorState.WithNextState(PlayEvaluationState.StandardMediumPassingPlayOutcome);
             }
 
             Log.Information("MainGameDecision: Conservative team disposition, selected a long pass.");
-            return priorState.WithNextState(GameplayNextState.StandardLongPassingPlayOutcome);
+            return priorState.WithNextState(PlayEvaluationState.StandardLongPassingPlayOutcome);
         }
 
-        internal static GameState PassingVeryCloseToEndOfGame(GameState priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, GameTeam opponent, bool isFakePlay)
+        internal static PlayContext PassingVeryCloseToEndOfGame(PlayContext priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, GameTeam opponent, bool isFakePlay)
         {
             if (!isFakePlay && InFieldGoalRange(priorState, physicsParams, opponent) && CanAttemptFieldGoal(priorState))
             {
@@ -368,12 +368,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 return FieldGoalAttemptOutcome.Run(priorState, parameters, physicsParams);
             }
             Log.Information("MainGameDecision: Late-game passing play but not in field goal range, attempting Hail Mary.");
-            return priorState.WithNextState(GameplayNextState.HailMaryOutcome);
+            return priorState.WithNextState(PlayEvaluationState.HailMaryOutcome);
         }
         #endregion
 
         #region Helpers
-        internal static bool InFieldGoalRange(GameState priorState, IReadOnlyDictionary<string, PhysicsParam> physicsParams, GameTeam opponent)
+        internal static bool InFieldGoalRange(PlayContext priorState, IReadOnlyDictionary<string, PhysicsParam> physicsParams, GameTeam opponent)
         {
             bool inFieldGoalRange;
             var lineOfScrimmageTeamYard = priorState.InternalYardToTeamYard(priorState.LineOfScrimmage);
@@ -392,7 +392,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
         /// <returns>
         /// True if a field goal may be attempted from the current state; otherwise false.
         /// </returns>
-        internal static bool CanAttemptFieldGoal(GameState gameState)
+        internal static bool CanAttemptFieldGoal(PlayContext gameState)
         {
             if (gameState.NextPlay == NextPlayKind.ConversionAttempt)
             {

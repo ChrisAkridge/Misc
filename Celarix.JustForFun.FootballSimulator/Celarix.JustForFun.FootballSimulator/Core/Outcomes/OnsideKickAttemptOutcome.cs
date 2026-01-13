@@ -9,7 +9,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class OnsideKickAttemptOutcome
     {
-        public static GameState Run(GameState priorState,
+        public static PlayContext Run(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
@@ -51,11 +51,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             {
                 Log.Information("OnsideKickAttemptOutcome: Kicking team recovers own onside kick.");
                 return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, priorState.TeamWithPossession,
-                    "{OffAbbr} recovers the onside kick at {LoS}!", clockRunning: false);
+                    "{OffAbbr} recovers the onside kick at {LoS}!", clockRunning: false, startOfDrive: true);
             }
             Log.Information("OnsideKickAttemptOutcome: Receiving team recovers onside kick.");
             return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, priorState.TeamWithPossession.Opponent(),
-                "{OffAbbr} recovers the onside kick of {DefAbbr} at {LoS}!", clockRunning: false);
+                "{OffAbbr} recovers the onside kick of {DefAbbr} at {LoS}!", clockRunning: false, startOfDrive: true);
         }
     }
 }

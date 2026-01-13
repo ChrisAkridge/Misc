@@ -10,7 +10,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
 {
     internal static class TouchdownDecision
     {
-        public static GameState Run(GameState priorState,
+        public static PlayContext Run(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
@@ -45,9 +45,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             return AttemptExtraPoint(priorState, parameters, physicsParams);
         }
 
-        private static GameState AttemptTwoPointConversion(GameState priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        private static PlayContext AttemptTwoPointConversion(PlayContext priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
-            return priorState.WithNextState(GameplayNextState.TwoPointConversionAttemptOutcome) with
+            return priorState.WithNextState(PlayEvaluationState.TwoPointConversionAttemptOutcome) with
             {
                 LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 2),
                 NextPlay = NextPlayKind.ConversionAttempt,
@@ -55,9 +55,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             };
         }
 
-        private static GameState AttemptExtraPoint(GameState priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        private static PlayContext AttemptExtraPoint(PlayContext priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
-            return priorState.WithNextState(GameplayNextState.FieldGoalsAndExtraPointAttemptOutcome) with
+            return priorState.WithNextState(PlayEvaluationState.FieldGoalsAndExtraPointAttemptOutcome) with
             {
                 LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 15),
                 NextPlay = NextPlayKind.ConversionAttempt,

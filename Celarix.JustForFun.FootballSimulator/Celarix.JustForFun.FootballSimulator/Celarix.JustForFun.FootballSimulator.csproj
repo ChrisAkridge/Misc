@@ -18,8 +18,4 @@
     <ProjectReference Include="..\Celarix.JustForFun.FootballSimulator.Data\Celarix.JustForFun.FootballSimulator.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Core\System\" />
-  </ItemGroup>
-
 </Project>

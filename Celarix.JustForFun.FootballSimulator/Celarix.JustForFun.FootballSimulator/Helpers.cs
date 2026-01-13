@@ -1,10 +1,14 @@
-﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
+﻿using Celarix.JustForFun.FootballSimulator.Core;
+using Celarix.JustForFun.FootballSimulator.Data;
+using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Random;
 using Celarix.JustForFun.FootballSimulator.Scheduling;
 using MathNet.Numerics.Distributions;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,6 +47,47 @@ namespace Celarix.JustForFun.FootballSimulator
             }
 
             return rankings;
+        }
+
+        public static Dictionary<BasicTeamInfo, TeamWinLossTie> GetWinLossTies(IReadOnlyList<BasicTeamInfo> teams,
+            IEnumerable<GameRecord> gameRecords)
+        {
+            var games = gameRecords
+                .Where(g => g.GameComplete)
+                .Select(g => new
+                {
+                    HomeTeam = new BasicTeamInfo(g.HomeTeam.TeamName, g.HomeTeam.Conference, g.HomeTeam.Division),
+                    AwayTeam = new BasicTeamInfo(g.AwayTeam.TeamName, g.AwayTeam.Conference, g.AwayTeam.Division),
+                    HomeScore = g.GetScoreForTeam(GameTeam.Home),
+                    AwayScore = g.GetScoreForTeam(GameTeam.Away)
+                })
+                .ToList();
+            var winLossTies = teams.ToDictionary(t => t, t => new TeamWinLossTie());
+            foreach (var game in games)
+            {
+                if (game.HomeScore > game.AwayScore)
+                {
+                    winLossTies[game.HomeTeam].Wins++;
+                    winLossTies[game.AwayTeam].Losses++;
+                }
+                else if (game.HomeScore < game.AwayScore)
+                {
+                    winLossTies[game.AwayTeam].Wins++;
+                    winLossTies[game.HomeTeam].Losses++;
+                }
+                else
+                {
+                    winLossTies[game.HomeTeam].Ties++;
+                    winLossTies[game.AwayTeam].Ties++;
+                }
+            }
+            return winLossTies;
+        }
+
+        public static Dictionary<BasicTeamInfo, int> GetSeasonDivisionRankings(IReadOnlyList<BasicTeamInfo> teams,
+            IReadOnlyList<GameRecord> seasonGames)
+        {
+            var winLossTies = GetWinLossTies(teams, seasonGames.Where(g => g.GameType == GameType.RegularSeason));
         }
 
         public static IEnumerable<BasicTeamInfo> GetTeamsInDivision(IEnumerable<BasicTeamInfo> teams, Conference conference, Division division) =>
@@ -129,6 +174,70 @@ namespace Celarix.JustForFun.FootballSimulator
                 GameTeam.Home => startYard + addend,
                 _ => throw new ArgumentOutOfRangeException(nameof(team), $"Unhandled team value: {team}")
             };
+        }
+
+        public static PlayContext CreateInitialPlayContext(IRandom random,
+            GameRecord gameRecord,
+            double startWindSpeedStddev,
+            double airTemperature)
+        {
+            return new PlayContext(
+                Version: 0L,
+                NextState: PlayEvaluationState.Start,
+                Environment: null,
+                StateHistory: ImmutableList<StateHistoryEntry>.Empty,
+                AdditionalParameters: ImmutableList<AdditionalParameter<object>>.Empty,
+                BaseWindDirection: random.NextDouble() * 360d,
+                BaseWindSpeed: random.SampleNormalDistribution(gameRecord.Stadium.AverageWindSpeed, startWindSpeedStddev),
+                AirTemperature: airTemperature,
+                CoinFlipWinner: GameTeam.Home,
+                TeamWithPossession: GameTeam.Home,
+                AwayScore: 0,
+                HomeScore: 0,
+                PeriodNumber: 1,
+                SecondsLeftInPeriod: Constants.SecondsPerQuarter,
+                ClockRunning: false,
+                HomeTimeoutsRemaining: 3,
+                AwayTimeoutsRemaining: 3,
+                LineOfScrimmage: 50,
+                LineToGain: null,
+                NextPlay: NextPlayKind.Kickoff,
+                DriveStartingFieldPosition: 50,
+                DriveStartingPeriodNumber: 1,
+                DriveStartingSecondsLeftInPeriod: Constants.SecondsPerQuarter,
+                LastPlayDescriptionTemplate: "Gameplay loop initializing.",
+                PossessionOnPlay: PossessionOnPlay.None,
+                TeamCallingTimeout: null);
+        }
+
+        public static double GetTemperatureForGame(GameRecord gameRecord,
+            IReadOnlyDictionary<string, PhysicsParam> physicsParams,
+            IRandom random)
+        {
+            var stadium = gameRecord.Stadium;
+            var month = gameRecord.KickoffTime.Month;
+            var averageTemperatures = stadium.AverageTemperatures
+                .Split(',')
+                .Select(double.Parse);
+            double averageTemperatureThisMonth;
+            if (month >= 8)
+            {
+                // Indexes 0-4 correspond to August-December
+                averageTemperatureThisMonth = averageTemperatures.ElementAt(month - 8);
+            }
+            else if (month <= 2)
+            {
+                // Indexes 5-6 correspond to January-February
+                averageTemperatureThisMonth = averageTemperatures.ElementAt(month + 4);
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    $"Invalid kickoff month {month} for game ID {gameRecord.GameID}.");
+            }
+
+            var temperatureStddev = physicsParams["StartTemperatureStddev"].Value;
+            return random.SampleNormalDistribution(averageTemperatureThisMonth, temperatureStddev);
         }
     }
 }

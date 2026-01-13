@@ -10,7 +10,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class ReturnableKickOutcome
     {
-        public static GameState Run(GameState priorState,
+        public static PlayContext Run(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
@@ -31,7 +31,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (parameters.Random.Chance(kickRecoveryChance))
             {
                 Log.Information("ReturnableKickOutcome: Kick recovered cleanly by receiving team.");
-                return priorState.WithNextState(GameplayNextState.SignalFairCatchDecision) with
+                return priorState.WithNextState(PlayEvaluationState.SignalFairCatchDecision) with
                 {
                     TeamWithPossession = receivingTeam,
                     LineOfScrimmage = kickActualYard,
@@ -42,7 +42,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             else
             {
                 Log.Information("ReturnableKickOutcome: Kick not recovered cleanly by receiving team; live ball.");
-                return priorState.WithNextState(GameplayNextState.FumbledLiveBallOutcome);
+                return priorState.WithNextState(PlayEvaluationState.FumbledLiveBallOutcome);
             }
         }
     }

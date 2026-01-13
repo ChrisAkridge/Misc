@@ -11,7 +11,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class StandardPassingPlayOutcome
     {
-        public static GameState Run(GameState priorState,
+        public static PlayContext Run(PlayContext priorState,
            GameDecisionParameters parameters,
            IReadOnlyDictionary<string, PhysicsParam> physicsParams,
            PassAttemptDistance distance)
@@ -82,7 +82,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (wasIntercepted)
             {
                 return priorState.WithAdditionalParameter<bool?>("WasIntercepted", true)
-                    .WithNextState(GameplayNextState.FumbledLiveBallOutcome)
+                    .WithNextState(PlayEvaluationState.FumbledLiveBallOutcome)
                 with
                 {
                     ClockRunning = true,
@@ -204,7 +204,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (yardsAfterCatch.WasFumbled)
             {
                 Log.Information("StandardPassingPlayOutcome: Fumble after a catch for {YardsGained}.", yardsAfterCatch.YardsGained);
-                return priorState.WithNextState(GameplayNextState.FumbledLiveBallOutcome);
+                return priorState.WithNextState(PlayEvaluationState.FumbledLiveBallOutcome);
             }
 
             int yardsPlusYAC = Math.Clamp(yardsGained + (yardsAfterCatch.YardsGained ?? 0),

@@ -39,24 +39,30 @@ If `CoinToss || CoinTossLoserReceives`, the current drive ends.
 ## The System State Machine
 
 - **Start**: The initial state, when the application is first launched. We first check if the database exists - if not, go to **InitializeDatabase**, if so, go to **PrepareForGame**.
-- **PrepareForGame**: Checks if we have an active season, and what state it's in:
-		- No season exists or all existing seasons are completed with full playoffs: Go to **InitializeNextSeason**.
+- **PrepareForGame**: Checks the game records in the database and goes to a state based on what is found:
+		- No season exists or all existing seasons are completed with full playoffs (15 games): Go to **InitializeNextSeason**.
 		- A season exists and is complete but has no summary: Go to **WriteSummaryForSeason**.
 		- There is one season with unplayed games (preseason, regular season, or playoffs): Go to **LoadGame**.
-		- There is one season with all preseason and regular season games played, but no playoff games exist: Go to **InitializePlayoffs**.
+		- There is one season with all preseason and regular season games played, but no playoff games exist: Go to **InitializeWildCardRound**.
+		- There is one season with all preseason and regular season games played along with exactly 8 completed playoff games: Go to **InitializeDivisionalRound**.
+		- There is one season with all preseason and regular season games played along with exactly 12 completed playoff games: Go to **InitializeConferenceChampionships**.
+		- There is one season with all preseason and regular season games played along with exactly 14 completed playoff games: Go to **InitializeSuperBowl**.
 		- There is a game record with some `TeamDriveRecord` rows but is not marked completed: Go to **ResumePartialGame**.
 		- There is a game marked complete but has no summary: Go to **WriteSummaryForGame**.
 - **InitializeDatabase**: Create the database file, add teams and stadiums, add initial rosters, then go to **InitializeNextSeason**.
 - **InitializeNextSeason**: Generate the preseason and regular season schedule for the next season. From an empty database, this is the 2014 season. Otherwise, find the highest season year in the database and add 1. Go to **LoadGame**.
-- **InitializePlayoffs**: Determine division standings (using tiebreakers when necessary) and seed each of the 5 division winners per conference as seeds 1-5. Pick 3 wild card teams from the remaining 30 teams (best 3 in each conference left). Create game records and save them, then go to **LoadGame**. See Appendix A: Playoffs for more details.
-- **ResumePartialGame**: Finds the one game that hasn't been completed and initializes the game state machine with the partial state. The `TeamDriveRecord` rows track their elapsed time, so set the game clock appropriately.
-- **LoadGame**: Finds the next game to play (the first unplayed game when the season's games are sorted by start time ascending), checks for any injury recoveries available and applies them, initializes the game state machine, and goes to **InGame**. If there are no games to play, go to either **InitializePlayoffs** or **InitializeNextSeason**.
+- **InitializeWildCardRound**: Determine division standings (using tiebreakers when necessary) and seed each of the 5 division winners per conference as seeds 1-5. Pick 3 wild card teams from the remaining 30 teams (best 3 in each conference left). Create game records and save them, then go to **LoadGame**. See Appendix A: Playoffs for more details.
+- **InitializeDivisionalRound**: Determine winners of the Wild Card games and create game records for the divisional round. Go to **LoadGame**.
+- **InitializeConferenceChampionships**: Determine winners of the Divisional Round games and create game records for the conference championships. Go to **LoadGame**.
+- **InitializeSuperBowl**: Determine winners of the Conference Championships and create a game record for the Super Bowl. Go to **LoadGame**.
+- **ResumePartialGame**: Finds the one game that hasn't been completed and initializes the game state machine with the partial state. The `TeamDriveRecord` rows track their elapsed time, so set the game clock appropriately. Go to **InGame**.
+- **LoadGame**: Finds the next game to play (the first unplayed game when the season's games are sorted by start time ascending), checks for any injury recoveries available and applies them, initializes the game state machine, and goes to **InGame**. If there are no games to play, go to **PrepareForGame**.
 - **InGame**: The game state machine is active here - the method that moves the system state machine to the next state calls the game state machine, which moves itself internally and then signals an outcome to the system loop. The outcomes are:
 	- **GameContinues**: The system state machine has no need to take action. Go to **InGame**.
 	- **GameCompleted**: The game has completed. Go to **PostGame**.
 - **PostGame**: The game record is updated in the database. We set `Recovered` on all recovered injuries. Go to **WriteSummaryForGame**, unless this game was the season's Super Bowl, in which case go to **WriteSummaryForSeason**.
 - **WriteSummaryForGame**: Given the `TeamDriveRecords`, write a summary for the game to the database. If this step fails, we write a basic summary instead. Go to **PrepareForGame**.
-- **WriteSummaryForSeason**: Given a condensed list of game results for all 40 teams, write a summary for the season to the database. If this step fails, we write a basic summary instead. Go to **PrepareForGame**.
+- **WriteSummaryForSeason**: Given a condensed list of game results for all 40 teams, write a summary for the season to the database, then mark the season as complete. If this step fails, we write a basic summary instead. Go to **PrepareForGame**.
 - **Error**: An unrecoverable error has occurred at any point in any of the state machines. This is a terminal state. Any failure to read or write to the database causes this state immediately.
 
 ## The Game State Machine

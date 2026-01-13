@@ -9,7 +9,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class FakePuntOrFieldGoalOutcome
     {
-        public static GameState Run(GameState priorState,
+        public static PlayContext Run(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {

@@ -10,7 +10,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class PuntOutcome
     {
-        public static GameState Run(GameState priorState,
+        public static PlayContext Run(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
@@ -96,15 +96,15 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 physicsParams);
         }
 
-        private static GameState OutcomeDecision(double kickActualYard,
-            GameState priorState,
+        private static PlayContext OutcomeDecision(double kickActualYard,
+            PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
             if (kickActualYard >= -10 && kickActualYard <= 110)
             {
                 Log.Information("PuntOutcome: Punt landed in-bounds and can be recovered and returned.");
-                return priorState.WithNextState(GameplayNextState.ReturnablePuntOutcome) with
+                return priorState.WithNextState(PlayEvaluationState.ReturnablePuntOutcome) with
                 {
                     LineOfScrimmage = kickActualYard.Round(),
                     PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay(),
@@ -124,12 +124,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     ClockRunning = false,
                     LastPlayDescriptionTemplate = "{OffAbbr} {{OffPlayer0}} punt from {LoS} out of back of own endzone for a safety."
                 };
-                return updatedState.WithNextState(GameplayNextState.FreeKickDecision);
+                return updatedState.WithNextState(PlayEvaluationState.FreeKickDecision);
             }
 
             Log.Information("PuntOutcome: Touchback.");
             return priorState.WithFirstDownLineOfScrimmage(25d, kickActualTeamYard.Team.Opponent(),
-                "{DefAbbr} touchback, ball placed at {LoS}.", clockRunning: false);
+                "{DefAbbr} touchback, ball placed at {LoS}.", clockRunning: false, startOfDrive: true);
         }
 
         private static double ComputeKickOutOfBoundsForwardDistance(double lineOfScrimmage, double kickActualYard, double kickActualCross)

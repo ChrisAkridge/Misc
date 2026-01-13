@@ -10,7 +10,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class KickOrPuntReturnOutcome
     {
-        public static GameState Run(GameState priorState,
+        public static PlayContext Run(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
@@ -26,11 +26,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (rushAttemptResult.WasFumbled)
             {
                 Log.Information("KickOrPuntReturnOutcome: Fumble on kick/punt return!");
-                return priorState.WithNextState(GameplayNextState.FumbledLiveBallOutcome);
+                return priorState.WithNextState(PlayEvaluationState.FumbledLiveBallOutcome);
             }
 
             var yardsGained = rushAttemptResult.YardsGained ?? throw new InvalidOperationException("Rushing function specified no yards gained value, but ball was not fumbled; must have value.");
-            GameState newState = priorState with
+            PlayContext newState = priorState with
             {
                 TeamWithPossession = priorState.TeamWithPossession.Opponent(),
                 LastPlayDescriptionTemplate = "{OffTeam} {OffPlayer0} returned ball to the {LoS}.",

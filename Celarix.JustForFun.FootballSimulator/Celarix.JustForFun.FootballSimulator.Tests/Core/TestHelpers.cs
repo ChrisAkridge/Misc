@@ -8,9 +8,9 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
 {
     internal static class TestHelpers
     {
-        public static GameState EmptyState => new GameState(
+        public static PlayContext EmptyState => new GameState(
             Version: 0L,
-            NextState: GameplayNextState.Start,
+            NextState: PlayEvaluationState.Start,
             AdditionalParameters: Array.Empty<AdditionalParameter<object>>(),
             StateHistory: Array.Empty<StateHistoryEntry>(),
             BaseWindDirection: 0.0,

@@ -52,7 +52,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
         private int awayTeamId;
         private int homeTeamId;
         private IRandom random;
-        private PlayerManager manager;
+        private PlayerFactory manager;
 
         public double StadiumCurrentTemperature { get; set; }
 
@@ -60,7 +60,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
             int awayTeamId,
             int homeTeamId,
             IRandom random,
-            PlayerManager manager,
+            PlayerFactory manager,
             int gameStadiumID)
         {
             this.context = context;
@@ -234,7 +234,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
 
         private void FillRosterIfNeeded(List<Player> roster, FootballContext context, int teamId)
         {
-            var neededPositions = PlayerManager.GetStandardRoster().ToList();
+            var neededPositions = PlayerFactory.GetStandardRoster().ToList();
 
             // Remove positions already filled
             foreach (var player in roster)
@@ -248,7 +248,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
                 .Select(p =>
                 {
                     var newPlayer = manager.CreateNewPlayer(random, undraftedFreeAgent: true);
-                    PlayerManager.AssignPlayerToTeam(newPlayer, teamId, p, random);
+                    PlayerFactory.AssignPlayerToTeam(newPlayer, teamId, p, random);
                     return newPlayer;
                 });
             roster.AddRange(newPlayers);
@@ -264,36 +264,36 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
             return monthlyTemperatures.Average();
         }
 
-        private static (int OffensivePlayers, int DefensivePlayers, bool Quarterback, bool Kicker) GetPlayerRequirementsForState(GameplayNextState state) => state switch
+        private static (int OffensivePlayers, int DefensivePlayers, bool Quarterback, bool Kicker) GetPlayerRequirementsForState(PlayEvaluationState state) => state switch
         {
-            GameplayNextState.Start => (0, 0, false, false),
-            GameplayNextState.KickoffDecision => (0, 0, false, true),
-            GameplayNextState.FreeKickDecision => (0, 0, false, true),
-            GameplayNextState.SignalFairCatchDecision => (0, 1, false, false),
-            GameplayNextState.TouchdownDecision => (0, 0, false, false),
-            GameplayNextState.MainGameDecision => (0, 0, false, false),
-            GameplayNextState.ReturnFumbledOrInterceptedBallDecision => (0, 0, false, false),
-            GameplayNextState.NormalKickoffOutcome => (0, 0, false, true),
-            GameplayNextState.ReturnableKickOutcome => (1, 0, false, false),
-            GameplayNextState.FumbledLiveBallOutcome => (2, 1, false, false),
-            GameplayNextState.PuntOutcome => (0, 0, false, true),
-            GameplayNextState.ReturnablePuntOutcome => (1, 1, false, false),
-            GameplayNextState.KickOrPuntReturnOutcome => (1, 0, false, false),
-            GameplayNextState.OnsideKickAttemptOutcome => (1, 1, false, true),
-            GameplayNextState.FieldGoalsAndExtraPointAttemptOutcome => (1, 0, false, true),
-            GameplayNextState.TwoPointConversionAttemptOutcome => (1, 1, true, false),
-            GameplayNextState.FumbleOrInterceptionReturnOutcome => (1, 1, true, false),
-            GameplayNextState.StandardRushingPlayOutcome => (1, 1, false, false),
-            GameplayNextState.StandardShortPassingPlayOutcome => (1, 1, true, false),
-            GameplayNextState.StandardMediumPassingPlayOutcome => (1, 1, false, false),
-            GameplayNextState.StandardLongPassingPlayOutcome => (1, 1, false, false),
-            GameplayNextState.HailMaryOutcome => (1, 1, true, false),
-            GameplayNextState.QBSneakOutcome => (1, 1, true, false),
-            GameplayNextState.FakePuntOutcome => (1, 1, false, true),
-            GameplayNextState.FakeFieldGoalOutcome => (1, 1, false, true),
-            GameplayNextState.VictoryFormationOutcome => (1, 1, true, false),
-            GameplayNextState.PlayEvaluationComplete => (0, 0, false, false),
-            GameplayNextState.EndOfHalf => (0, 0, false, false),
+            PlayEvaluationState.Start => (0, 0, false, false),
+            PlayEvaluationState.KickoffDecision => (0, 0, false, true),
+            PlayEvaluationState.FreeKickDecision => (0, 0, false, true),
+            PlayEvaluationState.SignalFairCatchDecision => (0, 1, false, false),
+            PlayEvaluationState.TouchdownDecision => (0, 0, false, false),
+            PlayEvaluationState.MainGameDecision => (0, 0, false, false),
+            PlayEvaluationState.ReturnFumbledOrInterceptedBallDecision => (0, 0, false, false),
+            PlayEvaluationState.NormalKickoffOutcome => (0, 0, false, true),
+            PlayEvaluationState.ReturnableKickOutcome => (1, 0, false, false),
+            PlayEvaluationState.FumbledLiveBallOutcome => (2, 1, false, false),
+            PlayEvaluationState.PuntOutcome => (0, 0, false, true),
+            PlayEvaluationState.ReturnablePuntOutcome => (1, 1, false, false),
+            PlayEvaluationState.KickOrPuntReturnOutcome => (1, 0, false, false),
+            PlayEvaluationState.OnsideKickAttemptOutcome => (1, 1, false, true),
+            PlayEvaluationState.FieldGoalsAndExtraPointAttemptOutcome => (1, 0, false, true),
+            PlayEvaluationState.TwoPointConversionAttemptOutcome => (1, 1, true, false),
+            PlayEvaluationState.FumbleOrInterceptionReturnOutcome => (1, 1, true, false),
+            PlayEvaluationState.StandardRushingPlayOutcome => (1, 1, false, false),
+            PlayEvaluationState.StandardShortPassingPlayOutcome => (1, 1, true, false),
+            PlayEvaluationState.StandardMediumPassingPlayOutcome => (1, 1, false, false),
+            PlayEvaluationState.StandardLongPassingPlayOutcome => (1, 1, false, false),
+            PlayEvaluationState.HailMaryOutcome => (1, 1, true, false),
+            PlayEvaluationState.QBSneakOutcome => (1, 1, true, false),
+            PlayEvaluationState.FakePuntOutcome => (1, 1, false, true),
+            PlayEvaluationState.FakeFieldGoalOutcome => (1, 1, false, true),
+            PlayEvaluationState.VictoryFormationOutcome => (1, 1, true, false),
+            PlayEvaluationState.PlayEvaluationComplete => (0, 0, false, false),
+            PlayEvaluationState.EndOfHalf => (0, 0, false, false),
             _ => (0, 0, false, false)
         };
 

@@ -78,14 +78,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core
             currentGameLoop.Initialize();
         }
 
-        private PlayerManager CreatePlayerManager()
+        private PlayerFactory CreatePlayerManager()
         {
             // Get a list of first and last names from two files
             // in the build directory: "firstNames.txt" and "lastNames.txt"
             // They're newline-separated lists of names.
             var firstNames = File.ReadAllLines("firstNames.txt");
             var lastNames = File.ReadAllLines("lastNames.txt");
-            return new PlayerManager(firstNames, lastNames);
+            return new PlayerFactory(firstNames, lastNames);
         }
     }
 }

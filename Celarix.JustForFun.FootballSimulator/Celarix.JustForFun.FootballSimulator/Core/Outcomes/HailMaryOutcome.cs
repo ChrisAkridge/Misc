@@ -9,7 +9,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class HailMaryOutcome
     {
-        public static GameState Run(GameState priorState,
+        public static PlayContext Run(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
@@ -35,7 +35,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             {
                 Log.Information("PlayerDownedFunction: Safety on Hail Mary from own endzone!");
                 return priorState.WithScoreChange(possessingTeam.Opponent(), 2)
-                    .WithNextState(GameplayNextState.PlayEvaluationComplete)
+                    .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                 with
                 {
                     NextPlay = NextPlayKind.FreeKick,
@@ -63,7 +63,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             {
                 Log.Information("PlayerDownedFunction: Interception on Hail Mary!");
                 return priorState.WithAdditionalParameter<bool?>("WasIntercepted", true)
-                    .WithNextState(GameplayNextState.FumbledLiveBallOutcome)
+                    .WithNextState(PlayEvaluationState.FumbledLiveBallOutcome)
                 with
                 {
                     ClockRunning = false,
@@ -74,7 +74,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             {
                 Log.Information("PlayerDownedFunction: Touchdown on Hail Mary!");
                 return priorState.WithScoreChange(possessingTeam, 6)
-                    .WithNextState(GameplayNextState.PlayEvaluationComplete)
+                    .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                 with
                 {
                     NextPlay = NextPlayKind.ConversionAttempt,
@@ -87,7 +87,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             }
 
             // Get it as far as we can.
-            return priorState.WithNextState(GameplayNextState.StandardLongPassingPlayOutcome);
+            return priorState.WithNextState(PlayEvaluationState.StandardLongPassingPlayOutcome);
         }
     }
 }

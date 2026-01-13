@@ -10,7 +10,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class StandardRushingPlayOutcome
     {
-        public static GameState Run(GameState priorState,
+        public static PlayContext Run(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
@@ -28,7 +28,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (rushResult.WasFumbled)
             {
                 Log.Information("StandardRushingPlayOutcome: Fumble occurred during rushing play.");
-                return priorState.WithNextState(GameplayNextState.FumbledLiveBallOutcome);
+                return priorState.WithNextState(PlayEvaluationState.FumbledLiveBallOutcome);
             }
 
             return PlayerDownedFunction.Get(priorState,

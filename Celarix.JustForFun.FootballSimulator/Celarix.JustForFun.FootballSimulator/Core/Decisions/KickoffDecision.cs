@@ -15,7 +15,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
         //   they take in a GameState and return another GameState. GameStates are immutable records,
         //   so each decision or outcome produces a new GameState based on the prior one.
 
-        public static GameState Run(GameState priorState,
+        public static PlayContext Run(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
@@ -26,7 +26,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             if (kickingTeamDisposition == TeamDisposition.UltraConservative)
             {
                 Log.Information("KickoffDecision: Kicking team disposition is UltraConservative; performing normal kickoff.");
-                return priorState.WithNextState(GameplayNextState.NormalKickoffOutcome);
+                return priorState.WithNextState(PlayEvaluationState.NormalKickoffOutcome);
             }
             else if (kickingTeamDisposition == TeamDisposition.Conservative)
             {
@@ -37,18 +37,18 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                     && Math.Abs(scoreDifference) / minutesLeftInGame >= pointsPerMinuteThreshold)
                 {
                     Log.Information("KickoffDecision: Down by a lot with little time left; performing onside kick attempt.");
-                    return priorState.WithNextState(GameplayNextState.OnsideKickAttemptOutcome);
+                    return priorState.WithNextState(PlayEvaluationState.OnsideKickAttemptOutcome);
                 }
                 else
                 {
                     Log.Information("KickoffDecision: Performing normal kickoff.");
-                    return priorState.WithNextState(GameplayNextState.NormalKickoffOutcome);
+                    return priorState.WithNextState(PlayEvaluationState.NormalKickoffOutcome);
                 }
             }
             else
             {
                 Log.Information("KickoffDecision: Kicking team disposition is Insane or UltraInsane; performing onside kick attempt.");
-                return priorState.WithNextState(GameplayNextState.OnsideKickAttemptOutcome);
+                return priorState.WithNextState(PlayEvaluationState.OnsideKickAttemptOutcome);
             }
         }
     }

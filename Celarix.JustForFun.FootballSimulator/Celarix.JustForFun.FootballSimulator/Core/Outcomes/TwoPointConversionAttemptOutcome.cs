@@ -10,7 +10,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class TwoPointConversionAttemptOutcome
     {
-        public static GameState Run(GameState priorState,
+        public static PlayContext Run(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
@@ -29,7 +29,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 // Play was a touchdown, rewrite history and make it a two-point conversion
                 Log.Information("TwoPointConversionAttemptOutcome: Successful two-point conversion.");
                 return priorState.WithScoreChange(priorState.TeamWithPossession, 2)
-                    .WithNextState(GameplayNextState.PlayEvaluationComplete)    
+                    .WithNextState(PlayEvaluationState.PlayEvaluationComplete)    
                 with
                 {
                     NextPlay = NextPlayKind.Kickoff,
@@ -44,7 +44,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 // Play was a defensive safety, rewrite history and make it a one-point defensive safety
                 Log.Information("TwoPointConversionAttemptOutcome: Defensive safety on two-point conversion attempt.");
                 return priorState.WithScoreChange(priorState.TeamWithPossession, 1)
-                    .WithNextState(GameplayNextState.PlayEvaluationComplete)
+                    .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                 with
                 {
                     NextPlay = NextPlayKind.Kickoff,
@@ -59,7 +59,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 // Play was an offensive safety, rewrite history and make it a one-point offensive safety!
                 Log.Information("TwoPointConversionAttemptOutcome: Offensive safety on two-point conversion attempt.");
                 return priorState.WithScoreChange(priorState.TeamWithPossession.Opponent(), 1)
-                    .WithNextState(GameplayNextState.PlayEvaluationComplete)
+                    .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                 with
                 {
                     NextPlay = NextPlayKind.Kickoff,
@@ -74,7 +74,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 // Play was a defensive score, rewrite history and make it a two-point defensive score
                 Log.Information("TwoPointConversionAttemptOutcome: Defensive score on two-point conversion attempt.");
                 return priorState.WithScoreChange(priorState.TeamWithPossession.Opponent(), 2)
-                    .WithNextState(GameplayNextState.PlayEvaluationComplete)
+                    .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                 with
                 {
                     NextPlay = NextPlayKind.Kickoff,
@@ -87,7 +87,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 
             // Play was an unsuccessful two-point conversion attempt
             Log.Information("TwoPointConversionAttemptOutcome: Unsuccessful two-point conversion attempt.");
-            return priorState.WithNextState(GameplayNextState.PlayEvaluationComplete) with
+            return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete) with
             {
                 NextPlay = NextPlayKind.Kickoff,
                 LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 35),

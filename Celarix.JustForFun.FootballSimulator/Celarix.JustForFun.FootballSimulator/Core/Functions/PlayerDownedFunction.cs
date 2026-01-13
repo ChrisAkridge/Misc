@@ -10,7 +10,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
 {
     internal static class PlayerDownedFunction
     {
-        public static GameState Get(GameState priorState,
+        public static PlayContext Get(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams,
             int possessionStartYard,
@@ -32,7 +32,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                     if (endzoneBehavior == EndzoneBehavior.FumbleOrInterceptionReturn)
                     {
                         Log.Information("PlayerDownedFunction: Fumble recovered in own endzone, touchback.");
-                        return priorState.WithNextState(GameplayNextState.PlayEvaluationComplete) with
+                        return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete) with
                         {
                             NextPlay = NextPlayKind.FirstDown,
                             LineOfScrimmage = priorState.TeamYardToInternalYard(possessingTeam, 25),
@@ -59,7 +59,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         Log.Information("PlayerDownedFunction: Offensive safety on conversion attempt, {Points} points to the defense and kickoff.", safetyPoints);
                         return priorState
                             .WithScoreChange(otherTeam, safetyPoints)
-                            .WithNextState(GameplayNextState.PlayEvaluationComplete)
+                            .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                         with
                         {
                             NextPlay = NextPlayKind.Kickoff,
@@ -75,7 +75,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         Log.Information("PlayerDownedFunction: Safety on standard play, {Points} points to the defense and free kick.", safetyPoints);
                         return priorState
                             .WithScoreChange(otherTeam, safetyPoints)
-                            .WithNextState(GameplayNextState.PlayEvaluationComplete)
+                            .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                         with
                         {
                             NextPlay = NextPlayKind.FreeKick,
@@ -94,7 +94,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         Log.Information("PlayerDownedFunction: Touchdown!");
                         return priorState
                             .WithScoreChange(possessingTeam, 6)
-                            .WithNextState(GameplayNextState.PlayEvaluationComplete)
+                            .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                         with
                         {
                             NextPlay = NextPlayKind.ConversionAttempt,
@@ -110,7 +110,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         Log.Information("PlayerDownedFunction: Successful two-point conversion!");
                         return priorState
                             .WithScoreChange(possessingTeam, 2)
-                            .WithNextState(GameplayNextState.PlayEvaluationComplete)
+                            .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                         with
                         {
                             NextPlay = NextPlayKind.Kickoff,
@@ -128,7 +128,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
             if (endzoneBehavior == EndzoneBehavior.ConversionAttempt)
             {
                 Log.Information("PlayerDownedFunction: Unsuccessful conversion attempt.");
-                return priorState.WithNextState(GameplayNextState.PlayEvaluationComplete) with
+                return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete) with
                 {
                     NextPlay = NextPlayKind.Kickoff,
                     LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 35),
@@ -144,21 +144,22 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                 Log.Information("PlayerDownedFunction: Fumble or interception return downed in field of play; recovering team is not fumbling team. First down.");
                 return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, possessingTeam,
                     "{OffAbbr} {OffPlayer0} downed at {LoS} after fumble/interception recovery, first down for {OffAbbr}.",
-                    clockRunning);
+                    clockRunning, startOfDrive: true);
             }
             else if (priorState.NextPlay == NextPlayKind.FourthDown)
             {
                 Log.Information("PlayerDownedFunction: Turnover on downs.");
                 return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, otherTeam,
                     // TODO: Ensure that DefAbbr and OffAbbr are correct here - they may need to be swapped.
-                    "{DefAbbr} turnover on downs, {DefPlayer0} short of line to gain, first down for {OffAbbr}.", clockRunning);
+                    "{DefAbbr} turnover on downs, {DefPlayer0} short of line to gain, first down for {OffAbbr}.", clockRunning,
+                    startOfDrive: true);
             }
             else if (priorState.NextPlay is NextPlayKind.Kickoff or NextPlayKind.FreeKick)
             {
                 // This is where we switch possession after a kickoff or free kick.
                 Log.Information("PlayerDownedFunction: Change of possession after kickoff or free kick fielded by receiving team.");
                 return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, otherTeam,
-                    "{OffAbbr} has first down at {LoS}.", clockRunning);
+                    "{OffAbbr} has first down at {LoS}.", clockRunning, startOfDrive: true);
             }
             else if (priorState.LineToGain == null)
             {
@@ -183,7 +184,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                 NextPlayKind.FreeKick => throw new InvalidOperationException("Unreachable code: Free kick should have been handled above."),
                 _ => throw new InvalidOperationException($"Unrecognized NextPlayKind: {priorState.NextPlay}.")
             };
-            return priorState.WithNextState(GameplayNextState.PlayEvaluationComplete) with
+            return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete) with
             {
                 NextPlay = nextPlayKind,
                 LineOfScrimmage = newLineOfScrimmage.Round(),

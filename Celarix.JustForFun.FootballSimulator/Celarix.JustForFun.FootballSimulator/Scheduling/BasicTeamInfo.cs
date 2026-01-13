@@ -11,6 +11,11 @@ public sealed class BasicTeamInfo : IComparable<BasicTeamInfo>
     public Conference Conference { get; }
     public Division Division { get; }
 
+    public BasicTeamInfo(Team team)
+        : this(team.TeamName, team.Conference, team.Division)
+    {
+    }
+
     public BasicTeamInfo(string name, Conference conference, Division division)
     {
         Name = name;

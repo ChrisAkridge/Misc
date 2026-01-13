@@ -13,9 +13,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core
         public void Initialize()
         {
             double airTemperature = GetTemperatureForGame(gameRecord, physicsParams);
-            currentState = new GameState(
+            currentState = new PlayContext(
                 Version: 0L,
-                NextState: GameplayNextState.Start,
+                NextState: PlayEvaluationState.Start,
                 StateHistory: ImmutableList<StateHistoryEntry>.Empty,
                 AdditionalParameters: ImmutableList<AdditionalParameter<object>>.Empty,
                 BaseWindDirection: random.NextDouble() * 360.0,
@@ -85,7 +85,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
             };
         }
 
-        private static GameState SetupClockForPartiallyCompletedGame(GameState priorState,
+        private static PlayContext SetupClockForPartiallyCompletedGame(PlayContext priorState,
             GameRecord gameRecord)
         {
             if (gameRecord.TeamDriveRecords.Count == 0)
@@ -143,7 +143,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
             };
         }
 
-        private static GameState SetupScoreForPartiallyCompletedGame(GameState priorState, GameRecord gameRecord)
+        private static PlayContext SetupScoreForPartiallyCompletedGame(PlayContext priorState, GameRecord gameRecord)
         {
             DriveResult[] scoringDriveResults = [
                 DriveResult.FieldGoalSuccess,
@@ -196,12 +196,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core
             };
         }
 
-        private static GameState SetupNextPlayAndNextStateForPartiallyCompletedGame(GameState priorState, GameRecord gameRecord)
+        private static PlayContext SetupNextPlayAndNextStateForPartiallyCompletedGame(PlayContext priorState, GameRecord gameRecord)
         {
             if (gameRecord.TeamDriveRecords.Count == 0)
             {
                 Log.Information("No drive records found for current game. Starting from beginning of game.");
-                return priorState.WithNextState(GameplayNextState.KickoffDecision) with
+                return priorState.WithNextState(PlayEvaluationState.KickoffDecision) with
                 {
                     NextPlay = NextPlayKind.Kickoff
                 };
@@ -221,8 +221,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 // Kind of a hacky way to actually kick off the main loop.
                 return priorState.WithFirstDownLineOfScrimmage(priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 25),
                     priorState.TeamWithPossession,
-                    "Resuming game. {OffAbbr} has first down at their own 25.")
-                    .WithNextState(GameplayNextState.MainGameDecision);
+                    "Resuming game. {OffAbbr} has first down at their own 25.", startOfDrive: true)
+                    .WithNextState(PlayEvaluationState.MainGameDecision);
             }
 
             var nextPlayKind = lastDrive.Result switch
@@ -239,8 +239,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core
             };
 
             var nextState = nextPlayKind == NextPlayKind.Kickoff
-                ? GameplayNextState.KickoffDecision
-                : GameplayNextState.FreeKickDecision;
+                ? PlayEvaluationState.KickoffDecision
+                : PlayEvaluationState.FreeKickDecision;
 
             Log.Information("Resuming game {GameID} with next play kind {NextPlayKind}.",
                 gameRecord.GameID, nextPlayKind);

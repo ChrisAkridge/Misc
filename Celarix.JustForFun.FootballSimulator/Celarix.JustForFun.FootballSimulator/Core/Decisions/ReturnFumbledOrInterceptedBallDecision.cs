@@ -11,7 +11,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
 {
     internal static class ReturnFumbledOrInterceptedBallDecision
     {
-        public static GameState Run(GameState priorState,
+        public static PlayContext Run(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
@@ -20,19 +20,20 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             {
                 Log.Information("ReturnFumbledOrInterceptedBallDecision: Team with possession is {Disposition}, attempting return.",
                     possessingTeamDisposition);
-                return priorState.WithNextState(GameplayNextState.FumbleOrInterceptionReturnOutcome);
+                return priorState.WithNextState(PlayEvaluationState.FumbleOrInterceptionReturnOutcome);
             }
             else if (possessingTeamDisposition == TeamDisposition.UltraConservative)
             {
                 Log.Information("ReturnFumbledOrInterceptedBallDecision: Team with possession is UltraConservative, not attempting return.");
                 return priorState.WithFirstDownLineOfScrimmage(priorState.LineOfScrimmage,
                     priorState.TeamWithPossession,
-                    "{OffAbbr} fumble recovered by {DefAbbr} at {LoS}, will not return. First down.");
+                    "{OffAbbr} fumble recovered by {DefAbbr} at {LoS}, will not return. First down.",
+                    startOfDrive: true);
             }
             else if (priorState.NextPlay == NextPlayKind.ConversionAttempt)
             {
                 Log.Information("ReturnFumbledOrInterceptedBallDecision: On conversion attempt, attempting return.");
-                return priorState.WithNextState(GameplayNextState.FumbleOrInterceptionReturnOutcome);
+                return priorState.WithNextState(PlayEvaluationState.FumbleOrInterceptionReturnOutcome);
             }
             
             var secondsLeftInGame = priorState.TotalSecondsLeftInGame();
@@ -41,7 +42,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             {
                 // yeah I wonder if I typoed here, if we really mean to return here
                 Log.Information("ReturnFumbledOrInterceptedBallDecision: Late in game with lead, attempting return.");
-                return priorState.WithNextState(GameplayNextState.FumbleOrInterceptionReturnOutcome);
+                return priorState.WithNextState(PlayEvaluationState.FumbleOrInterceptionReturnOutcome);
             }
 
             var teamYard = priorState.InternalYardToTeamYard(priorState.LineOfScrimmage);
@@ -59,7 +60,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                     Log.Information("ReturnFumbledOrInterceptedBallDecision: Estimated running offense strength ({OffStr}) > estimated running defense strength ({DefStr}), attempting return.",
                         estimatedRunningOffenseStrength,
                         estimatedRunningDefenseStrength);
-                    return priorState.WithNextState(GameplayNextState.FumbleOrInterceptionReturnOutcome);
+                    return priorState.WithNextState(PlayEvaluationState.FumbleOrInterceptionReturnOutcome);
                 }
 
                 var scoreMargin = priorState.GetScoreDifferenceForTeam(priorState.TeamWithPossession);
@@ -67,13 +68,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 if (scoreMargin <= -1 && scoreMargin >= -8 && Math.Abs(scoreMarginPointsPerMinute) >= 1d)
                 {
                     Log.Information("ReturnFumbledOrInterceptedBallDecision: Possessing team is trailing by 1-8 points with at least 1 point per minute pace, attempting return.");
-                    return priorState.WithNextState(GameplayNextState.FumbleOrInterceptionReturnOutcome);
+                    return priorState.WithNextState(PlayEvaluationState.FumbleOrInterceptionReturnOutcome);
                 }
             }
             Log.Information("ReturnFumbledOrInterceptedBallDecision: Not attempting return.");
             return priorState.WithFirstDownLineOfScrimmage(priorState.LineOfScrimmage,
                 priorState.TeamWithPossession,
-                "{OffAbbr} fumble recovered by {DefAbbr} at {LoS}, will not return. First down.");
+                "{OffAbbr} fumble recovered by {DefAbbr} at {LoS}, will not return. First down.",
+                startOfDrive: true);
         }
     }
 }

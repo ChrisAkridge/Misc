@@ -11,7 +11,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class FumbledLiveBallOutcome
     {
-        public static GameState Run(GameState priorState,
+        public static PlayContext Run(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
@@ -96,7 +96,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 }
 
                 Log.Information("FumbledLiveBallOutcome: Fumble recovered by offense, eligible to return.");
-                return priorState.WithNextState(GameplayNextState.ReturnFumbledOrInterceptedBallDecision) with
+                return priorState.WithNextState(PlayEvaluationState.ReturnFumbledOrInterceptedBallDecision) with
                 {
                     LineOfScrimmage = fumbleRecoveryInternalYard.Round(),
                     ClockRunning = true,
@@ -109,7 +109,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             }
         }
 
-        private static GameState FumbleOrInteceptionRecoveredByDefense(GameState priorState,
+        private static PlayContext FumbleOrInteceptionRecoveredByDefense(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams,
             GameTeam possessingTeamBeforeFumble,
@@ -147,7 +147,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             }
 
             Log.Information("FumbledLiveBallOutcome: Fumble recovered by defense, eligible to return.");
-            return priorState.WithNextState(GameplayNextState.ReturnFumbledOrInterceptedBallDecision) with
+            return priorState.WithNextState(PlayEvaluationState.ReturnFumbledOrInterceptedBallDecision) with
             {
                 TeamWithPossession = fumbleRecoveryTeam,
                 PossessionOnPlay = PossessionOnPlay.BothTeams,
@@ -156,7 +156,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             };
         }
 
-        private static GameState RunPlayerDownedFunction(GameState priorState,
+        private static PlayContext RunPlayerDownedFunction(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams,
             GameTeam possessingTeamBeforeFumble,

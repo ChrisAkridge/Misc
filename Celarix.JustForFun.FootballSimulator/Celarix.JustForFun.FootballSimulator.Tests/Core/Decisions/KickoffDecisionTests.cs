@@ -14,7 +14,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
             // Arrange
             var priorState = TestHelpers.EmptyState with
             {
-                NextState = GameplayNextState.KickoffDecision,
+                NextState = PlayEvaluationState.KickoffDecision,
                 NextPlay = NextPlayKind.Kickoff,
                 TeamWithPossession = GameTeam.Away,
             };
@@ -29,7 +29,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
             // Act
             var newState = KickoffDecision.Run(priorState, parameters, physicsParams);
             // Assert
-            Assert.Equal(GameplayNextState.NormalKickoffOutcome, newState.NextState);
+            Assert.Equal(PlayEvaluationState.NormalKickoffOutcome, newState.NextState);
         }
 
         [Fact]
@@ -38,7 +38,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
             // Arrange
             var priorState = TestHelpers.EmptyState with
             {
-                NextState = GameplayNextState.KickoffDecision,
+                NextState = PlayEvaluationState.KickoffDecision,
                 NextPlay = NextPlayKind.Kickoff,
                 TeamWithPossession = GameTeam.Away,
                 AwayScore = 0,
@@ -60,7 +60,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
             // Act
             var newState = KickoffDecision.Run(priorState, parameters, physicsParams);
             // Assert
-            Assert.Equal(GameplayNextState.OnsideKickAttemptOutcome, newState.NextState);
+            Assert.Equal(PlayEvaluationState.OnsideKickAttemptOutcome, newState.NextState);
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
             // Arrange
             var priorState = TestHelpers.EmptyState with
             {
-                NextState = GameplayNextState.KickoffDecision,
+                NextState = PlayEvaluationState.KickoffDecision,
                 NextPlay = NextPlayKind.Kickoff,
                 TeamWithPossession = GameTeam.Away,
                 AwayScore = 14,
@@ -91,7 +91,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
             // Act
             var newState = KickoffDecision.Run(priorState, parameters, physicsParams);
             // Assert
-            Assert.Equal(GameplayNextState.NormalKickoffOutcome, newState.NextState);
+            Assert.Equal(PlayEvaluationState.NormalKickoffOutcome, newState.NextState);
         }
 
         [Theory]
@@ -102,7 +102,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
             // Arrange
             var priorState = TestHelpers.EmptyState with
             {
-                NextState = GameplayNextState.KickoffDecision,
+                NextState = PlayEvaluationState.KickoffDecision,
                 NextPlay = NextPlayKind.Kickoff,
                 TeamWithPossession = GameTeam.Away,
             };
@@ -117,7 +117,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
             // Act
             var newState = KickoffDecision.Run(priorState, parameters, physicsParams);
             // Assert
-            Assert.Equal(GameplayNextState.OnsideKickAttemptOutcome, newState.NextState);
+            Assert.Equal(PlayEvaluationState.OnsideKickAttemptOutcome, newState.NextState);
         }
     }
 }

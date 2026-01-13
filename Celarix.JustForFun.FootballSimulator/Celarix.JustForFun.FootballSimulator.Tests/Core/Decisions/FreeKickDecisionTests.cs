@@ -32,7 +32,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
                 parameters,
                 physicsParams: TestHelpers.EmptyPhysicsParams);
             // Assert
-            Assert.Equal(GameplayNextState.NormalKickoffOutcome, resultState.NextState);
+            Assert.Equal(PlayEvaluationState.NormalKickoffOutcome, resultState.NextState);
         }
 
         [Fact]
@@ -57,7 +57,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
                 parameters,
                 physicsParams: TestHelpers.EmptyPhysicsParams);
             // Assert
-            Assert.Equal(GameplayNextState.PuntOutcome, resultState.NextState);
+            Assert.Equal(PlayEvaluationState.PuntOutcome, resultState.NextState);
         }
     }
 }

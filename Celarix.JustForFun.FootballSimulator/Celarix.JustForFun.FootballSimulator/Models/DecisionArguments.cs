@@ -7,11 +7,11 @@ namespace Celarix.JustForFun.FootballSimulator.Models
 {
     internal sealed class DecisionArguments
     {
-        public GameState PriorState { get; }
+        public PlayContext PriorState { get; }
         public GameDecisionParameters Parameters { get; }
         public IReadOnlyDictionary<string, PhysicsParam> PhysicsParams { get; }
         
-        public DecisionArguments(GameState priorState,
+        public DecisionArguments(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
@@ -20,7 +20,7 @@ namespace Celarix.JustForFun.FootballSimulator.Models
             PhysicsParams = physicsParams;
         }
 
-        public void Deconstruct(out GameState priorState,
+        public void Deconstruct(out PlayContext priorState,
             out GameDecisionParameters parameters,
             out IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {

@@ -42,7 +42,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
 
             // Fixed-seed random: used for reproducing specific test cases
             var random = new System.Random(seed);
-            var playStatesForIteration = new List<GameState>();
+            var playStatesForIteration = new List<PlayContext>();
 
             const int iterations = 1000;
             for (var i = 0; i < iterations; i++)
@@ -60,7 +60,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
                         gameState = MoveNext(gameState, decisionParameters, physicsParams);
                         AssertPropertyBasedTests(gameState);
                         playStatesForIteration.Add(gameState);
-                    } while (gameState.NextState != GameplayNextState.PlayEvaluationComplete);
+                    } while (gameState.NextState != PlayEvaluationState.PlayEvaluationComplete);
 
                     if (i == 2 && gameState.Version == 1)
                     {
@@ -89,30 +89,30 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
         }
 
         #region Random Generators
-        private GameState GenerateRandomGameState(System.Random random)
+        private PlayContext GenerateRandomGameState(System.Random random)
         {
             NextPlayKind nextPlay = GetRandomEnumValue<NextPlayKind>(random);
-            GameplayNextState validStartStateForNextPlay = nextPlay switch
+            PlayEvaluationState validStartStateForNextPlay = nextPlay switch
             {
-                NextPlayKind.Kickoff => GameplayNextState.KickoffDecision,
-                NextPlayKind.FirstDown or NextPlayKind.SecondDown or NextPlayKind.ThirdDown or NextPlayKind.FourthDown => GameplayNextState.MainGameDecision,
-                NextPlayKind.ConversionAttempt => GameplayNextState.TouchdownDecision,
-                NextPlayKind.FreeKick => GameplayNextState.FreeKickDecision,
+                NextPlayKind.Kickoff => PlayEvaluationState.KickoffDecision,
+                NextPlayKind.FirstDown or NextPlayKind.SecondDown or NextPlayKind.ThirdDown or NextPlayKind.FourthDown => PlayEvaluationState.MainGameDecision,
+                NextPlayKind.ConversionAttempt => PlayEvaluationState.TouchdownDecision,
+                NextPlayKind.FreeKick => PlayEvaluationState.FreeKickDecision,
                 _ => throw new InvalidOperationException($"Unhandled next play kind {nextPlay}.")
             };
 
             GameTeam teamWithPossession = GetRandomEnumValue<GameTeam>(random);
             int lineOfScrimmage = validStartStateForNextPlay switch
             {
-                GameplayNextState.KickoffDecision => teamWithPossession == GameTeam.Home ? 35 : 65,
-                GameplayNextState.FreeKickDecision => teamWithPossession == GameTeam.Home ? 20 : 80,
-                GameplayNextState.TouchdownDecision => teamWithPossession == GameTeam.Home ? 85 : 15,
-                GameplayNextState.MainGameDecision => random.Next(1, 100),
+                PlayEvaluationState.KickoffDecision => teamWithPossession == GameTeam.Home ? 35 : 65,
+                PlayEvaluationState.FreeKickDecision => teamWithPossession == GameTeam.Home ? 20 : 80,
+                PlayEvaluationState.TouchdownDecision => teamWithPossession == GameTeam.Home ? 85 : 15,
+                PlayEvaluationState.MainGameDecision => random.Next(1, 100),
                 _ => throw new InvalidOperationException($"Unhandled start state {validStartStateForNextPlay}.")
             };
             var movingToHigherYardNumber = teamWithPossession == GameTeam.Home;
             var distanceToEndZone = movingToHigherYardNumber ? 100 - lineOfScrimmage : lineOfScrimmage;
-            int? yardsToGain = validStartStateForNextPlay == GameplayNextState.MainGameDecision
+            int? yardsToGain = validStartStateForNextPlay == PlayEvaluationState.MainGameDecision
                 ? random.Next(1, distanceToEndZone + 1)
                 : null;
             int? lineToGain = null;
@@ -121,7 +121,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
                 // If we're at the end zone, line to gain is null
                 lineToGain = null;
             }
-            else if (validStartStateForNextPlay == GameplayNextState.MainGameDecision && yardsToGain.HasValue)
+            else if (validStartStateForNextPlay == PlayEvaluationState.MainGameDecision && yardsToGain.HasValue)
             {
                 lineToGain = Helpers.AddYardsForTeam(lineOfScrimmage, yardsToGain.Value, teamWithPossession).Round();
             }
@@ -237,36 +237,36 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
         #endregion
 
         #region Main Loop
-        private GameState MoveNext(GameState currentState, GameDecisionParameters currentParameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        private PlayContext MoveNext(PlayContext currentState, GameDecisionParameters currentParameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
             var nextState = currentState.NextState switch
             {
-                GameplayNextState.Start => throw new InvalidOperationException("uh... shouldn't be here yet, I think?"),
-                GameplayNextState.KickoffDecision => KickoffDecision.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.FreeKickDecision => FreeKickDecision.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.SignalFairCatchDecision => SignalFairCatchDecision.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.TouchdownDecision => TouchdownDecision.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.MainGameDecision => MainGameDecision.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.ReturnFumbledOrInterceptedBallDecision => ReturnFumbledOrInterceptedBallDecision.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.NormalKickoffOutcome => NormalKickoffOutcome.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.ReturnableKickOutcome => ReturnableKickOutcome.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.FumbledLiveBallOutcome => FumbledLiveBallOutcome.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.PuntOutcome => PuntOutcome.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.ReturnablePuntOutcome => ReturnablePuntOutcome.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.KickOrPuntReturnOutcome => KickOrPuntReturnOutcome.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.FumbleOrInterceptionReturnOutcome => FumbleOrInterceptionReturnOutcome.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.OnsideKickAttemptOutcome => OnsideKickAttemptOutcome.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.FieldGoalsAndExtraPointAttemptOutcome => FieldGoalAttemptOutcome.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.TwoPointConversionAttemptOutcome => TwoPointConversionAttemptOutcome.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.StandardRushingPlayOutcome => StandardRushingPlayOutcome.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.StandardShortPassingPlayOutcome => StandardPassingPlayOutcome.Run(currentState, currentParameters, physicsParams, PassAttemptDistance.Short),
-                GameplayNextState.StandardMediumPassingPlayOutcome => StandardPassingPlayOutcome.Run(currentState, currentParameters, physicsParams, PassAttemptDistance.Medium),
-                GameplayNextState.StandardLongPassingPlayOutcome => StandardPassingPlayOutcome.Run(currentState, currentParameters, physicsParams, PassAttemptDistance.Long),
-                GameplayNextState.HailMaryOutcome => HailMaryOutcome.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.QBSneakOutcome => QBSneakOutcome.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.FakePuntOutcome => FakePuntOrFieldGoalOutcome.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.FakeFieldGoalOutcome => FakePuntOrFieldGoalOutcome.Run(currentState, currentParameters, physicsParams),
-                GameplayNextState.VictoryFormationOutcome => VictoryFormationOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.Start => throw new InvalidOperationException("uh... shouldn't be here yet, I think?"),
+                PlayEvaluationState.KickoffDecision => KickoffDecision.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.FreeKickDecision => FreeKickDecision.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.SignalFairCatchDecision => SignalFairCatchDecision.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.TouchdownDecision => TouchdownDecision.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.MainGameDecision => MainGameDecision.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.ReturnFumbledOrInterceptedBallDecision => ReturnFumbledOrInterceptedBallDecision.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.NormalKickoffOutcome => NormalKickoffOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.ReturnableKickOutcome => ReturnableKickOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.FumbledLiveBallOutcome => FumbledLiveBallOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.PuntOutcome => PuntOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.ReturnablePuntOutcome => ReturnablePuntOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.KickOrPuntReturnOutcome => KickOrPuntReturnOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.FumbleOrInterceptionReturnOutcome => FumbleOrInterceptionReturnOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.OnsideKickAttemptOutcome => OnsideKickAttemptOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.FieldGoalsAndExtraPointAttemptOutcome => FieldGoalAttemptOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.TwoPointConversionAttemptOutcome => TwoPointConversionAttemptOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.StandardRushingPlayOutcome => StandardRushingPlayOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.StandardShortPassingPlayOutcome => StandardPassingPlayOutcome.Run(currentState, currentParameters, physicsParams, PassAttemptDistance.Short),
+                PlayEvaluationState.StandardMediumPassingPlayOutcome => StandardPassingPlayOutcome.Run(currentState, currentParameters, physicsParams, PassAttemptDistance.Medium),
+                PlayEvaluationState.StandardLongPassingPlayOutcome => StandardPassingPlayOutcome.Run(currentState, currentParameters, physicsParams, PassAttemptDistance.Long),
+                PlayEvaluationState.HailMaryOutcome => HailMaryOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.QBSneakOutcome => QBSneakOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.FakePuntOutcome => FakePuntOrFieldGoalOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.FakeFieldGoalOutcome => FakePuntOrFieldGoalOutcome.Run(currentState, currentParameters, physicsParams),
+                PlayEvaluationState.VictoryFormationOutcome => VictoryFormationOutcome.Run(currentState, currentParameters, physicsParams),
                 _ => throw new InvalidOperationException($"Unhandled gameplay next state {currentState.NextState}.")
             };
 
@@ -279,11 +279,11 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
         }
         #endregion
 
-        private static void AssertPropertyBasedTests(GameState state)
+        private static void AssertPropertyBasedTests(PlayContext state)
         {
             Assert.True(state.Version >= 0L);
             Assert.True(Enum.IsDefined(state.NextState));
-            Assert.NotEqual(GameplayNextState.Start, state.NextState);
+            Assert.NotEqual(PlayEvaluationState.Start, state.NextState);
             Assert.True(state.AdditionalParameters.Count == 0
                 || state.AdditionalParameters.All(p => p.Key is "IsFakePlay" or "WasIntercepted" or "KickActualYard"));
             Assert.True(state.StateHistory.Count > 0);
@@ -304,7 +304,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
         }
 
         #region Next-Play Assertions
-        private void AssertForNextPlay(List<GameState> allStates)
+        private void AssertForNextPlay(List<PlayContext> allStates)
         {
             var nextPlay = allStates.First().NextPlay;
             if (nextPlay == NextPlayKind.Kickoff)
@@ -313,7 +313,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
             }
         }
 
-        private void AssertForKickoff(List<GameState> allGameStates)
+        private void AssertForKickoff(List<PlayContext> allGameStates)
         {
             // A kickoff can result in:
             // Either team scoring either a safety or a touchdown
@@ -325,7 +325,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
             var resultingState = allGameStates.Last();
             var kickingTeam = initialState.TeamWithPossession;
             var receivingTeam = kickingTeam.Opponent();
-            var fumbleOccurred = allGameStates.Any(gs => gs.NextState == GameplayNextState.FumbledLiveBallOutcome);
+            var fumbleOccurred = allGameStates.Any(gs => gs.NextState == PlayEvaluationState.FumbledLiveBallOutcome);
             var touchdownOccurred = resultingState.NextPlay == NextPlayKind.ConversionAttempt;
             var safetyOccurred = resultingState.AwayScore == initialState.AwayScore + 2
                 || resultingState.HomeScore == initialState.HomeScore + 2;

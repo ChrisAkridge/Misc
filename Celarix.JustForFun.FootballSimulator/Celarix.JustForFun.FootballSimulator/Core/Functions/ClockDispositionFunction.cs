@@ -25,7 +25,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
         /// <exception cref="InvalidOperationException">
         /// Thrown when an unexpected <see cref="ClockZone"/> value is encountered.
         /// </exception>
-        public static ClockDisposition Get(GameState priorState,
+        public static ClockDisposition Get(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
@@ -105,7 +105,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
         /// "LowTimeInHalfThreshold".
         /// </param>
         /// <returns>The <see cref="ClockZone"/> representing whether the game is in standard play or end-of-half time.</returns>
-        private static ClockZone GetClockZone(GameState priorState,
+        private static ClockZone GetClockZone(PlayContext priorState,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
             if (priorState.PeriodNumber is 1 or 3)

@@ -12,7 +12,10 @@ public enum SystemState
     PrepareForGame,
     InitializeDatabase,
     InitializeNextSeason,
-    InitializePlayoffs,
+    InitializeWildCardRound,
+    InitializeDivisionalRound,
+    InitializeConferenceChampionshipRound,
+    InitializeSuperBowl,
     ResumePartialGame,
     LoadGame,
     InGame,
@@ -22,6 +25,29 @@ public enum SystemState
     Error
 }
 
+public enum GameState
+{
+    Start,
+    EvaluatingPlay,
+    AdjustStrengths,
+    DeterminePlayersOnPlay,
+    InjuryCheck,
+    AdjustClock,
+    PostPlayCheck,
+    StartNextPeriod,
+    EndGame
+}
+
+public enum PostPlayDecision
+{
+    RunNextPlay,
+    EndGameWin,
+    EndGameTie,
+    NextPeriod,
+    EndOfPossession
+}
+
+[Obsolete]
 public enum CurrentSystemState
 {
     /// <summary>
@@ -90,7 +116,7 @@ internal enum GameResultForTeam
     Tie
 }
 
-internal enum GameplayNextState
+internal enum PlayEvaluationState
 {
     Start,
     KickoffDecision,
@@ -129,6 +155,7 @@ internal enum GameplayNextState
     /// The state reached when the clock hits zero at the end of the second quarter, fourth quarter,
     /// or any even overtime period.
     /// </summary>
+    [Obsolete]
     EndOfHalf,
 
     /// <summary>
@@ -138,6 +165,7 @@ internal enum GameplayNextState
     ///     - The end of any overtime period during a playoff game when one team has a lead and both teams have
     ///       at least one possession in overtime.
     /// </summary>
+    [Obsolete]
     EndOfGame
 }
 

@@ -10,7 +10,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
 {
     internal static class FreeKickDecision
     {
-        public static GameState Run(GameState priorState,
+        public static PlayContext Run(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
@@ -24,10 +24,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             if (kickingTeamSelfEstimate.KickDefenseStrength >= kickingTeamOtherEstimate.KickReturnStrength)
             {
                 Log.Information("FreeKickDecision: We're better at kick defense, choosing normal kickoff outcome.");
-                return priorState.WithNextState(GameplayNextState.NormalKickoffOutcome);
+                return priorState.WithNextState(PlayEvaluationState.NormalKickoffOutcome);
             }
             Log.Information("FreeKickDecision: They're better at kick returns, choosing punt outcome.");
-            return priorState.WithNextState(GameplayNextState.PuntOutcome);
+            return priorState.WithNextState(PlayEvaluationState.PuntOutcome);
         }
     }
 }

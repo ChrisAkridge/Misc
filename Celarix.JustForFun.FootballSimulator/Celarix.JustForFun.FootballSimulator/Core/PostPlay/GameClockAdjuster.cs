@@ -10,7 +10,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
 {
     internal static class GameClockAdjuster
     {
-        public static GameState Adjust(GameState priorState,
+        public static PlayContext Adjust(PlayContext priorState,
             GameDecisionParameters parameters,
             IReadOnlyDictionary<string, PhysicsParam> physicsParam,
             GameRecord currentGame)
@@ -53,7 +53,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
                     PeriodNumber = endedPeriod + 1,
                     SecondsLeftInPeriod = Constants.SecondsPerQuarter,
                     // Don't use WithNextState here, we don't need to keep history by this point
-                    NextState = GameplayNextState.PlayEvaluationComplete
+                    NextState = PlayEvaluationState.PlayEvaluationComplete
                 };
             }
             else if (endedPeriod is 2)
@@ -63,7 +63,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
                 {
                     PeriodNumber = 3,
                     SecondsLeftInPeriod = Constants.SecondsPerQuarter,
-                    NextState = GameplayNextState.EndOfHalf
+                    NextState = PlayEvaluationState.EndOfHalf
                 };
             }
             else if (endedPeriod is 4)
@@ -75,13 +75,13 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
                     {
                         PeriodNumber = 5,
                         SecondsLeftInPeriod = Constants.SecondsPerOvertimePeriod,
-                        NextState = GameplayNextState.EndOfHalf
+                        NextState = PlayEvaluationState.EndOfHalf
                     };
                 }
                 Log.Verbose("Clock: End of regulation, game over");
                 return priorState with
                 {
-                    NextState = GameplayNextState.EndOfGame
+                    NextState = PlayEvaluationState.EndOfGame
                 };
             }
             else if (endedPeriod >= 5)
@@ -98,7 +98,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
                     Log.Verbose("Clock: End of overtime, game over (regular season)");
                     return priorState with
                     {
-                        NextState = GameplayNextState.EndOfGame
+                        NextState = PlayEvaluationState.EndOfGame
                     };
                 }
                 else if (bothTeamsHadPossession && !isScoreTied)
@@ -106,7 +106,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
                     Log.Verbose("Clock: End of overtime, both teams had possession, game over (postseason)");
                     return priorState with
                     {
-                        NextState = GameplayNextState.EndOfGame
+                        NextState = PlayEvaluationState.EndOfGame
                     };
                 }
                 else
@@ -117,8 +117,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
                         PeriodNumber = endedPeriod + 1,
                         SecondsLeftInPeriod = Constants.SecondsPerOvertimePeriod,
                         NextState = (endedPeriod % 2 == 0)
-                            ? GameplayNextState.EndOfHalf
-                            : GameplayNextState.PlayEvaluationComplete
+                            ? PlayEvaluationState.EndOfHalf
+                            : PlayEvaluationState.PlayEvaluationComplete
                     };
                 }
             }

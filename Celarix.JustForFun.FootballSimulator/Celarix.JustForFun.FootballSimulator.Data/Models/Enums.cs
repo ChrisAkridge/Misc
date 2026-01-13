@@ -82,4 +82,11 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
 	    Defense,
 	    Kicker
     }
+
+    public enum WinningTeam
+    {
+        Away,
+        Home,
+        Tie
+    }
 }
