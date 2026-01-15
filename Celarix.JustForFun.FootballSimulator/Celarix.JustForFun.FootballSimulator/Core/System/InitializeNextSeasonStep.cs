@@ -14,36 +14,28 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
     {
         public static SystemContext Run(SystemContext context)
         {
-            var footballContext = context.Environment.FootballContext;
+            var repository = context.Environment.FootballRepository;
             var nextSeasonYear = 2014;
 
-            var teams = footballContext.Teams.ToList();
-            var dataTeams = teams.ToDictionary(t => new BasicTeamInfo(t), t => t);
-            BasicTeamInfo[] teamList = [.. dataTeams.Keys];
+            var teams = repository.GetTeams();
+            var basicTeamInfos = teams.ToDictionary(t => new BasicTeamInfo(t), t => t);
+            BasicTeamInfo[] teamList = [.. basicTeamInfos.Keys];
             var scheduleGenerator = context.Environment.ScheduleGenerator
                 ??= new ScheduleGenerator3(teamList, context.Environment.RandomFactory);
             var random = context.Environment.RandomFactory.Create();
 
-            var mostRecentSeason = footballContext.SeasonRecords.OrderByDescending(sr => sr.Year)
-                .FirstOrDefault();
+            var mostRecentSeason = repository.GetMostRecentSeason();
             Team? previousSuperBowlWinner = null;
             Dictionary<BasicTeamInfo, int>? divisionStandings = null;
             if (mostRecentSeason != null)
             {
                 nextSeasonYear = mostRecentSeason.Year + 1;
 
-                var regularSeasonGames = footballContext.GameRecords
-                    .Where(g => g.SeasonRecordID == mostRecentSeason.SeasonRecordID
-                        && g.GameType == GameType.RegularSeason)
-                    .ToList();
+                var regularSeasonGames = repository.GetGameRecordsForSeasonByGameType(mostRecentSeason.SeasonRecordID,
+                    GameType.RegularSeason);
 
-                var previousSuperBowl = footballContext.GameRecords
-                .Include(g => g.HomeTeam)
-                .Include(g => g.AwayTeam)
-                .Where(g => g.SeasonRecordID == mostRecentSeason.SeasonRecordID
-                    && g.GameType == GameType.Postseason
-                    && g.HomeTeam.Conference != g.AwayTeam.Conference)
-                .SingleOrDefault();
+                var previousSuperBowl = repository.GetPlayoffGamesForSeason(mostRecentSeason.SeasonRecordID,
+                    PlayoffRound.SuperBowl).FirstOrDefault();
                 var winner = previousSuperBowl?.GetWinningTeam();
                 previousSuperBowlWinner = winner == GameTeam.Home
                     ? previousSuperBowl?.HomeTeam
@@ -64,16 +56,16 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             }
 
             var schedule = scheduleGenerator.GenerateScheduleForYear(nextSeasonYear,
-                dataTeams,
+                basicTeamInfos,
                 divisionStandings,
                 new BasicTeamInfo(previousSuperBowlWinner),
                 out _);
-            footballContext.GameRecords.AddRange(schedule);
-            footballContext.SeasonRecords.Add(new SeasonRecord
+            repository.AddGameRecords(schedule);
+            repository.AddSeasonRecord(new SeasonRecord
             {
                 Year = nextSeasonYear
             });
-            footballContext.SaveChanges();
+            repository.SaveChanges();
 
             Log.Information("InitializeNextSeasonStep: Initialized next season ({NextSeasonYear}) schedule.",
                 nextSeasonYear);

@@ -18,17 +18,17 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
     {
         public static SystemContext Run(SystemContext context)
         {
-            var footballContext = context.Environment.FootballContext;
-            var teams = footballContext.Teams.ToArray();
+            var repository = context.Environment.FootballRepository;
+            var teams = repository.GetTeams();
 
-            var currentSeasonGames = GetGamesForCurrentSeason(footballContext);
-            var (afcPlayoffTeams, nfcPlayoffTeams) = GetPlayoffTeams(footballContext, currentSeasonGames, context.Environment.RandomFactory.Create());
+            var currentSeasonGames = GetGamesForCurrentSeason(repository);
+            var (afcPlayoffTeams, nfcPlayoffTeams) = GetPlayoffTeams(repository, currentSeasonGames, context.Environment.RandomFactory.Create());
             var wildCardGames = BuildWildCardGameRecords(teams,
                 afcPlayoffTeams,
                 nfcPlayoffTeams,
                 currentSeasonGames.OrderByDescending(g => g.KickoffTime).First());
 
-            footballContext.GameRecords.AddRange(wildCardGames);
+            repository.AddGameRecords(wildCardGames);
 
             var seeds = afcPlayoffTeams
                 .Select((t, i) => new
@@ -47,24 +47,18 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                     TeamID = teams.Single(t => t.TeamName == a.Team.Name).TeamID,
                     Seed = a.Seed
                 });
-            footballContext.TeamPlayoffSeeds.AddRange(seeds);
-            footballContext.SaveChanges();
+            repository.AddTeamPlayoffSeeds(seeds);
+            repository.SaveChanges();
 
             Log.Information("InitializeWildCardRoundStep: Wild Card round initialized.");
             return context.WithNextState(SystemState.LoadGame);
         }
 
-        internal static IReadOnlyList<GameRecord> GetGamesForCurrentSeason(FootballContext footballContext)
+        internal static IReadOnlyList<GameRecord> GetGamesForCurrentSeason(IFootballRepository repository)
         {
-            var currentSeason = footballContext.SeasonRecords
-                .OrderByDescending(sr => sr.Year)
-                .First();
-            IReadOnlyList<GameRecord> games = [.. footballContext.GameRecords
-                .Include(g => g.AwayTeam)
-                .Include(g => g.HomeTeam)
-                .Where(g => g.SeasonRecordID == currentSeason.SeasonRecordID
-                    && g.GameType == GameType.RegularSeason
-                    && g.GameComplete)];
+            var currentSeason = repository.GetMostRecentSeason()
+                ?? throw new InvalidOperationException("No season records found in database.");
+            var games = repository.GetGameRecordsForSeasonByGameType(currentSeason.SeasonRecordID, GameType.RegularSeason);
             Log.Verbose("InitializeWildCardRoundStep: Retrieved {GameCount} completed regular season games for season {SeasonYear}.",
                 games.Count,
                 currentSeason.Year);
@@ -72,9 +66,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
         }
 
         internal static (IReadOnlyList<BasicTeamInfo> AFCPlayoffTeams, IReadOnlyList<BasicTeamInfo> NFCPlayoffTeams)
-            GetPlayoffTeams(FootballContext footballContext, IReadOnlyList<GameRecord> currentSeasonGames, IRandom random)
+            GetPlayoffTeams(IFootballRepository repository, IReadOnlyList<GameRecord> currentSeasonGames, IRandom random)
         {
-            var divisionTieBreaker = new DivisionTiebreaker(footballContext.Teams,
+            var divisionTieBreaker = new DivisionTiebreaker(repository.GetTeams(),
                 currentSeasonGames,
                 random);
             var divisionTeamRankings = divisionTieBreaker.GetTeamDivisionRankings();

@@ -1,4 +1,5 @@
-﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
+﻿using Celarix.JustForFun.FootballSimulator.Data;
+using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -12,15 +13,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
     {
         public static SystemContext Run(SystemContext context)
         {
-            var footballContext = context.Environment.FootballContext;
-            var physicsParams = footballContext.PhysicsParams
+            var repository = context.Environment.FootballRepository;
+            var physicsParams = repository.GetPhysicsParams()
                 .ToDictionary(p => p.Name, p => p);
             var random = context.Environment.RandomFactory.Create();
-            var gameRecord = footballContext.GameRecords
-                .Include(g => g.Stadium)
-                .Include(g => g.TeamDriveRecords)
-                .OrderBy(g => g.KickoffTime)
-                .FirstOrDefault(g => !g.GameComplete);
+            var gameRecord = repository.GetNextUnplayedGame();
 
             if (gameRecord == null)
             {
@@ -36,7 +33,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             Log.Information("LoadGameStep: Initialized base wind direction to {WindDirection} degrees (0 = toward home, 180 = toward away).", newPlayContext.BaseWindDirection);
             Log.Information("LoadGameStep: Initialized base wind speed to {WindSpeed} mph.", newPlayContext.BaseWindSpeed);
 
-            CheckForInjuryRecoveries(footballContext, gameRecord);
+            CheckForInjuryRecoveries(repository, gameRecord);
             
             var coinTossWinner = random.Chance(0.5)
                 ? GameTeam.Home
@@ -85,14 +82,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             return context.WithNextState(SystemState.InGame);
         }
 
-        internal static void CheckForInjuryRecoveries(FootballContext footballContext,
+        internal static void CheckForInjuryRecoveries(IFootballRepository repository,
             GameRecord gameRecord)
         {
-            var claimableRecoveries = footballContext.InjuryRecoveries
-                .Where(ir => !ir.Recovered
-                    && (ir.TeamID == gameRecord.HomeTeamID || ir.TeamID == gameRecord.AwayTeamID)
-                    && ir.RecoverOn >= gameRecord.KickoffTime)
-                .ToArray();
+            var claimableRecoveries = repository.GetInjuryRecoveriesForGame(gameRecord.AwayTeamID,
+                gameRecord.HomeTeamID,
+                gameRecord.KickoffTime);
 
             foreach (var recovery in claimableRecoveries)
             {
@@ -113,7 +108,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 }
             }
 
-            footballContext.SaveChanges();
+            repository.SaveChanges();
         }
     }
 }

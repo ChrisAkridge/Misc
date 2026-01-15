@@ -10,9 +10,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
     {
         public static SystemContext Run(SystemContext context)
         {
-            var footballContext = context.Environment.FootballContext;
-            footballContext.Database.EnsureCreated();
-            var settings = footballContext.SimulatorSettings.SingleOrDefault();
+            var repository = context.Environment.FootballRepository;
+            repository.EnsureCreated();
+            var settings = repository.GetSimulatorSettings();
 
             if (settings?.SeedDataInitialized != true)
             {

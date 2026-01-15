@@ -13,19 +13,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
     {
         public static SystemContext Run(SystemContext context)
         {
-            var footballContext = context.Environment.FootballContext;
-            var currentSeason = footballContext.SeasonRecords
-                .OrderByDescending(sr => sr.Year)
-                .First();
-            var wildCardGames = footballContext.GameRecords
-                .Include(g => g.AwayTeam)
-                .Include(g => g.HomeTeam)
-                .Where(gr => gr.SeasonRecordID == currentSeason.SeasonRecordID
-                    && gr.GameType == GameType.Postseason)
-                .ToList();
-            var teamPlayoffSeeds = footballContext.TeamPlayoffSeeds
-                .Where(tps => tps.SeasonRecordID == currentSeason.SeasonRecordID)
-                .ToList();
+            var repository = context.Environment.FootballRepository;
+            var currentSeason = repository.GetMostRecentSeason()
+                ?? throw new InvalidOperationException("No season records found in database.");
+            var wildCardGames = repository.GetPlayoffGamesForSeason(currentSeason.SeasonRecordID, PlayoffRound.WildCard);
+            var teamPlayoffSeeds = repository.GetPlayoffSeedsForSeason(currentSeason.SeasonRecordID);
 
             if (wildCardGames.Count != 8)
             {
@@ -93,8 +85,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                     divisionalRoundKickoffTimes[3], currentSeason.SeasonRecordID)
             };
 
-            footballContext.GameRecords.AddRange(divisionalRoundGames);
-            footballContext.SaveChanges();
+            repository.AddGameRecords(divisionalRoundGames);
+            repository.SaveChanges();
 
             Log.Information("InitializeDivisionalRoundStep: Divisional Round games initialized.");
             return context.WithNextState(SystemState.LoadGame);

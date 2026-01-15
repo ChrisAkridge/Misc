@@ -12,28 +12,25 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
     {
         public static SystemContext Run(SystemContext context)
         {
-            var footballContext = context.Environment.FootballContext;
+            var repository = context.Environment.FootballRepository;
+            var incompleteSeasonCount = repository.CountIncompleteSeasons();
 
             // Check if any non-complete seasons exist
-            if (!footballContext.SeasonRecords.Any(sr => !sr.SeasonComplete))
+            if (incompleteSeasonCount == 0)
             {
-                Log.Information("PrepareForGameStep: No incomplete season found, initializing next season.")
+                Log.Information("PrepareForGameStep: No incomplete season found, initializing next season.");
                 return context.WithNextState(SystemState.InitializeNextSeason);
             }
 
-            if (footballContext.SeasonRecords.Count(sr => !sr.SeasonComplete) > 1)
+            if (incompleteSeasonCount > 1)
             {
                 throw new InvalidOperationException("More than one incomplete season exists in the database.");
             }
 
             // Check if a complete season exists but has no summary
-            var currentSeason = footballContext.SeasonRecords
-                .OrderByDescending(sr => sr.Year)
-                .First(sr => !sr.SeasonComplete);
-            var existingSummary = footballContext.Summaries
-                .Where(s => s.SeasonRecordID == currentSeason.SeasonRecordID
-                    && s.GameRecordID == null)
-                .SingleOrDefault();
+            var currentSeason = repository.GetMostRecentSeason()
+                ?? throw new InvalidOperationException("Unreachable: no current season record despite earlier check");
+            var existingSummary = repository.GetSummaryForSeason(currentSeason.SeasonRecordID);
             if (existingSummary == null)
             {
                 Log.Information("PrepareForGameStep: Complete season found with no summary, writing summary for season {SeasonYear}.",
@@ -42,10 +39,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             }
 
             // Check if any non-complete games exist
-            var seasonGames = footballContext.GameRecords
-                .Include(g => g.TeamDriveRecords)
-                .Where(g => g.SeasonRecordID == currentSeason.SeasonRecordID)
-                .ToList();
+            var seasonGames = repository.GetGameRecordsForSeason(currentSeason.SeasonRecordID);
             if (seasonGames.Any(g => !g.GameComplete))
             {
                 // Check if any partially complete games exist

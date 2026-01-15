@@ -89,4 +89,12 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         Home,
         Tie
     }
+
+    public enum PlayoffRound
+    {
+        WildCard,
+        Divisional,
+        ConferenceChampionship,
+        SuperBowl
+    }
 }

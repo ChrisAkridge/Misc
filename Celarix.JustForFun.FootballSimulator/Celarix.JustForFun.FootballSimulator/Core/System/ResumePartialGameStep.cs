@@ -14,14 +14,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
     {
         public static SystemContext Run(SystemContext context)
         {
-            var footballContext = context.Environment.FootballContext;
-            var physicsParams = footballContext.PhysicsParams
+            var repository = context.Environment.FootballRepository;
+            var physicsParams = repository.GetPhysicsParams()
                 .ToDictionary(p => p.Name, p => p);
             var random = context.Environment.RandomFactory.Create();
-            var gameRecord = footballContext.GameRecords
-                .Include(g => g.Stadium)
-                .Include(g => g.TeamDriveRecords)
-                .Single(g => !g.GameComplete && g.TeamDriveRecords.Count > 0);
+            var gameRecord = repository.GetPartialGameRecord();
 
             var airTemperature = Helpers.GetTemperatureForGame(gameRecord, physicsParams, random);
             var resumingPlayContext = Helpers.CreateInitialPlayContext(random,

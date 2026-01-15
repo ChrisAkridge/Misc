@@ -13,20 +13,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
     {
         public static SystemContext Run(SystemContext context)
         {
-            var footballContext = context.Environment.FootballContext;
-            var currentSeason = footballContext.SeasonRecords
-                .OrderByDescending(sr => sr.Year)
-                .First();
-            var divisionalRoundGames = footballContext.GameRecords
-                .Include(g => g.AwayTeam)
-                .Include(g => g.HomeTeam)
-                .Where(gr => gr.SeasonRecordID == currentSeason.SeasonRecordID
-                    && gr.GameType == GameType.Postseason
-                    && gr.WeekNumber == 19)
-                .ToList();
-            var teamPlayoffSeeds = footballContext.TeamPlayoffSeeds
-                .Where(tps => tps.SeasonRecordID == currentSeason.SeasonRecordID)
-                .ToList();
+            var repository = context.Environment.FootballRepository;
+            var currentSeason = repository.GetMostRecentSeason()
+                ?? throw new InvalidOperationException("No current season found.");
+            var divisionalRoundGames = repository.GetPlayoffGamesForSeason(currentSeason.SeasonRecordID,
+                PlayoffRound.Divisional);
+            var teamPlayoffSeeds = repository.GetPlayoffSeedsForSeason(currentSeason.SeasonRecordID);
 
             if (divisionalRoundGames.Count != 4)
             {
@@ -87,8 +79,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                     conferenceChampionshipKickoffTimes[1], currentSeason.SeasonRecordID)
             };
 
-            footballContext.GameRecords.AddRange(conferenceChampionships);
-            footballContext.SaveChanges();
+            repository.AddGameRecords(conferenceChampionships);
+            repository.SaveChanges();
 
             Log.Information("InitializeConferenceChampionshipRoundStep: Created Conference Championships.");
             return context.WithNextState(SystemState.LoadGame);

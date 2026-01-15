@@ -10,7 +10,7 @@ using static Celarix.JustForFun.FootballSimulator.Helpers;
 
 namespace Celarix.JustForFun.FootballSimulator
 {
-    [Obsolete("See Gameplay.FootballGame instead for the main implementation.")]
+    [Obsolete("See ~~Gameplay.FootballGame~~ types in the Core namespace instead for the main implementation.")]
     internal sealed class GameLoop
     {
         private const int SecondsInRegulationQuarter = 15 * 60;

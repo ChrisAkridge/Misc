@@ -11,16 +11,16 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
     {
         public static SystemContext Run(SystemContext context)
         {
-            var footballContext = context.Environment.FootballContext;
-            var settings = footballContext.SimulatorSettings.SingleOrDefault();
+            var repository = context.Environment.FootballRepository;
+            var settings = repository.GetSimulatorSettings();
 
             if (settings == null)
             {
-                footballContext.SimulatorSettings.Add(new SimulatorSettings
+                repository.AddSimulatorSettings(new SimulatorSettings
                 {
                     SeedDataInitialized = true
                 });
-                footballContext.SaveChanges();
+                repository.SaveChanges();
             }
             else
             {
@@ -31,9 +31,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             Log.Verbose($"InitializeDatabaseStep: Seeding team data for {teamsWithStadiums.Count} teams into database.");
             foreach (var team in teamsWithStadiums)
             {
-                footballContext.Teams.Add(team);
+                repository.AddTeam(team);
             }
-            footballContext.SaveChanges();
+            repository.SaveChanges();
 
             Log.Verbose("InitializeDatabaseStep: Generating player rosters.");
             var playerFactory = context.Environment.PlayerFactory;
@@ -45,18 +45,18 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 {
                     var player = playerFactory.CreateNewPlayer(random, undraftedFreeAgent: false);
                     PlayerFactory.AssignPlayerToTeam(player, team.TeamID, rosterPosition, random);
-                    footballContext.Players.Add(player);
+                    repository.AddPlayer(player);
                 }
             }
-            footballContext.SaveChanges();
+            repository.SaveChanges();
 
             Log.Verbose("InitializeDatabaseStep: Adding physics parameters.");
             var physicsParams = SeedData.ParamSeemData();
             foreach (var param in physicsParams)
             {
-                footballContext.PhysicsParams.Add(param);
+                repository.AddPhysicsParam(param);
             }
-            footballContext.SaveChanges();
+            repository.SaveChanges();
 
             Log.Information("InitializeDatabaseStep: Initialized database.");
             return context.WithNextState(SystemState.InitializeNextSeason);

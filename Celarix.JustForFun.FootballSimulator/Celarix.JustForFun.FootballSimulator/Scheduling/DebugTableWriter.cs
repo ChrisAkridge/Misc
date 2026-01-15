@@ -10,7 +10,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 {
 	internal sealed class DebugTableWriter
 	{
-		private StringBuilder htmlBuilder;
+		private readonly StringBuilder htmlBuilder;
 		private readonly IRandom random;
 		
 		public DebugTableWriter(IRandom random)
