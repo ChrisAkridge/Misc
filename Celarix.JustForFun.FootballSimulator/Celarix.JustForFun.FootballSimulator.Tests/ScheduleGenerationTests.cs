@@ -336,8 +336,6 @@ namespace Celarix.JustForFun.FootballSimulator.Tests
             }
         }
 
-
-
         private static BasicTeamInfo ToBasicTeamInfo(Team team)
         {
             return new BasicTeamInfo(team.TeamName, team.Conference, team.Division);

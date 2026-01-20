@@ -5,7 +5,7 @@ using Celarix.JustForFun.FootballSimulator.Data.Models;
 
 namespace Celarix.JustForFun.FootballSimulator.Scheduling;
 
-public sealed class BasicTeamInfo : IComparable<BasicTeamInfo>
+public sealed class BasicTeamInfo : IComparable<BasicTeamInfo>, IEquatable<BasicTeamInfo>
 {
     public string Name { get; }
     public Conference Conference { get; }
@@ -41,7 +41,48 @@ public sealed class BasicTeamInfo : IComparable<BasicTeamInfo>
     /// <param name="other">An object to compare with this instance.</param>
     /// <returns>A value that indicates the relative order of the objects being compared. The return value has these meanings:
     /// <list type="table"><listheader><term> Value</term><description> Meaning</description></listheader><item><term> Less than zero</term><description> This instance precedes <paramref name="other" /> in the sort order.</description></item><item><term> Zero</term><description> This instance occurs in the same position in the sort order as <paramref name="other" />.</description></item><item><term> Greater than zero</term><description> This instance follows <paramref name="other" /> in the sort order.</description></item></list></returns>
-    public int CompareTo(BasicTeamInfo? other) => other == null
+    public int CompareTo(BasicTeamInfo? other) => other is null
             ? 1
             : string.Compare(Name, other.Name, StringComparison.Ordinal);
+
+    public bool Equals(BasicTeamInfo? other)
+    {
+        if (other is null) { return false; }
+        return Name == other.Name;
+    }
+
+    public static bool operator ==(BasicTeamInfo left, BasicTeamInfo right)
+    {
+        if (left is null)
+        {
+            return right is null;
+        }
+
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(BasicTeamInfo left, BasicTeamInfo right)
+    {
+        return !(left == right);
+    }
+
+    public static bool operator <(BasicTeamInfo left, BasicTeamInfo right)
+    {
+        return left is null ? right is not null : left.CompareTo(right) < 0;
+    }
+
+    public static bool operator <=(BasicTeamInfo left, BasicTeamInfo right)
+    {
+        return left is null || left.CompareTo(right) <= 0;
+    }
+
+    public static bool operator >(BasicTeamInfo left, BasicTeamInfo right)
+    {
+        return left is not null && left.CompareTo(right) > 0;
+    }
+
+    public static bool operator >=(BasicTeamInfo left, BasicTeamInfo right)
+    {
+        return left is null ? right is null : left.CompareTo(right) >= 0;
+    }
 }

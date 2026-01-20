@@ -299,5 +299,27 @@ namespace Celarix.JustForFun.FootballSimulator
                 ClockManagementStrength = strengths[10]
             };
         }
+
+        // Source - https://stackoverflow.com/a/1674779
+        // Posted by Jon Skeet, modified by community. See post 'Timeline' for change history
+        // Retrieved 2026-01-20, License - CC BY-SA 2.5
+
+        public static List<T> IntersectAll<T>(IEnumerable<IEnumerable<T>> lists)
+        {
+            HashSet<T>? hashSet = null;
+            foreach (var list in lists)
+            {
+                if (hashSet == null)
+                {
+                    hashSet = [.. list];
+                }
+                else
+                {
+                    hashSet.IntersectWith(list);
+                }
+            }
+            return hashSet == null ? [] : [.. hashSet];
+        }
+
     }
 }
