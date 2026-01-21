@@ -49,47 +49,6 @@ namespace Celarix.JustForFun.FootballSimulator
             return rankings;
         }
 
-        public static Dictionary<BasicTeamInfo, TeamWinLossTie> GetWinLossTies(IReadOnlyList<BasicTeamInfo> teams,
-            IEnumerable<GameRecord> gameRecords)
-        {
-            var games = gameRecords
-                .Where(g => g.GameComplete)
-                .Select(g => new
-                {
-                    HomeTeam = new BasicTeamInfo(g.HomeTeam.TeamName, g.HomeTeam.Conference, g.HomeTeam.Division),
-                    AwayTeam = new BasicTeamInfo(g.AwayTeam.TeamName, g.AwayTeam.Conference, g.AwayTeam.Division),
-                    HomeScore = g.GetScoreForTeam(GameTeam.Home),
-                    AwayScore = g.GetScoreForTeam(GameTeam.Away)
-                })
-                .ToList();
-            var winLossTies = teams.ToDictionary(t => t, t => new TeamWinLossTie());
-            foreach (var game in games)
-            {
-                if (game.HomeScore > game.AwayScore)
-                {
-                    winLossTies[game.HomeTeam].Wins++;
-                    winLossTies[game.AwayTeam].Losses++;
-                }
-                else if (game.HomeScore < game.AwayScore)
-                {
-                    winLossTies[game.AwayTeam].Wins++;
-                    winLossTies[game.HomeTeam].Losses++;
-                }
-                else
-                {
-                    winLossTies[game.HomeTeam].Ties++;
-                    winLossTies[game.AwayTeam].Ties++;
-                }
-            }
-            return winLossTies;
-        }
-
-        public static Dictionary<BasicTeamInfo, int> GetSeasonDivisionRankings(IReadOnlyList<BasicTeamInfo> teams,
-            IReadOnlyList<GameRecord> seasonGames)
-        {
-            var winLossTies = GetWinLossTies(teams, seasonGames.Where(g => g.GameType == GameType.RegularSeason));
-        }
-
         public static IEnumerable<BasicTeamInfo> GetTeamsInDivision(IEnumerable<BasicTeamInfo> teams, Conference conference, Division division) =>
 			teams.Where(t => t.Conference == conference && t.Division == division);
 
@@ -176,7 +135,7 @@ namespace Celarix.JustForFun.FootballSimulator
             };
         }
 
-        public static PlayContext CreateInitialPlayContext(IRandom random,
+        internal static PlayContext CreateInitialPlayContext(IRandom random,
             GameRecord gameRecord,
             double startWindSpeedStddev,
             double airTemperature)
@@ -240,7 +199,7 @@ namespace Celarix.JustForFun.FootballSimulator
             return random.SampleNormalDistribution(averageTemperatureThisMonth, temperatureStddev);
         }
 
-        public static TeamStrengthSet EstimateStrengthSetForTeam(Team team, Team requestingTeam,
+        internal static TeamStrengthSet EstimateStrengthSetForTeam(Team team, Team requestingTeam,
             GameRecord gameRecord,
             IRandom random,
             IReadOnlyDictionary<string, PhysicsParam> physicsParams)
@@ -321,5 +280,34 @@ namespace Celarix.JustForFun.FootballSimulator
             return hashSet == null ? [] : [.. hashSet];
         }
 
+
+        public static string CapitalizeLastName(string lastName)
+        {
+            // Ensure the name is title case
+            var titleCased = char.ToUpper(lastName[0]) + lastName[1..].ToLower();
+
+            // If the name has an apostrophe or a hyphen, capitalize the letter after it
+            var capitalizeAfter = new[] { '\'', '-', ' ' };
+            foreach (var separator in capitalizeAfter)
+            {
+                var separatorIndex = titleCased.IndexOf(separator);
+                if (separatorIndex > 0 && separatorIndex < titleCased.Length - 1)
+                {
+                    titleCased = titleCased[..(separatorIndex + 1)] +
+                        char.ToUpper(titleCased[separatorIndex + 1]) +
+                        titleCased[(separatorIndex + 2)..];
+                }
+            }
+
+            // If the name starts with "Mc", capitalize the letter after it
+            if (titleCased.Length > 2 && titleCased.StartsWith("Mc"))
+            {
+                titleCased = "Mc" +
+                    char.ToUpper(titleCased[2]) +
+                    titleCased[3..];
+            }
+
+            return titleCased;
+        }
     }
 }

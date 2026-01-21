@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Celarix.JustForFun.FootballSimulator.Data
 {
-    public sealed class FootballRepository
+    public sealed class FootballRepository : IFootballRepository
     {
         private readonly FootballContext context;
 
@@ -160,6 +160,23 @@ namespace Celarix.JustForFun.FootballSimulator.Data
                 .Include(g => g.Stadium)
                 .Include(g => g.TeamDriveRecords)
                 .Single(g => !g.GameComplete && g.TeamDriveRecords.Count > 0);
+        }
+
+        public void AddSummary(Summary summary)
+        {
+            context.Summaries.Add(summary);
+        }
+
+        public SeasonRecord GetSeasonWithGames(int seasonRecordID)
+        {
+            return context.SeasonRecords
+                .Include(sr => sr.GameRecords)
+                    .ThenInclude(gr => gr.HomeTeam)
+                .Include(sr => sr.GameRecords)
+                    .ThenInclude(gr => gr.AwayTeam)
+                .Include(sr => sr.GameRecords)
+                    .ThenInclude(gr => gr.QuarterBoxScores)
+                .Single(sr => sr.SeasonRecordID == seasonRecordID);
         }
     }
 }

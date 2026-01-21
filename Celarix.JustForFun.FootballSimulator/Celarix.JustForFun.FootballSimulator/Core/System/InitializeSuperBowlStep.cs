@@ -82,7 +82,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 AwayTeamID = away.TeamID,
                 KickoffTime = superBowlKickoffTime,
                 StadiumID = home.HomeStadiumID,
-                WeekNumber = 19,
+                WeekNumber = 22,
                 GameComplete = false,
                 HomeTeamStrengthsAtKickoffJSON = home.GetStrengthJson(),
                 AwayTeamStrengthsAtKickoffJSON = away.GetStrengthJson()

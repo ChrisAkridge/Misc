@@ -47,6 +47,49 @@ public enum PostPlayDecision
     EndOfPossession
 }
 
+public enum StateMachineAdvanceMode
+{
+    /// <summary>
+    /// The state machine advances one step no matter what, even inside of nested state machines.
+    /// This makes for a much slower experience but is useful for testing and validation.
+    /// </summary>
+    OneStepStrict,
+
+    /// <summary>
+    /// The state machine indicates when an internal state machine has stepped, allowing callers to
+    /// choose to step more quickly through internal steps if desired.
+    /// </summary>
+    FastInternalSteps,
+
+    /// <summary>
+    /// If the state machine finds that an internal state machine has stepped, it continues to step
+    /// through all internal steps until the internal state machine indicates it has completed.
+    /// </summary>
+    RunAllInternalSteps
+}
+
+public enum AdvancedStateMachine
+{
+    System,
+    Game,
+    PlayEvaluation
+}
+
+public enum InGameSignal
+{
+    None,
+    PlayEvaluationStep,
+    GameStateAdvanced,
+    GameCompleted,
+}
+
+public enum EvaluatingPlaySignal
+{
+    None,
+    InProgress,
+    PlayEvaluationComplete
+}
+
 [Obsolete]
 public enum CurrentSystemState
 {

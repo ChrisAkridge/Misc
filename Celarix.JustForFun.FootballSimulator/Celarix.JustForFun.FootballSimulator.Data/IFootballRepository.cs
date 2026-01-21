@@ -30,5 +30,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data
         Summary? GetSummaryForSeason(int seasonRecordID);
         IReadOnlyList<GameRecord> GetGameRecordsForSeason(int seasonID);
         GameRecord GetPartialGameRecord();
+        void AddSummary(Summary summary);
+        SeasonRecord GetSeasonWithGames(int seasonRecordID);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Celarix.JustForFun.FootballSimulator.Data;
+﻿using Celarix.JustForFun.FootballSimulator.Core.System;
+using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
 using Celarix.JustForFun.FootballSimulator.Random;
@@ -12,59 +13,59 @@ namespace Celarix.JustForFun.FootballSimulator.Core
 {
     public sealed partial class SystemLoop
     {
-        private IRandomFactory randomFactory;
-        private FootballContext footballContext;
-        private GameLoop? currentGameLoop;
+        private SystemContext context;
 
-        public CurrentSystemState CurrentState { get; private set; }
-        public SystemStatus SystemStatus { get; private set; }
-
-        public SystemLoop(IRandomFactory randomFactory)
+        public SystemLoop()
         {
-            footballContext = new FootballContext();
-            CurrentState = CurrentSystemState.Initialization;
-            SystemStatus = new SystemStatus
+            var firstNames = File.ReadAllLines("Names\\player-first-names.csv");
+            var lastNames = File.ReadAllLines("Names\\player-last-names.csv")
+                .Select(Helpers.CapitalizeLastName);
+
+            context = new SystemContext(
+                Version: 0L,
+                NextState: SystemState.Start,
+                Environment: new SystemEnvironment
+                {
+                    FootballRepository = new FootballRepository(new FootballContext()),
+                    RandomFactory = new RandomFactory(),
+                    PlayerFactory = new PlayerFactory(firstNames, lastNames)
+                });
+        }
+
+        public AdvancedStateMachine MoveNext()
+        {
+            InGameSignal inGameSignal = InGameSignal.None;
+
+            context = context.NextState switch
             {
-                CurrentState = CurrentState,
-                StatusMessage = "Football Simulator started."
+                SystemState.Start => StartStep.Run(context),
+                SystemState.InitializeDatabase => InitializeDatabaseStep.Run(context),
+                SystemState.PrepareForGame => PrepareForGameStep.Run(context),
+                SystemState.InitializeNextSeason => InitializeNextSeasonStep.Run(context),
+                SystemState.InitializeWildCardRound => InitializeWildCardRoundStep.Run(context),
+                SystemState.InitializeDivisionalRound => InitializeDivisionalRoundStep.Run(context),
+                SystemState.InitializeConferenceChampionshipRound => InitializeConferenceChampionshipRoundStep.Run(context),
+                SystemState.InitializeSuperBowl => InitializeSuperBowlStep.Run(context),
+                SystemState.ResumePartialGame => ResumePartialGameStep.Run(context),
+                SystemState.LoadGame => LoadGameStep.Run(context),
+                SystemState.InGame => InGameStep.Run(context, out inGameSignal),
+                SystemState.PostGame => PostGameStep.Run(context),
+                SystemState.WriteSummaryForGame => WriteSummaryForGameStep.Run(context),
+                SystemState.WriteSummaryForSeason => WriteSummaryForSeasonStep.Run(context),
+                SystemState.Error => ErrorStep.Run(context),
+                _ => throw new ArgumentOutOfRangeException($"Unhandled system state: {context.NextState}")
             };
-            this.randomFactory = randomFactory;
-        }
 
-        public void MoveNext()
-        {
-            try
+            if (context.NextState == SystemState.InGame)
             {
-                switch (CurrentState)
+                return inGameSignal switch
                 {
-                    case CurrentSystemState.Initialization:
-                        Initialize();
-                        break;
-                    case CurrentSystemState.GameInitialization:
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "An error occurred during system loop execution in state {State}.", CurrentState);
-                SystemStatus = new SystemStatus
-                {
-                    CurrentState = CurrentState,
-                    StatusMessage = $"An error occurred: {ex.Message}"
+                    InGameSignal.None => AdvancedStateMachine.System,
+                    InGameSignal.PlayEvaluationStep => AdvancedStateMachine.PlayEvaluation,
+                    InGameSignal.GameStateAdvanced => AdvancedStateMachine.Game,
+                    InGameSignal.GameCompleted => AdvancedStateMachine.System,
+                    _ => throw new ArgumentOutOfRangeException($"InGameStep returned unexpected signal: {inGameSignal}")
                 };
-                HandleException(ex);
-            }
-        }
-
-        private void HandleException(Exception ex)
-        {
-            switch (CurrentState)
-            {
-                case CurrentSystemState.Initialization:
-                    // Hard to recover from this state, leave it as-is.
-                    Log.Fatal("Fatal error during initialization. Stopping the simulator.");
-                    CurrentState = CurrentSystemState.Faulted;
-                    break;
             }
         }
     }

@@ -126,25 +126,32 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
                 lineToGain = Helpers.AddYardsForTeam(lineOfScrimmage, yardsToGain.Value, teamWithPossession).Round();
             }
 
-            return new GameState(
+            int periodNumber = random.Next(1, 9);
+            int secondsLeftInPeriod = random.Next(0, 900);
+            return new PlayContext(
                 Version: 0L,
                 NextState: validStartStateForNextPlay,
                 AdditionalParameters: [],
                 StateHistory: [],
+                Environment: null!,
                 BaseWindDirection: random.NextDouble() * 360d,
                 BaseWindSpeed: random.SampleNormalDistribution(5d, 2d),
                 AirTemperature: random.SampleNormalDistribution(60d, 10d),
+                CoinFlipWinner: random.NextDouble() < 0.5d ? GameTeam.Home : GameTeam.Away,
                 TeamWithPossession: teamWithPossession,
                 AwayScore: random.Next(0, 50),
                 HomeScore: random.Next(0, 50),
-                PeriodNumber: random.Next(1, 9),
-                SecondsLeftInPeriod: random.Next(0, 900),
+                PeriodNumber: periodNumber,
+                SecondsLeftInPeriod: secondsLeftInPeriod,
                 ClockRunning: random.NextDouble() < 0.5d,
                 HomeTimeoutsRemaining: random.Next(0, 4),
                 AwayTimeoutsRemaining: random.Next(0, 4),
                 LineOfScrimmage: lineOfScrimmage,
                 LineToGain: lineToGain,
                 NextPlay: nextPlay,
+                DriveStartingFieldPosition: lineOfScrimmage,
+                DriveStartingPeriodNumber: periodNumber,
+                DriveStartingSecondsLeftInPeriod: secondsLeftInPeriod,
                 LastPlayDescriptionTemplate: "",
                 PossessionOnPlay: (PossessionOnPlay)random.Next(0, 3),
                 TeamCallingTimeout: random.NextDouble() < 0.03d

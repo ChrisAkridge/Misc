@@ -8,15 +8,17 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
 {
     internal static class TestHelpers
     {
-        public static PlayContext EmptyState => new GameState(
+        public static PlayContext EmptyState => new PlayContext(
             Version: 0L,
             NextState: PlayEvaluationState.Start,
             AdditionalParameters: Array.Empty<AdditionalParameter<object>>(),
             StateHistory: Array.Empty<StateHistoryEntry>(),
+            Environment: null!,
             BaseWindDirection: 0.0,
             BaseWindSpeed: 0.0,
             AirTemperature: 0.0,
-            TeamWithPossession: Data.Models.GameTeam.Away,
+            CoinFlipWinner: GameTeam.Home,
+            TeamWithPossession: GameTeam.Away,
             AwayScore: 0,
             HomeScore: 0,
             PeriodNumber: 1,
@@ -27,6 +29,9 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
             LineOfScrimmage: 25,
             LineToGain: null,
             NextPlay: NextPlayKind.Kickoff,
+            DriveStartingFieldPosition: 25,
+            DriveStartingPeriodNumber: 1,
+            DriveStartingSecondsLeftInPeriod: 900,
             LastPlayDescriptionTemplate: string.Empty,
             PossessionOnPlay: PossessionOnPlay.AwayTeamOnly,
             TeamCallingTimeout: null

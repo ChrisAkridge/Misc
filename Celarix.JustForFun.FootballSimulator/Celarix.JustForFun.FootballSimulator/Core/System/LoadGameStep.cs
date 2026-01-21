@@ -34,7 +34,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             Log.Information("LoadGameStep: Initialized base wind speed to {WindSpeed} mph.", newPlayContext.BaseWindSpeed);
 
             CheckForInjuryRecoveries(repository, gameRecord);
-            
+            SetStrengthsAtKickoff(repository, gameRecord);
+
             var coinTossWinner = random.Chance(0.5)
                 ? GameTeam.Home
                 : GameTeam.Away;
@@ -108,6 +109,18 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 }
             }
 
+            repository.SaveChanges();
+        }
+
+        internal static void SetStrengthsAtKickoff(IFootballRepository repository,
+            GameRecord gameRecord)
+        {
+            var awayTeamStrengths = TeamStrengthSet.FromTeamDirectly(gameRecord.AwayTeam, GameTeam.Away);
+            var homeTeamStrengths = TeamStrengthSet.FromTeamDirectly(gameRecord.HomeTeam, GameTeam.Home);
+            var awayTeamStrengthsJson = global::System.Text.Json.JsonSerializer.Serialize(awayTeamStrengths);
+            var homeTeamStrengthsJson = global::System.Text.Json.JsonSerializer.Serialize(homeTeamStrengths);
+            gameRecord.AwayTeamStrengthsAtKickoffJSON = awayTeamStrengthsJson;
+            gameRecord.HomeTeamStrengthsAtKickoffJSON = homeTeamStrengthsJson;
             repository.SaveChanges();
         }
     }

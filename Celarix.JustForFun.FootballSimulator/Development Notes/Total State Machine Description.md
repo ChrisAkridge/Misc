@@ -58,7 +58,8 @@ If `CoinToss || CoinTossLoserReceives`, the current drive ends.
 - **ResumePartialGame**: Finds the one game that hasn't been completed and initializes the game state machine with the partial state. The `TeamDriveRecord` rows track their elapsed time, so set the game clock appropriately. Go to **InGame**.
 - **LoadGame**: Finds the next game to play (the first unplayed game when the season's games are sorted by start time ascending), checks for any injury recoveries available and applies them, initializes the game state machine, and goes to **InGame**. If there are no games to play, go to **PrepareForGame**.
 - **InGame**: The game state machine is active here - the method that moves the system state machine to the next state calls the game state machine, which moves itself internally and then signals an outcome to the system loop. The outcomes are:
-	- **GameContinues**: The system state machine has no need to take action. Go to **InGame**.
+	- **PlayEvaluationStep**: The system state machine has no need to take action. Go to **InGame**.
+	- **PlayCompleted**: The system state machine also has no need to take action. Go to **InGame**.
 	- **GameCompleted**: The game has completed. Go to **PostGame**.
 - **PostGame**: The game record is updated in the database. We set `Recovered` on all recovered injuries. Go to **WriteSummaryForGame**, unless this game was the season's Super Bowl, in which case go to **WriteSummaryForSeason**.
 - **WriteSummaryForGame**: Given the `TeamDriveRecords`, write a summary for the game to the database. If this step fails, we write a basic summary instead. Go to **PrepareForGame**.
