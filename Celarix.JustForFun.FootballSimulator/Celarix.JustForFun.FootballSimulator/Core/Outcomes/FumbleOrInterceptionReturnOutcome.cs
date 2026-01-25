@@ -10,10 +10,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class FumbleOrInterceptionReturnOutcome
     {
-        public static PlayContext Run(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        public static PlayContext Run(PlayContext priorState)
         {
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
+
             var kickingStrength = parameters.GetActualStrengthsForTeam(priorState.TeamWithPossession)
                .KickingStrength;
             var kickDefenseStrength = parameters.GetActualStrengthsForTeam(priorState.TeamWithPossession.Opponent())
@@ -30,13 +31,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             }
 
             var yardsGained = rushAttemptResult.YardsGained ?? throw new InvalidOperationException("Rushing function specified no yards gained value, but ball was not fumbled; must have value.");
-            PlayContext newState = priorState with
+            PlayContext newState = priorState.InvolvesDefenseRun()
+                .InvolvesAdditionalDefensivePlayer() with
             {
                 TeamWithPossession = priorState.TeamWithPossession.Opponent(),
                 LastPlayDescriptionTemplate = "{OffTeam} {OffPlayer0} returned ball to the {LoS}.",
             };
             var newLineOfScrimmage = newState.AddYardsForPossessingTeam(priorState.LineOfScrimmage, yardsGained);
-            return PlayerDownedFunction.Get(newState, parameters, physicsParams, priorState.LineOfScrimmage, yardsGained.Round(), EndzoneBehavior.FumbleOrInterceptionReturn, null);
+            return PlayerDownedFunction.Get(newState, priorState.LineOfScrimmage, yardsGained.Round(), EndzoneBehavior.FumbleOrInterceptionReturn, null);
         }
     }
 }

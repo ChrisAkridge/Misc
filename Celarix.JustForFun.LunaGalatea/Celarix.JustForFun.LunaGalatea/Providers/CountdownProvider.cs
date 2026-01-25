@@ -71,7 +71,7 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                 new NumberedAnniversaryCountdownWrapper("Start at RxLightning", new FixedDateCountdown("", 3, 3), 2025, NumberedAnniversaryKind.Anniversary),
 
                 // Weekday-of-month countdowns
-                new WeekdayOfMonthCountdown("NCAA-I College Football Playoff Championship", 1, IsoDayOfWeek.Monday, 2),
+                new WeekdayOfMonthCountdown("NCAA-I College Football Playoff Championship", 1, IsoDayOfWeek.Monday, 3),
                 new WeekdayOfMonthCountdown("Martin Luther King Jr. Day", 1, IsoDayOfWeek.Monday, 3),
                 new WeekdayOfMonthCountdown("NFL Pro Bowl Games", 2, IsoDayOfWeek.Sunday, 1),
                 new WeekdayOfMonthCountdown("NBA All-Star Game/Daytona 500", 2, IsoDayOfWeek.Sunday, 3),

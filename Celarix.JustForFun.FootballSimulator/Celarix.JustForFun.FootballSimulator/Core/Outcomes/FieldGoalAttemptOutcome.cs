@@ -9,10 +9,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class FieldGoalAttemptOutcome
     {
-        public static PlayContext Run(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        public static PlayContext Run(PlayContext priorState)
         {
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
+
             var desiredTargetYard = priorState.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), -10);
             var desiredCrossRangeMinimum = -3.08;
             var desiredCrossRangeMaximum = 3.08;
@@ -91,7 +92,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (kickBlocked)
             {
                 Log.Information("FieldGoalAttemptOutcome: Kick was blocked, ball is live!");
-                return priorState.WithNextState(PlayEvaluationState.FumbledLiveBallOutcome);
+                return priorState.WithNextState(PlayEvaluationState.FumbledLiveBallOutcome)
+                    .InvolvesKick()
+                    .InvolvesAdditionalOffensivePlayer()
+                    .InvolvesAdditionalDefensivePlayer();
             }
 
             if (priorState.NextPlay != NextPlayKind.ConversionAttempt)
@@ -101,20 +105,23 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     Log.Information("FieldGoalAttemptOutcome: Field goal kick was good!");
                     return priorState.WithScoreChange(priorState.TeamWithPossession, 3)
                         .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
-                    with
-                    {
-                        NextPlay = NextPlayKind.Kickoff,
-                        LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
-                        LineToGain = null,
-                        ClockRunning = false,
-                        LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} made a field goal from {FGKickDistance} yards."
-                    };
+                        .InvolvesKick()
+                        .InvolvesAdditionalOffensivePlayer() with
+                        {
+                            NextPlay = NextPlayKind.Kickoff,
+                            LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
+                            LineToGain = null,
+                            ClockRunning = false,
+                            LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} made a field goal from {FGKickDistance} yards."
+                        };
                 }
                 else
                 {
                     Log.Information("FieldGoalAttemptOutcome: Field goal kick was no good.");
                     return priorState.WithFirstDownLineOfScrimmage(priorState.LineOfScrimmage, priorState.TeamWithPossession.Opponent(),
-                        "{DefAbbr} {DefPlayer0} missed a field goal from {FGKickDistance} yards, first down for {OffAbbr}.", startOfDrive: true);
+                        "{DefAbbr} {DefPlayer0} missed a field goal from {FGKickDistance} yards, first down for {OffAbbr}.", startOfDrive: true)
+                        .InvolvesKick()
+                        .InvolvesAdditionalOffensivePlayer();
                 }
             }
 
@@ -123,6 +130,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 Log.Information("FieldGoalAttemptOutcome: Extra point kick was good!");
                 return priorState.WithScoreChange(priorState.TeamWithPossession, 1)
                     .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
+                    .InvolvesKick()
+                    .InvolvesAdditionalOffensivePlayer()
                 with
                 {
                     NextPlay = NextPlayKind.Kickoff,
@@ -136,7 +145,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             else
             {
                 Log.Information("FieldGoalAttemptOutcome: Extra point kick was no good.");
-                return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete) with
+                return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete)
+                    .InvolvesKick()
+                    .InvolvesAdditionalOffensivePlayer()
+                with
                 {
                     NextPlay = NextPlayKind.Kickoff,
                     LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35),

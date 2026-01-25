@@ -12,10 +12,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
     internal static class StandardPassingPlayOutcome
     {
         public static PlayContext Run(PlayContext priorState,
-           GameDecisionParameters parameters,
-           IReadOnlyDictionary<string, PhysicsParam> physicsParams,
            PassAttemptDistance distance)
         {
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
+
             var selfStrengths = parameters.GetActualStrengthsForTeam(priorState.TeamWithPossession);
             var opponentStrengths = parameters.GetActualStrengthsForTeam(priorState.TeamWithPossession.Opponent());
             var selfPassingStrength = selfStrengths.PassingOffenseStrength;
@@ -136,7 +137,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             {
                 // Incomplete passes will be treated as 0-yard rushing gains.
                 Log.Information("StandardPassingPlayOutcome: Incomplete pass.");
-                return PlayerDownedFunction.Get(priorState, parameters, physicsParams,
+                return PlayerDownedFunction.Get(priorState.InvolvesOffensivePass().InvolvesAdditionalOffensivePlayer(),
                     priorState.LineOfScrimmage,
                     0,
                     EndzoneBehavior.StandardGameplay,
@@ -189,7 +190,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (!hadYAC)
             {
                 Log.Information("StandardPassingPlayOutcome: Ball caught for a gain of {YardsGained} but receiver brought down immediately.", yardsGained.Round());
-                return PlayerDownedFunction.Get(priorState, parameters, physicsParams,
+                return PlayerDownedFunction.Get(priorState.InvolvesOffensivePass().InvolvesAdditionalOffensivePlayer().InvolvesAdditionalOffensivePlayer(),
                     priorState.LineOfScrimmage,
                     yardsGained.Round(),
                     EndzoneBehavior.StandardGameplay,
@@ -211,7 +212,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     Constants.HomeEndLineYard,
                     Constants.AwayEndLineYard).Round();
             Log.Information("StandardPassingPlayOutcome: Completed pass with YAC, total gain {YardsGained}.", yardsPlusYAC);
-            return PlayerDownedFunction.Get(priorState, parameters, physicsParams,
+            return PlayerDownedFunction.Get(priorState.InvolvesOffensivePass().InvolvesAdditionalOffensivePlayer()
+                    .InvolvesOffensiveRun().InvolvesAdditionalOffensivePlayer(),
                 priorState.LineOfScrimmage,
                 yardsPlusYAC,
                 EndzoneBehavior.StandardGameplay,

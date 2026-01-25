@@ -11,14 +11,15 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
     internal static class PlayerDownedFunction
     {
         public static PlayContext Get(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams,
             int possessionStartYard,
             int yardsGained,
             EndzoneBehavior endzoneBehavior,
             GameTeam? teamAttemptingConversion,
             bool? clockRunning = null)
         {
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
+
             var possessingTeam = priorState.TeamWithPossession;
             var otherTeam = possessingTeam.Opponent();
             var newLineOfScrimmage = priorState.AddYardsForPossessingTeam(possessionStartYard, yardsGained).ClampWithinField();
@@ -38,7 +39,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                             LineOfScrimmage = priorState.TeamYardToInternalYard(possessingTeam, 25),
                             LineToGain = null,
                             PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
-                            ClockRunning = !clockRunning.HasValue ? false : clockRunning.Value,
+                            ClockRunning = clockRunning ?? false,
                             LastPlayDescriptionTemplate =
                                 "{OffAbbr} recovers fumble in own endzone, touchback. Ball placed at {LoS}."
                         };

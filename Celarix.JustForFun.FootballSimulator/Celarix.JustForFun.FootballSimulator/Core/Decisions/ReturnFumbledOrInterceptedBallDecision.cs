@@ -11,10 +11,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
 {
     internal static class ReturnFumbledOrInterceptedBallDecision
     {
-        public static PlayContext Run(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        public static PlayContext Run(PlayContext priorState)
         {
+            var parameters = priorState.Environment!.DecisionParameters;
+
             var possessingTeamDisposition = parameters.GetDispositionForTeam(priorState.TeamWithPossession);
             if (possessingTeamDisposition is TeamDisposition.Insane or TeamDisposition.UltraInsane)
             {
@@ -28,7 +28,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 return priorState.WithFirstDownLineOfScrimmage(priorState.LineOfScrimmage,
                     priorState.TeamWithPossession,
                     "{OffAbbr} fumble recovered by {DefAbbr} at {LoS}, will not return. First down.",
-                    startOfDrive: true);
+                    startOfDrive: true)
+                    .InvolvesAdditionalDefensivePlayer();
             }
             else if (priorState.NextPlay == NextPlayKind.ConversionAttempt)
             {
@@ -75,7 +76,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             return priorState.WithFirstDownLineOfScrimmage(priorState.LineOfScrimmage,
                 priorState.TeamWithPossession,
                 "{OffAbbr} fumble recovered by {DefAbbr} at {LoS}, will not return. First down.",
-                startOfDrive: true);
+                startOfDrive: true)
+                .InvolvesAdditionalDefensivePlayer();
         }
     }
 }

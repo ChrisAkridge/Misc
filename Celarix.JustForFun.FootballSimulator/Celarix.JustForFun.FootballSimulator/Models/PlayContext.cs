@@ -30,6 +30,7 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         bool ClockRunning,
         int HomeTimeoutsRemaining,
         int AwayTimeoutsRemaining,
+        PlayInvolvement PlayInvolvement,
 
         // Down-and-distance
         int LineOfScrimmage,

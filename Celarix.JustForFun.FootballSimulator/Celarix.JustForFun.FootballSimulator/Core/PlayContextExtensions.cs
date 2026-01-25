@@ -344,7 +344,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
 
                 sb.Append(" @ ");
                 sb.Append(state.InternalYardToDisplayTeamYardString(state.LineOfScrimmage, parameters) + ", ");
-                
+
                 if (state.PeriodNumber <= 4)
                 {
                     sb.Append($"Q{state.PeriodNumber} ");
@@ -372,6 +372,73 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                     DriveStartingFieldPosition = startOfDrive ? state.LineOfScrimmage : state.DriveStartingFieldPosition,
                     DriveStartingPeriodNumber = startOfDrive ? state.PeriodNumber : state.DriveStartingPeriodNumber,
                     DriveStartingSecondsLeftInPeriod = startOfDrive ? state.SecondsLeftInPeriod : state.DriveStartingSecondsLeftInPeriod
+                };
+            }
+
+            // PlayInvolvement Helpers
+            public PlayContext InvolvesOffensiveRun()
+            {
+                return state with
+                {
+                    PlayInvolvement = state.PlayInvolvement with
+                    {
+                        InvolvesOffenseRun = true
+                    }
+                };
+            }
+
+            public PlayContext InvolvesOffensivePass()
+            {
+                return state with
+                {
+                    PlayInvolvement = state.PlayInvolvement with
+                    {
+                        InvolvesOffensePass = true
+                    }
+                };
+            }
+
+            public PlayContext InvolvesKick()
+            {
+                return state with
+                {
+                    PlayInvolvement = state.PlayInvolvement with
+                    {
+                        InvolvesKick = true
+                    }
+                };
+            }
+
+            public PlayContext InvolvesDefenseRun()
+            {
+                return state with
+                {
+                    PlayInvolvement = state.PlayInvolvement with
+                    {
+                        InvolvesDefenseRun = true
+                    }
+                };
+            }
+
+            public PlayContext InvolvesAdditionalOffensivePlayer()
+            {
+                return state with
+                {
+                    PlayInvolvement = state.PlayInvolvement with
+                    {
+                        OffensivePlayersInvolved = state.PlayInvolvement.OffensivePlayersInvolved + 1
+                    }
+                };
+            }
+
+            public PlayContext InvolvesAdditionalDefensivePlayer()
+            {
+                return state with
+                {
+                    PlayInvolvement = state.PlayInvolvement with
+                    {
+                        DefensivePlayersInvolved = state.PlayInvolvement.DefensivePlayersInvolved + 1
+                    }
                 };
             }
         }

@@ -309,5 +309,17 @@ namespace Celarix.JustForFun.FootballSimulator
 
             return titleCased;
         }
+
+        public static PlayInvolvement CreateInitialPlayInvolvement()
+        {
+            return new PlayInvolvement(
+                InvolvesOffenseRun: false,
+                InvolvesOffensePass: false,
+                InvolvesKick: false,
+                InvolvesDefenseRun: false,
+                OffensivePlayersInvolved: 0,
+                DefensivePlayersInvolved: 0
+            );
+        }
     }
 }

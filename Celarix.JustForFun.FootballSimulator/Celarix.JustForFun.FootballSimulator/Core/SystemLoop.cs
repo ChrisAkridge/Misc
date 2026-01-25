@@ -4,6 +4,7 @@ using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
 using Celarix.JustForFun.FootballSimulator.Random;
 using Celarix.JustForFun.FootballSimulator.Scheduling;
+using Celarix.JustForFun.FootballSimulator.SummaryWriting;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 {
                     FootballRepository = new FootballRepository(new FootballContext()),
                     RandomFactory = new RandomFactory(),
-                    PlayerFactory = new PlayerFactory(firstNames, lastNames)
+                    PlayerFactory = new PlayerFactory(firstNames, lastNames),
+                    SummaryWriter = new OpenAISummaryWriter()
                 });
         }
 
@@ -67,6 +69,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                     _ => throw new ArgumentOutOfRangeException($"InGameStep returned unexpected signal: {inGameSignal}")
                 };
             }
+            return AdvancedStateMachine.System;
         }
     }
 }

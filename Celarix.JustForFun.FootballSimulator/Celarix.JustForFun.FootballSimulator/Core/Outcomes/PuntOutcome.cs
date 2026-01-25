@@ -10,10 +10,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class PuntOutcome
     {
-        public static PlayContext Run(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        public static PlayContext Run(PlayContext priorState)
         {
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
+
             var desiredTargetYard = priorState.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 0) switch
             {
                 0 => 0.1d,
@@ -104,7 +105,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (kickActualYard >= -10 && kickActualYard <= 110)
             {
                 Log.Information("PuntOutcome: Punt landed in-bounds and can be recovered and returned.");
-                return priorState.WithNextState(PlayEvaluationState.ReturnablePuntOutcome) with
+                return priorState.WithNextState(PlayEvaluationState.ReturnablePuntOutcome)
+                    .InvolvesKick()
+                    .InvolvesAdditionalOffensivePlayer() with
                 {
                     LineOfScrimmage = kickActualYard.Round(),
                     PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay(),
@@ -117,7 +120,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (kickActualTeamYard.Team == priorState.TeamWithPossession)
             {
                 Log.Information("PuntOutcome: Unusual punt resulted in a safety for the kicking team; went out back of own endzone.");
-                var updatedState = priorState.WithScoreChange(kickActualTeamYard.Team.Opponent(), 2) with
+                var updatedState = priorState.WithScoreChange(kickActualTeamYard.Team.Opponent(), 2)
+                    .InvolvesKick()
+                    .InvolvesAdditionalOffensivePlayer() with
                 {
                     LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
                     PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay(),
@@ -129,7 +134,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 
             Log.Information("PuntOutcome: Touchback.");
             return priorState.WithFirstDownLineOfScrimmage(25d, kickActualTeamYard.Team.Opponent(),
-                "{DefAbbr} touchback, ball placed at {LoS}.", clockRunning: false, startOfDrive: true);
+                "{DefAbbr} touchback, ball placed at {LoS}.", clockRunning: false, startOfDrive: true)
+                .InvolvesKick()
+                .InvolvesAdditionalOffensivePlayer();
         }
 
         private static double ComputeKickOutOfBoundsForwardDistance(double lineOfScrimmage, double kickActualYard, double kickActualCross)

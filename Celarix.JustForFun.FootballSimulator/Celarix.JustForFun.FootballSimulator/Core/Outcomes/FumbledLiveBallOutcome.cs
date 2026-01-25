@@ -11,10 +11,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class FumbledLiveBallOutcome
     {
-        public static PlayContext Run(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        public static PlayContext Run(PlayContext priorState)
         {
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
+
             var wasInterception = priorState.GetAdditionalParameterOrDefault<bool?>("WasIntercepted");
             if (wasInterception == true)
             {
@@ -25,7 +26,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 if (interceptionTeamYard.TeamYard is < 0 && interceptionTeamYard.Team == priorState.TeamWithPossession)
                 {
                     Log.Information("FumbledLiveBallOutcome: Interception occurred inside offense's endzone, either a touchdown or successful two-point conversion for the defense!");
-                    return RunPlayerDownedFunction(priorState with
+                    return RunPlayerDownedFunction(priorState.InvolvesAdditionalDefensivePlayer() with
                     {
                         TeamWithPossession = priorState.TeamWithPossession.Opponent(),
                         PossessionOnPlay = PossessionOnPlay.BothTeams,
@@ -35,7 +36,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 else
                 {
                     Log.Information("FumbledLiveBallOutcome: Interception occurred outside offense's endzone.");
-                    return FumbleOrInteceptionRecoveredByDefense(priorState with
+                    return FumbleOrInteceptionRecoveredByDefense(priorState.InvolvesAdditionalDefensivePlayer() with
                     {
                         TeamWithPossession = priorState.TeamWithPossession.Opponent(),
                         PossessionOnPlay = PossessionOnPlay.BothTeams,
@@ -168,7 +169,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                                 ? EndzoneBehavior.FumbleOrInterceptionReturn
                                 : EndzoneBehavior.StandardGameplay;
 
-            return PlayerDownedFunction.Get(priorState, parameters, physicsParams,
+            return PlayerDownedFunction.Get(priorState,
                         priorState.LineOfScrimmage,
                         fumbleRecoveryInternalYard.Round(),
                         endzoneBehavior,

@@ -121,8 +121,6 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                     "https://trimarc.org/images/milestone/CCTV_05_64_0079.jpg"),
                 new KeyValuePair<string, string>("I-64 at Hurstbourne Lane",
                     "https://trimarc.org/images/milestone/CCTV_05_64_0150.jpg"),
-                new KeyValuePair<string, string>("I-64 at I-264 (East intersection)",
-                    "https://trimarc.org/images/milestone/CCTV_05_64_0121.jpg"),
                 new KeyValuePair<string, string>("I-64 at I-264",
                     "https://trimarc.org/images/milestone/CCTV_05_64_0012.jpg"),
                 new KeyValuePair<string, string>("I-64 at I-265",
@@ -143,8 +141,6 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                     "https://trimarc.org/images/milestone/CCTV_05_64_0242.jpg"),
                 new KeyValuePair<string, string>("I-64 near I-65 (alternate)",
                     "https://trimarc.org/images/milestone/CCTV_05_64_0054-2.jpg"),
-                new KeyValuePair<string, string>("I-64 near I-65",
-                    "https://trimarc.org/images/milestone/CCTV_05_64_0054-1.jpg"),
                 new KeyValuePair<string, string>("I-64 near Slugger Field",
                     "https://trimarc.org/images/milestone/CCTV_05_64_0050.jpg"),
                 new KeyValuePair<string, string>("I-64 over East Muhammad Ali Boulevard",
@@ -212,7 +208,21 @@ namespace Celarix.JustForFun.LunaGalatea.Providers
                 new KeyValuePair<string, string>("Westbound I-64 at mile marker 6.1",
                     "https://trimarc.org/images/milestone/CCTV_05_64_0061_EB.jpg"),
                 new KeyValuePair<string, string>("NOAA Weather Radar",
-                    "https://radar.weather.gov/ridge/standard/KLVX_0.gif")
+                    "https://radar.weather.gov/ridge/standard/KLVX_0.gif"),
+                new KeyValuePair<string, string>("WAVE-3 Radar",
+                    "https://webpubcontent.gray.tv/wave/esplive/radar-640.jpg"),
+                new KeyValuePair<string, string>("WAVE-3 Current Louisville Temperatures",
+                    "https://webpubcontent.gray.tv/wave/esplive/metrotemps.jpg"),
+                new KeyValuePair<string, string>("WAVE-3 Current Kentuckiana Temperatures",
+                    "https://webpubcontent.gray.tv/wave/esplive/3_City_Currents.jpg"),
+                new KeyValuePair<string, string>("WAVE-3 Current Regional Temperatures",
+                    "https://webpubcontent.gray.tv/wave/esplive/5State_Currents.jpg"),
+                new KeyValuePair<string, string>("WAVE-3 Current Conditions",
+                    "https://webpubcontent.gray.tv/wave/esplive/wxgarden.jpg"),
+                new KeyValuePair<string, string>("WAVE-3 Ohio River at McAlpine Upper",
+                    "https://webpubcontent.gray.tv/wave/esplive/ohioupper.jpg"),
+                new KeyValuePair<string, string>("WAVE-3 Ohio River at McAlpine Lower",
+                    "https://webpubcontent.gray.tv/wave/esplive/ohiolower.jpg")
             };
 
             random = new Random();

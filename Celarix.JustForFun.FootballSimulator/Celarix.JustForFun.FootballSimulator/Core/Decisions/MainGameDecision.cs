@@ -12,10 +12,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
 {
     internal static class MainGameDecision
     {
-        public static PlayContext Run(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        public static PlayContext Run(PlayContext priorState)
         {
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
 
             GameTeam self = priorState.TeamWithPossession;
             GameTeam opponent = self.Opponent();
@@ -34,7 +34,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
 
             var isFakePlay = priorState.GetAdditionalParameterOrDefault<bool?>("IsFakePlay") == true;
 
-            var clockDisposition = ClockDispositionFunction.Get(priorState, parameters, physicsParams);
+            var clockDisposition = ClockDispositionFunction.Get(priorState);
             var selfEstimateOfSelf = parameters.GetEstimateOfTeamByTeam(self, self);
             var selfEstimateOfOpponent = parameters.GetEstimateOfTeamByTeam(self, opponent);
             var selfEstimatedAverage = selfEstimateOfSelf.OverallAverageStrength;
@@ -102,7 +102,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             }
 
             Log.Information("MainGameDecision: Spiking ball to stop the clock!");
-            return PlayerDownedFunction.Get(priorState, parameters, physicsParams, priorState.LineOfScrimmage, -2,
+            return PlayerDownedFunction.Get(priorState, priorState.LineOfScrimmage, -2,
                 priorState.NextPlay == NextPlayKind.ConversionAttempt ? EndzoneBehavior.ConversionAttempt : EndzoneBehavior.StandardGameplay,
                 priorState.NextPlay == NextPlayKind.ConversionAttempt ? self : null);
         }
@@ -229,7 +229,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 }
             }
             Log.Information("MainGameDecision: Attempting a field goal on fourth down.");
-            return FieldGoalAttemptOutcome.Run(priorState, parameters, physicsParams);
+            return FieldGoalAttemptOutcome.Run(priorState);
         }
 
         private static PlayContext FakeOrRealPunt(PlayContext priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, double estimatedStrengthRatio)
@@ -282,7 +282,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 else
                 {
                     Log.Information("MainGameDecision: Overtime leading and there's not enough time for opponent to win. Victory formation!");
-                    return PlayerDownedFunction.Get(priorState, parameters, physicsParams, priorState.LineOfScrimmage, -1,
+                    return PlayerDownedFunction.Get(priorState, priorState.LineOfScrimmage, -1,
                         EndzoneBehavior.StandardGameplay, null);
                 }
             }
@@ -365,7 +365,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             if (!isFakePlay && InFieldGoalRange(priorState, physicsParams, opponent) && CanAttemptFieldGoal(priorState))
             {
                 Log.Information("MainGameDecision: Late-game passing play in field goal range, attempting field goal.");
-                return FieldGoalAttemptOutcome.Run(priorState, parameters, physicsParams);
+                return FieldGoalAttemptOutcome.Run(priorState);
             }
             Log.Information("MainGameDecision: Late-game passing play but not in field goal range, attempting Hail Mary.");
             return priorState.WithNextState(PlayEvaluationState.HailMaryOutcome);

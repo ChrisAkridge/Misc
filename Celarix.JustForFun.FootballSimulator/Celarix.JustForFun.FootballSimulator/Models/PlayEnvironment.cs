@@ -8,6 +8,6 @@ namespace Celarix.JustForFun.FootballSimulator.Models
     internal sealed class PlayEnvironment
     {
         public required GameDecisionParameters DecisionParameters { get; init; }
-        public required IDictionary<string, PhysicsParam> PhysicsParams { get; init; }
+        public required IReadOnlyDictionary<string, PhysicsParam> PhysicsParams { get; init; }
     }
 }

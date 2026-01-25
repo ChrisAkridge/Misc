@@ -32,5 +32,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data
         GameRecord GetPartialGameRecord();
         void AddSummary(Summary summary);
         SeasonRecord GetSeasonWithGames(int seasonRecordID);
+        IReadOnlyList<PlayerRosterPosition> GetActiveRosterForTeam(int teamID);
+        void AddPlayerRosterPosition(PlayerRosterPosition position);
     }
 }

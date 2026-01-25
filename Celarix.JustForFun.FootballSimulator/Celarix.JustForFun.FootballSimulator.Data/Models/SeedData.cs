@@ -291,7 +291,9 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
                 new PhysicsParam("TeamNoticesOwnInjuryChance", 0.9, "chance", "chance"),
                 new PhysicsParam("TeamNoticesOpponentInjuryChance", 0.6, "chance", "chance"),
                 new PhysicsParam("TeamPlayersTradedPerOffseasonMean", 1, "players", "players"),
-                new PhysicsParam("TeamPlayersTradedPerOffseasonStddev", 1, "players", "players")
+                new PhysicsParam("TeamPlayersTradedPerOffseasonStddev", 1, "players", "players"),
+                new PhysicsParam("StrengthAdjustmentMultiplierMean", 1 + 1e-6, "multiplier", "multiplier"),
+                new PhysicsParam("StrengthAdjustmentMultiplierStdDev", 1e-9, "multiplier", "multiplier")
             };
         }
     }

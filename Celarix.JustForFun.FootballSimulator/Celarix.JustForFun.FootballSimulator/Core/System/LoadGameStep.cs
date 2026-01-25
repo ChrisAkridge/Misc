@@ -74,6 +74,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 {
                     PhysicsParams = physicsParams,
                     CurrentPlayContext = newPlayContext,
+                    CurrentGameRecord = gameRecord
                 });
 
             Log.Information("LoadGameStep: Loaded incomplete game between {AwayTeam} and {HomeTeam} scheduled for {KickoffTime}.",

@@ -10,13 +10,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
 {
     internal static class SignalFairCatchDecision
     {
-        public static PlayContext Run(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        public static PlayContext Run(PlayContext priorState)
         {
             // Prerequisites:
             // - priorState.TeamWithPossession here is always the team receiving the kick
             // - priorState.LineOfScrimmage is where the ball is caught
+
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
 
             var receivingTeamDisposition = parameters.GetDispositionForTeam(priorState.TeamWithPossession);
             if (receivingTeamDisposition != TeamDisposition.Conservative)
@@ -69,7 +70,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 int lineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35);
                 Log.Information("SignalFairCatchDecision: Fair catch in end zone, touchback to {LoS}.",
                     lineOfScrimmage);
-                return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete) with
+                return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete)
+                    .InvolvesAdditionalDefensivePlayer() with
                 {
                     TeamWithPossession = priorState.TeamWithPossession.Opponent(),
                     PossessionOnPlay = priorState.TeamWithPossession.Opponent().ToPossessionOnPlay(),
@@ -83,7 +85,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 // Fair catch on field
                 Log.Information("SignalFairCatchDecision: Fair catch on field at {LoS}.",
                     priorState.LineOfScrimmage);
-                return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete) with
+                return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete)
+                    .InvolvesAdditionalDefensivePlayer() with
                 {
                     TeamWithPossession = priorState.TeamWithPossession.Opponent(),
                     PossessionOnPlay = priorState.TeamWithPossession.Opponent().ToPossessionOnPlay(),

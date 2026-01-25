@@ -42,6 +42,16 @@ namespace Celarix.JustForFun.FootballSimulator
             return items;
         }
 
+        public static IList<T> Shuffle<T>(this IList<T> items, IRandom random)
+        {
+            for (int i = 0; i < items.Count - 1; i++)
+            {
+                int pos = random.Next(i, items.Count);
+                (items[i], items[pos]) = (items[pos], items[i]);
+            }
+            return items;
+        }
+
         public static Conference OtherConference(this Conference conference) =>
             conference switch
             {

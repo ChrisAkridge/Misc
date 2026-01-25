@@ -10,10 +10,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
 {
     internal static class TouchdownDecision
     {
-        public static PlayContext Run(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        public static PlayContext Run(PlayContext priorState)
         {
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
+
             var possessingTeamDisposition = parameters.GetDispositionForTeam(priorState.TeamWithPossession);
             if (possessingTeamDisposition == TeamDisposition.UltraConservative)
             {

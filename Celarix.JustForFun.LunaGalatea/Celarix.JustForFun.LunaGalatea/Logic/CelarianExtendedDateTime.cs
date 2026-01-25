@@ -101,7 +101,7 @@ namespace Celarix.JustForFun.LunaGalatea.Logic
             Month switch
             {
                 >= 0 and < 3 => 0,
-                >= 4 and < 6 => 1,
+                >= 3 and < 6 => 1,
                 >= 6 and < 9 => 2,
                 >= 9 => 3,
                 _ => throw new InvalidOperationException()

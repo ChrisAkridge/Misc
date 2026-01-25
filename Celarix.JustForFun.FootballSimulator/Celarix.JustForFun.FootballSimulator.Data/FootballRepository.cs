@@ -178,5 +178,17 @@ namespace Celarix.JustForFun.FootballSimulator.Data
                     .ThenInclude(gr => gr.QuarterBoxScores)
                 .Single(sr => sr.SeasonRecordID == seasonRecordID);
         }
+
+        public IReadOnlyList<PlayerRosterPosition> GetActiveRosterForTeam(int teamID)
+        {
+            return [.. context.PlayerRosterPositions
+                .Include(prp => prp.Player)
+                .Where(prp => prp.TeamID == teamID && prp.CurrentPlayer)];
+        }
+
+        public void AddPlayerRosterPosition(PlayerRosterPosition position)
+        {
+            context.PlayerRosterPositions.Add(position);
+        }
     }
 }

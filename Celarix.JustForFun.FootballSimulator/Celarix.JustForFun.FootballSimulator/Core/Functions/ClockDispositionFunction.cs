@@ -25,10 +25,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
         /// <exception cref="InvalidOperationException">
         /// Thrown when an unexpected <see cref="ClockZone"/> value is encountered.
         /// </exception>
-        public static ClockDisposition Get(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        public static ClockDisposition Get(PlayContext priorState)
         {
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
+
             GameTeam self = priorState.TeamWithPossession;
             GameTeam opponent = self.Opponent();
             var clockZone = GetClockZone(priorState, physicsParams);

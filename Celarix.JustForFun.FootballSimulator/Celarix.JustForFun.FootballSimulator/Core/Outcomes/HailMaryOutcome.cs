@@ -9,10 +9,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class HailMaryOutcome
     {
-        public static PlayContext Run(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        public static PlayContext Run(PlayContext priorState)
         {
+            priorState = priorState.InvolvesOffensivePass()
+                .InvolvesAdditionalOffensivePlayer();
+
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
+
             var possessingTeam = priorState.TeamWithPossession;
             var selfStrengths = parameters.GetActualStrengthsForTeam(priorState.TeamWithPossession);
             var opponentStrengths = parameters.GetActualStrengthsForTeam(priorState.TeamWithPossession.Opponent());
@@ -64,6 +68,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 Log.Information("PlayerDownedFunction: Interception on Hail Mary!");
                 return priorState.WithAdditionalParameter<bool?>("WasIntercepted", true)
                     .WithNextState(PlayEvaluationState.FumbledLiveBallOutcome)
+                    .InvolvesAdditionalDefensivePlayer()
                 with
                 {
                     ClockRunning = false,
@@ -75,6 +80,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 Log.Information("PlayerDownedFunction: Touchdown on Hail Mary!");
                 return priorState.WithScoreChange(possessingTeam, 6)
                     .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
+                    .InvolvesAdditionalOffensivePlayer()
                 with
                 {
                     NextPlay = NextPlayKind.ConversionAttempt,

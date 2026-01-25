@@ -10,16 +10,15 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class TwoPointConversionAttemptOutcome
     {
-        public static PlayContext Run(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        public static PlayContext Run(PlayContext priorState)
         {
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
+
             var possessingTeamScore = priorState.GetScoreForTeam(priorState.TeamWithPossession);
             var opposingTeamScore = priorState.GetScoreForTeam(priorState.TeamWithPossession.Opponent());
 
-            var mainGameDecisionResult = MainGameDecision.Run(priorState,
-                parameters,
-                physicsParams);
+            var mainGameDecisionResult = MainGameDecision.Run(priorState);
 
             var newPossessingTeamScore = mainGameDecisionResult.GetScoreForTeam(priorState.TeamWithPossession);
             var newOpposingTeamScore = mainGameDecisionResult.GetScoreForTeam(priorState.TeamWithPossession.Opponent());
@@ -27,9 +26,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (newPossessingTeamScore - possessingTeamScore == 6)
             {
                 // Play was a touchdown, rewrite history and make it a two-point conversion
+                // No need to set play involvement as MainGameDecision already did that
                 Log.Information("TwoPointConversionAttemptOutcome: Successful two-point conversion.");
                 return priorState.WithScoreChange(priorState.TeamWithPossession, 2)
-                    .WithNextState(PlayEvaluationState.PlayEvaluationComplete)    
+                    .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                 with
                 {
                     NextPlay = NextPlayKind.Kickoff,
@@ -41,8 +41,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             }
             else if (newPossessingTeamScore - possessingTeamScore == 2)
             {
-                // Play was a defensive safety, rewrite history and make it a one-point defensive safety
-                Log.Information("TwoPointConversionAttemptOutcome: Defensive safety on two-point conversion attempt.");
+                // Play was a defensive safety, rewrite history and make it a one-point defensive safety!
+                Log.Information("TwoPointConversionAttemptOutcome: Defensive safety on two-point conversion attempt!");
                 return priorState.WithScoreChange(priorState.TeamWithPossession, 1)
                     .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                 with

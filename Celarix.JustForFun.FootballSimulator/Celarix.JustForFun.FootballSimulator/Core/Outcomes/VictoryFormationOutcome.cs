@@ -10,14 +10,13 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class VictoryFormationOutcome
     {
-        public static PlayContext Run(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        public static PlayContext Run(PlayContext priorState)
         {
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
+
             Log.Information("VictoryFormationOutcome: Taking victory formation.");
-            return PlayerDownedFunction.Get(priorState,
-                parameters,
-                physicsParams,
+            return PlayerDownedFunction.Get(priorState.InvolvesOffensiveRun().InvolvesAdditionalOffensivePlayer(),
                 priorState.LineOfScrimmage,
                 -2,
                 EndzoneBehavior.StandardGameplay,

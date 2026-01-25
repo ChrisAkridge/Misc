@@ -69,7 +69,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 Environment: new GameEnvironment
                 {
                     PhysicsParams = physicsParams,
-                    CurrentPlayContext = resumingPlayContext
+                    CurrentPlayContext = resumingPlayContext,
+                    CurrentGameRecord = gameRecord
                 });
 
             Log.Information("ResumePartialGameStep: Resumed partial game {GameID}.",

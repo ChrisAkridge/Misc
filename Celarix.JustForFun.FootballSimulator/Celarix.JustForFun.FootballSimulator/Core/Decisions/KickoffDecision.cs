@@ -15,10 +15,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
         //   they take in a GameState and return another GameState. GameStates are immutable records,
         //   so each decision or outcome produces a new GameState based on the prior one.
 
-        public static PlayContext Run(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        public static PlayContext Run(PlayContext priorState)
         {
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
+
             // The kicking team is marked as having possession until one team or the other recovers the kick
             var kickingTeam = parameters.GetTeam(priorState.TeamWithPossession);
             var kickingTeamDisposition = parameters.GetDispositionForTeam(priorState.TeamWithPossession);

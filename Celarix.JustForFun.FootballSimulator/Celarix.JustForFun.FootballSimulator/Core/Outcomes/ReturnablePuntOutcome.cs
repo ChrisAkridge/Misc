@@ -10,10 +10,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class ReturnablePuntOutcome
     {
-        public static PlayContext Run(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        public static PlayContext Run(PlayContext priorState)
         {
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
+
             var receivingTeamStrengths = parameters.GetActualStrengthsForTeam(
                 priorState.TeamWithPossession.Opponent());
             var kickReturnStrength = receivingTeamStrengths.KickReturnStrength;

@@ -10,10 +10,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 {
     internal static class QBSneakOutcome
     {
-        public static PlayContext Run(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        public static PlayContext Run(PlayContext priorState)
         {
+            var parameters = priorState.Environment!.DecisionParameters;
+            var physicsParams = priorState.Environment.PhysicsParams;
+
             var offensiveLineStrength = parameters
                 .GetActualStrengthsForTeam(priorState.TeamWithPossession)
                 .OffensiveLineStrength;
@@ -35,10 +36,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 
             var yardsLost = -(parameters.Random.NextDouble() * 2);
             var newLineOfScrimmage = priorState.AddYardsForPossessingTeam(priorState.LineOfScrimmage, yardsLost);
-            return PlayerDownedFunction.Get(priorState with
+            return PlayerDownedFunction.Get(priorState.InvolvesOffensiveRun().InvolvesAdditionalOffensivePlayer() with
             {
                 LineOfScrimmage = newLineOfScrimmage.Round()
-            }, parameters, physicsParams, priorState.LineOfScrimmage, yardsLost.Round(), EndzoneBehavior.StandardGameplay, null);
+            }, priorState.LineOfScrimmage, yardsLost.Round(), EndzoneBehavior.StandardGameplay, null);
         }
     }
 }
