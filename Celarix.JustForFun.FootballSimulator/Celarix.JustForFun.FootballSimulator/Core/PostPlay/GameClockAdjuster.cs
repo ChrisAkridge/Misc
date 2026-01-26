@@ -15,7 +15,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.PostPlay
             IReadOnlyDictionary<string, PhysicsParam> physicsParam,
             GameRecord currentGame)
         {
-            var clockDispositionOfPossessingTeam = ClockDispositionFunction.Get(priorState, parameters, physicsParam);
+            var clockDispositionOfPossessingTeam = ClockDispositionFunction.Get(priorState);
             var clockStoppedAfterPlay = !priorState.ClockRunning;
             Log.Verbose("Clock: Last play by team with {Disposition} clock disposition, clock running: {ClockRunning}",
                 clockDispositionOfPossessingTeam, !clockStoppedAfterPlay);

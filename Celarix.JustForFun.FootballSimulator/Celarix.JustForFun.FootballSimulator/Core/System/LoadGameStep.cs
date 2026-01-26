@@ -74,7 +74,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 {
                     PhysicsParams = physicsParams,
                     CurrentPlayContext = newPlayContext,
-                    CurrentGameRecord = gameRecord
+                    CurrentGameRecord = gameRecord,
+                    RandomFactory = context.Environment.RandomFactory,
+                    AwayActiveRoster = repository.GetActiveRosterForTeam(gameRecord.AwayTeamID),
+                    HomeActiveRoster = repository.GetActiveRosterForTeam(gameRecord.HomeTeamID),
                 });
 
             Log.Information("LoadGameStep: Loaded incomplete game between {AwayTeam} and {HomeTeam} scheduled for {KickoffTime}.",

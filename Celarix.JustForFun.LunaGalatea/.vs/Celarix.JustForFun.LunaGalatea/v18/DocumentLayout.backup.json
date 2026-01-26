@@ -1,16 +1,7 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\",
-  "Documents": [
-    {
-      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|e:\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\providers\\staticurlimageprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\providers\\staticurlimageprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|e:\\documents\\github\\misc\\celarix.justforfun.lunagalatea\\celarix.justforfun.lunagalatea\\presentation\\staticurlimagepresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EF65F01-9A5C-48F7-8459-94ED4016ECFA}|Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea.csproj|solutionrelative:celarix.justforfun.lunagalatea\\presentation\\staticurlimagepresenter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    }
-  ],
+  "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 1,
@@ -18,7 +9,7 @@
       "DocumentGroups": [
         {
           "DockedHeight": 200,
-          "SelectedChildIndex": 26,
+          "SelectedChildIndex": -1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -119,32 +110,6 @@
             {
               "$type": "Bookmark",
               "Name": "ST:2:0:{34c7837f-3b3a-449c-bdf0-bdad86cbaf4a}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "StaticURLImagePresenter.cs",
-              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\StaticURLImagePresenter.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Presentation\\StaticURLImagePresenter.cs",
-              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Presentation\\StaticURLImagePresenter.cs",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Presentation\\StaticURLImagePresenter.cs",
-              "ViewState": "AgIAADEAAAAAAAAAAAAgwD4AAAA3AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-21T23:50:34.747Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "StaticURLImageProvider.cs",
-              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\StaticURLImageProvider.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.LunaGalatea\\Providers\\StaticURLImageProvider.cs",
-              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.LunaGalatea\\Celarix.JustForFun.LunaGalatea\\Providers\\StaticURLImageProvider.cs*",
-              "RelativeToolTip": "Celarix.JustForFun.LunaGalatea\\Providers\\StaticURLImageProvider.cs*",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAUwBQAAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-21T23:05:09.274Z",
-              "EditorCaption": ""
             }
           ]
         }

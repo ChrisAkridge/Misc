@@ -68,7 +68,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                             LineToGain = null,
                             PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
                             ClockRunning = !clockRunning.HasValue ? false : clockRunning.Value,
-                            LastPlayDescriptionTemplate = "{OffAbbr} suffers one-point safety!."
+                            LastPlayDescriptionTemplate = "{OffAbbr} suffers one-point safety!.",
+                            DriveResult = DriveResult.TouchdownWithDefensiveScore
                         };
                     }
                     else
@@ -83,7 +84,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                             LineOfScrimmage = priorState.TeamYardToInternalYard(possessingTeam, 20),
                             LineToGain = null,
                             ClockRunning = !clockRunning.HasValue ? false : clockRunning.Value,
-                            LastPlayDescriptionTemplate = "{OffAbbr} suffers a safety, {DefAbbr} awarded 2 point(s)."
+                            LastPlayDescriptionTemplate = "{OffAbbr} suffers a safety, {DefAbbr} awarded 2 point(s).",
+                            DriveResult = DriveResult.Safety
                         };
                     }
                 }
@@ -119,7 +121,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                             LineToGain = null,
                             PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
                             ClockRunning = !clockRunning.HasValue ? false : clockRunning.Value,
-                            LastPlayDescriptionTemplate = "{OffAbbr} successful two-point conversion! Scored by {OffPlayer0}."
+                            LastPlayDescriptionTemplate = "{OffAbbr} successful two-point conversion! Scored by {OffPlayer0}.",
+                            DriveResult = DriveResult.TouchdownWithTwoPointConversion
                         };
                     }
                 }
@@ -137,7 +140,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                     PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
                     ClockRunning = !clockRunning.HasValue ? false : clockRunning.Value,
                     LastPlayDescriptionTemplate =
-                        "{OffAbbr} unsuccessful conversion attempt, {OffPlayer0} downed at {LoS}."
+                        "{OffAbbr} unsuccessful conversion attempt, {OffPlayer0} downed at {LoS}.",
+                    DriveResult = DriveResult.TouchdownNoXP
                 };
             }
             else if (endzoneBehavior == EndzoneBehavior.FumbleOrInterceptionReturn)
@@ -153,7 +157,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                 return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, otherTeam,
                     // TODO: Ensure that DefAbbr and OffAbbr are correct here - they may need to be swapped.
                     "{DefAbbr} turnover on downs, {DefPlayer0} short of line to gain, first down for {OffAbbr}.", clockRunning,
-                    startOfDrive: true);
+                    startOfDrive: true) with
+                {
+                    DriveResult = DriveResult.TurnoverOnDowns
+                };
             }
             else if (priorState.NextPlay is NextPlayKind.Kickoff or NextPlayKind.FreeKick)
             {

@@ -5,6 +5,7 @@ using Celarix.JustForFun.FootballSimulator.Models;
 using Celarix.JustForFun.FootballSimulator.Random;
 using Celarix.JustForFun.FootballSimulator.Scheduling;
 using MathNet.Numerics.Distributions;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -320,6 +321,48 @@ namespace Celarix.JustForFun.FootballSimulator
                 OffensivePlayersInvolved: 0,
                 DefensivePlayersInvolved: 0
             );
+        }
+
+        internal static void RebuildStrengthsInDecisionParameters(GameContext context, IRandom random)
+        {
+            var decisionParameters = context.Environment.CurrentPlayContext!.Environment!.DecisionParameters!;
+            var awayTeam = context.Environment.CurrentGameRecord!.AwayTeam;
+            var homeTeam = context.Environment.CurrentGameRecord.HomeTeam;
+            var gameRecord = context.Environment.CurrentGameRecord;
+            var physicsParams = context.Environment.PhysicsParams;
+            decisionParameters.AwayTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(awayTeam, GameTeam.Away);
+            decisionParameters.HomeTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(homeTeam, GameTeam.Home);
+            decisionParameters.AwayTeamEstimateOfAway = EstimateStrengthSetForTeam(awayTeam, awayTeam, gameRecord, random, physicsParams);
+            decisionParameters.AwayTeamEstimateOfHome = EstimateStrengthSetForTeam(homeTeam, awayTeam, gameRecord, random, physicsParams);
+            decisionParameters.HomeTeamEstimateOfAway = EstimateStrengthSetForTeam(awayTeam, homeTeam, gameRecord, random, physicsParams);
+            decisionParameters.HomeTeamEstimateOfHome = EstimateStrengthSetForTeam(homeTeam, homeTeam, gameRecord, random, physicsParams);
+        }
+
+        internal static void SaveQuarterBoxScores(GameContext context)
+        {
+            var playContext = context.Environment.CurrentPlayContext!;
+            var repository = context.Environment.FootballRepository;
+            var gameRecordID = context.Environment.CurrentGameRecord!.GameID;
+            var awayScoreInSavedQuarters = repository.GetScoreForTeamInGame(gameRecordID, GameTeam.Away);
+            var homeScoreInSavedQuarters = repository.GetScoreForTeamInGame(gameRecordID, GameTeam.Home);
+            var awayScoreInCurrentQuarter = playContext.AwayScore - awayScoreInSavedQuarters;
+            var homeScoreInCurrentQuarter = playContext.HomeScore - homeScoreInSavedQuarters;
+
+            repository.AddQuarterBoxScore(new QuarterBoxScore
+            {
+                GameRecordID = gameRecordID,
+                QuarterNumber = playContext.PeriodNumber,
+                Team = GameTeam.Away,
+                Score = awayScoreInCurrentQuarter
+            });
+
+            repository.AddQuarterBoxScore(new QuarterBoxScore
+            {
+                GameRecordID = gameRecordID,
+                QuarterNumber = playContext.PeriodNumber,
+                Team = GameTeam.Home,
+                Score = homeScoreInCurrentQuarter
+            });
         }
     }
 }

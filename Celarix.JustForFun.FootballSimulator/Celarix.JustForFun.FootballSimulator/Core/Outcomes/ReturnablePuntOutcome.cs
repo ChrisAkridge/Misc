@@ -63,7 +63,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                         NextPlay = NextPlayKind.FreeKick,
                         PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay(),
                         ClockRunning = false,
-                        LastPlayDescriptionTemplate = "The {OffAbbr} punt rolled into their own endzone for a safety!"
+                        LastPlayDescriptionTemplate = "The {OffAbbr} punt rolled into their own endzone for a safety!",
+                        DriveResult = DriveResult.Safety
                     };
                     return updatedState.WithNextState(PlayEvaluationState.FreeKickDecision);
                 }

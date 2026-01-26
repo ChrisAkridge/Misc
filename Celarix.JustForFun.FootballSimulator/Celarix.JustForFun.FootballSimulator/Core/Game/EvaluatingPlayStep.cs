@@ -15,10 +15,38 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
 
             if (playContext.NextState == PlayEvaluationState.PlayEvaluationComplete)
             {
-                // We're coming back to start a new play evaluation. Reset the play involvement.
+                // We're coming back to start a new play evaluation. Reset the play context.
+                var playCountResets = playContext.TeamWithPossession != context.TeamWithPossession
+                    || playContext.NextPlay is NextPlayKind.Kickoff or NextPlayKind.FreeKick;
+                var playNumber = playCountResets ? 1 : context.PlayCountOnDrive + 1;
+
                 playContext = playContext with
                 {
-                    PlayInvolvement = Helpers.CreateInitialPlayInvolvement()
+                    NextState = playContext.NextPlay switch
+                    {
+                        NextPlayKind.Kickoff => PlayEvaluationState.KickoffDecision,
+                        NextPlayKind.ConversionAttempt => PlayEvaluationState.MainGameDecision,
+                        NextPlayKind.FreeKick => PlayEvaluationState.FreeKickDecision,
+                        NextPlayKind.FirstDown or
+                        NextPlayKind.SecondDown or
+                        NextPlayKind.ThirdDown or
+                        NextPlayKind.FourthDown => PlayEvaluationState.MainGameDecision,
+                        _ => throw new InvalidOperationException("Invalid next play kind encountered.")
+                    },
+                    PlayInvolvement = Helpers.CreateInitialPlayInvolvement(),
+                    AwayScoredThisPlay = false,
+                    HomeScoredThisPlay = false,
+                    DriveResult = null,
+                    PossessionOnPlay = PossessionOnPlay.None,
+                    TeamCallingTimeout = null
+                };
+
+                context = context with
+                {
+                    OffensePlayersOnPlay = null,
+                    DefensePlayersOnPlay = null,
+                    TeamWithPossession = playContext.TeamWithPossession,
+                    PlayCountOnDrive = playNumber
                 };
             }
 

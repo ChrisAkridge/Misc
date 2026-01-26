@@ -112,7 +112,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     LineOfScrimmage = kickActualYard.Round(),
                     PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay(),
                     ClockRunning = true,
-                    LastPlayDescriptionTemplate = "{OffAbbr} {{OffPlayer0}} punt from {LoS} to {PuntYard} ({PuntDistance} yard(s))."
+                    LastPlayDescriptionTemplate = "{OffAbbr} {{OffPlayer0}} punt from {LoS} to {PuntYard} ({PuntDistance} yard(s)).",
+                    DriveResult = DriveResult.Punt
                 };
             }
 
@@ -127,7 +128,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
                     PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay(),
                     ClockRunning = false,
-                    LastPlayDescriptionTemplate = "{OffAbbr} {{OffPlayer0}} punt from {LoS} out of back of own endzone for a safety."
+                    LastPlayDescriptionTemplate = "{OffAbbr} {{OffPlayer0}} punt from {LoS} out of back of own endzone for a safety.",
+                    DriveResult = DriveResult.Safety
                 };
                 return updatedState.WithNextState(PlayEvaluationState.FreeKickDecision);
             }
@@ -136,7 +138,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             return priorState.WithFirstDownLineOfScrimmage(25d, kickActualTeamYard.Team.Opponent(),
                 "{DefAbbr} touchback, ball placed at {LoS}.", clockRunning: false, startOfDrive: true)
                 .InvolvesKick()
-                .InvolvesAdditionalOffensivePlayer();
+                .InvolvesAdditionalOffensivePlayer() with
+            {
+                DriveResult = DriveResult.Punt
+            };
         }
 
         private static double ComputeKickOutOfBoundsForwardDistance(double lineOfScrimmage, double kickActualYard, double kickActualCross)

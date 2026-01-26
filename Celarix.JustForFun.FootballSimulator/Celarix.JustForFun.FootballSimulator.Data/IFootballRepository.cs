@@ -34,5 +34,11 @@ namespace Celarix.JustForFun.FootballSimulator.Data
         SeasonRecord GetSeasonWithGames(int seasonRecordID);
         IReadOnlyList<PlayerRosterPosition> GetActiveRosterForTeam(int teamID);
         void AddPlayerRosterPosition(PlayerRosterPosition position);
+        void AddInjuryRecoveries(IEnumerable<InjuryRecovery> recoveries);
+        void AddTeamDriveRecord(TeamDriveRecord driveRecord);
+        int GetScoreForTeamInGame(int gameRecordID, GameTeam gameTeam);
+        void AddQuarterBoxScore(QuarterBoxScore quarterBoxScore);
+        void CompleteGame(int gameRecordID);
+        void SetTeamStrengths(IStrengths newStrengths, int teamID);
     }
 }

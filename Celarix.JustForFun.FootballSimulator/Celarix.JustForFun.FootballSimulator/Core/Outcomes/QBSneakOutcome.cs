@@ -30,8 +30,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (sneakSucceeded)
             {
                 Log.Information("QBSneakOutcome: QB sneak successful, first down.");
-                return priorState.WithFirstDownLineOfScrimmage(priorState.LineToGain!.Value, priorState.TeamWithPossession,
-                    "{OffAbbr} QB sneak by {OffPlayer0} successful for a first down at {LoS}!");
+                return PlayerDownedFunction.Get(priorState.InvolvesOffensiveRun().InvolvesAdditionalOffensivePlayer() with
+                {
+                    LineOfScrimmage = priorState.LineToGain!.Value,
+                    LastPlayDescriptionTemplate = "{OffAbbr} QB sneak by {OffPlayer0} successful for a first down at {LoS}!"
+                }, priorState.LineOfScrimmage, priorState.LineToGain.Value - priorState.LineOfScrimmage, EndzoneBehavior.StandardGameplay,
+                null);
             }
 
             var yardsLost = -(parameters.Random.NextDouble() * 2);

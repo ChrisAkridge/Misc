@@ -112,7 +112,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                             LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
                             LineToGain = null,
                             ClockRunning = false,
-                            LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} made a field goal from {FGKickDistance} yards."
+                            LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} made a field goal from {FGKickDistance} yards.",
+                            DriveResult = DriveResult.FieldGoalSuccess
                         };
                 }
                 else
@@ -121,7 +122,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     return priorState.WithFirstDownLineOfScrimmage(priorState.LineOfScrimmage, priorState.TeamWithPossession.Opponent(),
                         "{DefAbbr} {DefPlayer0} missed a field goal from {FGKickDistance} yards, first down for {OffAbbr}.", startOfDrive: true)
                         .InvolvesKick()
-                        .InvolvesAdditionalOffensivePlayer();
+                        .InvolvesAdditionalOffensivePlayer() with
+                    {
+                        DriveResult = DriveResult.FieldGoalMiss
+                    };
                 }
             }
 
@@ -138,7 +142,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
                     LineToGain = null,
                     ClockRunning = false,
-                    LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} made the extra point."
+                    LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} made the extra point.",
+                    DriveResult = DriveResult.TouchdownWithXP
                 };
 
             }
@@ -154,7 +159,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
                     LineToGain = null,
                     ClockRunning = false,
-                    LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} missed the extra point."
+                    LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} missed the extra point.",
+                    DriveResult = DriveResult.TouchdownNoXP
                 };
             }
         }

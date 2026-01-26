@@ -11,6 +11,18 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         GameState NextState,
 
         // Environment
-        GameEnvironment Environment
+        GameEnvironment Environment,
+
+        // Injury Chance Modifiers
+        double AwayTeamAcclimatedTemperature,
+        double HomeTeamAcclimatedTemperature,
+
+        // Game Properties That Persist Through the Play Evaluation
+        GameTeam TeamWithPossession,
+        int PlayCountOnDrive,
+
+        // Players Involved
+        IReadOnlyList<PlayerRosterPosition>? OffensePlayersOnPlay = null,
+        IReadOnlyList<PlayerRosterPosition>? DefensePlayersOnPlay = null
     );
 }

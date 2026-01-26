@@ -87,7 +87,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 with
                 {
                     ClockRunning = true,
-                    LineOfScrimmage = catchYard.Round()
+                    LineOfScrimmage = catchYard.Round(),
+                    DriveResult = DriveResult.Interception
                 };
             }
 

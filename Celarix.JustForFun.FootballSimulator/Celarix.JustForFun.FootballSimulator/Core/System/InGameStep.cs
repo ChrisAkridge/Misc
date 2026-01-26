@@ -1,4 +1,5 @@
-﻿using Celarix.JustForFun.FootballSimulator.Models;
+﻿using Celarix.JustForFun.FootballSimulator.Core.Game;
+using Celarix.JustForFun.FootballSimulator.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,15 +11,19 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
         public static SystemContext Run(SystemContext context, out InGameSignal inGameSignal)
         {
             EvaluatingPlaySignal evaluatingPlaySignal = EvaluatingPlaySignal.None;
-
-            if (context.Environment.CurrentGameContext == null)
+            var gameContext = context.Environment.CurrentGameContext ?? throw new InvalidOperationException("Game state machine is not initialized!");
+            context.Environment.CurrentGameContext = gameContext.NextState switch
             {
-                throw new InvalidOperationException("Game state machine is not initialized!");
-            }
-
-            context.Environment.CurrentGameContext = context.Environment.CurrentGameContext.NextState switch
-            {
-
+                GameState.AdjustClock => AdjustClockStep.Run(gameContext),
+                GameState.AdjustStrengths => AdjustStrengthStep.Run(gameContext),
+                GameState.DeterminePlayersOnPlay => DeterminePlayersOnPlayStep.Run(gameContext),
+                GameState.EndGame => EndGameStep.Run(gameContext),
+                GameState.EvaluatingPlay => EvaluatingPlayStep.Run(gameContext, out evaluatingPlaySignal),
+                GameState.InjuryCheck => InjuryCheckStep.Run(gameContext),
+                GameState.PostPlayCheck => PostPlayCheck.Run(gameContext),
+                GameState.StartNextPeriod => StartNextPeriodStep.Run(gameContext),
+                GameState.Start => Game.StartStep.Run(gameContext),
+                _ => throw new InvalidOperationException("Invalid game state encountered.")
             };
 
             var nextGameState = context.Environment.CurrentGameContext.NextState;

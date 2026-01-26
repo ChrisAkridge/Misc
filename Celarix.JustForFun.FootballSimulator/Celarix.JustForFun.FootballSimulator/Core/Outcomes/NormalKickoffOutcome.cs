@@ -128,7 +128,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                         NextPlay = NextPlayKind.FreeKick,
                         LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
                         ClockRunning = false,
-                        LastPlayDescriptionTemplate = "{OffAbbr} kickoff results in kicking team safety. {DefAbbr} awarded 2 points. Free kick to follow from {LoS}."
+                        LastPlayDescriptionTemplate = "{OffAbbr} kickoff results in kicking team safety. {DefAbbr} awarded 2 points. Free kick to follow from {LoS}.",
+                        DriveResult = DriveResult.Safety
                     };
                     return updatedState.WithNextState(PlayEvaluationState.FreeKickDecision);
                 }

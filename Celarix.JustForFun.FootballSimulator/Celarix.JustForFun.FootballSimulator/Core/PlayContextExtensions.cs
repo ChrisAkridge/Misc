@@ -166,8 +166,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core
             {
                 return scoringTeam switch
                 {
-                    GameTeam.Away => state with { AwayScore = state.AwayScore + points },
-                    GameTeam.Home => state with { HomeScore = state.HomeScore + points },
+                    GameTeam.Away => state with { AwayScore = state.AwayScore + points, AwayScoredThisPlay = true },
+                    GameTeam.Home => state with { HomeScore = state.HomeScore + points, HomeScoredThisPlay = true },
                     _ => throw new ArgumentOutOfRangeException(nameof(scoringTeam), $"Unhandled team value: {scoringTeam}")
                 };
             }
@@ -439,6 +439,38 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                     {
                         DefensivePlayersInvolved = state.PlayInvolvement.DefensivePlayersInvolved + 1
                     }
+                };
+            }
+
+            public TeamDriveRecord BuildTeamDriveRecord(int gameRecordID, int teamID, int playCount)
+            {
+                int driveDurationSeconds;
+                if (state.PeriodNumber != state.DriveStartingPeriodNumber)
+                {
+                    // Drive spanned multiple periods; no drive can last more than two periods, though
+                    var firstPeriodSecondsUsed = state.DriveStartingSecondsLeftInPeriod; // Drive used all remaining time in first period
+                    var secondPeriodTotalDuration = state.PeriodNumber <= 4
+                        ? Constants.SecondsPerQuarter
+                        : Constants.SecondsPerOvertimePeriod;
+                    var secondPeriodSecondsUsed = secondPeriodTotalDuration - state.SecondsLeftInPeriod;
+                    driveDurationSeconds = firstPeriodSecondsUsed + secondPeriodSecondsUsed;
+                }
+                else
+                {
+                    driveDurationSeconds = state.DriveStartingSecondsLeftInPeriod - state.SecondsLeftInPeriod;
+                }
+
+                return new TeamDriveRecord
+                {
+                    GameRecordID = gameRecordID,
+                    TeamID = teamID,
+                    QuarterNumber = state.DriveStartingPeriodNumber,
+                    DriveStartTimeSeconds = state.DriveStartingSecondsLeftInPeriod,
+                    StartingFieldPosition = state.DriveStartingFieldPosition,
+                    PlayCount = playCount,
+                    DriveDurationSeconds = driveDurationSeconds,
+                    NetYards = state.DistanceForPossessingTeam(state.DriveStartingFieldPosition, state.LineOfScrimmage).Round(),
+                    Result = state.DriveResult ?? throw new InvalidOperationException("DriveResult must be set to build a TeamDriveRecord.")
                 };
             }
         }

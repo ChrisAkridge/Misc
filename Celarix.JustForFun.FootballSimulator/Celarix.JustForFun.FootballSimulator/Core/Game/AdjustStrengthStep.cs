@@ -72,16 +72,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
             }
 
             // Rebuild decision parameter strength sets
-            var decisionParameters = context.Environment.CurrentPlayContext.Environment!.DecisionParameters!;
-            var awayTeam = context.Environment.CurrentGameRecord!.AwayTeam;
-            var homeTeam = context.Environment.CurrentGameRecord.HomeTeam;
-            var gameRecord = context.Environment.CurrentGameRecord;
-            decisionParameters.AwayTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(awayTeam, GameTeam.Away);
-            decisionParameters.HomeTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(homeTeam, GameTeam.Home);
-            decisionParameters.AwayTeamEstimateOfAway = Helpers.EstimateStrengthSetForTeam(awayTeam, awayTeam, gameRecord, random, physicsParams);
-            decisionParameters.AwayTeamEstimateOfHome = Helpers.EstimateStrengthSetForTeam(homeTeam, awayTeam, gameRecord, random, physicsParams);
-            decisionParameters.HomeTeamEstimateOfAway = Helpers.EstimateStrengthSetForTeam(awayTeam, homeTeam, gameRecord, random, physicsParams);
-            decisionParameters.HomeTeamEstimateOfHome = Helpers.EstimateStrengthSetForTeam(homeTeam, homeTeam, gameRecord, random, physicsParams);
+            Helpers.RebuildStrengthsInDecisionParameters(context, random);
 
             return context.WithNextState(GameState.DeterminePlayersOnPlay);
         }

@@ -47,7 +47,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     LineToGain = null,
                     PossessionOnPlay = possessingTeam.Opponent().ToPossessionOnPlay(),
                     ClockRunning = false,
-                    LastPlayDescriptionTemplate = "{DefAbbr} safety! {OffPlayer0} dropped back out of his own endzone."
+                    LastPlayDescriptionTemplate = "{DefAbbr} safety! {OffPlayer0} dropped back out of his own endzone.",
+                    DriveResult = DriveResult.Safety
                 };
             }
 
@@ -72,7 +73,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 with
                 {
                     ClockRunning = false,
-                    LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 0)
+                    LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 0),
+                    DriveResult = DriveResult.Interception
                 };
             }
             else if (someoneCaughtIt)

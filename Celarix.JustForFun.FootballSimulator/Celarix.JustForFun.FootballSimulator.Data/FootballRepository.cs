@@ -190,5 +190,50 @@ namespace Celarix.JustForFun.FootballSimulator.Data
         {
             context.PlayerRosterPositions.Add(position);
         }
+
+        public void AddInjuryRecoveries(IEnumerable<InjuryRecovery> recoveries)
+        {
+            context.InjuryRecoveries.AddRange(recoveries);
+        }
+
+        public void AddTeamDriveRecord(TeamDriveRecord driveRecord)
+        {
+            context.TeamDriveRecords.Add(driveRecord);
+        }
+
+        public int GetScoreForTeamInGame(int gameRecordID, GameTeam gameTeam)
+        {
+            return context.QuarterBoxScores
+                .Where(qbs => qbs.GameRecordID == gameRecordID && qbs.Team == gameTeam)
+                .Sum(qbs => qbs.Score);
+        }
+
+        public void AddQuarterBoxScore(QuarterBoxScore quarterBoxScore)
+        {
+            context.QuarterBoxScores.Add(quarterBoxScore);
+        }
+
+        public void CompleteGame(int gameRecordID)
+        {
+            var gameRecord = context.GameRecords.Single(gr => gr.GameID == gameRecordID);
+            gameRecord.GameComplete = true;
+            context.GameRecords.Update(gameRecord);
+        }
+
+        public void SetTeamStrengths(IStrengths newStrengths, int teamID)
+        {
+            var team = context.Teams.Single(t => t.TeamID == teamID);
+            team.OffensiveLineStrength = newStrengths.OffensiveLineStrength;
+            team.DefensiveLineStrength = newStrengths.DefensiveLineStrength;
+            team.RunningOffenseStrength = newStrengths.RunningOffenseStrength;
+            team.RunningDefenseStrength = newStrengths.RunningDefenseStrength;
+            team.PassingOffenseStrength = newStrengths.PassingOffenseStrength;
+            team.PassingDefenseStrength = newStrengths.PassingDefenseStrength;
+            team.KickingStrength = newStrengths.KickingStrength;
+            team.FieldGoalStrength = newStrengths.FieldGoalStrength;
+            team.KickReturnStrength = newStrengths.KickReturnStrength;
+            team.KickDefenseStrength = newStrengths.KickDefenseStrength;
+            context.Teams.Update(team);
+        }
     }
 }

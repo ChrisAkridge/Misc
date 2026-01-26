@@ -42,8 +42,13 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         int DriveStartingPeriodNumber,
         int DriveStartingSecondsLeftInPeriod,
 
-        // Display properties
+        // End-of-drive properties
+        DriveResult? DriveResult,
+
+        // Play results
         string LastPlayDescriptionTemplate,
+        bool AwayScoredThisPlay,
+        bool HomeScoredThisPlay,
 
         // Internal properties
         PossessionOnPlay PossessionOnPlay,

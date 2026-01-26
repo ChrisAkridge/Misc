@@ -40,7 +40,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     {
                         TeamWithPossession = priorState.TeamWithPossession.Opponent(),
                         PossessionOnPlay = PossessionOnPlay.BothTeams,
-                        LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} pass intercepted."
+                        LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} pass intercepted.",
+                        DriveResult = DriveResult.Interception
                     }, parameters, physicsParams, priorState.TeamWithPossession, priorState.TeamWithPossession.Opponent(),
                     fumbleDownedImmediately: false, priorState.LineOfScrimmage, interceptionTeamYard);
                 }
@@ -129,7 +130,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     PossessionOnPlay = PossessionOnPlay.BothTeams,
                     LineOfScrimmage = fumbleRecoveryInternalYard.Round(),
                     ClockRunning = false,
-                    LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} fumbled, {DefAbbr} {DefPlayer0} recovered fumble at {LoS}."
+                    LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} fumbled, {DefAbbr} {DefPlayer0} recovered fumble at {LoS}.",
+                    DriveResult = DriveResult.FumbleLost
                 }, parameters, physicsParams, possessingTeamBeforeFumble, fumbleRecoveryInternalYard);
             }
 
@@ -143,7 +145,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     PossessionOnPlay = PossessionOnPlay.BothTeams,
                     LineOfScrimmage = fumbleRecoveryInternalYard.Round(),
                     ClockRunning = false,
-                    LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} fumbled, {DefAbbr} {DefPlayer0} recovered fumble inside {OffAbbr} endzone."
+                    LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} fumbled, {DefAbbr} {DefPlayer0} recovered fumble inside {OffAbbr} endzone.",
+                    DriveResult = DriveResult.FumbleLost
                 }, parameters, physicsParams, possessingTeamBeforeFumble, fumbleRecoveryInternalYard);
             }
 
@@ -153,7 +156,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 TeamWithPossession = fumbleRecoveryTeam,
                 PossessionOnPlay = PossessionOnPlay.BothTeams,
                 LineOfScrimmage = fumbleRecoveryInternalYard.Round(),
-                LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} fumbled, {DefAbbr} {DefPlayer0} recovered fumble at {LoS}."
+                LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} fumbled, {DefAbbr} {DefPlayer0} recovered fumble at {LoS}.",
+                DriveResult = DriveResult.FumbleLost
             };
         }
 

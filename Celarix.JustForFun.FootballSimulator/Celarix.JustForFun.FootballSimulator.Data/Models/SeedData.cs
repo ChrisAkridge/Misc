@@ -293,7 +293,13 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
                 new PhysicsParam("TeamPlayersTradedPerOffseasonMean", 1, "players", "players"),
                 new PhysicsParam("TeamPlayersTradedPerOffseasonStddev", 1, "players", "players"),
                 new PhysicsParam("StrengthAdjustmentMultiplierMean", 1 + 1e-6, "multiplier", "multiplier"),
-                new PhysicsParam("StrengthAdjustmentMultiplierStdDev", 1e-9, "multiplier", "multiplier")
+                new PhysicsParam("StrengthAdjustmentMultiplierStdDev", 1e-9, "multiplier", "multiplier"),
+                new PhysicsParam("InjuryTemperatureStep", 10, "degree", "degrees"),
+                new PhysicsParam("InjuryTemperatureMultiplierPerStep", 1.03, "multiplier", "multiplier"),
+                new PhysicsParam("InjuryStrengthAdjustmentMean", 0.95, "multiplier", "multiplier"),
+                new PhysicsParam("InjuryStrengthAdjustmentStdDev", 0.02, "multiplier", "multiplier"),
+                new PhysicsParam("InjuryRecoveryDaysMean", 7, "day", "days"),
+                new PhysicsParam("InjuryRecoveryDaysStdDev", 14, "day", "days")
             };
         }
     }
