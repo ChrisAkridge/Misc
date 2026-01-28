@@ -66,19 +66,31 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 }
             };
 
+            var awayMainStadium = repository.GetStadium(gameRecord.AwayTeam.HomeStadiumID);
+            var homeMainStadium = repository.GetStadium(gameRecord.HomeTeam.HomeStadiumID);
+            var gameMonth = gameRecord.KickoffTime.Month;
+            var awayAcclimatedTemperature = Helpers.GetTemperatureForStadiumAndMonth(awayMainStadium, gameMonth);
+            var homeAcclimatedTemperature = Helpers.GetTemperatureForStadiumAndMonth(homeMainStadium, gameMonth);
+
             context.Environment.CurrentGameRecord = gameRecord;
             context.Environment.CurrentGameContext = new GameContext(
                 Version: 0L,
                 NextState: GameState.Start,
                 Environment: new GameEnvironment
                 {
+                    FootballRepository = repository,
                     PhysicsParams = physicsParams,
                     CurrentPlayContext = newPlayContext,
                     CurrentGameRecord = gameRecord,
                     RandomFactory = context.Environment.RandomFactory,
                     AwayActiveRoster = repository.GetActiveRosterForTeam(gameRecord.AwayTeamID),
                     HomeActiveRoster = repository.GetActiveRosterForTeam(gameRecord.HomeTeamID),
-                });
+                },
+                AwayTeamAcclimatedTemperature: awayAcclimatedTemperature,
+                HomeTeamAcclimatedTemperature: homeAcclimatedTemperature,
+                TeamWithPossession: GameTeam.Away,
+                PlayCountOnDrive: 0
+            );
 
             Log.Information("LoadGameStep: Loaded incomplete game between {AwayTeam} and {HomeTeam} scheduled for {KickoffTime}.",
                 gameRecord.AwayTeam.TeamName,

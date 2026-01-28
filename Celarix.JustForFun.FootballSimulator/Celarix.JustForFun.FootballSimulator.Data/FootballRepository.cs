@@ -235,5 +235,10 @@ namespace Celarix.JustForFun.FootballSimulator.Data
             team.KickDefenseStrength = newStrengths.KickDefenseStrength;
             context.Teams.Update(team);
         }
+
+        public Stadium GetStadium(int stadiumID)
+        {
+            return context.Stadiums.Single(s => s.StadiumID == stadiumID);
+        }
     }
 }

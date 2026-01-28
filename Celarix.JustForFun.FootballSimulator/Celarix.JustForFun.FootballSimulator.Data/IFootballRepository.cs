@@ -40,5 +40,6 @@ namespace Celarix.JustForFun.FootballSimulator.Data
         void AddQuarterBoxScore(QuarterBoxScore quarterBoxScore);
         void CompleteGame(int gameRecordID);
         void SetTeamStrengths(IStrengths newStrengths, int teamID);
+        Stadium GetStadium(int stadiumID);
     }
 }

@@ -263,7 +263,6 @@ namespace Celarix.JustForFun.FootballSimulator
         // Source - https://stackoverflow.com/a/1674779
         // Posted by Jon Skeet, modified by community. See post 'Timeline' for change history
         // Retrieved 2026-01-20, License - CC BY-SA 2.5
-
         public static List<T> IntersectAll<T>(IEnumerable<IEnumerable<T>> lists)
         {
             HashSet<T>? hashSet = null;
@@ -363,6 +362,23 @@ namespace Celarix.JustForFun.FootballSimulator
                 Team = GameTeam.Home,
                 Score = homeScoreInCurrentQuarter
             });
+        }
+
+        internal static double GetTemperatureForStadiumAndMonth(Stadium stadium, int month)
+        {
+            if (month is > 2 and < 8)
+            {
+                throw new ArgumentOutOfRangeException(nameof(month), $"Invalid month {month} for temperature lookup.");
+            }
+
+            var averageTemperatures = stadium.AverageTemperatures
+                .Split(',')
+                .Select(double.Parse);
+            return month >= 8
+                ? // Indexes 0-4 correspond to August-December
+                averageTemperatures.ElementAt(month - 8)
+                : // Indexes 5-6 correspond to January-February
+                averageTemperatures.ElementAt(month + 4);
         }
     }
 }
