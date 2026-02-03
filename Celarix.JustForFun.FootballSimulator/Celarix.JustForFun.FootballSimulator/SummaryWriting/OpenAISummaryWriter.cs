@@ -29,6 +29,7 @@ namespace Celarix.JustForFun.FootballSimulator.SummaryWriting
                 apiKey = File.ReadAllText(apiKeyPath).Trim();
                 var client = new OpenAIClient(apiKey);
                 var responses = client.GetResponsesClient("gpt-5-mini");
+                return WriteGameSummaryImpl(gameRecord, responses);
             }
             catch (Exception ex)
             {
@@ -45,7 +46,7 @@ namespace Celarix.JustForFun.FootballSimulator.SummaryWriting
 
         private string WriteGameSummaryImpl(GameRecord gameRecord, ResponsesClient chatClient)
         {
-            
+            throw new NotImplementedException();
         }
     }
 #pragma warning restore OPENAI001

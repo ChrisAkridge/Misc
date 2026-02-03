@@ -45,7 +45,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 // Check if any partially complete games exist
                 var partialGame = seasonGames
                     .Where(g => !g.GameComplete)
-                    .SingleOrDefault(g => g.TeamGameRecords.Count > 0);
+                    .SingleOrDefault(g => g.TeamDriveRecords.Count > 0);
                 if (partialGame != null)
                 {
                     Log.Information("PrepareForGameStep: Found partially complete game (GameID: {GameID}) for season {SeasonYear}, resuming game.",

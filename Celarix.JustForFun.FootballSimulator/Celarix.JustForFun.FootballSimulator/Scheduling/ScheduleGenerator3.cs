@@ -88,9 +88,11 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 	                {
 		                GameType = GameType.RegularSeason,
 		                AwayTeam = awayDataTeam,
-		                StadiumID = homeDataTeam.HomeStadiumID,
-		                HomeTeam = homeDataTeam
-	                },
+                        AwayTeamID = awayDataTeam.TeamID,
+                        StadiumID = homeDataTeam.HomeStadiumID,
+		                HomeTeam = homeDataTeam,
+                        HomeTeamID = homeDataTeam.TeamID
+                    },
 	                GameType = matchup.GameType
                 };
                 
@@ -401,8 +403,10 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 	                    GameType = GameType.Preseason,
 	                    WeekNumber = weekNumber,
 	                    HomeTeam = homeDataTeam,
-	                    AwayTeam = awayDataTeam,
-	                    StadiumID = homeDataTeam.HomeStadiumID,
+                        HomeTeamID = homeDataTeam.TeamID,
+                        AwayTeam = awayDataTeam,
+                        AwayTeamID = awayDataTeam.TeamID,
+                        StadiumID = homeDataTeam.HomeStadiumID,
 	                    KickoffTime = gamesAssignedThisWeek switch
 	                    {
 		                    0 => weekStartDay.AddHours(19),                               // Thursday 7:00pm

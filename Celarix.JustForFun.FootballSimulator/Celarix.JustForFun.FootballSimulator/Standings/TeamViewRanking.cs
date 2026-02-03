@@ -9,5 +9,7 @@ namespace Celarix.JustForFun.FootballSimulator.Standings
     {
         public required BasicTeamInfo BasicTeamInfo { get; init; }
         public required int Ranking { get; init; }
+
+        public override string ToString() => $"#{Ranking} {BasicTeamInfo.Name}";
     }
 }

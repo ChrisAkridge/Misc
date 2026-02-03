@@ -6,7 +6,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
 {
     internal static class Constants
     {
-        public const double ChaosMultiplierChance = 1 / 10000;
+        public const double ChaosMultiplierChance = 1d / 10000;
         public const double ChaosMultiplier = 1000;
 
         public const int SecondsPerQuarter = 15 * 60;

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Celarix.JustForFun.FootballSimulator.Models
 {
@@ -11,7 +12,7 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         GameState NextState,
 
         // Environment
-        GameEnvironment Environment,
+        [property: JsonIgnore] GameEnvironment Environment,
 
         // Injury Chance Modifiers
         double AwayTeamAcclimatedTemperature,
@@ -22,7 +23,7 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         int PlayCountOnDrive,
 
         // Players Involved
-        IReadOnlyList<PlayerRosterPosition>? OffensePlayersOnPlay = null,
-        IReadOnlyList<PlayerRosterPosition>? DefensePlayersOnPlay = null
+        [property: JsonIgnore] IReadOnlyList<PlayerRosterPosition>? OffensePlayersOnPlay = null,
+        [property: JsonIgnore] IReadOnlyList<PlayerRosterPosition>? DefensePlayersOnPlay = null
     );
 }

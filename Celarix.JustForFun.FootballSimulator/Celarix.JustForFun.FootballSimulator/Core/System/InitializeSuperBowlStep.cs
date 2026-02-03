@@ -61,7 +61,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 .OrderBy(g => g.KickoffTime)
                 .First()
                 .KickoffTime
-                .Date
+                .AtMidnight()
                 .AddDays(14)
                 .AddHours(18)
                 .AddMinutes(5);

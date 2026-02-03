@@ -13,5 +13,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         public int SimulatorSettingsID { get; set; }
         
         public bool SeedDataInitialized { get; set; }
+        public bool SaveStateMachineContextsForDebugging { get; set; }
+        public string StateMachineContextSavePath { get; set; }
     }
 }

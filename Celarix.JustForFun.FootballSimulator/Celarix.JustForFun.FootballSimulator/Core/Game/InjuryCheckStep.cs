@@ -2,6 +2,7 @@
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
 using Celarix.JustForFun.FootballSimulator.Random;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -52,6 +53,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                 var injuryRoll = random.Chance(offenseIsHomeTeam ? homeTeamInjuryChancePerPlay : awayTeamInjuryChancePerPlay);
                 if (injuryRoll)
                 {
+                    Log.Verbose("InjuryCheckStep: Player {PlayerName} ({TeamName}) injured on play.",
+                        player.Player.FirstName + " " + player.Player.LastName,
+                        offenseTeam.TeamName);
                     newInjuryRecoveries.AddRange(InjurePlayerAndCreateRecoveries(random, player, offenseTeam, context.Environment.PhysicsParams, kickoffTime));
                 }
             }
@@ -61,6 +65,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                 var injuryRoll = random.Chance(offenseIsHomeTeam ? awayTeamInjuryChancePerPlay : homeTeamInjuryChancePerPlay);
                 if (injuryRoll)
                 {
+                    Log.Verbose("InjuryCheckStep: Player {PlayerName} ({TeamName}) injured on play.",
+                        player.Player.FirstName + " " + player.Player.LastName,
+                        offenseTeam.TeamName);
                     newInjuryRecoveries.AddRange(InjurePlayerAndCreateRecoveries(random, player, defenseTeam, context.Environment.PhysicsParams, kickoffTime));
                 }
             }
@@ -68,6 +75,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
             Helpers.RebuildStrengthsInDecisionParameters(context, random);
             context.Environment.FootballRepository.AddInjuryRecoveries(newInjuryRecoveries);
             context.Environment.FootballRepository.SaveChanges();
+
+            Log.Verbose("InjuryCheckStep: Completed injury checks for play.");
+            return context.WithNextState(GameState.AdjustClock);
         }
 
         internal static IEnumerable<InjuryRecovery> InjurePlayerAndCreateRecoveries(IRandom random, PlayerRosterPosition playerRosterPosition,

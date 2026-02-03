@@ -51,7 +51,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             repository.SaveChanges();
 
             Log.Verbose("InitializeDatabaseStep: Adding physics parameters.");
-            var physicsParams = SeedData.ParamSeemData();
+            var physicsParams = SeedData.ParamSeedData();
             foreach (var param in physicsParams)
             {
                 repository.AddPhysicsParam(param);

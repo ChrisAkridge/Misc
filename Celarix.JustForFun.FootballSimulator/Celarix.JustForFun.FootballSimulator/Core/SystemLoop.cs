@@ -1,4 +1,5 @@
-﻿using Celarix.JustForFun.FootballSimulator.Core.System;
+﻿using Celarix.JustForFun.FootballSimulator.Core.Debug;
+using Celarix.JustForFun.FootballSimulator.Core.System;
 using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
@@ -22,15 +23,18 @@ namespace Celarix.JustForFun.FootballSimulator.Core
             var lastNames = File.ReadAllLines("Names\\player-last-names.csv")
                 .Select(Helpers.CapitalizeLastName);
 
+            FootballRepository footballRepository = new(new FootballContext());
+            var settings = footballRepository.GetSimulatorSettings() ?? throw new InvalidOperationException("Simulator settings could not be loaded from the database.");
             context = new SystemContext(
                 Version: 0L,
                 NextState: SystemState.Start,
                 Environment: new SystemEnvironment
                 {
-                    FootballRepository = new FootballRepository(new FootballContext()),
+                    FootballRepository = footballRepository,
                     RandomFactory = new RandomFactory(),
                     PlayerFactory = new PlayerFactory(firstNames, lastNames),
-                    SummaryWriter = new OpenAISummaryWriter()
+                    SummaryWriter = new OpenAISummaryWriter(),
+                    DebugContextWriter = new DebugContextWriter(settings.SaveStateMachineContextsForDebugging, settings.StateMachineContextSavePath)
                 });
         }
 
@@ -57,6 +61,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 SystemState.Error => ErrorStep.Run(context),
                 _ => throw new ArgumentOutOfRangeException($"Unhandled system state: {context.NextState}")
             };
+
+            context.Environment.DebugContextWriter.WriteContext(context);
 
             if (context.NextState == SystemState.InGame)
             {

@@ -12,7 +12,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
         public void KickoffDecision_Run_KickingTeamUltraConservative_PerformsNormalKickoff()
         {
             // Arrange
-            var priorState = TestHelpers.EmptyState with
+            var priorState = TestHelpers.EmptyPlayContext with
             {
                 NextState = PlayEvaluationState.KickoffDecision,
                 NextPlay = NextPlayKind.Kickoff,
@@ -27,7 +27,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
             };
             var physicsParams = TestHelpers.EmptyPhysicsParams;
             // Act
-            var newState = KickoffDecision.Run(priorState, parameters, physicsParams);
+            var newState = KickoffDecision.Run(priorState);
             // Assert
             Assert.Equal(PlayEvaluationState.NormalKickoffOutcome, newState.NextState);
         }
@@ -36,7 +36,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
         public void KickoffDecision_Run_KickingTeamConservative_DownByALotWithLittleTime_PerformsOnsideKickAttempt()
         {
             // Arrange
-            var priorState = TestHelpers.EmptyState with
+            var priorState = TestHelpers.EmptyPlayContext with
             {
                 NextState = PlayEvaluationState.KickoffDecision,
                 NextPlay = NextPlayKind.Kickoff,
@@ -58,7 +58,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
                 { "OnsideKickPointsPerMinuteThreshold", new PhysicsParam("OnsideKickPointsPerMinuteThreshold", 7.0, "point", "points") }
             };
             // Act
-            var newState = KickoffDecision.Run(priorState, parameters, physicsParams);
+            var newState = KickoffDecision.Run(priorState);
             // Assert
             Assert.Equal(PlayEvaluationState.OnsideKickAttemptOutcome, newState.NextState);
         }
@@ -67,7 +67,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
         public void KickoffDecision_Run_KickingTeamConservative_NotDownByALot_PerformsNormalKickoff()
         {
             // Arrange
-            var priorState = TestHelpers.EmptyState with
+            var priorState = TestHelpers.EmptyPlayContext with
             {
                 NextState = PlayEvaluationState.KickoffDecision,
                 NextPlay = NextPlayKind.Kickoff,
@@ -89,7 +89,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
                 { "OnsideKickPointsPerMinuteThreshold", new PhysicsParam("OnsideKickPointsPerMinuteThreshold", 7.0, "point", "points") }
             };
             // Act
-            var newState = KickoffDecision.Run(priorState, parameters, physicsParams);
+            var newState = KickoffDecision.Run(priorState);
             // Assert
             Assert.Equal(PlayEvaluationState.NormalKickoffOutcome, newState.NextState);
         }
@@ -100,7 +100,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
         public void KickoffDecision_Run_KickingTeamInsane_PerformsOnsideKickAttempt(TeamDisposition disposition)
         {
             // Arrange
-            var priorState = TestHelpers.EmptyState with
+            var priorState = TestHelpers.EmptyPlayContext with
             {
                 NextState = PlayEvaluationState.KickoffDecision,
                 NextPlay = NextPlayKind.Kickoff,
@@ -115,7 +115,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
             };
             var physicsParams = TestHelpers.EmptyPhysicsParams;
             // Act
-            var newState = KickoffDecision.Run(priorState, parameters, physicsParams);
+            var newState = KickoffDecision.Run(priorState);
             // Assert
             Assert.Equal(PlayEvaluationState.OnsideKickAttemptOutcome, newState.NextState);
         }

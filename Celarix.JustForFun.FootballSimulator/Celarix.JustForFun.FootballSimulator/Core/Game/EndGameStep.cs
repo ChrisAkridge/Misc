@@ -1,4 +1,5 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -24,6 +25,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
             repository.SaveChanges();
 
             // This state points to itself and signals GameCompleted to the system state machine.
+            Log.Information("EndGameStep: Game {GameID} has completed between {AwayTeam} and {HomeTeam} with final score {AwayScore}-{HomeScore}",
+                gameRecord.GameID,
+                awayTeam.Abbreviation,
+                homeTeam.Abbreviation,
+                gameRecord.AwayScore,
+                gameRecord.HomeScore);
             return context.WithNextState(GameState.EndGame);
         }
     }

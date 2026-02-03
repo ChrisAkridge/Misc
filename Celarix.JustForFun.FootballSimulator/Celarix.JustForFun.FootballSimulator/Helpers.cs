@@ -159,13 +159,23 @@ namespace Celarix.JustForFun.FootballSimulator
                 ClockRunning: false,
                 HomeTimeoutsRemaining: 3,
                 AwayTimeoutsRemaining: 3,
+                PlayInvolvement: new PlayInvolvement(
+                    InvolvesOffenseRun: false,
+                    InvolvesDefenseRun: false,
+                    OffensivePlayersInvolved: 0,
+                    DefensivePlayersInvolved: 0,
+                    InvolvesKick: false,
+                    InvolvesOffensePass: false),
                 LineOfScrimmage: 50,
                 LineToGain: null,
                 NextPlay: NextPlayKind.Kickoff,
                 DriveStartingFieldPosition: 50,
                 DriveStartingPeriodNumber: 1,
                 DriveStartingSecondsLeftInPeriod: Constants.SecondsPerQuarter,
+                DriveResult: null,
                 LastPlayDescriptionTemplate: "Gameplay loop initializing.",
+                AwayScoredThisPlay: false,
+                HomeScoredThisPlay: false,
                 PossessionOnPlay: PossessionOnPlay.None,
                 TeamCallingTimeout: null);
         }

@@ -58,36 +58,36 @@ namespace Celarix.JustForFun.FootballSimulator.Core
             {
                 Log.Information(currentState.GetDescription(currentParameters));
 
-                currentState = currentState.NextState switch
-                {
-                    PlayEvaluationState.Start => throw new InvalidOperationException("uh... shouldn't be here yet, I think?"),
-                    PlayEvaluationState.KickoffDecision => KickoffDecision.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.FreeKickDecision => FreeKickDecision.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.SignalFairCatchDecision => SignalFairCatchDecision.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.TouchdownDecision => TouchdownDecision.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.MainGameDecision => MainGameDecision.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.ReturnFumbledOrInterceptedBallDecision => ReturnFumbledOrInterceptedBallDecision.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.NormalKickoffOutcome => NormalKickoffOutcome.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.ReturnableKickOutcome => ReturnableKickOutcome.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.FumbledLiveBallOutcome => FumbledLiveBallOutcome.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.PuntOutcome => PuntOutcome.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.ReturnablePuntOutcome => ReturnablePuntOutcome.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.KickOrPuntReturnOutcome => KickOrPuntReturnOutcome.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.FumbleOrInterceptionReturnOutcome => FumbleOrInterceptionReturnOutcome.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.OnsideKickAttemptOutcome => OnsideKickAttemptOutcome.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.FieldGoalsAndExtraPointAttemptOutcome => FieldGoalAttemptOutcome.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.TwoPointConversionAttemptOutcome => TwoPointConversionAttemptOutcome.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.StandardRushingPlayOutcome => StandardRushingPlayOutcome.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.StandardShortPassingPlayOutcome => StandardPassingPlayOutcome.Run(currentState, currentParameters, physicsParams, PassAttemptDistance.Short),
-                    PlayEvaluationState.StandardMediumPassingPlayOutcome => StandardPassingPlayOutcome.Run(currentState, currentParameters, physicsParams, PassAttemptDistance.Medium),
-                    PlayEvaluationState.StandardLongPassingPlayOutcome => StandardPassingPlayOutcome.Run(currentState, currentParameters, physicsParams, PassAttemptDistance.Long),
-                    PlayEvaluationState.HailMaryOutcome => HailMaryOutcome.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.QBSneakOutcome => QBSneakOutcome.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.FakePuntOutcome => FakePuntOrFieldGoalOutcome.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.FakeFieldGoalOutcome => FakePuntOrFieldGoalOutcome.Run(currentState, currentParameters, physicsParams),
-                    PlayEvaluationState.VictoryFormationOutcome => VictoryFormationOutcome.Run(currentState, currentParameters, physicsParams),
-                    _ => throw new InvalidOperationException($"Unhandled gameplay next state {currentState.NextState}.")
-                };
+                //currentState = currentState.NextState switch
+                //{
+                //    PlayEvaluationState.Start => throw new InvalidOperationException("uh... shouldn't be here yet, I think?"),
+                //    PlayEvaluationState.KickoffDecision => KickoffDecision.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.FreeKickDecision => FreeKickDecision.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.SignalFairCatchDecision => SignalFairCatchDecision.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.TouchdownDecision => TouchdownDecision.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.MainGameDecision => MainGameDecision.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.ReturnFumbledOrInterceptedBallDecision => ReturnFumbledOrInterceptedBallDecision.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.NormalKickoffOutcome => NormalKickoffOutcome.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.ReturnableKickOutcome => ReturnableKickOutcome.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.FumbledLiveBallOutcome => FumbledLiveBallOutcome.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.PuntOutcome => PuntOutcome.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.ReturnablePuntOutcome => ReturnablePuntOutcome.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.KickOrPuntReturnOutcome => KickOrPuntReturnOutcome.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.FumbleOrInterceptionReturnOutcome => FumbleOrInterceptionReturnOutcome.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.OnsideKickAttemptOutcome => OnsideKickAttemptOutcome.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.FieldGoalsAndExtraPointAttemptOutcome => FieldGoalAttemptOutcome.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.TwoPointConversionAttemptOutcome => TwoPointConversionAttemptOutcome.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.StandardRushingPlayOutcome => StandardRushingPlayOutcome.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.StandardShortPassingPlayOutcome => StandardPassingPlayOutcome.Run(currentState, currentParameters, physicsParams, PassAttemptDistance.Short),
+                //    PlayEvaluationState.StandardMediumPassingPlayOutcome => StandardPassingPlayOutcome.Run(currentState, currentParameters, physicsParams, PassAttemptDistance.Medium),
+                //    PlayEvaluationState.StandardLongPassingPlayOutcome => StandardPassingPlayOutcome.Run(currentState, currentParameters, physicsParams, PassAttemptDistance.Long),
+                //    PlayEvaluationState.HailMaryOutcome => HailMaryOutcome.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.QBSneakOutcome => QBSneakOutcome.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.FakePuntOutcome => FakePuntOrFieldGoalOutcome.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.FakeFieldGoalOutcome => FakePuntOrFieldGoalOutcome.Run(currentState, currentParameters, physicsParams),
+                //    PlayEvaluationState.VictoryFormationOutcome => VictoryFormationOutcome.Run(currentState, currentParameters, physicsParams),
+                //    _ => throw new InvalidOperationException($"Unhandled gameplay next state {currentState.NextState}.")
+                //};
 
                 currentState = currentState with
                 {

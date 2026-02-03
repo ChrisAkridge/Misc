@@ -1,5 +1,6 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,6 +13,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
         {
             // LoadGameStep or ResumePartialGameStep have already set up the initial environment,
             // so there's nothing to do here.
+            Log.Information("StartStep: Starting game!");
             return context.WithNextState(GameState.EvaluatingPlay);
         }
     }

@@ -1,4 +1,5 @@
-﻿using Celarix.JustForFun.FootballSimulator.Data;
+﻿using Celarix.JustForFun.FootballSimulator.Core.Debug;
+using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Random;
 using System;
@@ -11,6 +12,7 @@ namespace Celarix.JustForFun.FootballSimulator.Models
     {
         public required IFootballRepository FootballRepository { get; init; }
         public required IReadOnlyDictionary<string, PhysicsParam> PhysicsParams { get; set; }
+        public required DebugContextWriter DebugContextWriter { get; init; }
         public PlayContext? CurrentPlayContext { get; set; }
         public required GameRecord CurrentGameRecord { get; init; }
         public required IRandomFactory RandomFactory { get; init; }

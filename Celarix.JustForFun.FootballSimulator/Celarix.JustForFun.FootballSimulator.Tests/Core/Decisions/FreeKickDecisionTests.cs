@@ -14,7 +14,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
         public void Run_KickingTeamBetterAtKickDefense_ChoosesNormalKickoffOutcome()
         {
             // Arrange
-            var priorState = TestHelpers.EmptyState;
+            var priorState = TestHelpers.EmptyPlayContext;
             var parameters = new GameDecisionParameters
             {
                 AwayTeamEstimateOfAway = new TeamStrengthSet
@@ -27,10 +27,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
                 }
             };
             // Act
-            var resultState = FreeKickDecision.Run(
-                priorState,
-                parameters,
-                physicsParams: TestHelpers.EmptyPhysicsParams);
+            var resultState = FreeKickDecision.Run(priorState);
             // Assert
             Assert.Equal(PlayEvaluationState.NormalKickoffOutcome, resultState.NextState);
         }
@@ -39,7 +36,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
         public void Run_OpponentBetterAtKickReturns_ChoosesPuntOutcome()
         {
             // Arrange
-            var priorState = TestHelpers.EmptyState;
+            var priorState = TestHelpers.EmptyPlayContext;
             var parameters = new GameDecisionParameters
             {
                 AwayTeamEstimateOfAway = new TeamStrengthSet
@@ -52,10 +49,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
                 }
             };
             // Act
-            var resultState = FreeKickDecision.Run(
-                priorState,
-                parameters,
-                physicsParams: TestHelpers.EmptyPhysicsParams);
+            var resultState = FreeKickDecision.Run(priorState);
             // Assert
             Assert.Equal(PlayEvaluationState.PuntOutcome, resultState.NextState);
         }

@@ -1,6 +1,7 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
 using Celarix.JustForFun.FootballSimulator.SummaryWriting;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -25,6 +26,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             repository.AddSummary(summary);
             repository.SaveChanges();
 
+            Log.Information("WriteSummaryForGameStep: Wrote summary for game {GameID}.", gameRecord.GameID);
             return context.WithNextState(SystemState.PrepareForGame);
         }
     }

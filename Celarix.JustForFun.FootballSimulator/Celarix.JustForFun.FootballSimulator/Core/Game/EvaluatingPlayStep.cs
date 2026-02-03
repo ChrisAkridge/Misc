@@ -1,6 +1,7 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Core.Decisions;
 using Celarix.JustForFun.FootballSimulator.Core.Outcomes;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,6 +20,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                 var playCountResets = playContext.TeamWithPossession != context.TeamWithPossession
                     || playContext.NextPlay is NextPlayKind.Kickoff or NextPlayKind.FreeKick;
                 var playNumber = playCountResets ? 1 : context.PlayCountOnDrive + 1;
+                Log.Verbose("EvaluatingPlayStep: Starting evaluation of play number {PlayNumber} for {TeamWithPossession}.",
+                    playNumber,
+                    context.TeamWithPossession);
 
                 playContext = playContext with
                 {
@@ -48,6 +52,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                     TeamWithPossession = playContext.TeamWithPossession,
                     PlayCountOnDrive = playNumber
                 };
+
+                context.Environment.DebugContextWriter.WriteContext(playContext);
+                context.Environment.DebugContextWriter.WriteContext(context);
             }
 
             context.Environment.CurrentPlayContext = playContext.NextState switch
@@ -79,12 +86,16 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                 _ => throw new InvalidOperationException("Invalid play evaluation state encountered.")
             };
 
+            context.Environment.DebugContextWriter.WriteContext(context.Environment.CurrentPlayContext);
+
             evaluatingPlaySignal = playContext.NextState switch
             {
                 PlayEvaluationState.PlayEvaluationComplete => EvaluatingPlaySignal.PlayEvaluationComplete,
                 _ => EvaluatingPlaySignal.InProgress
             };
 
+            Log.Information("EvaluatingPlayStep: Play evaluation state machine advanced to {PlayState}.",
+                context.Environment.CurrentPlayContext!.NextState);
             return playContext.NextState == PlayEvaluationState.PlayEvaluationComplete
                 ? context.WithNextState(GameState.AdjustStrengths)
                 : context.WithNextState(GameState.EvaluatingPlay);

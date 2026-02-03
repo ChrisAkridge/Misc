@@ -1,6 +1,7 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
 using Celarix.JustForFun.FootballSimulator.SummaryWriting;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -32,6 +33,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             // Mark season as complete
             currentSeason.SeasonComplete = true;
             repository.SaveChanges();
+            Log.Information("WriteSummaryForSeasonStep: Completed the {SeasonYear} season.", currentSeason.Year);
             return context.WithNextState(SystemState.PrepareForGame);
         }
 

@@ -43,5 +43,12 @@ namespace Celarix.JustForFun.FootballSimulator.Random
                 list[j] = temp;
             }
         }
+
+        public IReadOnlyList<T> ShuffleIntoNewList<T>(IReadOnlyList<T> list)
+        {
+            var shuffledList = new List<T>(list);
+            Shuffle(shuffledList);
+            return shuffledList;
+        }
     }
 }

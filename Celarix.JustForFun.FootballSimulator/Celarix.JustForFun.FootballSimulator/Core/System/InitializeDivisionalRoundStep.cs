@@ -61,11 +61,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 .OrderBy(g => g.KickoffTime)
                 .First()
                 .KickoffTime
-                .Date
+                .AtMidnight()
                 .AddDays(7);
             var divisionalRoundSunday = divisionalRoundSaturday.AddDays(1);
 
-            var divisionalRoundKickoffTimes = new List<DateTime>
+            var divisionalRoundKickoffTimes = new List<DateTimeOffset>
             {
                 divisionalRoundSaturday.AddHours(16).AddMinutes(25),
                 divisionalRoundSaturday.AddHours(20).AddMinutes(20),
@@ -92,7 +92,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             return context.WithNextState(SystemState.LoadGame);
         }
 
-        internal static GameRecord MakeDivisionalRoundGame(Team away, Team home,
+        internal static GameRecord MakeDivisionalRoundGame(Team home, Team away,
             DateTimeOffset kickoffTime, int seasonRecordID)
         {
             Log.Information($"InitializeDivisionalRoundStep: " +

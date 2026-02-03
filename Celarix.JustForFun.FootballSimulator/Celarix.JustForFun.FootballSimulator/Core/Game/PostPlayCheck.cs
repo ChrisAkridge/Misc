@@ -1,5 +1,6 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -65,6 +66,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                 SaveDriveRecord(context);
             }
 
+            Log.Information("PostPlayCheck: Decision = {Decision}", decision);
             return context.WithNextState(decision switch
             {
                 PostPlayDecision.RunNextPlay => GameState.EvaluatingPlay,

@@ -28,7 +28,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             var airTemperature = Helpers.GetTemperatureForGame(gameRecord, physicsParams, random);
             var newPlayContext = Helpers.CreateInitialPlayContext(random,
                 gameRecord,
-                physicsParams["StartWindSpeedStdDev"].Value,
+                physicsParams["StartWindSpeedStddev"].Value,
                 airTemperature);
             Log.Information("LoadGameStep: Initialized base wind direction to {WindDirection} degrees (0 = toward home, 180 = toward away).", newPlayContext.BaseWindDirection);
             Log.Information("LoadGameStep: Initialized base wind speed to {WindSpeed} mph.", newPlayContext.BaseWindSpeed);
@@ -45,7 +45,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
 
             newPlayContext = newPlayContext with
             {
-                TeamWithPossession = coinTossWinner.Opponent(),
+                CoinFlipWinner = coinTossWinner,
+                TeamWithPossession = coinTossWinner.Opponent(), // The coin toss winner receives, so the opponent kicks off for the first play
                 LineOfScrimmage = kickoffLineOfScrimmage,
                 Environment = new PlayEnvironment
                 {
@@ -83,6 +84,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                     CurrentPlayContext = newPlayContext,
                     CurrentGameRecord = gameRecord,
                     RandomFactory = context.Environment.RandomFactory,
+                    DebugContextWriter = context.Environment.DebugContextWriter,
                     AwayActiveRoster = repository.GetActiveRosterForTeam(gameRecord.AwayTeamID),
                     HomeActiveRoster = repository.GetActiveRosterForTeam(gameRecord.HomeTeamID),
                 },

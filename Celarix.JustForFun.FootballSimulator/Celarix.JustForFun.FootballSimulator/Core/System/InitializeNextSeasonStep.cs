@@ -2,6 +2,7 @@
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
 using Celarix.JustForFun.FootballSimulator.Scheduling;
+using Celarix.JustForFun.FootballSimulator.Standings;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System;
@@ -43,10 +44,15 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                         ? previousSuperBowl?.AwayTeam
                         : null;
 
-                context.Environment.DivisionTiebreaker ??= new Tiebreaking.DivisionTiebreaker(teams,
-                    regularSeasonGames,
-                    random);
-                divisionStandings = context.Environment.DivisionTiebreaker.GetTeamDivisionRankings();
+                context.Environment.TeamRanker ??= new TeamRanker(regularSeasonGames, teams);
+                divisionStandings = new(teams
+                    .GroupBy(t => new
+                    {
+                        t.Conference,
+                        t.Division
+                    })
+                    .Select(d => context.Environment.TeamRanker.RankTeamsAndBreakCoinFlipTies(d.Select(t => new BasicTeamInfo(t)), random))
+                    .SelectMany(tvr => tvr.ToDictionary(tvr => tvr.BasicTeamInfo, tvr => tvr.Ranking)));
             }
 
             if (previousSuperBowlWinner == null)

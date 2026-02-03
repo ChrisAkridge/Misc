@@ -62,6 +62,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 Environment = playEnvironment
             };
 
+            var awayMainStadium = repository.GetStadium(gameRecord.AwayTeam.HomeStadiumID);
+            var homeMainStadium = repository.GetStadium(gameRecord.HomeTeam.HomeStadiumID);
+            var gameMonth = gameRecord.KickoffTime.Month;
+            var awayAcclimatedTemperature = Helpers.GetTemperatureForStadiumAndMonth(awayMainStadium, gameMonth);
+            var homeAcclimatedTemperature = Helpers.GetTemperatureForStadiumAndMonth(homeMainStadium, gameMonth);
+
             context.Environment.CurrentGameRecord = gameRecord;
             context.Environment.CurrentGameContext = new GameContext(
                 Version: 0L,
@@ -70,8 +76,18 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 {
                     PhysicsParams = physicsParams,
                     CurrentPlayContext = resumingPlayContext,
-                    CurrentGameRecord = gameRecord
-                });
+                    CurrentGameRecord = gameRecord,
+                    FootballRepository = repository,
+                    RandomFactory = context.Environment.RandomFactory,
+                    DebugContextWriter = context.Environment.DebugContextWriter,
+                    AwayActiveRoster = repository.GetActiveRosterForTeam(gameRecord.AwayTeamID),
+                    HomeActiveRoster = repository.GetActiveRosterForTeam(gameRecord.HomeTeamID)
+                },
+                AwayTeamAcclimatedTemperature: awayAcclimatedTemperature,
+                HomeTeamAcclimatedTemperature: homeAcclimatedTemperature,
+                TeamWithPossession: GameTeam.Away,
+                PlayCountOnDrive: 0
+            );
 
             Log.Information("ResumePartialGameStep: Resumed partial game {GameID}.",
                 gameRecord.GameID);

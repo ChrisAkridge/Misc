@@ -1,5 +1,6 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -25,7 +26,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                     // Remember, the other team kicks off
                     TeamWithPossession = kickingTeam,
                     LineOfScrimmage = playContext.TeamYardToInternalYard(kickingTeam, 35),
-                    LineToGain = null
+                    LineToGain = null,
+                    AwayTimeoutsRemaining = nextQuarterActions.NextPeriodNumber <= 4 ? 3 : 2,
+                    HomeTimeoutsRemaining = nextQuarterActions.NextPeriodNumber <= 4 ? 3 : 2
                 };
             }
             else if (nextQuarterActions.CoinTossLoserReceivesPossession)
@@ -52,6 +55,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
             Helpers.SaveQuarterBoxScores(context);
             context.Environment.FootballRepository!.SaveChanges();
 
+            Log.Information("StartNextPeriodStep: Started period {PeriodNumber}.", context.Environment.CurrentPlayContext.PeriodNumber);
             return context.WithNextState(GameState.EvaluatingPlay);
         }
 

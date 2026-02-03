@@ -13,5 +13,6 @@ namespace Celarix.JustForFun.FootballSimulator.Random
         public int Next(int maxValue);
         public int Next(int minValue, int maxValue);
         public void Shuffle<T>(IList<T> list);
+        public IReadOnlyList<T> ShuffleIntoNewList<T>(IReadOnlyList<T> list);
     }
 }

@@ -169,5 +169,10 @@ namespace Celarix.JustForFun.FootballSimulator
         {
             return Math.Clamp(value, min, max);
         }
+
+        public static DateTimeOffset AtMidnight(this DateTimeOffset date)
+        {
+            return new DateTimeOffset(date.Year, date.Month, date.Day, 0, 0, 0, date.Offset);
+        }
     }
 }

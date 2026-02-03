@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Celarix.JustForFun.FootballSimulator.Models
 {
@@ -10,6 +11,6 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         SystemState NextState,
 
         // Environment
-        SystemEnvironment Environment
+        [property: JsonIgnore] SystemEnvironment Environment
     );
 }

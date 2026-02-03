@@ -1,4 +1,5 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,6 +28,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             repository.SaveChanges();
 
             var wasSuperBowl = gameRecord.WeekNumber == 22;
+            Log.Information("PostGameStep: Writing summary for {SummaryType}.",
+                wasSuperBowl ? "season" : "game");
             return context.WithNextState(wasSuperBowl ? SystemState.WriteSummaryForSeason : SystemState.WriteSummaryForGame);
         }
     }

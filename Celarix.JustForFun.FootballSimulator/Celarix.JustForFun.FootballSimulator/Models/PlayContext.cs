@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Celarix.JustForFun.FootballSimulator.Models
 {
@@ -10,10 +11,10 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         long Version,
         PlayEvaluationState NextState,
         IReadOnlyList<AdditionalParameter<object>> AdditionalParameters,
-        IReadOnlyList<StateHistoryEntry> StateHistory,
+        [property: JsonIgnore] IReadOnlyList<StateHistoryEntry> StateHistory,
 
         // Environment
-        PlayEnvironment? Environment,
+        [property: JsonIgnore] PlayEnvironment? Environment,
 
         // Initial conditions
         double BaseWindDirection,

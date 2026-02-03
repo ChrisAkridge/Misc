@@ -1,6 +1,7 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
 using Celarix.JustForFun.FootballSimulator.Random;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -74,6 +75,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
             // Rebuild decision parameter strength sets
             Helpers.RebuildStrengthsInDecisionParameters(context, random);
 
+            Log.Information("AdjustStrengthStep: Adjusted strengths for team after play.");
             return context.WithNextState(GameState.DeterminePlayersOnPlay);
         }
 

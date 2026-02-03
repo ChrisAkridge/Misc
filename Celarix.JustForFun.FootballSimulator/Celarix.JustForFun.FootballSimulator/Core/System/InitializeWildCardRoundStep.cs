@@ -3,6 +3,7 @@ using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
 using Celarix.JustForFun.FootballSimulator.Random;
 using Celarix.JustForFun.FootballSimulator.Scheduling;
+using Celarix.JustForFun.FootballSimulator.Standings;
 using Celarix.JustForFun.FootballSimulator.Tiebreaking;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -68,16 +69,25 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
         internal static (IReadOnlyList<BasicTeamInfo> AFCPlayoffTeams, IReadOnlyList<BasicTeamInfo> NFCPlayoffTeams)
             GetPlayoffTeams(IFootballRepository repository, IReadOnlyList<GameRecord> currentSeasonGames, IRandom random)
         {
-            var divisionTieBreaker = new DivisionTiebreaker(repository.GetTeams(),
-                currentSeasonGames,
-                random);
-            var divisionTeamRankings = divisionTieBreaker.GetTeamDivisionRankings();
+            IReadOnlyList<Team> teams = repository.GetTeams();
+            var teamRanker = new TeamRanker(currentSeasonGames, teams);
+            var teamsByDivision = teams.GroupBy(t => new
+            {
+                t.Conference,
+                t.Division
+            });
+            var divisionTeamRankings = teamsByDivision
+                .Select(g =>
+                {
+                    var basicTeamInfos = g.Select(t => new BasicTeamInfo(t));
+                    return teamRanker.RankTeamsAndBreakCoinFlipTies(basicTeamInfos, random);
+                })
+                .ToArray();
             var divisionWinners = divisionTeamRankings
-                .Where(kvp => kvp.Value == 1)
+                .Select(d => d.Where(t => t.Ranking == 1).Single())
                 .ToArray();
             var nonDivisionWinners = divisionTeamRankings
-                .Where(kvp => kvp.Value > 1)
-                .Select(kvp => kvp.Key)
+                .SelectMany(d => d.Where(t => t.Ranking != 1))
                 .ToArray();
 
             if (divisionWinners.Length != 10)
@@ -90,24 +100,26 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 throw new InvalidOperationException($"Expected 30 non-division winners, but found {nonDivisionWinners.Length}.");
             }
 
-            var nfcTeams = divisionTieBreaker.RankTeams(nonDivisionWinners
-                .Where(t => t.Conference == Conference.NFC));
-            var afcTeams = divisionTieBreaker.RankTeams(nonDivisionWinners
-                .Where(t => t.Conference == Conference.AFC));
+            var nfcTeams = teamRanker.RankTeamsAndBreakCoinFlipTies(nonDivisionWinners
+                .Where(t => t.BasicTeamInfo.Conference == Conference.NFC)
+                .Select(t => t.BasicTeamInfo), random);
+            var afcTeams = teamRanker.RankTeamsAndBreakCoinFlipTies(nonDivisionWinners
+                .Where(t => t.BasicTeamInfo.Conference == Conference.AFC)
+                .Select(t => t.BasicTeamInfo), random);
 
-            var nfcDivisionWinners = divisionTieBreaker.RankTeams(divisionWinners
-                .Where(dw => dw.Key.Conference == Conference.NFC)
-                .Select(dw => dw.Key));
-            var afcDivisionWinners = divisionTieBreaker.RankTeams(divisionWinners
-                .Where(dw => dw.Key.Conference == Conference.AFC)
-                .Select(dw => dw.Key));
+            var nfcDivisionWinners = teamRanker.RankTeamsAndBreakCoinFlipTies(divisionWinners
+                .Where(dw => dw.BasicTeamInfo.Conference == Conference.NFC)
+                .Select(dw => dw.BasicTeamInfo), random);
+            var afcDivisionWinners = teamRanker.RankTeamsAndBreakCoinFlipTies(divisionWinners
+                .Where(dw => dw.BasicTeamInfo.Conference == Conference.AFC)
+                .Select(dw => dw.BasicTeamInfo), random);
             var nfcWildCards = nfcTeams.Take(3).ToArray();
             var afcWildCards = afcTeams.Take(3).ToArray();
 
             var nfcPlayoffTeams = nfcDivisionWinners.Concat(nfcWildCards).ToArray();
             var afcPlayoffTeams = afcDivisionWinners.Concat(afcWildCards).ToArray();
 
-            return (afcPlayoffTeams, nfcPlayoffTeams);
+            return (afcPlayoffTeams.Select(t => t.BasicTeamInfo).ToArray(), nfcPlayoffTeams.Select(t => t.BasicTeamInfo).ToArray());
         }
 
         internal static IReadOnlyList<GameRecord> BuildWildCardGameRecords(IReadOnlyList<Team> teams,
@@ -116,14 +128,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             GameRecord lastRegularSeasonGame)
         {
             var seasonRecordID = lastRegularSeasonGame.SeasonRecordID;
-            var dateOfLastGame = lastRegularSeasonGame.KickoffTime.Date;
+            var dateOfLastGame = lastRegularSeasonGame.KickoffTime.AtMidnight();
             if (dateOfLastGame.DayOfWeek != DayOfWeek.Monday)
             {
                 throw new InvalidOperationException("Expected last regular season game to be on a Monday.");
             }
 
-            var wildCardSaturday = dateOfLastGame.Date.AddDays(5);
-            var wildCardSunday = dateOfLastGame.Date.AddDays(6);
+            var wildCardSaturday = dateOfLastGame.AtMidnight().AddDays(5);
+            var wildCardSunday = dateOfLastGame.AtMidnight().AddDays(6);
             var wildCardTimes = new[]
             {
                 wildCardSaturday.AddHours(16).AddMinutes(25),
@@ -141,15 +153,15 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
 
             var wildCardGames = new List<GameRecord>
             {
-                MakeWildCardGame(afcTeamRecords[8], afcTeamRecords[1], wildCardTimes[0], seasonRecordID),
-                MakeWildCardGame(afcTeamRecords[7], afcTeamRecords[2], wildCardTimes[1], seasonRecordID),
-                MakeWildCardGame(afcTeamRecords[6], afcTeamRecords[3], wildCardTimes[2], seasonRecordID),
-                MakeWildCardGame(afcTeamRecords[5], afcTeamRecords[4], wildCardTimes[3], seasonRecordID),
+                MakeWildCardGame(afcTeamRecords[7], afcTeamRecords[0], wildCardTimes[0], seasonRecordID),
+                MakeWildCardGame(afcTeamRecords[6], afcTeamRecords[1], wildCardTimes[1], seasonRecordID),
+                MakeWildCardGame(afcTeamRecords[5], afcTeamRecords[2], wildCardTimes[2], seasonRecordID),
+                MakeWildCardGame(afcTeamRecords[4], afcTeamRecords[3], wildCardTimes[3], seasonRecordID),
 
-                MakeWildCardGame(nfcTeamRecords[8], nfcTeamRecords[1], wildCardTimes[0], seasonRecordID),
-                MakeWildCardGame(nfcTeamRecords[7], nfcTeamRecords[2], wildCardTimes[1], seasonRecordID),
-                MakeWildCardGame(nfcTeamRecords[6], nfcTeamRecords[3], wildCardTimes[2], seasonRecordID),
-                MakeWildCardGame(nfcTeamRecords[5], nfcTeamRecords[4], wildCardTimes[3], seasonRecordID)
+                MakeWildCardGame(nfcTeamRecords[7], nfcTeamRecords[0], wildCardTimes[0], seasonRecordID),
+                MakeWildCardGame(nfcTeamRecords[6], nfcTeamRecords[1], wildCardTimes[1], seasonRecordID),
+                MakeWildCardGame(nfcTeamRecords[5], nfcTeamRecords[2], wildCardTimes[2], seasonRecordID),
+                MakeWildCardGame(nfcTeamRecords[4], nfcTeamRecords[3], wildCardTimes[3], seasonRecordID)
             };
 
             return wildCardGames;

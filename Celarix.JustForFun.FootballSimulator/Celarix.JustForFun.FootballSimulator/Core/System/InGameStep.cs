@@ -1,5 +1,6 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Core.Game;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -26,20 +27,25 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 _ => throw new InvalidOperationException("Invalid game state encountered.")
             };
 
+            context.Environment.DebugContextWriter.WriteContext(context.Environment.CurrentGameContext);
+
             var nextGameState = context.Environment.CurrentGameContext.NextState;
             if (nextGameState == GameState.EvaluatingPlay && evaluatingPlaySignal == EvaluatingPlaySignal.InProgress)
             {
                 inGameSignal = InGameSignal.PlayEvaluationStep;
+                Log.Information("InGameStep: Game state machine moved to {GameState}.", context.Environment.CurrentGameContext!.NextState);
                 return context.WithNextState(SystemState.InGame);
             }
 
             if (nextGameState == GameState.EndGame)
             {
                 inGameSignal = InGameSignal.GameCompleted;
+                Log.Information("InGameStep: Game state machine moved to {GameState}.", context.Environment.CurrentGameContext!.NextState);
                 return context.WithNextState(SystemState.PostGame);
             }
 
             inGameSignal = InGameSignal.GameStateAdvanced;
+            Log.Information("InGameStep: Game state machine moved to {GameState}.", context.Environment.CurrentGameContext!.NextState);
             return context.WithNextState(SystemState.InGame);
         }
     }

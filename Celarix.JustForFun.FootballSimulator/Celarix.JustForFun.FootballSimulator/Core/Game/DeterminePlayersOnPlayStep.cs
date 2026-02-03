@@ -1,5 +1,6 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -48,6 +49,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
             offensePlayersOnPlay.AddRange(shuffledOffenseRoster.Take(offensePlayersOnPlayCount));
             defensePlayersOnPlay.AddRange(shuffledDefenseRoster.Take(defensePlayersOnPlayCount));
 
+            Log.Information("DeterminePlayersOnPlayStep: Assigned {OffenseCount} offense players and {DefenseCount} defense players to the play.",
+                offensePlayersOnPlay.Count, defensePlayersOnPlay.Count);
             return context.WithNextState(GameState.InjuryCheck) with
             {
                 OffensePlayersOnPlay = offensePlayersOnPlay,

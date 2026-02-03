@@ -173,7 +173,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
             };
         }
 
-        public static List<PhysicsParam> ParamSeemData()
+        public static List<PhysicsParam> ParamSeedData()
         {
             return new List<PhysicsParam>
             {
