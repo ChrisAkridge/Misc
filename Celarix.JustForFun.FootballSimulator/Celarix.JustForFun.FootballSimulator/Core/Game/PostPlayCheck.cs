@@ -30,17 +30,17 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                     }
                 }
             }
-            else if (playContext.SecondsLeftInPeriod == 0)
+            
+            if (playContext.SecondsLeftInPeriod == 0)
             {
-                if (playContext.PeriodNumber >= 4 && playContext.HomeScore != playContext.AwayScore)
-                {
-                    decision = PostPlayDecision.EndGameWin;
-                }
-
                 var gameIsRegularSeason = context.Environment.CurrentGameRecord!.GameType == GameType.RegularSeason;
                 if (playContext.PeriodNumber == 5 && gameIsRegularSeason && playContext.HomeScore == playContext.AwayScore)
                 {
                     decision = PostPlayDecision.EndGameTie;
+                }
+                else if (playContext.PeriodNumber >= 4 && playContext.HomeScore != playContext.AwayScore)
+                {
+                    decision = PostPlayDecision.EndGameWin;
                 }
                 else
                 {

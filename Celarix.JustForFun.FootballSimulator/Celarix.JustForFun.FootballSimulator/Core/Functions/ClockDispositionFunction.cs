@@ -41,7 +41,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
             }
 
             ClockDisposition selectedClockDisposition;
-            if (priorState.GetScoreForTeam(self) > priorState.GetScoreForTeam(opponent))
+            int selfScore = priorState.GetScoreForTeam(self);
+            int opponentScore = priorState.GetScoreForTeam(opponent);
+            if (selfScore >= opponentScore)
             {
                 var selfEstimateOfSelf = parameters.GetEstimateOfTeamByTeam(self, self);
                 var selfEstimateOfOpponent = parameters.GetEstimateOfTeamByTeam(self, opponent);

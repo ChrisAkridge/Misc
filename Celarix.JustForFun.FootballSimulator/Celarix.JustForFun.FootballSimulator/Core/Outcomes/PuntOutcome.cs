@@ -18,7 +18,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var desiredTargetYard = priorState.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 0) switch
             {
                 0 => 0.1d,
-                100 => 99.9d
+                100 => 99.9d,
+                _ => throw new InvalidOperationException("Unexpected failure to convert team's 0-yard line to internal yard."),
             };
             var teamStrengths = parameters.GetActualStrengthsForTeam(priorState.TeamWithPossession);
             var kickingStrength = teamStrengths.KickingStrength;

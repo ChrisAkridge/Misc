@@ -25,8 +25,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                 ? context.Environment.AwayActiveRoster
                 : context.Environment.HomeActiveRoster;
             var playInvolvement = context.Environment.CurrentPlayContext!.PlayInvolvement;
-            var offensePlayersOnPlayCount = Math.Clamp(0, playInvolvement.OffensivePlayersInvolved, 12);
-            var defensePlayersOnPlayCount = Math.Clamp(0, playInvolvement.DefensivePlayersInvolved, 11);
+            var offensePlayersOnPlayCount = Math.Clamp(playInvolvement.OffensivePlayersInvolved, 0, 12);
+            var defensePlayersOnPlayCount = Math.Clamp(playInvolvement.DefensivePlayersInvolved, 0, 11);
             var offensePlayersOnPlay = new List<PlayerRosterPosition>(offensePlayersOnPlayCount);
             var defensePlayersOnPlay = new List<PlayerRosterPosition>(defensePlayersOnPlayCount);
 

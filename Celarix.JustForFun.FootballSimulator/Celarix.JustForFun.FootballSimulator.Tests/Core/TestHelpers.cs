@@ -68,6 +68,15 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
         public static IReadOnlyDictionary<string, PhysicsParam> EmptyPhysicsParams =>
             new Dictionary<string, PhysicsParam>();
 
+        public static PlayInvolvement EmptyPlayInvolvement =>
+            new PlayInvolvement(
+                InvolvesOffenseRun: false,
+                InvolvesOffensePass: false,
+                InvolvesKick: false,
+                InvolvesDefenseRun: false,
+                OffensivePlayersInvolved: 0,
+                DefensivePlayersInvolved: 0);
+
         public static IReadOnlyDictionary<string, PhysicsParam> CreatePhysicsParams(string key, double value)
         {
             return new Dictionary<string, PhysicsParam>
@@ -90,6 +99,23 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
             team.KickDefenseStrength = random.Next(1, 100);
             team.KickingStrength = random.Next(1, 100);
             team.KickReturnStrength = random.Next(1, 100);
+            team.FieldGoalStrength = random.Next(1, 100);
+        }
+
+        public static void SetFixedStrengths(Team team, double strength)
+        {
+            team.ClockManagementStrength = strength;
+            team.DefensiveLineStrength = strength;
+            team.OffensiveLineStrength = strength;
+            team.RunningDefenseStrength = strength;
+            team.OffensiveLineStrength = strength;
+            team.PassingDefenseStrength = strength;
+            team.PassingOffenseStrength = strength;
+            team.RunningOffenseStrength = strength;
+            team.KickDefenseStrength = strength;
+            team.KickingStrength = strength;
+            team.KickReturnStrength = strength;
+            team.FieldGoalStrength = strength;
         }
 
         public static void AssertStrengthJSON(string? json, Team team)

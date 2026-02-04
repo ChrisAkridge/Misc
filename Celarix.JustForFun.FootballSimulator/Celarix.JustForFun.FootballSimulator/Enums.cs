@@ -212,7 +212,7 @@ internal enum PlayEvaluationState
     EndOfGame
 }
 
-internal enum NextPlayKind
+public enum NextPlayKind
 {
     Kickoff,
     FirstDown,

@@ -88,7 +88,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
 
             context.Environment.DebugContextWriter.WriteContext(context.Environment.CurrentPlayContext);
 
-            evaluatingPlaySignal = playContext.NextState switch
+            evaluatingPlaySignal = context.Environment.CurrentPlayContext.NextState switch
             {
                 PlayEvaluationState.PlayEvaluationComplete => EvaluatingPlaySignal.PlayEvaluationComplete,
                 _ => EvaluatingPlaySignal.InProgress
@@ -96,9 +96,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
 
             Log.Information("EvaluatingPlayStep: Play evaluation state machine advanced to {PlayState}.",
                 context.Environment.CurrentPlayContext!.NextState);
-            return playContext.NextState == PlayEvaluationState.PlayEvaluationComplete
-                ? context.WithNextState(GameState.AdjustStrengths)
-                : context.WithNextState(GameState.EvaluatingPlay);
+            return context.WithNextState(context.Environment.CurrentPlayContext.NextState == PlayEvaluationState.PlayEvaluationComplete
+                ? GameState.AdjustStrengths
+                : GameState.EvaluatingPlay);
         }
     }
 }

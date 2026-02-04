@@ -3,12 +3,16 @@
   "WorkspaceRootPath": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.FootballSimulator\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{81210243-4D2E-45A6-8E0E-C619B160A4BA}|Celarix.JustForFun.FootballSimulator.Tests\\Celarix.JustForFun.FootballSimulator.Tests.csproj|e:\\documents\\github\\misc\\celarix.justforfun.footballsimulator\\celarix.justforfun.footballsimulator.tests\\core\\system\\startsteptests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{81210243-4D2E-45A6-8E0E-C619B160A4BA}|Celarix.JustForFun.FootballSimulator.Tests\\Celarix.JustForFun.FootballSimulator.Tests.csproj|solutionrelative:celarix.justforfun.footballsimulator.tests\\core\\system\\startsteptests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6707B482-35F5-4924-AAB9-7E7C4782ED26}|Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.footballsimulator\\celarix.justforfun.footballsimulator\\core\\game\\startnextperiodstep.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6707B482-35F5-4924-AAB9-7E7C4782ED26}|Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator.csproj|solutionrelative:celarix.justforfun.footballsimulator\\core\\game\\startnextperiodstep.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6707B482-35F5-4924-AAB9-7E7C4782ED26}|Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.footballsimulator\\celarix.justforfun.footballsimulator\\core\\system\\startstep.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6707B482-35F5-4924-AAB9-7E7C4782ED26}|Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator.csproj|solutionrelative:celarix.justforfun.footballsimulator\\core\\system\\startstep.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{81210243-4D2E-45A6-8E0E-C619B160A4BA}|Celarix.JustForFun.FootballSimulator.Tests\\Celarix.JustForFun.FootballSimulator.Tests.csproj|e:\\documents\\github\\misc\\celarix.justforfun.footballsimulator\\celarix.justforfun.footballsimulator.tests\\core\\game\\startnextperiodsteptests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{81210243-4D2E-45A6-8E0E-C619B160A4BA}|Celarix.JustForFun.FootballSimulator.Tests\\Celarix.JustForFun.FootballSimulator.Tests.csproj|solutionrelative:celarix.justforfun.footballsimulator.tests\\core\\game\\startnextperiodsteptests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6707B482-35F5-4924-AAB9-7E7C4782ED26}|Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator.csproj|e:\\documents\\github\\misc\\celarix.justforfun.footballsimulator\\celarix.justforfun.footballsimulator\\helpers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6707B482-35F5-4924-AAB9-7E7C4782ED26}|Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator.csproj|solutionrelative:celarix.justforfun.footballsimulator\\helpers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedHeight": 200,
-          "SelectedChildIndex": 26,
+          "SelectedChildIndex": 28,
           "Children": [
             {
               "$type": "Bookmark",
@@ -126,28 +130,41 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "StartStepTests.cs",
-              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator.Tests\\Core\\System\\StartStepTests.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.FootballSimulator.Tests\\Core\\System\\StartStepTests.cs",
-              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator.Tests\\Core\\System\\StartStepTests.cs",
-              "RelativeToolTip": "Celarix.JustForFun.FootballSimulator.Tests\\Core\\System\\StartStepTests.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAATAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "Helpers.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator\\Helpers.cs",
+              "RelativeDocumentMoniker": "Celarix.JustForFun.FootballSimulator\\Helpers.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator\\Helpers.cs",
+              "RelativeToolTip": "Celarix.JustForFun.FootballSimulator\\Helpers.cs",
+              "ViewState": "AgIAAEgBAAAAAAAAAAAgwGEBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-03T05:34:26.54Z",
+              "WhenOpened": "2026-02-04T03:12:14.535Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "StartStep.cs",
-              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator\\Core\\System\\StartStep.cs",
-              "RelativeDocumentMoniker": "Celarix.JustForFun.FootballSimulator\\Core\\System\\StartStep.cs",
-              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator\\Core\\System\\StartStep.cs",
-              "RelativeToolTip": "Celarix.JustForFun.FootballSimulator\\Core\\System\\StartStep.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAlAAAAAAAAAA==",
+              "Title": "StartNextPeriodStepTests.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator.Tests\\Core\\Game\\StartNextPeriodStepTests.cs",
+              "RelativeDocumentMoniker": "Celarix.JustForFun.FootballSimulator.Tests\\Core\\Game\\StartNextPeriodStepTests.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator.Tests\\Core\\Game\\StartNextPeriodStepTests.cs",
+              "RelativeToolTip": "Celarix.JustForFun.FootballSimulator.Tests\\Core\\Game\\StartNextPeriodStepTests.cs",
+              "ViewState": "AgIAAHwAAAAAAAAAAAAQwJMAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-03T04:55:54.694Z",
+              "WhenOpened": "2026-02-04T03:04:38.721Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "StartNextPeriodStep.cs",
+              "DocumentMoniker": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator\\Core\\Game\\StartNextPeriodStep.cs",
+              "RelativeDocumentMoniker": "Celarix.JustForFun.FootballSimulator\\Core\\Game\\StartNextPeriodStep.cs",
+              "ToolTip": "E:\\Documents\\GitHub\\Misc\\Celarix.JustForFun.FootballSimulator\\Celarix.JustForFun.FootballSimulator\\Core\\Game\\StartNextPeriodStep.cs",
+              "RelativeToolTip": "Celarix.JustForFun.FootballSimulator\\Core\\Game\\StartNextPeriodStep.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAAAQwDEAAABDAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-04T03:03:04.288Z",
               "EditorCaption": ""
             }
           ]

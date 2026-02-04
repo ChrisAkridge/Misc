@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Celarix.JustForFun.FootballSimulator.Core.Debugging;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 
-namespace Celarix.JustForFun.FootballSimulator.Core.Debug
+namespace Celarix.JustForFun.FootballSimulator.Core.Debugging
 {
-    internal sealed class DebugContextWriter
+    internal sealed class DebugContextWriter : IDebugContextWriter
     {
         private readonly bool enabled;
         private readonly string folderPath;

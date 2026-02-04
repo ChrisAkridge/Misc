@@ -47,7 +47,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
             context.Environment.CurrentPlayContext = playContext with
             {
                 PeriodNumber = playContext.PeriodNumber + 1,
-                SecondsLeftInPeriod = playContext.PeriodNumber > 4
+                SecondsLeftInPeriod = (playContext.PeriodNumber + 1) > 4
                     ? Constants.SecondsPerOvertimePeriod
                     : Constants.SecondsPerQuarter
             };

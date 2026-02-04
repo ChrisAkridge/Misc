@@ -1,4 +1,4 @@
-﻿using Celarix.JustForFun.FootballSimulator.Core.Debug;
+﻿using Celarix.JustForFun.FootballSimulator.Core.Debugging;
 using Celarix.JustForFun.FootballSimulator.Core.System;
 using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
