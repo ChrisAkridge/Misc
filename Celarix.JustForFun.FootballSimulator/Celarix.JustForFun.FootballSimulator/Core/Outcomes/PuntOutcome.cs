@@ -122,6 +122,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (kickActualTeamYard.Team == priorState.TeamWithPossession)
             {
                 Log.Information("PuntOutcome: Unusual punt resulted in a safety for the kicking team; went out back of own endzone.");
+                priorState.AddTag("safety-scored");
+                priorState.AddTag("punt-backward-safety");
                 var updatedState = priorState.WithScoreChange(kickActualTeamYard.Team.Opponent(), 2)
                     .InvolvesKick()
                     .InvolvesAdditionalOffensivePlayer() with
@@ -136,6 +138,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             }
 
             Log.Information("PuntOutcome: Touchback.");
+            priorState.AddTag("touchback");
             return priorState.WithFirstDownLineOfScrimmage(25d, kickActualTeamYard.Team.Opponent(),
                 "{DefAbbr} touchback, ball placed at {LoS}.", clockRunning: false, startOfDrive: true)
                 .InvolvesKick()

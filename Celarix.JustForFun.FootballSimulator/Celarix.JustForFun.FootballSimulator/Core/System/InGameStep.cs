@@ -27,7 +27,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 _ => throw new InvalidOperationException("Invalid game state encountered.")
             };
 
-            context.Environment.DebugContextWriter.WriteContext(context.Environment.CurrentGameContext);
+            context.Environment.DebugContextWriter.WriteContext(context.Environment.CurrentGameContext, context.Environment);
 
             var nextGameState = context.Environment.CurrentGameContext.NextState;
             if (nextGameState == GameState.EvaluatingPlay && evaluatingPlaySignal == EvaluatingPlaySignal.InProgress)

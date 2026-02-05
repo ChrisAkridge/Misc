@@ -51,10 +51,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (kickRecovered)
             {
                 Log.Information("OnsideKickAttemptOutcome: Kicking team recovers own onside kick.");
+                priorState.AddTag("onside-kick-recovery");
                 return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, priorState.TeamWithPossession,
                     "{OffAbbr} recovers the onside kick at {LoS}!", clockRunning: false, startOfDrive: true);
             }
             Log.Information("OnsideKickAttemptOutcome: Receiving team recovers onside kick.");
+            priorState.AddTag("onside-kick-failed");
             return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, priorState.TeamWithPossession.Opponent(),
                 "{OffAbbr} recovers the onside kick of {DefAbbr} at {LoS}!", clockRunning: false, startOfDrive: true);
         }

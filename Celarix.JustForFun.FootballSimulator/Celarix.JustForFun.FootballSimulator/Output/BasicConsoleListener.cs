@@ -23,6 +23,7 @@ namespace Celarix.JustForFun.FootballSimulator.Output
         private string distanceToGo = "";
         private string lineOfScrimmage = "";
         private string lastPlayDescription = "";
+        private string tags = "";
 
         public void Handle(GameEvent gameEvent)
         {
@@ -41,7 +42,7 @@ namespace Celarix.JustForFun.FootballSimulator.Output
                 Console.WriteLine($"Game state machine to go to {gameContext!.NextState}.");
             }
 
-                var systemEnvironment = systemContext!.Environment;
+            var systemEnvironment = systemContext!.Environment;
             var gameEnvironment = gameContext!.Environment;
             var playEnvironment = playContext!.Environment;
 
@@ -77,8 +78,8 @@ namespace Celarix.JustForFun.FootballSimulator.Output
                 NextPlayKind.FreeKick => "Free Kick",
                 _ => $"Unknown {playContext.NextPlay}"
             } + distanceToGo;
-            
             lineOfScrimmage = playContext.InternalYardToDisplayTeamYardString(playContext.LineOfScrimmage, playEnvironment!.DecisionParameters);
+            tags = "Tags: " + string.Join(", ", gameEvent.Tags);
 
             Render();
         }
@@ -100,43 +101,46 @@ namespace Celarix.JustForFun.FootballSimulator.Output
 
             // Wrap last play description if too long
             var maxLineWidth = Console.WindowWidth;
-            var lastPlayLines = new List<string>();
-            if (lastPlayDescription.Length <= maxLineWidth)
-            {
-                lastPlayLines.Add(lastPlayDescription);
-            }
-            else
-            {
-                var words = lastPlayDescription.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                var currentLine = new StringBuilder();
-                foreach (var word in words)
-                {
-                    if (currentLine.Length + word.Length + 1 <= maxLineWidth)
-                    {
-                        if (currentLine.Length > 0)
-                        {
-                            currentLine.Append(' ');
-                        }
-                        currentLine.Append(word);
-                    }
-                    else
-                    {
-                        lastPlayLines.Add(currentLine.ToString());
-                        currentLine.Clear();
-                        currentLine.Append(word);
-                    }
-                }
-                if (currentLine.Length > 0)
-                {
-                    lastPlayLines.Add(currentLine.ToString());
-                }
-            }
+            var lastPlayLines = WrapString(lastPlayDescription, maxLineWidth);
+            var tagLines = WrapString(tags, maxLineWidth);
 
             Console.WriteLine(line1);
             Console.WriteLine(line2);
             foreach (var line in lastPlayLines)
             {
                 Console.WriteLine(line);
+            }
+            Console.WriteLine();
+            foreach (var line in tagLines)
+            {
+                Console.WriteLine(line);
+            }
+        }
+
+        private IEnumerable<string> WrapString(string text, int maxWidth)
+        {
+            var words = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var currentLine = new StringBuilder();
+            foreach (var word in words)
+            {
+                if (currentLine.Length + word.Length + 1 <= maxWidth)
+                {
+                    if (currentLine.Length > 0)
+                    {
+                        currentLine.Append(' ');
+                    }
+                    currentLine.Append(word);
+                }
+                else
+                {
+                    yield return currentLine.ToString();
+                    currentLine.Clear();
+                    currentLine.Append(word);
+                }
+            }
+            if (currentLine.Length > 0)
+            {
+                yield return currentLine.ToString();
             }
         }
     }

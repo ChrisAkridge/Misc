@@ -12,9 +12,6 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
     {
         public static PlayContext Run(PlayContext priorState)
         {
-            var parameters = priorState.Environment!.DecisionParameters;
-            var physicsParams = priorState.Environment.PhysicsParams;
-
             var possessingTeamScore = priorState.GetScoreForTeam(priorState.TeamWithPossession);
             var opposingTeamScore = priorState.GetScoreForTeam(priorState.TeamWithPossession.Opponent());
 
@@ -43,6 +40,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             {
                 // Play was a defensive safety, rewrite history and make it a one-point defensive safety!
                 Log.Information("TwoPointConversionAttemptOutcome: Defensive safety on two-point conversion attempt!");
+                priorState.AddTag("defensive-safety-on-conversion-attempt-scored");
+                priorState.AddTag("really-big-play");
                 return priorState.WithScoreChange(priorState.TeamWithPossession, 1)
                     .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                 with

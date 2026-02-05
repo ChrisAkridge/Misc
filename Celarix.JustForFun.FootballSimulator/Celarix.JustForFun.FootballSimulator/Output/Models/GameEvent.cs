@@ -25,5 +25,6 @@ namespace Celarix.JustForFun.FootballSimulator.Output.Models
     public static class GameEventTypes
     {
         // Const strings go here
+        public const string SystemStateMachineStep = nameof(SystemStateMachineStep);
     }
 }

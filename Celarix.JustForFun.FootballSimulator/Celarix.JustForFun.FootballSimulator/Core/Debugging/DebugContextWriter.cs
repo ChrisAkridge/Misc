@@ -67,7 +67,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Debugging
             streamWriter = new StreamWriter(filePath, false, Encoding.UTF8);
         }
 
-        public void WriteContext<T>(T context)
+        public void WriteContext<T, TTagListable>(T context, TTagListable tagListable) where TTagListable : ITagListable
         {
             if (!enabled)
             {
@@ -77,7 +77,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Debugging
             {
                 Type = typeof(T).Name,
                 Timestamp = DateTimeOffset.Now,
-                Context = context
+                Context = context,
+                Tags = tagListable.GetTags().ToArray()
             }, jsonSerializerOptions);
             streamWriter!.WriteLine(json);
             streamWriter.Flush();

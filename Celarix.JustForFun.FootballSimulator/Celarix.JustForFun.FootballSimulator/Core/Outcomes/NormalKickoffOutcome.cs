@@ -77,6 +77,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     // We treat distances over 20 yards as hypothetically possible for the kicking team
                     // to recover, but in practice never possible.
                     Log.Information("NormalKickoffOutcome: Normal kick either abnormally short or too far for the kicking team to recover.");
+                    priorState.AddTag("unusually-short-kickoff");
                     return priorState.WithNextState(PlayEvaluationState.ReturnableKickOutcome)
                         .WithAdditionalParameter("KickActualYard", kickActualYard.Round())
                         .InvolvesKick()
@@ -104,6 +105,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 if (kickActualTeamYard.Team == otherTeam && kickActualTeamYard.TeamYard < -10d)
                 {
                     Log.Information("NormalKickoffOutcome: Touchback on kickoff.");
+                    priorState.AddTag("touchback");
                     return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                         .InvolvesKick()
                         .InvolvesAdditionalOffensivePlayer() with
@@ -120,6 +122,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 else if (kickActualTeamYard.Team == priorState.TeamWithPossession && kickActualTeamYard.TeamYard < -10d)
                 {
                     Log.Information("NormalKickoffOutcome: Kicking team safety on kickoff.");
+                    priorState.AddTag("safety-scored");
+                    priorState.AddTag("kickoff-backward-safety");
                     var updatedState = priorState.WithScoreChange(otherTeam, 2)
                         .InvolvesKick()
                         .InvolvesAdditionalOffensivePlayer() with
@@ -136,6 +140,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             }
 
             Log.Information("NormalKickoffOutcome: Out of bounds kickoff.");
+            priorState.AddTag("kickoff-out-of-bounds");
             return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                 .InvolvesKick()
                 .InvolvesAdditionalOffensivePlayer() with

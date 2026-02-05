@@ -8,6 +8,6 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Debugging
     {
         void EnterGame(int gameID);
         void ExitGame();
-        void WriteContext<T>(T context);
+        void WriteContext<T, TTagListable>(T context, TTagListable tagListable) where TTagListable : ITagListable;
     }
 }

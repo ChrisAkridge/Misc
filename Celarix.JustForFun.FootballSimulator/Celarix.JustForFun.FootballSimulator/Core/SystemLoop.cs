@@ -4,6 +4,7 @@ using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
 using Celarix.JustForFun.FootballSimulator.Output;
+using Celarix.JustForFun.FootballSimulator.Output.Models;
 using Celarix.JustForFun.FootballSimulator.Random;
 using Celarix.JustForFun.FootballSimulator.Scheduling;
 using Celarix.JustForFun.FootballSimulator.SummaryWriting;
@@ -64,7 +65,21 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 _ => throw new ArgumentOutOfRangeException($"Unhandled system state: {context.NextState}")
             };
 
-            context.Environment.DebugContextWriter.WriteContext(context);
+            context.Environment.DebugContextWriter.WriteContext(context, context.Environment);
+
+            // This is the main place where game events are published.
+            // It's very clunky, but we basically want to collect tags instead of having every level
+            // of every state machine want to publish its own events. A new event is published every
+            // step of the system state machine, which might contain a step of the game state machine
+            // or the play evaluation state machine. Events aren't required to produce visible updates
+            // in event listeners every time.
+            var eventBus = context.Environment.EventBus;
+            var gameEvent = new GameEvent
+            {
+                EventType = GameEventTypes.SystemStateMachineStep,
+                SystemContext = context
+            }.WithTags(context.CollectTags());
+            eventBus.Publish(gameEvent);
 
             if (context.NextState == SystemState.InGame)
             {

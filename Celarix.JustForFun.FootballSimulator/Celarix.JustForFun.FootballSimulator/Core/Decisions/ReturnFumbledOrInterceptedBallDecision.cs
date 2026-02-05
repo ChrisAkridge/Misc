@@ -58,7 +58,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 var estimatedRunningDefenseStrength = possessingTeamEstimatesOfOpponent.RunningDefenseStrength;
                 if (estimatedRunningOffenseStrength > estimatedRunningDefenseStrength)
                 {
-                    Log.Information("ReturnFumbledOrInterceptedBallDecision: Estimated running offense strength ({OffStr}) > estimated running defense strength ({DefStr}), attempting return.",
+                    Log.Information("ReturnFumbledOrInterceptedBallDecision: Estimated running offense strength > estimated running defense strength, attempting return.",
                         estimatedRunningOffenseStrength,
                         estimatedRunningDefenseStrength);
                     return priorState.WithNextState(PlayEvaluationState.FumbleOrInterceptionReturnOutcome);

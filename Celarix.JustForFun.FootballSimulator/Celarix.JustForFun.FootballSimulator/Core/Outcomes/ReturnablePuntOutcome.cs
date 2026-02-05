@@ -15,6 +15,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var parameters = priorState.Environment!.DecisionParameters;
             var physicsParams = priorState.Environment.PhysicsParams;
 
+            priorState.AddTag("returnable-punt");
+
             var receivingTeamStrengths = parameters.GetActualStrengthsForTeam(
                 priorState.TeamWithPossession.Opponent());
             var kickReturnStrength = receivingTeamStrengths.KickReturnStrength;

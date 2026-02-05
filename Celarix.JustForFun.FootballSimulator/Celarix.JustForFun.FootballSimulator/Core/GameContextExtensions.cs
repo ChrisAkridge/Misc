@@ -15,6 +15,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                     Version = context.Version + 1,
                     NextState = nextState
                 };
+
+            public void AddTag(string tag)
+            {
+                context.Environment!.AddTag(tag);
+            }
         }
     }
 }

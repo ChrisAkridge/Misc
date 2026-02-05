@@ -38,6 +38,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (throwingYardLocation.Team == possessingTeam && throwingYardLocation.TeamYard <= -10)
             {
                 Log.Information("PlayerDownedFunction: Safety on Hail Mary from own endzone!");
+                priorState.AddTag("safety-scored");
                 return priorState.WithScoreChange(possessingTeam.Opponent(), 2)
                     .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                 with
@@ -67,6 +68,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (wasIntercepted)
             {
                 Log.Information("PlayerDownedFunction: Interception on Hail Mary!");
+                priorState.AddTag("interception");
                 return priorState.WithAdditionalParameter<bool?>("WasIntercepted", true)
                     .WithNextState(PlayEvaluationState.FumbledLiveBallOutcome)
                     .InvolvesAdditionalDefensivePlayer()
@@ -80,6 +82,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             else if (someoneCaughtIt)
             {
                 Log.Information("PlayerDownedFunction: Touchdown on Hail Mary!");
+                priorState.AddTag("touchdown-scored");
+                priorState.AddTag("hail-mary-success");
                 return priorState.WithScoreChange(possessingTeam, 6)
                     .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                     .InvolvesAdditionalOffensivePlayer()

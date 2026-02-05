@@ -38,6 +38,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                     && Math.Abs(scoreDifference) / minutesLeftInGame >= pointsPerMinuteThreshold)
                 {
                     Log.Information("KickoffDecision: Down by a lot with little time left; performing onside kick attempt.");
+                    priorState.AddTag("onside-kick-attempt");
                     return priorState.WithNextState(PlayEvaluationState.OnsideKickAttemptOutcome);
                 }
                 else
@@ -49,6 +50,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             else
             {
                 Log.Information("KickoffDecision: Kicking team disposition is Insane or UltraInsane; performing onside kick attempt.");
+                priorState.AddTag("onside-kick-attempt");
                 return priorState.WithNextState(PlayEvaluationState.OnsideKickAttemptOutcome);
             }
         }

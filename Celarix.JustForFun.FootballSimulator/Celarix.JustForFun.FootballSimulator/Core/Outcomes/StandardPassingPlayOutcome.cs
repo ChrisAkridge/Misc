@@ -82,6 +82,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 
             if (wasIntercepted)
             {
+                priorState.AddTag("interception");
                 return priorState.WithAdditionalParameter<bool?>("WasIntercepted", true)
                     .WithNextState(PlayEvaluationState.FumbledLiveBallOutcome)
                 with
@@ -191,6 +192,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (!hadYAC)
             {
                 Log.Information("StandardPassingPlayOutcome: Ball caught for a gain of {YardsGained} but receiver brought down immediately.", yardsGained.Round());
+                if (yardsGained < 0) { priorState.AddTag("negative-play"); }
                 return PlayerDownedFunction.Get(priorState.InvolvesOffensivePass().InvolvesAdditionalOffensivePlayer().InvolvesAdditionalOffensivePlayer(),
                     priorState.LineOfScrimmage,
                     yardsGained.Round(),
@@ -206,12 +208,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (yardsAfterCatch.WasFumbled)
             {
                 Log.Information("StandardPassingPlayOutcome: Fumble after a catch for {YardsGained}.", yardsAfterCatch.YardsGained);
+                priorState.AddTag("fumbled-live-ball");
                 return priorState.WithNextState(PlayEvaluationState.FumbledLiveBallOutcome);
             }
 
             int yardsPlusYAC = Math.Clamp(yardsGained + (yardsAfterCatch.YardsGained ?? 0),
                     Constants.HomeEndLineYard,
                     Constants.AwayEndLineYard).Round();
+            if (yardsPlusYAC < 0) { priorState.AddTag("negative-play"); }
             Log.Information("StandardPassingPlayOutcome: Completed pass with YAC, total gain {YardsGained}.", yardsPlusYAC);
             return PlayerDownedFunction.Get(priorState.InvolvesOffensivePass().InvolvesAdditionalOffensivePlayer()
                     .InvolvesOffensiveRun().InvolvesAdditionalOffensivePlayer(),

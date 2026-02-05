@@ -11,9 +11,6 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
     {
         public static PlayContext Run(PlayContext priorState)
         {
-            var parameters = priorState.Environment!.DecisionParameters;
-            var physicsParams = priorState.Environment.PhysicsParams;
-
             var priorStateWithSimulatedLineOfScrimmage = priorState with
             {
                 LineOfScrimmage = priorState.AddYardsForPossessingTeam(priorState.LineOfScrimmage, -15).Round()

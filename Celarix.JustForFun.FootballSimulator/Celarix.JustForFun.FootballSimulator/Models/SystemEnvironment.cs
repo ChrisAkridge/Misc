@@ -9,12 +9,15 @@ using Celarix.JustForFun.FootballSimulator.SummaryWriting;
 using Celarix.JustForFun.FootballSimulator.Tiebreaking;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Text;
 
 namespace Celarix.JustForFun.FootballSimulator.Models
 {
-    public sealed class SystemEnvironment
+    public sealed class SystemEnvironment : ITagListable
     {
+        private readonly List<string> tags = [];
+
         public required IFootballRepository FootballRepository { get; init; }
         public required IRandomFactory RandomFactory { get; init; }
         public required PlayerFactory PlayerFactory { get; init; }
@@ -25,5 +28,19 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         public TeamRanker? TeamRanker { get; set; }
         public GameRecord? CurrentGameRecord { get; set; }
         public GameContext? CurrentGameContext { get; set; }
+
+        public void AddTag(string tag)
+        {
+            tags.Add(tag);
+        }
+
+        public IEnumerable<string> GetTagsAndReset()
+        {
+            var tagsToReturn = tags.ToArray();
+            tags.Clear();
+            return tagsToReturn;
+        }
+
+        public IEnumerable<string> GetTags() => tags.AsReadOnly();
     }
 }

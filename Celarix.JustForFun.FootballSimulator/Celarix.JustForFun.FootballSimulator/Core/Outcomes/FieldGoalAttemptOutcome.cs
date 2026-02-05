@@ -92,6 +92,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (kickBlocked)
             {
                 Log.Information("FieldGoalAttemptOutcome: Kick was blocked, ball is live!");
+                priorState.AddTag("fumbled-live-ball");
                 return priorState.WithNextState(PlayEvaluationState.FumbledLiveBallOutcome)
                     .InvolvesKick()
                     .InvolvesAdditionalOffensivePlayer()
@@ -103,6 +104,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 if (kickSuccessful)
                 {
                     Log.Information("FieldGoalAttemptOutcome: Field goal kick was good!");
+                    priorState.AddTag("field-goal-scored");
                     return priorState.WithScoreChange(priorState.TeamWithPossession, 3)
                         .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                         .InvolvesKick()
@@ -119,6 +121,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 else
                 {
                     Log.Information("FieldGoalAttemptOutcome: Field goal kick was no good.");
+                    priorState.AddTag("turnover-after-field-goal-miss");
                     return priorState.WithFirstDownLineOfScrimmage(priorState.LineOfScrimmage, priorState.TeamWithPossession.Opponent(),
                         "{DefAbbr} {DefPlayer0} missed a field goal from {FGKickDistance} yards, first down for {OffAbbr}.", startOfDrive: true)
                         .InvolvesKick()
@@ -132,6 +135,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (kickSuccessful)
             {
                 Log.Information("FieldGoalAttemptOutcome: Extra point kick was good!");
+                priorState.AddTag("extra-point-scored");
                 return priorState.WithScoreChange(priorState.TeamWithPossession, 1)
                     .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
                     .InvolvesKick()

@@ -31,6 +31,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                 homeTeam.Abbreviation,
                 gameRecord.AwayScore,
                 gameRecord.HomeScore);
+            context.AddTag("game-over");
             return context.WithNextState(GameState.EndGame);
         }
     }

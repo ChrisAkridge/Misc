@@ -1,5 +1,6 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output.Models;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -445,6 +446,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                         DefensivePlayersInvolved = state.PlayInvolvement.DefensivePlayersInvolved + 1
                     }
                 };
+            }
+
+            public void AddTag(string tag)
+            {
+                state.Environment!.AddTag(tag);
             }
 
             public TeamDriveRecord BuildTeamDriveRecord(int gameRecordID, int teamID, int playCount)

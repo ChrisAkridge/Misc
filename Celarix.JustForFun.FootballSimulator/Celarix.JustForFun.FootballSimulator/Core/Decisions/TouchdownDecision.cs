@@ -48,6 +48,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
 
         private static PlayContext AttemptTwoPointConversion(PlayContext priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
+            priorState.AddTag("two-point-attempt");
             return priorState.WithNextState(PlayEvaluationState.TwoPointConversionAttemptOutcome) with
             {
                 LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 2),
@@ -58,6 +59,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
 
         private static PlayContext AttemptExtraPoint(PlayContext priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams)
         {
+            priorState.AddTag("extra-point-attempt");
             return priorState.WithNextState(PlayEvaluationState.FieldGoalsAndExtraPointAttemptOutcome) with
             {
                 LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 15),

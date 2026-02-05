@@ -31,25 +31,28 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                 }
             }
             
-            if (playContext.SecondsLeftInPeriod == 0)
+            if (decision != PostPlayDecision.EndGameTie)
             {
-                var gameIsRegularSeason = context.Environment.CurrentGameRecord!.GameType == GameType.RegularSeason;
-                if (playContext.PeriodNumber == 5 && gameIsRegularSeason && playContext.HomeScore == playContext.AwayScore)
+                if (playContext.SecondsLeftInPeriod == 0)
                 {
-                    decision = PostPlayDecision.EndGameTie;
+                    var gameIsRegularSeason = context.Environment.CurrentGameRecord!.GameType == GameType.RegularSeason;
+                    if (playContext.PeriodNumber == 5 && gameIsRegularSeason && playContext.HomeScore == playContext.AwayScore)
+                    {
+                        decision = PostPlayDecision.EndGameTie;
+                    }
+                    else if (playContext.PeriodNumber >= 4 && playContext.HomeScore != playContext.AwayScore)
+                    {
+                        decision = PostPlayDecision.EndGameWin;
+                    }
+                    else
+                    {
+                        decision = PostPlayDecision.NextPeriod;
+                    }
                 }
-                else if (playContext.PeriodNumber >= 4 && playContext.HomeScore != playContext.AwayScore)
+                else if (context.TeamWithPossession != playContext.TeamWithPossession)
                 {
-                    decision = PostPlayDecision.EndGameWin;
+                    decision = PostPlayDecision.EndOfPossession;
                 }
-                else
-                {
-                    decision = PostPlayDecision.NextPeriod;
-                }
-            }
-            else if (context.TeamWithPossession != playContext.TeamWithPossession)
-            {
-                decision = PostPlayDecision.EndOfPossession;
             }
 
             bool saveDriveRecord = decision is PostPlayDecision.EndGameWin
@@ -61,8 +64,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
             {
                 saveDriveRecord = true;
             }
+
             if (saveDriveRecord)
             {
+                context.AddTag("drive-record-saved");
                 SaveDriveRecord(context);
             }
 

@@ -24,7 +24,6 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
             var otherTeam = possessingTeam.Opponent();
             var newLineOfScrimmage = priorState.AddYardsForPossessingTeam(possessionStartYard, yardsGained).ClampWithinField();
             var gainedTeamYard = priorState.InternalYardToTeamYard(newLineOfScrimmage.Round());
-            string displayYard = priorState.InternalYardToDisplayTeamYardString(newLineOfScrimmage.Round(), parameters);
 
             if (gainedTeamYard.TeamYard < 0)
             {
@@ -33,6 +32,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                     if (endzoneBehavior == EndzoneBehavior.FumbleOrInterceptionReturn)
                     {
                         Log.Information("PlayerDownedFunction: Fumble recovered in own endzone, touchback.");
+                        priorState.AddTag("touchback");
                         return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete) with
                         {
                             NextPlay = NextPlayKind.FirstDown,
@@ -46,6 +46,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                     }
 
                     // Safety! Oh, no!
+                    priorState.AddTag("safety-scored");
                     var safetyPoints = endzoneBehavior switch
                     {
                         EndzoneBehavior.StandardGameplay => 2,
@@ -58,6 +59,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         // Safeties on conversion attempts end the conversion attempt and do not cause
                         // a free kick.
                         Log.Information("PlayerDownedFunction: Offensive safety on conversion attempt, {Points} points to the defense and kickoff.", safetyPoints);
+                        priorState.AddTag("offensive-conversion-safety-scored");
                         return priorState
                             .WithScoreChange(otherTeam, safetyPoints)
                             .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
@@ -67,7 +69,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                             LineOfScrimmage = priorState.TeamYardToInternalYard(possessingTeam, 35),
                             LineToGain = null,
                             PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
-                            ClockRunning = !clockRunning.HasValue ? false : clockRunning.Value,
+                            ClockRunning = clockRunning ?? false,
                             LastPlayDescriptionTemplate = "{OffAbbr} suffers one-point safety!.",
                             DriveResult = DriveResult.TouchdownWithDefensiveScore
                         };
@@ -95,6 +97,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         || endzoneBehavior == EndzoneBehavior.FumbleOrInterceptionReturn)
                     {
                         Log.Information("PlayerDownedFunction: Touchdown!");
+                        priorState.AddTag("touchdown-scored");
                         return priorState
                             .WithScoreChange(possessingTeam, 6)
                             .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
@@ -111,6 +114,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                     else
                     {
                         Log.Information("PlayerDownedFunction: Successful two-point conversion!");
+                        priorState.AddTag("two-point-conversion-scored");
                         return priorState
                             .WithScoreChange(possessingTeam, 2)
                             .WithNextState(PlayEvaluationState.PlayEvaluationComplete)
@@ -120,7 +124,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                             LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 35),
                             LineToGain = null,
                             PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
-                            ClockRunning = !clockRunning.HasValue ? false : clockRunning.Value,
+                            ClockRunning = clockRunning ?? false,
                             LastPlayDescriptionTemplate = "{OffAbbr} successful two-point conversion! Scored by {OffPlayer0}.",
                             DriveResult = DriveResult.TouchdownWithTwoPointConversion
                         };
@@ -154,6 +158,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
             else if (priorState.NextPlay == NextPlayKind.FourthDown)
             {
                 Log.Information("PlayerDownedFunction: Turnover on downs.");
+                priorState.AddTag("turnover-on-downs");
+                priorState.Environment.DecisionParameters.RecordFourthDownAttempt(priorState.TeamWithPossession, false);
                 return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, otherTeam,
                     // TODO: Ensure that DefAbbr and OffAbbr are correct here - they may need to be swapped.
                     "{DefAbbr} turnover on downs, {DefPlayer0} short of line to gain, first down for {OffAbbr}.", clockRunning,
@@ -176,6 +182,16 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
             else if (priorState.CompareYardForTeam(priorState.LineOfScrimmage, priorState.LineToGain.Value, possessingTeam) >= 0)
             {
                 Log.Information("PlayerDownedFunction: First down achieved.");
+                priorState.AddTag("first-down");
+                if (priorState.NextPlay == NextPlayKind.ThirdDown)
+                {
+                    priorState.AddTag("third-down-conversion");
+                }
+                else if (priorState.NextPlay == NextPlayKind.FourthDown)
+                {
+                    priorState.AddTag("fourth-down-conversion");
+                    priorState.Environment.DecisionParameters.RecordFourthDownAttempt(priorState.TeamWithPossession, true);
+                }
                 return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, possessingTeam,
                     "{OffAbbr} {OffPlayer0} has gained a first down at {LoS}.", clockRunning);
             }
@@ -197,7 +213,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                 NextPlay = nextPlayKind,
                 LineOfScrimmage = newLineOfScrimmage.Round(),
                 PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
-                ClockRunning = !clockRunning.HasValue ? true : clockRunning.Value,
+                ClockRunning = clockRunning ?? true,
                 LastPlayDescriptionTemplate =
                     "{OffAbbr} {OffPlayer0} downed at {LoS}, {NextPlay}."
             };

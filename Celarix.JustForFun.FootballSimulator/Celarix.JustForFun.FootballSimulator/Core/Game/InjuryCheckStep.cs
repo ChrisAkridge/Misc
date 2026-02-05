@@ -53,6 +53,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                 var injuryRoll = random.Chance(offenseIsHomeTeam ? homeTeamInjuryChancePerPlay : awayTeamInjuryChancePerPlay);
                 if (injuryRoll)
                 {
+                    context.AddTag("offensive-injury");
                     Log.Verbose("InjuryCheckStep: Player {PlayerName} ({TeamName}) injured on play.",
                         player.Player.FirstName + " " + player.Player.LastName,
                         offenseTeam.TeamName);
@@ -65,9 +66,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                 var injuryRoll = random.Chance(offenseIsHomeTeam ? awayTeamInjuryChancePerPlay : homeTeamInjuryChancePerPlay);
                 if (injuryRoll)
                 {
+                    context.AddTag("defensive-injury");
                     Log.Verbose("InjuryCheckStep: Player {PlayerName} ({TeamName}) injured on play.",
                         player.Player.FirstName + " " + player.Player.LastName,
-                        offenseTeam.TeamName);
+                        defenseTeam.TeamName);
                     newInjuryRecoveries.AddRange(InjurePlayerAndCreateRecoveries(random, player, defenseTeam, context.Environment.PhysicsParams, kickoffTime));
                 }
             }

@@ -29,10 +29,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 {
                     Log.Verbose("Hail, Mary, full of grace, the Lord is with thee. Blessed art thou amongst women and blessed is the fruit of thy womb, Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.");
                 }
+                priorState.AddTag("hail-mary-attempt");
                 return priorState.WithNextState(PlayEvaluationState.HailMaryOutcome);
             }
 
             var isFakePlay = priorState.GetAdditionalParameterOrDefault<bool?>("IsFakePlay") == true;
+            if (isFakePlay) { priorState.AddTag("fake-play"); }
 
             var clockDisposition = ClockDispositionFunction.Get(priorState);
             var selfEstimateOfSelf = parameters.GetEstimateOfTeamByTeam(self, self);
@@ -98,10 +100,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             if (selfTimeoutsRemaining > 1)
             {
                 Log.Information("MainGameDecision: Clock running during two-minute drill, calling a timeout.");
+                priorState.AddTag("timeout");
                 return priorState.TakeTimeout(self);
             }
 
             Log.Information("MainGameDecision: Spiking ball to stop the clock!");
+            priorState.AddTag("spike-ball");
             return PlayerDownedFunction.Get(priorState, priorState.LineOfScrimmage, -2,
                 priorState.NextPlay == NextPlayKind.ConversionAttempt ? EndzoneBehavior.ConversionAttempt : EndzoneBehavior.StandardGameplay,
                 priorState.NextPlay == NextPlayKind.ConversionAttempt ? self : null);
@@ -119,6 +123,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             bool goForIt = GoForItOnFourthDown(priorState, parameters, physicsParams, self, opponent);
             if (goForIt)
             {
+                priorState.AddTag("fourth-down-attempt");
                 return QBSneakOrRunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
             }
 
@@ -210,6 +215,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             if (priorState.DistanceToGo() <= qbSneakDistance)
             {
                 Log.Information("MainGameDecision: Going for it on fourth down with a QB sneak!");
+                priorState.AddTag("qb-sneak");
                 return priorState.WithNextState(PlayEvaluationState.QBSneakOutcome);
             }
             Log.Information("MainGameDecision: Going for it on fourth down with a standard play!");
@@ -229,6 +235,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 }
             }
             Log.Information("MainGameDecision: Attempting a field goal on fourth down.");
+            priorState.AddTag("field-goal-attempt");
             return FieldGoalAttemptOutcome.Run(priorState);
         }
 
@@ -245,6 +252,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 }
             }
             Log.Information("MainGameDecision: Punting on fourth down.");
+            priorState.AddTag("punt");
             return priorState.WithNextState(PlayEvaluationState.PuntOutcome);
         }
 
@@ -282,6 +290,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 else
                 {
                     Log.Information("MainGameDecision: Overtime leading and there's not enough time for opponent to win. Victory formation!");
+                    priorState.AddTag("victory-formation");
                     return PlayerDownedFunction.Get(priorState, priorState.LineOfScrimmage, -1,
                         EndzoneBehavior.StandardGameplay, null);
                 }
@@ -368,6 +377,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 return FieldGoalAttemptOutcome.Run(priorState);
             }
             Log.Information("MainGameDecision: Late-game passing play but not in field goal range, attempting Hail Mary.");
+            priorState.AddTag("hail-mary-attempt");
             return priorState.WithNextState(PlayEvaluationState.HailMaryOutcome);
         }
         #endregion

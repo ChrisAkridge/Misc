@@ -16,6 +16,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
 
             if (nextQuarterActions.CoinTossNeeded)
             {
+                context.AddTag("coin-toss");
                 var random = context.Environment.RandomFactory.Create();
                 var awayReceives = random.NextDouble() < 0.5;
                 var kickingTeam = awayReceives ? GameTeam.Home : GameTeam.Away;
@@ -33,6 +34,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
             }
             else if (nextQuarterActions.CoinTossLoserReceivesPossession)
             {
+                context.AddTag("coin-toss-loser-receives");
                 var kickingTeam = playContext.CoinFlipWinner;
                 playContext = playContext with
                 {
@@ -42,6 +44,15 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                     LineOfScrimmage = playContext.TeamYardToInternalYard(kickingTeam, 35),
                     LineToGain = null
                 };
+            }
+
+            if (playContext.PeriodNumber + 1 == 5)
+            {
+                context.AddTag("start-overtime-period");
+            }
+            else if (playContext.PeriodNumber + 1 > 5)
+            {
+                context.AddTag("start-postseason-additional-overtime-period");
             }
 
             context.Environment.CurrentPlayContext = playContext with

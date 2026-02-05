@@ -26,6 +26,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 physicsParams,
                 parameters.Random);
 
+            if (rushResult.YardsGained < 0)
+            {
+                priorState.AddTag("negative-play");
+            }
+
             if (rushResult.WasFumbled)
             {
                 Log.Information("StandardRushingPlayOutcome: Fumble occurred during rushing play.");

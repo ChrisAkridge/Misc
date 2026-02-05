@@ -27,6 +27,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (rushAttemptResult.WasFumbled)
             {
                 Log.Information("Fumble on fumble/interception return!");
+                priorState.AddTag("fumbled-live-ball");
                 return priorState.WithNextState(PlayEvaluationState.FumbledLiveBallOutcome);
             }
 

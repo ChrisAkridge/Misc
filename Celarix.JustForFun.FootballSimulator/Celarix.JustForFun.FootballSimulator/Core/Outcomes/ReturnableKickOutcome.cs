@@ -15,6 +15,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var parameters = priorState.Environment!.DecisionParameters;
             var physicsParams = priorState.Environment.PhysicsParams;
 
+            priorState.AddTag("returnable-kick");
+
             if (priorState.AdditionalParameters is null ||
                 !priorState.HasAdditionalParameter("KickActualYard"))
             {

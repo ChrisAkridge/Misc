@@ -40,6 +40,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 
             var yardsLost = -(parameters.Random.NextDouble() * 2);
             var newLineOfScrimmage = priorState.AddYardsForPossessingTeam(priorState.LineOfScrimmage, yardsLost);
+            priorState.AddTag("negative-play");
             return PlayerDownedFunction.Get(priorState.InvolvesOffensiveRun().InvolvesAdditionalOffensivePlayer() with
             {
                 LineOfScrimmage = newLineOfScrimmage.Round()
