@@ -24,7 +24,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                     playNumber,
                     context.TeamWithPossession);
 
-                playContext = playContext with
+                context.Environment.CurrentPlayContext = playContext with
                 {
                     NextState = playContext.NextPlay switch
                     {
@@ -53,8 +53,19 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                     PlayCountOnDrive = playNumber
                 };
 
-                context.Environment.DebugContextWriter.WriteContext(playContext);
-                context.Environment.DebugContextWriter.WriteContext(context);
+                context.Environment.DebugContextWriter.WriteContext(playContext, playContext.Environment!);
+                context.Environment.DebugContextWriter.WriteContext(context, context.Environment!);
+
+                var lineOfScrimmageTeamYard = playContext.InternalYardToTeamYard(playContext.LineOfScrimmage);
+                var inOpponentTerritory = playContext.TeamWithPossession != lineOfScrimmageTeamYard.Team;
+                if (inOpponentTerritory && lineOfScrimmageTeamYard.TeamYard <= 20)
+                {
+                    context.AddTag("red-zone");
+                }
+                else if (!inOpponentTerritory && lineOfScrimmageTeamYard.TeamYard <= 10)
+                {
+                    context.AddTag("near-own-endzone");
+                }
             }
 
             context.Environment.CurrentPlayContext = playContext.NextState switch
@@ -86,7 +97,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                 _ => throw new InvalidOperationException("Invalid play evaluation state encountered.")
             };
 
-            context.Environment.DebugContextWriter.WriteContext(context.Environment.CurrentPlayContext);
+            context.Environment.DebugContextWriter.WriteContext(context.Environment.CurrentPlayContext, context.Environment);
 
             evaluatingPlaySignal = context.Environment.CurrentPlayContext.NextState switch
             {
