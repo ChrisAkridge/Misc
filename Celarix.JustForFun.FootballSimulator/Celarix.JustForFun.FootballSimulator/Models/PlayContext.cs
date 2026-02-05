@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace Celarix.JustForFun.FootballSimulator.Models
 {
-    internal sealed record PlayContext(
+    public sealed record PlayContext(
         // State machine
         long Version,
         PlayEvaluationState NextState,
@@ -56,13 +56,13 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         GameTeam? TeamCallingTimeout
     );
 
-    internal sealed record AdditionalParameter<T>(
+    public sealed record AdditionalParameter<T>(
         string Key,
         T Value,
         long AddedInVersion
     );
 
-    internal sealed record StateHistoryEntry(
+    public sealed record StateHistoryEntry(
         PlayEvaluationState State,
         GameTeam TeamWithPossession,
         long Version

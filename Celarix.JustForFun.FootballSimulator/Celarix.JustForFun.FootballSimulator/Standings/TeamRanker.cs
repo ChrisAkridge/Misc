@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Celarix.JustForFun.FootballSimulator.Standings
 {
-    internal sealed class TeamRanker
+    public sealed class TeamRanker
     {
         private readonly (Func<BasicTeamInfo, TieGroup, decimal> Tiebreaker, string Name)[] tiebreakers;
 

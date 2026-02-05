@@ -118,6 +118,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 };
             }
 
+            public double DistanceForFirstDown()
+            {
+                return state.DistanceForPossessingTeam(state.LineOfScrimmage, state.LineToGain ?? throw new InvalidOperationException("LineToGain must be set to calculate distance for first down."));
+            }
+
             public int TeamYardToInternalYard(GameTeam team, int teamYard)
             {
                 if (teamYard < -10d || teamYard > 50d)

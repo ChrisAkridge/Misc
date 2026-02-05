@@ -2,6 +2,7 @@ using Celarix.JustForFun.FootballSimulator.Core.Functions;
 using Celarix.JustForFun.FootballSimulator.Core.Game;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output;
 using Celarix.JustForFun.FootballSimulator.Random;
 using Moq;
 using Serilog;
@@ -80,7 +81,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                         HomeTeam = _homeTeam
                     },
                     AwayActiveRoster = [],
-                    HomeActiveRoster = []
+                    HomeActiveRoster = [],
+                    EventBus = Mock.Of<IEventBus>()
                 },
                 AwayTeamAcclimatedTemperature: 70.0,
                 HomeTeamAcclimatedTemperature: 70.0,
@@ -145,7 +147,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                     AwayTeam = awayTeam,
                     HomeTeam = homeTeam,
                 },
-                PhysicsParams = _physicsParams
+                PhysicsParams = _physicsParams,
+                EventBus = Mock.Of<IEventBus>()
             };
         }
 

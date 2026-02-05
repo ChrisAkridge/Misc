@@ -11,6 +11,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
     {
         public static GameContext Run(GameContext context)
         {
+            var random = context.Environment.RandomFactory.Create();
+
             var offenseIsHomeTeam = context.Environment.CurrentPlayContext!.TeamWithPossession == GameTeam.Home;
             var offenseTeam = offenseIsHomeTeam
                 ? context.Environment.CurrentGameRecord!.HomeTeam
@@ -44,10 +46,26 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                 offensePlayersOnPlay.Add(kicker);
             }
 
-            var shuffledOffenseRoster = offenseRoster.ToList().Shuffle();
-            var shuffledDefenseRoster = defenseRoster.ToList().Shuffle();
+            var shuffledOffenseRoster = offenseRoster.ToList().Shuffle(random);
+            var shuffledDefenseRoster = defenseRoster.ToList().Shuffle(random);
             offensePlayersOnPlay.AddRange(shuffledOffenseRoster.Take(offensePlayersOnPlayCount));
             defensePlayersOnPlay.AddRange(shuffledDefenseRoster.Take(defensePlayersOnPlayCount));
+
+            var lineOfScrimmageTeamYard = context.Environment.CurrentPlayContext.InternalYardToTeamYard(context.Environment.CurrentPlayContext.LineOfScrimmage);
+            var teamYardTeamAbbreviation = lineOfScrimmageTeamYard.Team == GameTeam.Home
+                ? context.Environment.CurrentGameRecord!.HomeTeam.Abbreviation
+                : context.Environment.CurrentGameRecord!.AwayTeam.Abbreviation;
+            var lineOfScrimmageDisplay = $"{teamYardTeamAbbreviation} {lineOfScrimmageTeamYard.TeamYard}";
+            context.Environment.CurrentPlayContext = context.Environment.CurrentPlayContext with
+            {
+                LastPlayDescriptionTemplate = ResolveLastPlayDescriptionTemplate(
+                    context.Environment.CurrentPlayContext.LastPlayDescriptionTemplate,
+                    offensePlayersOnPlay,
+                    defensePlayersOnPlay,
+                    offenseTeam.Abbreviation,
+                    defenseTeam.Abbreviation,
+                    lineOfScrimmageDisplay)
+            };
 
             Log.Information("DeterminePlayersOnPlayStep: Assigned {OffenseCount} offense players and {DefenseCount} defense players to the play.",
                 offensePlayersOnPlay.Count, defensePlayersOnPlay.Count);
@@ -56,6 +74,29 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                 OffensePlayersOnPlay = offensePlayersOnPlay,
                 DefensePlayersOnPlay = defensePlayersOnPlay
             };
+        }
+
+        private static string ResolveLastPlayDescriptionTemplate(string template,
+            IReadOnlyList<PlayerRosterPosition> offensePlayersOnPlay,
+            IReadOnlyList<PlayerRosterPosition> defensePlayersOnPlay,
+            string offenseAbbreviation,
+            string defenseAbbreviation,
+            string lineOfScrimmageTeamYard)
+        {
+            var description = template;
+            for (int i = 0; i < offensePlayersOnPlay.Count; i++)
+            {
+                description = description.Replace($"{{OffPlayer{i}}}", offensePlayersOnPlay[i].Player.FullName);
+            }
+            for (int i = 0; i < defensePlayersOnPlay.Count; i++)
+            {
+                description = description.Replace($"{{DefPlayer{i}}}", defensePlayersOnPlay[i].Player.FullName);
+            }
+
+            description = description.Replace("{OffAbbr}", offenseAbbreviation);
+            description = description.Replace("{DefAbbr}", defenseAbbreviation);
+            description = description.Replace("{LoS}", lineOfScrimmageTeamYard);
+            return description;
         }
     }
 }

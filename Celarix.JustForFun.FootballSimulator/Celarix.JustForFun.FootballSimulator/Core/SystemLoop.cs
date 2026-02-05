@@ -3,6 +3,7 @@ using Celarix.JustForFun.FootballSimulator.Core.System;
 using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output;
 using Celarix.JustForFun.FootballSimulator.Random;
 using Celarix.JustForFun.FootballSimulator.Scheduling;
 using Celarix.JustForFun.FootballSimulator.SummaryWriting;
@@ -17,7 +18,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
     {
         private SystemContext context;
 
-        public SystemLoop()
+        public SystemLoop(IEventBus eventBus)
         {
             var firstNames = File.ReadAllLines("Names\\player-first-names.csv");
             var lastNames = File.ReadAllLines("Names\\player-last-names.csv")
@@ -34,7 +35,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                     RandomFactory = new RandomFactory(),
                     PlayerFactory = new PlayerFactory(firstNames, lastNames),
                     SummaryWriter = new OpenAISummaryWriter(),
-                    DebugContextWriter = new DebugContextWriter(settings.SaveStateMachineContextsForDebugging, settings.StateMachineContextSavePath)
+                    DebugContextWriter = new DebugContextWriter(settings.SaveStateMachineContextsForDebugging, settings.StateMachineContextSavePath),
+                    EventBus = eventBus
                 });
         }
 

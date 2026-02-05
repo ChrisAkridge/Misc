@@ -2,6 +2,7 @@
 using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -76,7 +77,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                     RandomFactory = null!,
                     PlayerFactory = null!,
                     DebugContextWriter = null!,
-                    SummaryWriter = null!
+                    SummaryWriter = null!,
+                    EventBus = Mock.Of<IEventBus>()
                 }
             };
 
@@ -156,7 +158,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                     RandomFactory = null!,
                     PlayerFactory = null!,
                     DebugContextWriter = null!,
-                    SummaryWriter = null!
+                    SummaryWriter = null!,
+                    EventBus = Mock.Of<IEventBus>()
                 }
             };
             // Act & Assert
@@ -182,7 +185,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                     RandomFactory = null!,
                     PlayerFactory = null!,
                     DebugContextWriter = null!,
-                    SummaryWriter = null!
+                    SummaryWriter = null!,
+                    EventBus = Mock.Of<IEventBus>()
                 }
             };
             // Act & Assert
@@ -217,7 +221,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                     RandomFactory = null!,
                     PlayerFactory = null!,
                     DebugContextWriter = null!,
-                    SummaryWriter = null!
+                    SummaryWriter = null!,
+                    EventBus = Mock.Of<IEventBus>()
                 }
             };
             // Act & Assert
@@ -265,7 +270,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                     RandomFactory = null!,
                     PlayerFactory = null!,
                     DebugContextWriter = null!,
-                    SummaryWriter = null!
+                    SummaryWriter = null!,
+                    EventBus = Mock.Of<IEventBus>()
                 }
             };
             // Act & Assert

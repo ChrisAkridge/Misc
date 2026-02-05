@@ -55,5 +55,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
 		public float CareerFieldGoalPercentage => CareerFieldGoalsMade / (float)CareerFieldGoalAttempts;
 		public float CareerExtraPointPercentage => CareerExtraPointsMade / (float)CareerExtraPointAttempts;
 		public int CareerTotalPoints => (CareerTouchdownsScored * 6) + (CareerFieldGoalsMade * 3) + CareerExtraPointsMade;
-	}
+
+		public string FullName => $"{FirstName} {LastName}";
+    }
 }

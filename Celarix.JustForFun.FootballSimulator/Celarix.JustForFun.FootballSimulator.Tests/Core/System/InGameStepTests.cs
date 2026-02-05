@@ -3,6 +3,7 @@ using Celarix.JustForFun.FootballSimulator.Core.System;
 using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -51,11 +52,14 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                                             Disposition = TeamDisposition.UltraConservative
                                         }
                                     },
-                                    PhysicsParams = TestHelpers.EmptyPhysicsParams
+                                    PhysicsParams = TestHelpers.EmptyPhysicsParams,
+                                    EventBus = Mock.Of<IEventBus>()
                                 }
-                            }
+                            },
+                            EventBus = Mock.Of<IEventBus>()
                         }
-                    }
+                    },
+                    EventBus = Mock.Of<IEventBus>()
                 }
             };
 
@@ -105,9 +109,11 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                                 }
                             },
                             AwayActiveRoster = [],
-                            HomeActiveRoster = []
+                            HomeActiveRoster = [],
+                            EventBus = Mock.Of<IEventBus>()
                         }
-                    }
+                    },
+                    EventBus = Mock.Of<IEventBus>()
                 }
             };
             // Act
@@ -148,9 +154,11 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                             },
                             AwayActiveRoster = [],
                             HomeActiveRoster = [],
-                            CurrentPlayContext = TestHelpers.EmptyPlayContext
+                            CurrentPlayContext = TestHelpers.EmptyPlayContext,
+                            EventBus = Mock.Of<IEventBus>()
                         }
-                    }
+                    },
+                    EventBus = Mock.Of<IEventBus>()
                 }
             };
             // Act

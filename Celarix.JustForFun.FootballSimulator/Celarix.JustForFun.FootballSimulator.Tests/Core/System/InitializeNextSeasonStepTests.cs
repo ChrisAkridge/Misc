@@ -2,6 +2,7 @@
 using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output;
 using Celarix.JustForFun.FootballSimulator.Random;
 using Moq;
 using System;
@@ -46,6 +47,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                     PlayerFactory = null!,
                     SummaryWriter = null!,
                     DebugContextWriter = null!,
+                    EventBus = Mock.Of<IEventBus>()
                 }
             };
 
@@ -126,6 +128,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                     PlayerFactory = null!,
                     SummaryWriter = null!,
                     DebugContextWriter = null!,
+                    EventBus = Mock.Of<IEventBus>()
                 }
             };
 

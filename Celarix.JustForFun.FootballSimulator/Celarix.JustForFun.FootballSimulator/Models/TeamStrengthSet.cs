@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Celarix.JustForFun.FootballSimulator.Models
 {
-    internal sealed class TeamStrengthSet : IStrengths
+    public sealed class TeamStrengthSet : IStrengths
     {
         public bool IsEstimate { get; init; }
         public GameTeam Team { get; init; }

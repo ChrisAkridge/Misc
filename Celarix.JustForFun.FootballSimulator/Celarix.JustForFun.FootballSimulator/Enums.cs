@@ -159,7 +159,7 @@ internal enum GameResultForTeam
     Tie
 }
 
-internal enum PlayEvaluationState
+public enum PlayEvaluationState
 {
     Start,
     KickoffDecision,
@@ -254,7 +254,7 @@ internal enum ClockEvent
     NewCoinTossRequired
 }
 
-internal enum StrengthSetKind
+public enum StrengthSetKind
 {
     TeamOfItself,
     TeamOfOpponent
@@ -279,7 +279,7 @@ internal enum EndzoneBehavior
 }
 
 [Flags]
-internal enum PossessionOnPlay
+public enum PossessionOnPlay
 {
     None = 0b0,
     AwayTeamOnly = 0b1,

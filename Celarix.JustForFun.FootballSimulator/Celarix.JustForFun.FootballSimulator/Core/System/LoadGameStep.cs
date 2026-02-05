@@ -63,7 +63,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                         HomeTeamEstimateOfAway = Helpers.EstimateStrengthSetForTeam(gameRecord.AwayTeam, gameRecord.HomeTeam, gameRecord, random, physicsParams),
                         HomeTeamEstimateOfHome = Helpers.EstimateStrengthSetForTeam(gameRecord.HomeTeam, gameRecord.HomeTeam, gameRecord, random, physicsParams),
                     },
-                    PhysicsParams = physicsParams
+                    PhysicsParams = physicsParams,
+                    EventBus = context.Environment.EventBus
                 }
             };
 
@@ -87,6 +88,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                     DebugContextWriter = context.Environment.DebugContextWriter,
                     AwayActiveRoster = repository.GetActiveRosterForTeam(gameRecord.AwayTeamID),
                     HomeActiveRoster = repository.GetActiveRosterForTeam(gameRecord.HomeTeamID),
+                    EventBus = context.Environment.EventBus
                 },
                 AwayTeamAcclimatedTemperature: awayAcclimatedTemperature,
                 HomeTeamAcclimatedTemperature: homeAcclimatedTemperature,

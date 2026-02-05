@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Celarix.JustForFun.FootballSimulator
 {
-    internal sealed class PlayerFactory
+    public sealed class PlayerFactory
     {
         private string[] firstNames;
         private string[] lastNames;

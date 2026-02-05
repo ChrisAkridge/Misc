@@ -3,6 +3,7 @@ using Celarix.JustForFun.FootballSimulator.Core.System;
 using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output;
 using Celarix.JustForFun.FootballSimulator.Random;
 using Celarix.JustForFun.FootballSimulator.SummaryWriting;
 using Moq;
@@ -43,7 +44,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 PlayerFactory = null!,
                 SummaryWriter = null!,
                 DebugContextWriter = null!,
-                CurrentGameRecord = gameRecord
+                CurrentGameRecord = gameRecord,
+                EventBus = Mock.Of<IEventBus>()
             };
 
             var context = new SystemContext(1, SystemState.PostGame, environment);
@@ -88,7 +90,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 PlayerFactory = null!,
                 SummaryWriter = null!,
                 DebugContextWriter = null!,
-                CurrentGameRecord = gameRecord
+                CurrentGameRecord = gameRecord,
+                EventBus = Mock.Of<IEventBus>()
             };
 
             var context = new SystemContext(1, SystemState.PostGame, environment);
@@ -130,7 +133,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 PlayerFactory = null!,
                 SummaryWriter = null!,
                 DebugContextWriter = null!,
-                CurrentGameRecord = gameRecord
+                CurrentGameRecord = gameRecord,
+                EventBus = Mock.Of<IEventBus>()
             };
 
             var context = new SystemContext(1, SystemState.PostGame, environment);
@@ -177,7 +181,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 PlayerFactory = null!,
                 SummaryWriter = null!,
                 DebugContextWriter = null!,
-                CurrentGameRecord = gameRecord
+                CurrentGameRecord = gameRecord,
+                EventBus = Mock.Of<IEventBus>()
             };
 
             var context = new SystemContext(1, SystemState.PostGame, environment);
@@ -222,7 +227,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 PlayerFactory = null!,
                 SummaryWriter = null!,
                 DebugContextWriter = null!,
-                CurrentGameRecord = gameRecord
+                CurrentGameRecord = gameRecord,
+                EventBus = Mock.Of<IEventBus>()
             };
 
             var context = new SystemContext(1, SystemState.PostGame, environment);
@@ -261,7 +267,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 PlayerFactory = null!,
                 SummaryWriter = null!,
                 DebugContextWriter = null!,
-                CurrentGameRecord = gameRecord
+                CurrentGameRecord = gameRecord,
+                EventBus = Mock.Of<IEventBus>()
             };
 
             var originalVersion = 42L;

@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace Celarix.JustForFun.FootballSimulator.Models
 {
-    internal sealed record GameContext(
+    public sealed record GameContext(
         // State machine
         long Version,
         GameState NextState,

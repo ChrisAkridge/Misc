@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Celarix.JustForFun.FootballSimulator.Models
 {
-    internal sealed class GameDecisionParameters
+    public sealed class GameDecisionParameters
     {
         private int awayTeamFourthDownTries = 0;
         private int homeTeamFourthDownTries = 0;

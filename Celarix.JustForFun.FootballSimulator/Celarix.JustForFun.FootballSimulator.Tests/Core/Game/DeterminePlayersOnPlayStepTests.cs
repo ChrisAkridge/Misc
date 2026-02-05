@@ -3,6 +3,7 @@ using Celarix.JustForFun.FootballSimulator.Core.Game;
 using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output;
 using Celarix.JustForFun.FootballSimulator.Random;
 using Moq;
 using System;
@@ -298,19 +299,48 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             Assert.Equal(originalContext.HomeTeamAcclimatedTemperature, result.HomeTeamAcclimatedTemperature);
         }
 
+        [Fact]
+        public void Run_PerformsTemplateSubstitution()
+        {
+            // Arrange
+            var originalContext = CreateTestGameContext(GameTeam.Home, new PlayInvolvement(
+                InvolvesOffenseRun: true,
+                InvolvesOffensePass: false,
+                InvolvesKick: false,
+                InvolvesDefenseRun: false,
+                OffensivePlayersInvolved: 3,
+                DefensivePlayersInvolved: 3
+            ));
+            originalContext.Environment.CurrentPlayContext = originalContext.Environment.CurrentPlayContext! with
+            {
+                LineOfScrimmage = 50,
+                LastPlayDescriptionTemplate = "Offense {OffAbbr}: {OffPlayer0}, {OffPlayer1}, {OffPlayer2}. Defense {DefAbbr}: {DefPlayer0}, {DefPlayer1}, {DefPlayer2}. LoS is {LoS}."
+            };
+
+            // Act
+            var result = DeterminePlayersOnPlayStep.Run(originalContext);
+
+            // Assert
+            Assert.Equal("Offense HOM: Player 19, Test Quarterback, Test Kicker. Defense AWA: Player 19, Test Quarterback, Test Kicker. LoS is HOM 50.", 
+                result.Environment.CurrentPlayContext!.LastPlayDescriptionTemplate);
+        }
+
         private static GameContext CreateTestGameContext(
             GameTeam teamWithPossession, 
             PlayInvolvement playInvolvement, 
             int rosterSize = 20)
         {
+            var randomFactory = new Mock<IRandomFactory>();
+            randomFactory.Setup(rf => rf.Create()).Returns(new Mock<IRandom>().Object);
+
             var homeRoster = CreateTestRoster(rosterSize, isHomeTeam: true);
             var awayRoster = CreateTestRoster(rosterSize, isHomeTeam: false);
 
             var gameRecord = new GameRecord
             {
                 GameID = 1,
-                HomeTeam = new Team { TeamID = 1, TeamName = "Home Team" },
-                AwayTeam = new Team { TeamID = 2, TeamName = "Away Team" }
+                HomeTeam = new Team { TeamID = 1, TeamName = "Home Team", Abbreviation = "HOM" },
+                AwayTeam = new Team { TeamID = 2, TeamName = "Away Team", Abbreviation = "AWA" }
             };
 
             var playContext = TestHelpers.EmptyPlayContext with
@@ -326,9 +356,10 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                 DebugContextWriter = null!,
                 CurrentPlayContext = playContext,
                 CurrentGameRecord = gameRecord,
-                RandomFactory = Mock.Of<IRandomFactory>(),
+                RandomFactory = randomFactory.Object,
                 AwayActiveRoster = awayRoster,
-                HomeActiveRoster = homeRoster
+                HomeActiveRoster = homeRoster,
+                EventBus = Mock.Of<IEventBus>()
             };
 
             return TestHelpers.EmptyGameContext with
@@ -348,6 +379,12 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             {
                 PlayerRosterPositionID = 1,
                 PlayerID = 1,
+                Player = new Player
+                {
+                    PlayerID = 1,
+                    FirstName = "Test",
+                    LastName = "Quarterback"
+                },
                 TeamID = teamId,
                 Position = BasicPlayerPosition.Quarterback,
                 JerseyNumber = 1,
@@ -358,6 +395,12 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             {
                 PlayerRosterPositionID = 2,
                 PlayerID = 2,
+                Player = new Player
+                {
+                    PlayerID = 2,
+                    FirstName = "Test",
+                    LastName = "Kicker"
+                },
                 TeamID = teamId,
                 Position = BasicPlayerPosition.Kicker,
                 JerseyNumber = 2,
@@ -371,6 +414,12 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                 {
                     PlayerRosterPositionID = i,
                     PlayerID = i,
+                    Player = new Player
+                    {
+                        PlayerID = i,
+                        FirstName = "Player",
+                        LastName = i.ToString()
+                    },
                     TeamID = teamId,
                     Position = i % 2 == 0 ? BasicPlayerPosition.Offense : BasicPlayerPosition.Defense,
                     JerseyNumber = i,
