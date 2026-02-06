@@ -3,6 +3,7 @@ using Celarix.JustForFun.FootballSimulator.Core.Game;
 using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output;
 using Celarix.JustForFun.FootballSimulator.Random;
 using Moq;
 using Xunit;
@@ -35,7 +36,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                 },
                 AwayActiveRoster = [],
                 HomeActiveRoster = [],
-                CurrentPlayContext = TestHelpers.EmptyPlayContext
+                CurrentPlayContext = TestHelpers.EmptyPlayContext,
+                EventBus = Mock.Of<IEventBus>()
             };
         }
 

@@ -22,6 +22,11 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         public double MaxValue { get; set; }
         public double Precision { get; set; }
 
+        public PhysicsParam(string name, double value, string unit)
+            : this(name, value, unit, unit + "s")
+        {
+        }
+
         public PhysicsParam(string name, double value, string unit, string unitPlural,
             double? minValue = null, double? maxValue = null, double? precision = null)
         {

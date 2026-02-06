@@ -3,6 +3,7 @@ using Celarix.JustForFun.FootballSimulator.Core.Game;
 using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output;
 using Celarix.JustForFun.FootballSimulator.Random;
 using Moq;
 using Serilog;
@@ -61,7 +62,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var playEnvironment = new PlayEnvironment
             {
                 DecisionParameters = decisionParams,
-                PhysicsParams = physicsParams
+                PhysicsParams = physicsParams,
+                EventBus = Mock.Of<IEventBus>()
             };
 
             var playContext = TestHelpers.EmptyPlayContext with
@@ -86,7 +88,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                 RandomFactory = new Mock<IRandomFactory>().Object,
                 AwayActiveRoster = Array.Empty<PlayerRosterPosition>(),
                 HomeActiveRoster = Array.Empty<PlayerRosterPosition>(),
-                DebugContextWriter = new Mock<IDebugContextWriter>().Object
+                DebugContextWriter = new Mock<IDebugContextWriter>().Object,
+                EventBus = Mock.Of<IEventBus>()
             };
 
             GameContext gameContext = TestHelpers.EmptyGameContext with
@@ -257,7 +260,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                         ["LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultipleForAggressivePlay"] = new PhysicsParam("LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultipleForAggressivePlay", 1.0, "multiple", "multiple"),
                         ["OnsideKickPointsPerMinuteThreshold"] = new PhysicsParam("OnsideKickPointsPerMinuteThreshold", 0.5, "points per minute", "points per minute"),
                         ["LeadingClockDispositionInStandardZoneOpponentStrengthMultiple"] = new PhysicsParam("LeadingClockDispositionInStandardZoneOpponentStrengthMultiple", 1.0, "multiple", "multiple"),
-                    }
+                    },
+                    EventBus = Mock.Of<IEventBus>()
                 }
             };
 

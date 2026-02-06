@@ -1,6 +1,7 @@
 using Celarix.JustForFun.FootballSimulator.Core.Game;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output;
 using Celarix.JustForFun.FootballSimulator.Random;
 using Moq;
 using System;
@@ -71,7 +72,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                                 HomeTeam = homeTeam,
                                 AwayTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(awayTeam, GameTeam.Away),
                                 HomeTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(homeTeam, GameTeam.Home),
-                            }
+                            },
+                            EventBus = Mock.Of<IEventBus>()
                         }
                     },
                     RandomFactory = mockRandomFactory.Object,
@@ -79,7 +81,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                     FootballRepository = null!,
                     AwayActiveRoster = [],
                     HomeActiveRoster = [],
-                    DebugContextWriter = null!
+                    DebugContextWriter = null!,
+                    EventBus = Mock.Of<IEventBus>()
                 }
             };
         }

@@ -15,7 +15,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.13");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
 
             modelBuilder.Entity("Celarix.JustForFun.FootballSimulator.Data.Models.GameRecord", b =>
                 {
@@ -70,6 +70,33 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Migrations
                     b.HasIndex("StadiumID");
 
                     b.ToTable("GameRecords");
+                });
+
+            modelBuilder.Entity("Celarix.JustForFun.FootballSimulator.Data.Models.InjuryRecovery", b =>
+                {
+                    b.Property<int>("InjuryRecoveryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("RecoverOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Recovered")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Strength")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("StrengthDelta")
+                        .HasColumnType("REAL");
+
+                    b.Property<int>("TeamID")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("InjuryRecoveryID");
+
+                    b.ToTable("InjuryRecoveries");
                 });
 
             modelBuilder.Entity("Celarix.JustForFun.FootballSimulator.Data.Models.PhysicsParam", b =>
@@ -127,9 +154,12 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Migrations
                     b.Property<bool>("Retired")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("UndraftedFreeAgent")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("PlayerID");
 
-                    b.ToTable("Player");
+                    b.ToTable("Players");
                 });
 
             modelBuilder.Entity("Celarix.JustForFun.FootballSimulator.Data.Models.PlayerRosterPosition", b =>
@@ -228,7 +258,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Migrations
 
                     b.HasIndex("TeamID");
 
-                    b.ToTable("PlayerRosterPosition");
+                    b.ToTable("PlayerRosterPositions");
                 });
 
             modelBuilder.Entity("Celarix.JustForFun.FootballSimulator.Data.Models.QuarterBoxScore", b =>
@@ -279,8 +309,15 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("SaveStateMachineContextsForDebugging")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("SeedDataInitialized")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("StateMachineContextSavePath")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("SimulatorSettingsID");
 
@@ -313,7 +350,28 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Migrations
 
                     b.HasKey("StadiumID");
 
-                    b.ToTable("Stadium");
+                    b.ToTable("Stadiums");
+                });
+
+            modelBuilder.Entity("Celarix.JustForFun.FootballSimulator.Data.Models.Summary", b =>
+                {
+                    b.Property<int>("SummaryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("GameRecordID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("SeasonRecordID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SummaryText")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("SummaryID");
+
+                    b.ToTable("Summaries");
                 });
 
             modelBuilder.Entity("Celarix.JustForFun.FootballSimulator.Data.Models.Team", b =>
@@ -417,6 +475,9 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Team")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TeamID")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("TeamDriveRecordID");
@@ -533,6 +594,26 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Migrations
                     b.HasIndex("GameRecordID");
 
                     b.ToTable("TeamGameRecords");
+                });
+
+            modelBuilder.Entity("Celarix.JustForFun.FootballSimulator.Data.Models.TeamPlayoffSeed", b =>
+                {
+                    b.Property<int>("TeamPlayoffSeedID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SeasonRecordID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Seed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TeamID")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("TeamPlayoffSeedID");
+
+                    b.ToTable("TeamPlayoffSeeds");
                 });
 
             modelBuilder.Entity("Celarix.JustForFun.FootballSimulator.Data.Models.GameRecord", b =>

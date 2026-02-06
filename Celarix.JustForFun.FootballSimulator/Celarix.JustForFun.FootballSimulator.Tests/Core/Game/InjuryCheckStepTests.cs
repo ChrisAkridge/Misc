@@ -2,6 +2,7 @@ using Celarix.JustForFun.FootballSimulator.Core.Game;
 using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output;
 using Celarix.JustForFun.FootballSimulator.Random;
 using Moq;
 using System;
@@ -275,7 +276,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                 Environment: new PlayEnvironment
                 {
                     DecisionParameters = new GameDecisionParameters(),
-                    PhysicsParams = CreatePhysicsParamsForInjury()
+                    PhysicsParams = CreatePhysicsParamsForInjury(),
+                    EventBus = Mock.Of<IEventBus>()
                 },
                 BaseWindDirection: 0.0,
                 BaseWindSpeed: 0.0,
@@ -320,7 +322,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                 CurrentPlayContext = playContext,
                 DebugContextWriter = null!,
                 AwayActiveRoster = [],
-                HomeActiveRoster = []
+                HomeActiveRoster = [],
+                EventBus = Mock.Of<IEventBus>()
             };
 
             var offensePlayers = new List<PlayerRosterPosition>

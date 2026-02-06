@@ -2,6 +2,7 @@ using Celarix.JustForFun.FootballSimulator.Core.System;
 using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output;
 using Moq;
 using Serilog;
 using Xunit;
@@ -26,7 +27,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 RandomFactory = null!,
                 PlayerFactory = null!,
                 DebugContextWriter = null!,
-                SummaryWriter = null!
+                SummaryWriter = null!,
+                EventBus = Mock.Of<IEventBus>()
             };
             
             _context = new SystemContext(

@@ -2,6 +2,7 @@ using Celarix.JustForFun.FootballSimulator.Core.Game;
 using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output;
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,7 +50,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                 Environment = new PlayEnvironment
                 {
                     PhysicsParams = TestHelpers.EmptyPhysicsParams,
-                    DecisionParameters = null!
+                    DecisionParameters = null!,
+                    EventBus = Mock.Of<IEventBus>()
                 }
             };
 
@@ -66,7 +68,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                     RandomFactory = null!,
                     DebugContextWriter = null!,
                     AwayActiveRoster = [],
-                    HomeActiveRoster = []
+                    HomeActiveRoster = [],
+                    EventBus = Mock.Of<IEventBus>()
                 }
             };
         }

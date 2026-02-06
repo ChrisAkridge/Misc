@@ -2,6 +2,7 @@ using Celarix.JustForFun.FootballSimulator.Core.Game;
 using Celarix.JustForFun.FootballSimulator.Data;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
 using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output;
 using Celarix.JustForFun.FootballSimulator.Random;
 using Moq;
 using Serilog;
@@ -43,7 +44,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                 AwayActiveRoster = Array.Empty<PlayerRosterPosition>(),
                 HomeActiveRoster = Array.Empty<PlayerRosterPosition>(),
                 DebugContextWriter = null!,
-                CurrentPlayContext = TestHelpers.EmptyPlayContext
+                CurrentPlayContext = TestHelpers.EmptyPlayContext,
+                EventBus = Mock.Of<IEventBus>()
             };
 
             return TestHelpers.EmptyGameContext with
