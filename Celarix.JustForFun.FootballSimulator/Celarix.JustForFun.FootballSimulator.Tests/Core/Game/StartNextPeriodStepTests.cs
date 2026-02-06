@@ -68,7 +68,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             Assert.Equal(GameTeam.Away, resultPlayContext.CoinFlipWinner);
             Assert.Equal(GameTeam.Home, resultPlayContext.TeamWithPossession); // Kicking team is opposite
             Assert.Equal(NextPlayKind.Kickoff, resultPlayContext.NextPlay);
-            Assert.Equal(35, resultPlayContext.TeamYardToInternalYard(GameTeam.Home, 35));
+            Assert.Equal(35, object.TeamYardToInternalYard(GameTeam.Home, 35));
             Assert.Null(resultPlayContext.LineToGain);
             Assert.Equal(3, resultPlayContext.AwayTimeoutsRemaining);
             Assert.Equal(3, resultPlayContext.HomeTimeoutsRemaining);
@@ -125,7 +125,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             Assert.Equal(3, resultPlayContext.PeriodNumber);
             Assert.Equal(NextPlayKind.Kickoff, resultPlayContext.NextPlay);
             Assert.Equal(GameTeam.Away, resultPlayContext.TeamWithPossession); // Same as coin flip winner
-            Assert.Equal(65, resultPlayContext.TeamYardToInternalYard(GameTeam.Away, 35));
+            Assert.Equal(65, object.TeamYardToInternalYard(GameTeam.Away, 35));
             Assert.Null(resultPlayContext.LineToGain);
         }
 

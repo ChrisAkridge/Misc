@@ -4,16 +4,11 @@ using System.Text;
 
 namespace Celarix.JustForFun.FootballSimulator.Random
 {
-    internal sealed class RandomWrapper : IRandom
+    internal sealed class RandomWrapper(int? seed = null) : IRandom
     {
-        private readonly System.Random random;
-
-        public RandomWrapper(int? seed = null)
-        {
-            random = seed.HasValue
+        private readonly System.Random random = seed.HasValue
                 ? new System.Random(seed.Value)
                 : new System.Random();
-        }
 
         public bool Chance(double chance) => random.Chance(chance);
 

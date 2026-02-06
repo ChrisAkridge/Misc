@@ -23,7 +23,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
             var possessingTeam = priorState.TeamWithPossession;
             var otherTeam = possessingTeam.Opponent();
             var newLineOfScrimmage = priorState.AddYardsForPossessingTeam(possessionStartYard, yardsGained).ClampWithinField();
-            var gainedTeamYard = priorState.InternalYardToTeamYard(newLineOfScrimmage.Round());
+            var gainedTeamYard = object.InternalYardToTeamYard(newLineOfScrimmage.Round());
 
             if (gainedTeamYard.TeamYard < 0)
             {
@@ -36,7 +36,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete) with
                         {
                             NextPlay = NextPlayKind.FirstDown,
-                            LineOfScrimmage = priorState.TeamYardToInternalYard(possessingTeam, 25),
+                            LineOfScrimmage = object.TeamYardToInternalYard(possessingTeam, 25),
                             LineToGain = null,
                             PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
                             ClockRunning = clockRunning ?? false,
@@ -66,7 +66,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         with
                         {
                             NextPlay = NextPlayKind.Kickoff,
-                            LineOfScrimmage = priorState.TeamYardToInternalYard(possessingTeam, 35),
+                            LineOfScrimmage = object.TeamYardToInternalYard(possessingTeam, 35),
                             LineToGain = null,
                             PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
                             ClockRunning = clockRunning ?? false,
@@ -83,7 +83,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         with
                         {
                             NextPlay = NextPlayKind.FreeKick,
-                            LineOfScrimmage = priorState.TeamYardToInternalYard(possessingTeam, 20),
+                            LineOfScrimmage = object.TeamYardToInternalYard(possessingTeam, 20),
                             LineToGain = null,
                             ClockRunning = !clockRunning.HasValue ? false : clockRunning.Value,
                             LastPlayDescriptionTemplate = "{OffAbbr} suffers a safety, {DefAbbr} awarded 2 point(s).",
@@ -104,7 +104,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         with
                         {
                             NextPlay = NextPlayKind.ConversionAttempt,
-                            LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 15),
+                            LineOfScrimmage = object.TeamYardToInternalYard(otherTeam, 15),
                             LineToGain = null,
                             PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
                             ClockRunning = !clockRunning.HasValue ? false : clockRunning.Value,
@@ -121,7 +121,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         with
                         {
                             NextPlay = NextPlayKind.Kickoff,
-                            LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 35),
+                            LineOfScrimmage = object.TeamYardToInternalYard(otherTeam, 35),
                             LineToGain = null,
                             PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
                             ClockRunning = clockRunning ?? false,
@@ -139,7 +139,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                 return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete) with
                 {
                     NextPlay = NextPlayKind.Kickoff,
-                    LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 35),
+                    LineOfScrimmage = object.TeamYardToInternalYard(otherTeam, 35),
                     LineToGain = null,
                     PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
                     ClockRunning = !clockRunning.HasValue ? false : clockRunning.Value,
@@ -179,7 +179,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
             {
                 throw new InvalidOperationException("Cannot compute result of player being downed; code reached path where LineToGain is null but it should not be.");
             }
-            else if (priorState.CompareYardForTeam(priorState.LineOfScrimmage, priorState.LineToGain.Value, possessingTeam) >= 0)
+            else if (object.CompareYardForTeam(priorState.LineOfScrimmage, priorState.LineToGain.Value, possessingTeam) >= 0)
             {
                 Log.Information("PlayerDownedFunction: First down achieved.");
                 priorState.AddTag("first-down");

@@ -108,8 +108,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             return new PlayContext(
                 Version: 1L,
                 NextState: PlayEvaluationState.Start,
-                AdditionalParameters: new List<AdditionalParameter<object>>(),
-                StateHistory: new List<StateHistoryEntry>(),
+                AdditionalParameters: [],
+                StateHistory: [],
                 Environment: CreateMockPlayEnvironment(_mockRandom.Object, _awayTeam, _homeTeam),
                 BaseWindDirection: 0.0,
                 BaseWindSpeed: 0.0,

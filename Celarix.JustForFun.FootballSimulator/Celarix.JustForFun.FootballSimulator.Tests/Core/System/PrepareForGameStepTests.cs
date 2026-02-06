@@ -24,8 +24,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 Year = 2023
             });
             repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary {SummaryText = ""});
-            repository.Setup(r => r.GetGameRecordsForSeason(It.IsAny<int>())).Returns(new List<GameRecord>
-            {
+            repository.Setup(r => r.GetGameRecordsForSeason(It.IsAny<int>())).Returns(
+            [
                 new GameRecord
                 {
                     GameID = 1,
@@ -38,7 +38,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                     GameComplete = true,
                     TeamDriveRecords = []
                 }
-            });
+            ]);
 
             // Act
             var step = PrepareForGameStep.Run(TestHelpers.EmptySystemContext with
@@ -170,8 +170,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
             });
             repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary {SummaryText = ""});
 
-            repository.Setup(r => r.GetGameRecordsForSeason(It.IsAny<int>())).Returns(new List<GameRecord>
-            {
+            repository.Setup(r => r.GetGameRecordsForSeason(It.IsAny<int>())).Returns(
+            [
                 new GameRecord
                 {
                     GameID = 1,
@@ -192,7 +192,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                         new TeamDriveRecord()
                     ]
                 }
-            });
+            ]);
 
             // Act and Assert
             Assert.Throws<InvalidOperationException>(() => PrepareForGameStep.Run(TestHelpers.EmptySystemContext with
@@ -221,8 +221,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 Year = 2023
             });
             repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary {SummaryText = ""});
-            repository.Setup(r => r.GetGameRecordsForSeason(It.IsAny<int>())).Returns(new List<GameRecord>
-            {
+            repository.Setup(r => r.GetGameRecordsForSeason(It.IsAny<int>())).Returns(
+            [
                 new GameRecord
                 {
                     GameID = 1,
@@ -233,7 +233,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                         new TeamDriveRecord()
                     ]
                 }
-            });
+            ]);
 
             // Act
             var step = PrepareForGameStep.Run(TestHelpers.EmptySystemContext with

@@ -65,11 +65,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
         private static PlayContext FairCatch(PlayContext priorState)
         {
             priorState.AddTag("fair-catch");
-            if (priorState.InternalYardToTeamYard(priorState.LineOfScrimmage).TeamYard < 0)
+            if (object.InternalYardToTeamYard(priorState.LineOfScrimmage).TeamYard < 0)
             {
                 // Touchback
                 priorState.AddTag("touchback");
-                int lineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35);
+                int lineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession, 35);
                 Log.Information("SignalFairCatchDecision: Fair catch in end zone, touchback to {LoS}.",
                     lineOfScrimmage);
                 return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete)

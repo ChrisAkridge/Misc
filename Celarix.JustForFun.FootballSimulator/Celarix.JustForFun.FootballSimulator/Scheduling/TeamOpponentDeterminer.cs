@@ -10,17 +10,11 @@ using static Celarix.JustForFun.FootballSimulator.Helpers;
 
 namespace Celarix.JustForFun.FootballSimulator.Scheduling
 {
-	internal sealed class TeamOpponentDeterminer
-	{
-		private readonly IReadOnlyList<BasicTeamInfo> teams;
+	internal sealed class TeamOpponentDeterminer(IReadOnlyList<BasicTeamInfo> teams, IRandomFactory randomFactory)
+    {
+		private readonly IReadOnlyList<BasicTeamInfo> teams = teams;
 		private readonly BasicTeamInfoComparer comparer = new();
-		private readonly IRandomFactory randomFactory = new RandomFactory();
-
-        public TeamOpponentDeterminer(IReadOnlyList<BasicTeamInfo> teams, IRandomFactory randomFactory)
-        {
-            this.teams = teams;
-            this.randomFactory = randomFactory;
-        }
+		private readonly IRandomFactory randomFactory = randomFactory;
 
         public List<GameMatchup> GetTeamOpponentsForSeason(int cycleYear,
 			Dictionary<BasicTeamInfo, int>? previousSeasonDivisionRankings,

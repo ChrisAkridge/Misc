@@ -258,7 +258,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
 
             var mockRepository = new Mock<IFootballRepository>();
             mockRepository.Setup(r => r.GetInjuryRecoveriesForGame(11, 12, It.IsAny<DateTimeOffset>()))
-                          .Returns(new List<InjuryRecovery>());
+                          .Returns([]);
 
             var environment = new SystemEnvironment
             {

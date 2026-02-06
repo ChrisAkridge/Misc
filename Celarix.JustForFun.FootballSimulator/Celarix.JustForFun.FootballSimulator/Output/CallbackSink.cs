@@ -6,14 +6,9 @@ using System.Text;
 
 namespace Celarix.JustForFun.FootballSimulator.Output
 {
-    public sealed class CallbackSink : ILogEventSink
+    public sealed class CallbackSink(Action callback) : ILogEventSink
     {
-        private readonly Action callback;
-
-        public CallbackSink(Action callback)
-        {
-            this.callback = callback;
-        }
+        private readonly Action callback = callback;
 
         public void Emit(LogEvent logEvent)
         {

@@ -44,7 +44,6 @@ namespace Celarix.JustForFun.FootballSimulator.Output
                 return;
             }
 
-            var systemEnvironment = systemContext!.Environment;
             var gameEnvironment = gameContext!.Environment;
             var playEnvironment = playContext!.Environment;
 
@@ -126,7 +125,7 @@ namespace Celarix.JustForFun.FootballSimulator.Output
             }
         }
 
-        private IEnumerable<string> WrapString(string text, int maxWidth)
+        private static IEnumerable<string> WrapString(string text, int maxWidth)
         {
             var words = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var currentLine = new StringBuilder();

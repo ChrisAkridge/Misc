@@ -44,10 +44,9 @@ namespace Celarix.JustForFun.FootballSimulator.Data
 
             public IReadOnlyList<Player> GetActivePlayersForTeam(int teamId)
             {
-                return context.Players
+                return [.. context.Players
                 .Include(p => p.RosterPositions!.Where(rp => rp.TeamID == teamId && rp.CurrentPlayer))
-                .Where(p => p.RosterPositions!.Any(rp => rp.TeamID == teamId && rp.CurrentPlayer))
-                .ToList();
+                .Where(p => p.RosterPositions!.Any(rp => rp.TeamID == teamId && rp.CurrentPlayer))];
             }
 
             public Stadium GetHomeStadiumForTeam(int teamID)

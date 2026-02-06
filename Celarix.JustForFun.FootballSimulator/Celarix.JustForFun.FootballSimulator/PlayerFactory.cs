@@ -7,16 +7,10 @@ using System.Text;
 
 namespace Celarix.JustForFun.FootballSimulator
 {
-    public sealed class PlayerFactory
+    public sealed class PlayerFactory(IEnumerable<string> firstNames, IEnumerable<string> lastNames)
     {
-        private readonly string[] firstNames;
-        private readonly string[] lastNames;
-
-        public PlayerFactory(IEnumerable<string> firstNames, IEnumerable<string> lastNames)
-        {
-            this.firstNames = [.. firstNames];
-            this.lastNames = [.. lastNames];
-        }
+        private readonly string[] firstNames = [.. firstNames];
+        private readonly string[] lastNames = [.. lastNames];
 
         public Player CreateNewPlayer(IRandom random, bool undraftedFreeAgent)
         {
@@ -69,12 +63,11 @@ namespace Celarix.JustForFun.FootballSimulator
 
         public static IReadOnlyList<BasicPlayerPosition> GetStandardRoster()
         {
-            return ((IEnumerable<BasicPlayerPosition>[])[Enumerable.Repeat(BasicPlayerPosition.Offense, 10),
+            return [.. ((IEnumerable<BasicPlayerPosition>[])[Enumerable.Repeat(BasicPlayerPosition.Offense, 10),
                 Enumerable.Repeat(BasicPlayerPosition.Quarterback, 1),
                 Enumerable.Repeat(BasicPlayerPosition.Kicker, 1),
                 Enumerable.Repeat(BasicPlayerPosition.Defense, 11)])
-                .SelectMany(p => p)
-                .ToArray();
+                .SelectMany(p => p)];
         }
     }
 }

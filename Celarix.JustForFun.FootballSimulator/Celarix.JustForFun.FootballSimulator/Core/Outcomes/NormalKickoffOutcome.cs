@@ -38,7 +38,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 baseKickSkewStddev);
             if (skewIsInverted) { baseKickSkew *= -1; }
 
-            var desiredKickDirection = priorState.GetFacingEndzoneAngle(priorState.TeamWithPossession);
+            var desiredKickDirection = object.GetFacingEndzoneAngle(priorState.TeamWithPossession);
 
             // Get current wind conditions
             var currentWindAngle = parameters.Random.SampleNormalDistribution(
@@ -98,7 +98,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     };
                 }
 
-                var kickActualTeamYard = priorState.InternalYardToTeamYard(kickActualYard.Round());
+                var kickActualTeamYard = object.InternalYardToTeamYard(kickActualYard.Round());
                 var kickActualTeamDisplayYard = priorState.InternalYardToDisplayTeamYardString(kickActualYard.Round(),
                     parameters);
 
@@ -112,8 +112,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     {
                         TeamWithPossession = otherTeam,
                         PossessionOnPlay = otherTeam.ToPossessionOnPlay(),
-                        LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 35),
-                        LineToGain = priorState.TeamYardToInternalYard(otherTeam, 45),
+                        LineOfScrimmage = object.TeamYardToInternalYard(otherTeam, 35),
+                        LineToGain = object.TeamYardToInternalYard(otherTeam, 45),
                         NextPlay = NextPlayKind.FirstDown,
                         ClockRunning = false,
                         LastPlayDescriptionTemplate = "{DefAbbr} touchback, ball placed at {LoS}."
@@ -130,7 +130,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     {
                         PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay(),
                         NextPlay = NextPlayKind.FreeKick,
-                        LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
+                        LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
                         ClockRunning = false,
                         LastPlayDescriptionTemplate = "{OffAbbr} kickoff results in kicking team safety. {DefAbbr} awarded 2 points. Free kick to follow from {LoS}.",
                         DriveResult = DriveResult.Safety
@@ -147,8 +147,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             {
                 TeamWithPossession = otherTeam,
                 PossessionOnPlay = otherTeam.ToPossessionOnPlay(),
-                LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 40),
-                LineToGain = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 50),
+                LineOfScrimmage = object.TeamYardToInternalYard(otherTeam, 40),
+                LineToGain = object.TeamYardToInternalYard(priorState.TeamWithPossession, 50),
                 NextPlay = NextPlayKind.FirstDown,
                 ClockRunning = false,
                 LastPlayDescriptionTemplate = "{OffAbbr} kickoff out of bounds, ball placed at {LoS}, first down."

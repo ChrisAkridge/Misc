@@ -172,7 +172,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var context = CreateGameContextWithTeams(GameTeam.Home, playInvolvement);
 
             // Act
-            var result = AdjustStrengthStep.Run(context);
+            AdjustStrengthStep.Run(context);
 
             // Assert
             // Home team (offense) should have adjusted kicking and field goal strengths
@@ -196,7 +196,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var context = CreateGameContextWithTeams(GameTeam.Home, playInvolvement);
 
             // Act
-            var result = AdjustStrengthStep.Run(context);
+            AdjustStrengthStep.Run(context);
 
             // Assert
             // Away team (defense) should have adjusted kick return strength
@@ -222,7 +222,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var context = CreateGameContextWithTeams(GameTeam.Home, playInvolvement);
 
             // Act
-            var result = AdjustStrengthStep.Run(context);
+            AdjustStrengthStep.Run(context);
 
             // Assert
             // Away team (defense) should have adjusted running offense strength (for return)
@@ -343,7 +343,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var context = CreateGameContextWithTeams(GameTeam.Home, playInvolvement);
 
             // Act
-            var result = AdjustStrengthStep.Run(context);
+            AdjustStrengthStep.Run(context);
 
             // Assert
             // Home team (offense) should have all offense-related strengths adjusted

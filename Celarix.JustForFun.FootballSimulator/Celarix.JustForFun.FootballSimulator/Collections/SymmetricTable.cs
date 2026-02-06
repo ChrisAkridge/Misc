@@ -9,7 +9,7 @@ namespace Celarix.JustForFun.FootballSimulator.Collections;
 
 public sealed class SymmetricTable<T> where T : class?
 {
-    private readonly List<SymmetricTableRow<T?>> rows = new List<SymmetricTableRow<T?>>();
+    private readonly List<SymmetricTableRow<T?>> rows = [];
     private readonly IEqualityComparer<T?> comparer;
     private int cellsPerRow;
 
@@ -30,10 +30,7 @@ public sealed class SymmetricTable<T> where T : class?
         }
     }
 
-    private SymmetricTable(IEqualityComparer<T?> comparer)
-    {
-        this.comparer = comparer;
-    }
+    private SymmetricTable(IEqualityComparer<T?> comparer) => this.comparer = comparer;
 
     public void SetCellUnlessAlreadySet(T? key, int cellNumber, T? value)
     {

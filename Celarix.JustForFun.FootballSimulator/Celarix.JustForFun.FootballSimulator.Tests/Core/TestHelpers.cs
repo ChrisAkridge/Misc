@@ -29,8 +29,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
         public static PlayContext EmptyPlayContext => new PlayContext(
             Version: 0L,
             NextState: PlayEvaluationState.Start,
-            AdditionalParameters: Array.Empty<AdditionalParameter<object>>(),
-            StateHistory: Array.Empty<StateHistoryEntry>(),
+            AdditionalParameters: [],
+            StateHistory: [],
             Environment: null!,
             BaseWindDirection: 0.0,
             BaseWindSpeed: 0.0,

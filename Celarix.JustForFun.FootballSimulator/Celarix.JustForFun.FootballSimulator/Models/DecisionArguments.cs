@@ -5,20 +5,13 @@ using System.Text;
 
 namespace Celarix.JustForFun.FootballSimulator.Models
 {
-    internal sealed class DecisionArguments
+    internal sealed class DecisionArguments(PlayContext priorState,
+        GameDecisionParameters parameters,
+        IReadOnlyDictionary<string, PhysicsParam> physicsParams)
     {
-        public PlayContext PriorState { get; }
-        public GameDecisionParameters Parameters { get; }
-        public IReadOnlyDictionary<string, PhysicsParam> PhysicsParams { get; }
-        
-        public DecisionArguments(PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
-        {
-            PriorState = priorState;
-            Parameters = parameters;
-            PhysicsParams = physicsParams;
-        }
+        public PlayContext PriorState { get; } = priorState;
+        public GameDecisionParameters Parameters { get; } = parameters;
+        public IReadOnlyDictionary<string, PhysicsParam> PhysicsParams { get; } = physicsParams;
 
         public void Deconstruct(out PlayContext priorState,
             out GameDecisionParameters parameters,

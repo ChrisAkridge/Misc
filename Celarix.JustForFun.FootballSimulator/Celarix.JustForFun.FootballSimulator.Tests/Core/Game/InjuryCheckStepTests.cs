@@ -271,8 +271,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var playContext = new PlayContext(
                 Version: 0L,
                 NextState: PlayEvaluationState.Start,
-                AdditionalParameters: Array.Empty<AdditionalParameter<object>>(),
-                StateHistory: Array.Empty<StateHistoryEntry>(),
+                AdditionalParameters: [],
+                StateHistory: [],
                 Environment: new PlayEnvironment
                 {
                     DecisionParameters = new GameDecisionParameters
@@ -411,7 +411,9 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             mockRandomFactory.Setup(f => f.Create()).Returns(mockRandom.Object);
         }
 
+#pragma warning disable CA1859 // Disable "Use 'Dictionary<string, PhysicsParam>' instead of 'IReadOnlyDictionary<string, PhysicsParam>'" warning for this method
         private static IReadOnlyDictionary<string, PhysicsParam> CreatePhysicsParamsForInjury()
+#pragma warning restore CA1859
         {
             return new Dictionary<string, PhysicsParam>
             {

@@ -5,22 +5,15 @@ using Celarix.JustForFun.FootballSimulator.Data.Models;
 
 namespace Celarix.JustForFun.FootballSimulator.Scheduling;
 
-public sealed class BasicTeamInfo : IComparable<BasicTeamInfo>, IEquatable<BasicTeamInfo>
+public sealed class BasicTeamInfo(string name, Conference conference, Division division) : IComparable<BasicTeamInfo>, IEquatable<BasicTeamInfo>
 {
-    public string Name { get; }
-    public Conference Conference { get; }
-    public Division Division { get; }
+    public string Name { get; } = name;
+    public Conference Conference { get; } = conference;
+    public Division Division { get; } = division;
 
     public BasicTeamInfo(Team team)
         : this(team.TeamName, team.Conference, team.Division)
     {
-    }
-
-    public BasicTeamInfo(string name, Conference conference, Division division)
-    {
-        Name = name;
-        Conference = conference;
-        Division = division;
     }
 
     /// <summary>Indicates whether this instance and a specified object are equal.</summary>

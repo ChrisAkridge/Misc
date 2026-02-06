@@ -49,7 +49,6 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
             {
                 var gameState = GenerateRandomGameState(random);
                 var decisionParameters = GenerateRandomGameDecisionParameters(random.Next(), random);
-                var physicsParams = GeneratePhysicsParams(random);
 
                 Log.Information($"ITERATION {i} Before: " + gameState.GetDescription(decisionParameters));
 
@@ -57,7 +56,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
                 {
                     do
                     {
-                        gameState = MoveNext(gameState, decisionParameters, physicsParams);
+                        gameState = MoveNext(gameState);
                         AssertPropertyBasedTests(gameState);
                         playStatesForIteration.Add(gameState);
                     } while (gameState.NextState != PlayEvaluationState.PlayEvaluationComplete);
@@ -89,7 +88,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
         }
 
         #region Random Generators
-        private PlayContext GenerateRandomGameState(global::System.Random random)
+        private static PlayContext GenerateRandomGameState(global::System.Random random)
         {
             NextPlayKind nextPlay = GetRandomEnumValue<NextPlayKind>(random);
             PlayEvaluationState validStartStateForNextPlay = nextPlay switch
@@ -165,11 +164,11 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
                 HomeScoredThisPlay: false,
                 PossessionOnPlay: (PossessionOnPlay)random.Next(0, 3),
                 TeamCallingTimeout: random.NextDouble() < 0.03d
-                    ? GetRandomEnumValue<GameTeam>(random)
+                    ? global::Celarix.JustForFun.FootballSimulator.Tests.Core.GameStateMachineFuzzer.GetRandomEnumValue<GameTeam>(random)
                     : null);
         }
 
-        private GameDecisionParameters GenerateRandomGameDecisionParameters(int randomSeed, global::System.Random random)
+        private static GameDecisionParameters GenerateRandomGameDecisionParameters(int randomSeed, global::System.Random random)
         {
             var awayTeam = new Team
             {
@@ -200,7 +199,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
             };
         }
 
-        private TeamStrengthSet GenerateRandomTeamStrengthSet(global::System.Random random, bool isEstimate, GameTeam forTeam, GameTeam byTeam)
+        private static TeamStrengthSet GenerateRandomTeamStrengthSet(global::System.Random random, bool isEstimate, GameTeam forTeam, GameTeam byTeam)
         {
             return new TeamStrengthSet
             {
@@ -227,21 +226,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
             };
         }
 
-        private IReadOnlyDictionary<string, PhysicsParam> GeneratePhysicsParams(global::System.Random random)
-        {
-            var physicsParams = SeedData.ParamSeedData()
-                .ToDictionary(p => p.Name, p => p);
-
-            foreach (var param in physicsParams.Values)
-            {
-                var multiplier = random.SampleNormalDistribution(1d, 0.1d);
-                param.Value *= multiplier;
-            }
-
-            return physicsParams;
-        }
-
-        private TEnum GetRandomEnumValue<TEnum>(global::System.Random random, params TEnum[] except) where TEnum : Enum
+        private static TEnum GetRandomEnumValue<TEnum>(global::System.Random random, params TEnum[] except) where TEnum : Enum
         {
             var values = Enum.GetValues(typeof(TEnum));
             TEnum selectedValue;
@@ -256,7 +241,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
         #endregion
 
         #region Main Loop
-        private PlayContext MoveNext(PlayContext currentState, GameDecisionParameters currentParameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        private static PlayContext MoveNext(PlayContext currentState)
         {
             var nextState = currentState.NextState switch
             {
@@ -317,13 +302,13 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
             Assert.InRange(state.LineOfScrimmage, -10, 110);
             Assert.True(state.LineToGain is null || (state.LineToGain >= 0 && state.LineToGain <= 100));
             Assert.True(Enum.IsDefined(state.NextPlay));
-            Assert.True((state.PossessionOnPlay & ~PossessionOnPlay.BothTeams) == 0);
+            Assert.Equal(PossessionOnPlay.None, state.PossessionOnPlay & ~PossessionOnPlay.BothTeams);
             Assert.True(state.TeamCallingTimeout is null
                 || Enum.IsDefined(state.TeamCallingTimeout.Value));
         }
 
         #region Next-Play Assertions
-        private void AssertForNextPlay(List<PlayContext> allStates)
+        private static void AssertForNextPlay(List<PlayContext> allStates)
         {
             var nextPlay = allStates.First().NextPlay;
             if (nextPlay == NextPlayKind.Kickoff)
@@ -332,7 +317,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
             }
         }
 
-        private void AssertForKickoff(List<PlayContext> allGameStates)
+        private static void AssertForKickoff(List<PlayContext> allGameStates)
         {
             // A kickoff can result in:
             // Either team scoring either a safety or a touchdown

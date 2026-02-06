@@ -91,23 +91,23 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 Year = 2018
             });
             repository.Setup(r => r.GetGameRecordsForSeasonByGameType(1, GameType.RegularSeason))
-                .Returns(new List<GameRecord>());
+                .Returns([]);
             repository.Setup(r => r.GetPlayoffGamesForSeason(1, PlayoffRound.SuperBowl))
-                .Returns(new List<GameRecord>
-                {
+                .Returns(
+                [
                     new GameRecord
                     {
-                        QuarterBoxScores = new List<QuarterBoxScore>
-                        {
+                        QuarterBoxScores =
+                        [
                             new QuarterBoxScore
                             {
                                 Team = GameTeam.Home,
                                 Score = 24
                             }
-                        },
+                        ],
                         HomeTeam = teams[1]
                     }
-                });
+                ]);
 
             var receivedGames = new List<GameRecord>();
             SeasonRecord? receivedSeason = null;

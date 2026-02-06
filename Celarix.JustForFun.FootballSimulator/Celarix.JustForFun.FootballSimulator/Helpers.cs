@@ -55,7 +55,7 @@ namespace Celarix.JustForFun.FootballSimulator
             {
                 GameTeam.Home => GameTeam.Away,
                 GameTeam.Away => GameTeam.Home,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(nameof(team), $"Unhandled team value: {team}")
             };
 
         public static DriveDirection TowardOpponentEndzone(GameTeam team) =>
@@ -63,7 +63,7 @@ namespace Celarix.JustForFun.FootballSimulator
             {
                 GameTeam.Home => DriveDirection.TowardAwayEndzone,
                 GameTeam.Away => DriveDirection.TowardHomeEndzone,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(nameof(team), $"Unhandled team value: {team}")
             };
 
         public static int? YardsDownfield(int lineOfScrimmage, int distance, DriveDirection direction)
@@ -133,8 +133,8 @@ namespace Celarix.JustForFun.FootballSimulator
                 Version: 0L,
                 NextState: PlayEvaluationState.Start,
                 Environment: null,
-                StateHistory: ImmutableList<StateHistoryEntry>.Empty,
-                AdditionalParameters: ImmutableList<AdditionalParameter<object>>.Empty,
+                StateHistory: [],
+                AdditionalParameters: [],
                 BaseWindDirection: random.NextDouble() * 360d,
                 BaseWindSpeed: random.SampleNormalDistribution(gameRecord.Stadium.AverageWindSpeed, startWindSpeedStddev),
                 AirTemperature: airTemperature,
@@ -172,14 +172,8 @@ namespace Celarix.JustForFun.FootballSimulator
             IReadOnlyDictionary<string, PhysicsParam> physicsParams,
             IRandom random)
         {
-            var stadium = gameRecord.Stadium;
-
-            if (stadium == null)
-            {
-                throw new InvalidOperationException(
+            var stadium = gameRecord.Stadium ?? throw new InvalidOperationException(
                     $"Stadium is null for game ID {gameRecord.GameID} when getting temperature for game.");
-            }
-
             var month = gameRecord.KickoffTime.Month;
             var averageTemperatures = stadium.AverageTemperatures
                 .Split(',')

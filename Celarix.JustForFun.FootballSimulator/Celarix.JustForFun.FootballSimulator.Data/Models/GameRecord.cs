@@ -31,9 +31,9 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         public string? HomeTeamStrengthsAtKickoffJSON { get; set; }
         public string? AwayTeamStrengthsAtKickoffJSON { get; set; }
 
-        public List<QuarterBoxScore> QuarterBoxScores = new List<QuarterBoxScore>();
-        public List<TeamGameRecord> TeamGameRecords = new List<TeamGameRecord>();
-        public List<TeamDriveRecord> TeamDriveRecords = new List<TeamDriveRecord>();
+        public List<QuarterBoxScore> QuarterBoxScores = [];
+        public List<TeamGameRecord> TeamGameRecords = [];
+        public List<TeamDriveRecord> TeamDriveRecords = [];
 
         public int AwayScore => QuarterBoxScores
             .Where(s => s.Team == GameTeam.Away)

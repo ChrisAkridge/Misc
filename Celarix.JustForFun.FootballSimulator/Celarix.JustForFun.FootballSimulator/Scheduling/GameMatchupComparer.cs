@@ -4,11 +4,9 @@ using System.Linq;
 
 namespace Celarix.JustForFun.FootballSimulator.Scheduling;
 
-internal sealed class GameMatchupComparer : IEqualityComparer<GameMatchup>
+internal sealed class GameMatchupComparer(IEqualityComparer<BasicTeamInfo> teamComparer) : IEqualityComparer<GameMatchup>
 {
-    private readonly IEqualityComparer<BasicTeamInfo> teamComparer;
-
-    public GameMatchupComparer(IEqualityComparer<BasicTeamInfo> teamComparer) => this.teamComparer = teamComparer;
+    private readonly IEqualityComparer<BasicTeamInfo> teamComparer = teamComparer;
 
     public bool Equals(GameMatchup? x, GameMatchup? y)
     {

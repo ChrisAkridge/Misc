@@ -53,7 +53,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (rollsBackward) { puntRollDistance *= -1; }
 
             var newLineOfScrimmage = priorState.LineOfScrimmage + puntRollDistance;
-            var lineOfScrimmageTeamYard = priorState.InternalYardToTeamYard(newLineOfScrimmage.Round());
+            var lineOfScrimmageTeamYard = object.InternalYardToTeamYard(newLineOfScrimmage.Round());
             if (lineOfScrimmageTeamYard.TeamYard < 0)
             {
                 if (lineOfScrimmageTeamYard.Team == priorState.TeamWithPossession)
@@ -61,7 +61,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     Log.Information("ReturnablePuntOutcome: Punt landed in bounds but rolled into kicking team's endzone; safety.");
                     var updatedState = priorState.WithScoreChange(lineOfScrimmageTeamYard.Team.Opponent(), 2) with
                     {
-                        LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
+                        LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
                         NextPlay = NextPlayKind.FreeKick,
                         PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay(),
                         ClockRunning = false,

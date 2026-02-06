@@ -22,7 +22,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 // Interception! Check if we're in their endzone already.
                 Log.Information("FumbledLiveBallOutcome: Interception occurred during passing play.");
                 var interceptionInternalYard = priorState.LineOfScrimmage;
-                var interceptionTeamYard = priorState.InternalYardToTeamYard(interceptionInternalYard);
+                var interceptionTeamYard = object.InternalYardToTeamYard(interceptionInternalYard);
                 if (interceptionTeamYard.TeamYard is < 0 && interceptionTeamYard.Team == priorState.TeamWithPossession)
                 {
                     Log.Information("FumbledLiveBallOutcome: Interception occurred inside offense's endzone, either a touchdown or successful two-point conversion for the defense!");
@@ -78,7 +78,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             // It's okay to just use the + operator here, since the fumble has a 50% chance of going backwards,
             // it's fair for either direction to use + rather than the specialized function.
             var fumbleRecoveryInternalYard = priorState.LineOfScrimmage + fumbleRecoveryDistance;
-            var fumbleRecoveryTeamYard = priorState.InternalYardToTeamYard(fumbleRecoveryInternalYard.Round());
+            var fumbleRecoveryTeamYard = object.InternalYardToTeamYard(fumbleRecoveryInternalYard.Round());
 
             if (fumbleRecoveredByOffense)
             {

@@ -26,7 +26,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                     NextPlay = NextPlayKind.Kickoff,
                     // Remember, the other team kicks off
                     TeamWithPossession = kickingTeam,
-                    LineOfScrimmage = playContext.TeamYardToInternalYard(kickingTeam, 35),
+                    LineOfScrimmage = object.TeamYardToInternalYard(kickingTeam, 35),
                     LineToGain = null,
                     AwayTimeoutsRemaining = nextQuarterActions.NextPeriodNumber <= 4 ? 3 : 2,
                     HomeTimeoutsRemaining = nextQuarterActions.NextPeriodNumber <= 4 ? 3 : 2
@@ -41,7 +41,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                     NextPlay = NextPlayKind.Kickoff,
                     // Remember, the other team kicks off
                     TeamWithPossession = playContext.CoinFlipWinner,
-                    LineOfScrimmage = playContext.TeamYardToInternalYard(kickingTeam, 35),
+                    LineOfScrimmage = object.TeamYardToInternalYard(kickingTeam, 35),
                     LineToGain = null
                 };
             }

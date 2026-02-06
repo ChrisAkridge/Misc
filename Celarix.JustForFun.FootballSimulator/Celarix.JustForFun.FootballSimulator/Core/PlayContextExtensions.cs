@@ -90,7 +90,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 }
             }
 
-            public double GetFacingEndzoneAngle(GameTeam team)
+            public static double GetFacingEndzoneAngle(GameTeam team)
             {
                 return team switch
                 {
@@ -124,7 +124,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 return state.DistanceForPossessingTeam(state.LineOfScrimmage, state.LineToGain ?? throw new InvalidOperationException("LineToGain must be set to calculate distance for first down."));
             }
 
-            public int TeamYardToInternalYard(GameTeam team, int teamYard)
+            public static int TeamYardToInternalYard(GameTeam team, int teamYard)
             {
                 if (teamYard < -10d || teamYard > 50d)
                 {
@@ -139,7 +139,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 };
             }
 
-            public (GameTeam Team, int TeamYard) InternalYardToTeamYard(int internalYard)
+            public static (GameTeam Team, int TeamYard) InternalYardToTeamYard(int internalYard)
             {
                 if (internalYard < Constants.HomeEndLineYard || internalYard > Constants.AwayEndLineYard)
                 {
@@ -157,7 +157,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
 
             public string InternalYardToDisplayTeamYardString(int internalYard, GameDecisionParameters parameters)
             {
-                var (team, teamYard) = state.InternalYardToTeamYard(internalYard);
+                var (team, teamYard) = object.InternalYardToTeamYard(internalYard);
                 var teamAbbreviation = team switch
                 {
                     GameTeam.Away => parameters.AwayTeam.Abbreviation,
@@ -185,7 +185,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 if (teamYard.TeamYard is <= 0 && teamYard.Team == team.Opponent())
                 {
                     // Did not return ball out of opponent's endzone, touchback.
-                    return state.WithFirstDownLineOfScrimmage(state.TeamYardToInternalYard(team, 20), team, lastPlayDescriptionTemplate, clockRunning,
+                    return state.WithFirstDownLineOfScrimmage(object.TeamYardToInternalYard(team, 20), team, lastPlayDescriptionTemplate, clockRunning,
                         startOfDrive: true);
                 }
 
@@ -213,7 +213,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 .StartDrive(startOfDrive);
             }
 
-            public int CompareYardForTeam(int yardA, int yardB, GameTeam team)
+            public static int CompareYardForTeam(int yardA, int yardB, GameTeam team)
             {
                 return team switch
                 {
@@ -223,7 +223,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 };
             }
 
-            public int CompareYardForTeam(double yardA, double yardB, GameTeam team)
+            public static int CompareYardForTeam(double yardA, double yardB, GameTeam team)
             {
                 return team switch
                 {

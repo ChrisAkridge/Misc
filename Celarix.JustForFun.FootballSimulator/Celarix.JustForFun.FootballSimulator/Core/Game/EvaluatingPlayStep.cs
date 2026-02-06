@@ -56,7 +56,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                 context.Environment.DebugContextWriter.WriteContext(playContext, playContext.Environment!);
                 context.Environment.DebugContextWriter.WriteContext(context, context.Environment!);
 
-                var lineOfScrimmageTeamYard = playContext.InternalYardToTeamYard(playContext.LineOfScrimmage);
+                var lineOfScrimmageTeamYard = object.InternalYardToTeamYard(playContext.LineOfScrimmage);
                 var inOpponentTerritory = playContext.TeamWithPossession != lineOfScrimmageTeamYard.Team;
                 if (inOpponentTerritory && lineOfScrimmageTeamYard.TeamYard <= 20)
                 {

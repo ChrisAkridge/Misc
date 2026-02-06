@@ -39,7 +39,6 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                 ["StrengthEstimatorOffsetMean"] = new PhysicsParam("StrengthEstimatorOffsetMean", 0, "offset", "offset"),
                 ["StrengthEstimatorOffsetStddev"] = new PhysicsParam("StrengthEstimatorOffsetStddev", 0.1, "offset", "offset"),
                 ["StrengthEstimatorConservativeAdjustment"] = new PhysicsParam("StrengthEstimatorConservativeAdjustment", 0, "offset", "offset"),
-                ["LeadingClockDispositionInStandardZoneOpponentStrengthMultiple"] = new PhysicsParam("LeadingClockDispositionInStandardZoneOpponentStrengthMultiple", 1.0, "multiple", "multiple"),
                 ["LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultiple"] = new PhysicsParam("LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultiple", 1.0, "multiple", "multiple"),
                 ["LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultipleForAggressivePlay"] = new PhysicsParam("LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultipleForAggressivePlay", 1.0, "multiple", "multiple"),
                 ["OnsideKickPointsPerMinuteThreshold"] = new PhysicsParam("OnsideKickPointsPerMinuteThreshold", 0.5, "points per minute", "points per minute"),
@@ -86,8 +85,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                 FootballRepository = new Mock<IFootballRepository>().Object,
                 PhysicsParams = physicsParams,
                 RandomFactory = new Mock<IRandomFactory>().Object,
-                AwayActiveRoster = Array.Empty<PlayerRosterPosition>(),
-                HomeActiveRoster = Array.Empty<PlayerRosterPosition>(),
+                AwayActiveRoster = [],
+                HomeActiveRoster = [],
                 DebugContextWriter = new Mock<IDebugContextWriter>().Object,
                 EventBus = Mock.Of<IEventBus>()
             };
@@ -218,10 +217,9 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
         {
             // Arrange
             var context = CreateTestGameContext(PlayEvaluationState.PlayEvaluationComplete, NextPlayKind.FreeKick);
-            var originalPlayContext = context.Environment.CurrentPlayContext!;
 
             // Act
-            var result = EvaluatingPlayStep.Run(context, out var signal);
+            EvaluatingPlayStep.Run(context, out var _);
             var newPlayContext = context.Environment.CurrentPlayContext!;
 
             // Assert
@@ -261,7 +259,6 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                         ["StrengthEstimatorOffsetMean"] = new PhysicsParam("StrengthEstimatorOffsetMean", 0, "offset", "offset"),
                         ["StrengthEstimatorOffsetStddev"] = new PhysicsParam("StrengthEstimatorOffsetStddev", 0.1, "offset", "offset"),
                         ["StrengthEstimatorConservativeAdjustment"] = new PhysicsParam("StrengthEstimatorConservativeAdjustment", 0, "offset", "offset"),
-                        ["LeadingClockDispositionInStandardZoneOpponentStrengthMultiple"] = new PhysicsParam("LeadingClockDispositionInStandardZoneOpponentStrengthMultiple", 1.0, "multiple", "multiple"),
                         ["LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultiple"] = new PhysicsParam("LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultiple", 1.0, "multiple", "multiple"),
                         ["LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultipleForAggressivePlay"] = new PhysicsParam("LeadingClockDispositionInEndOfHalfZoneOpponentStrengthMultipleForAggressivePlay", 1.0, "multiple", "multiple"),
                         ["OnsideKickPointsPerMinuteThreshold"] = new PhysicsParam("OnsideKickPointsPerMinuteThreshold", 0.5, "points per minute", "points per minute"),
@@ -280,7 +277,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             Helpers.RebuildStrengthsInDecisionParameters(context, Mock.Of<IRandom>());
 
             // Act
-            var result = EvaluatingPlayStep.Run(context, out var signal);
+            var result = EvaluatingPlayStep.Run(context, out var _);
 
             // Assert
             Assert.Equal(1, result.PlayCountOnDrive); // Should reset to 1 when possession changes
@@ -331,7 +328,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var originalEnvironment = context.Environment;
 
             // Act
-            var result = EvaluatingPlayStep.Run(context, out var signal);
+            var result = EvaluatingPlayStep.Run(context, out var _);
 
             // Assert
             Assert.Same(originalEnvironment, result.Environment);
@@ -344,7 +341,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var context = CreateTestGameContext(PlayEvaluationState.FreeKickDecision) with { Version = 10 };
 
             // Act
-            var result = EvaluatingPlayStep.Run(context, out var signal);
+            var result = EvaluatingPlayStep.Run(context, out var _);
 
             // Assert
             Assert.Equal(11, result.Version);

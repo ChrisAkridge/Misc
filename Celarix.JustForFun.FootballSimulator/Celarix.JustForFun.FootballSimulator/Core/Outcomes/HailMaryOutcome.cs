@@ -34,7 +34,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             // but I find it funny, so I'll leave it in. Most likely to happen with
             // the decision loop choosing a fake field goal (-15 yards) and then choosing
             // a Hail Mary on the next play.
-            var throwingYardLocation = priorState.InternalYardToTeamYard(priorState.AddYardsForPossessingTeam(priorState.LineOfScrimmage, -5).Round());
+            var throwingYardLocation = object.InternalYardToTeamYard(priorState.AddYardsForPossessingTeam(priorState.LineOfScrimmage, -5).Round());
             if (throwingYardLocation.Team == possessingTeam && throwingYardLocation.TeamYard <= -10)
             {
                 Log.Information("PlayerDownedFunction: Safety on Hail Mary from own endzone!");
@@ -44,7 +44,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 with
                 {
                     NextPlay = NextPlayKind.FreeKick,
-                    LineOfScrimmage = priorState.TeamYardToInternalYard(possessingTeam.Opponent(), 25),
+                    LineOfScrimmage = object.TeamYardToInternalYard(possessingTeam.Opponent(), 25),
                     LineToGain = null,
                     PossessionOnPlay = possessingTeam.Opponent().ToPossessionOnPlay(),
                     ClockRunning = false,
@@ -75,7 +75,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 with
                 {
                     ClockRunning = false,
-                    LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 0),
+                    LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 0),
                     DriveResult = DriveResult.Interception
                 };
             }
@@ -90,7 +90,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 with
                 {
                     NextPlay = NextPlayKind.ConversionAttempt,
-                    LineOfScrimmage = priorState.TeamYardToInternalYard(possessingTeam.Opponent(), 15),
+                    LineOfScrimmage = object.TeamYardToInternalYard(possessingTeam.Opponent(), 15),
                     LineToGain = null,
                     PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
                     ClockRunning = false,

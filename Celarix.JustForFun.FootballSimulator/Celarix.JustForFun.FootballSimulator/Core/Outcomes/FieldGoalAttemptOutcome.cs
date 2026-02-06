@@ -14,7 +14,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var parameters = priorState.Environment!.DecisionParameters;
             var physicsParams = priorState.Environment.PhysicsParams;
 
-            var desiredTargetYard = priorState.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), -10);
+            var desiredTargetYard = object.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), -10);
             var desiredCrossRangeMinimum = -3.08;
             var desiredCrossRangeMaximum = 3.08;
             var fieldGoalBaseDistanceMeanMultiplier = physicsParams["FieldGoalBaseDistanceMean"].Value;
@@ -83,7 +83,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 puntActualForwardDistance);
 
             // Check if the kick made it
-            var kickClearsDistance = priorState.CompareYardForTeam(kickActualYard, desiredTargetYard, priorState.TeamWithPossession) >= 0;
+            var kickClearsDistance = object.CompareYardForTeam(kickActualYard, desiredTargetYard, priorState.TeamWithPossession) >= 0;
             var kickWithinSkew = kickActualCross >= desiredCrossRangeMinimum && kickActualCross <= desiredCrossRangeMaximum;
             var kickClearsUprights = KickClearsUprights(actualKickLocation, kickActualYard, desiredTargetYard);
             var kickSuccessful = kickClearsDistance && kickWithinSkew && kickClearsUprights;
@@ -111,7 +111,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                         .InvolvesAdditionalOffensivePlayer() with
                         {
                             NextPlay = NextPlayKind.Kickoff,
-                            LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
+                            LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
                             LineToGain = null,
                             ClockRunning = false,
                             LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} made a field goal from {FGKickDistance} yards.",
@@ -143,7 +143,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 with
                 {
                     NextPlay = NextPlayKind.Kickoff,
-                    LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
+                    LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
                     LineToGain = null,
                     ClockRunning = false,
                     LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} made the extra point.",
@@ -160,7 +160,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 with
                 {
                     NextPlay = NextPlayKind.Kickoff,
-                    LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
+                    LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
                     LineToGain = null,
                     ClockRunning = false,
                     LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} missed the extra point.",

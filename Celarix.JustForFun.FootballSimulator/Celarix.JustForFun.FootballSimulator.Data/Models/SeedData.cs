@@ -51,8 +51,8 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
             var jetsGiantsStadium = CreateStadium("MetLife Stadium", "East Rutherford, NJ", 28, 7.1, 84, 76, 64,
                 54, 43, 38, 41);
             
-            return new List<Team>
-            {
+            return
+            [
                 CreateTeam("Cincinnati", "Bengals", "CIN", Conference.AFC, Division.North,
                     CreateStadium("Paycor Stadium", "Cincinnati, OH", 23.32, 9, 85.2, 78.9, 66.7,
                         53.8, 43.3, 39.6, 43.7)),
@@ -170,13 +170,13 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
                     CreateStadium("Chukchi Stadium", "Wainwright, AK", 1.43, 11.95, 48.5, 38.9, 25.7,
                         11.8, -0.3, -3.9, -4.7)
                 )
-            };
+            ];
         }
 
         public static List<PhysicsParam> ParamSeedData()
         {
-            return new List<PhysicsParam>
-            {
+            return
+            [
                 new PhysicsParam("StartWindSpeedStddev", 10, "mph", "mph"),
                 new PhysicsParam("StartTemperatureStddev", 12, "degree", "degrees"),
                 new PhysicsParam("StrengthEstimatorOffsetMean", 0.05, "multiplier", "multiplier"),
@@ -300,7 +300,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
                 new PhysicsParam("InjuryStrengthAdjustmentStdDev", 0.02, "multiplier", "multiplier"),
                 new PhysicsParam("InjuryRecoveryDaysMean", 7, "day", "days"),
                 new PhysicsParam("InjuryRecoveryDaysStdDev", 14, "day", "days")
-            };
+            ];
         }
     }
 }

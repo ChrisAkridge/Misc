@@ -13,7 +13,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
             BasicTeamInfo Opponent
         );
         
-        private readonly List<MatchupDiagnostic> matchupDiagnostics = new();
+        private readonly List<MatchupDiagnostic> matchupDiagnostics = [];
 
         public BasicTeamInfo? Team { get; internal set; }
         public bool TeamDivisionPlaysSelfForIntraconference { get; internal set; }
@@ -26,10 +26,9 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 
         public IReadOnlyList<BasicTeamInfo> GetOpponentsByGameType(ScheduledGameType gameType)
         {
-            return matchupDiagnostics
+            return [.. matchupDiagnostics
                 .Where(md => md.GameType == gameType)
-                .Select(md => md.Opponent)
-                .ToArray();
+                .Select(md => md.Opponent)];
         }
     }
 }

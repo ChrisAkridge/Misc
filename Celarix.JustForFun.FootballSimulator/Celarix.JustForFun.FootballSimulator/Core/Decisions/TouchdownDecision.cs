@@ -51,7 +51,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             priorState.AddTag("two-point-attempt");
             return priorState.WithNextState(PlayEvaluationState.TwoPointConversionAttemptOutcome) with
             {
-                LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 2),
+                LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession, 2),
                 NextPlay = NextPlayKind.ConversionAttempt,
                 LastPlayDescriptionTemplate = "{OffAbbr} attempts a two-point conversion."
             };
@@ -62,7 +62,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             priorState.AddTag("extra-point-attempt");
             return priorState.WithNextState(PlayEvaluationState.FieldGoalsAndExtraPointAttemptOutcome) with
             {
-                LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 15),
+                LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession, 15),
                 NextPlay = NextPlayKind.ConversionAttempt,
                 LastPlayDescriptionTemplate = "{OffAbbr} attempts an extra point."
             };

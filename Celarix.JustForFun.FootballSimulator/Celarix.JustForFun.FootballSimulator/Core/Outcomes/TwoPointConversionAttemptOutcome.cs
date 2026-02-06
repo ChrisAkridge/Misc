@@ -30,7 +30,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 with
                 {
                     NextPlay = NextPlayKind.Kickoff,
-                    LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
+                    LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
                     LineToGain = null,
                     ClockRunning = false,
                     LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} successful two-point conversion."
@@ -47,7 +47,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 with
                 {
                     NextPlay = NextPlayKind.Kickoff,
-                    LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
+                    LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession, 35),
                     LineToGain = null,
                     ClockRunning = false,
                     LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} fumbled and was recovered by defense, but {DefAbbr} downed in own endzone for a one-point defensive safety."
@@ -62,7 +62,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 with
                 {
                     NextPlay = NextPlayKind.Kickoff,
-                    LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 35),
+                    LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 35),
                     LineToGain = null,
                     ClockRunning = false,
                     LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} was tackled in own endzone for a one-point offensive safety!"
@@ -77,7 +77,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 with
                 {
                     NextPlay = NextPlayKind.Kickoff,
-                    LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 35),
+                    LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 35),
                     LineToGain = null,
                     ClockRunning = false,
                     LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} fumbled and was recovered by defense for a two-point defensive score!"
@@ -89,7 +89,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete) with
             {
                 NextPlay = NextPlayKind.Kickoff,
-                LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 35),
+                LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 35),
                 LineToGain = null,
                 ClockRunning = false,
                 LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} unsuccessful two-point conversion attempt."

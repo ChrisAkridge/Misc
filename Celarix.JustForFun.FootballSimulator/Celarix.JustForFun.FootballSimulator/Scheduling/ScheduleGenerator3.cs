@@ -52,20 +52,17 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
             ScheduleGamesToTimeslots(scheduledGames, year, previousSuperBowlWinner);
             var preseasonGames = GetPreseasonGamesForYear(year, dataTeams);
 
-            diagnostics = diagnosticDictionary.Values.ToArray();
-            return preseasonGames.Concat(scheduledGames.Select(g => g.GameRecord))
-                .OrderBy(g => g.KickoffTime)
-                .ToList();
+            diagnostics = [.. diagnosticDictionary.Values];
+            return [.. preseasonGames.Concat(scheduledGames.Select(g => g.GameRecord)).OrderBy(g => g.KickoffTime)];
         }
 
-        private List<ScheduledGame> GetRegularSeasonGameRecords(List<GameMatchup> matchups,
+        private static List<ScheduledGame> GetRegularSeasonGameRecords(List<GameMatchup> matchups,
             Dictionary<BasicTeamInfo, Team> dataTeams)
         {
             var gameRecords = new List<ScheduledGame>(320);
-            matchups = matchups
+            matchups = [.. matchups
                 .Distinct(new GameMatchupComparer(new BasicTeamInfoComparer()))
-                .OrderBy(m => m.TeamA.Name)
-                .ToList();
+                .OrderBy(m => m.TeamA.Name)];
 
             if (matchups.Count != 320)
             {
@@ -216,7 +213,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 				            ineligibleSlots += 1;
 				            break;
 			            default:
-				            throw new ArgumentOutOfRangeException();
+				            throw new InvalidOperationException($"Unhandled game assignment value: {gameAssignmentTable[gameIndex, weekNumber]}");
 		            }
 	            }
             }

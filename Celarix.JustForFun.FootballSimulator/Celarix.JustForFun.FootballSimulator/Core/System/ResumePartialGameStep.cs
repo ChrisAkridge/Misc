@@ -220,7 +220,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 Log.Information("ResumePartialGameStep: Resuming game {GameID} with next play kind FirstDown after defensive change of possession.",
                     gameRecord.GameID);
                 // Kind of a hacky way to actually kick off the main loop.
-                return playContext.WithFirstDownLineOfScrimmage(playContext.TeamYardToInternalYard(playContext.TeamWithPossession, 25),
+                return playContext.WithFirstDownLineOfScrimmage(PlayContextExtensions.TeamYardToInternalYard(playContext.TeamWithPossession, 25),
                     playContext.TeamWithPossession,
                     "Resuming game. {OffAbbr} has first down at their own 25.",
                     startOfDrive: true)

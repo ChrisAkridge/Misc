@@ -6,14 +6,9 @@ using System.Text;
 
 namespace Celarix.JustForFun.FootballSimulator.Data
 {
-    public sealed class FootballRepository : IFootballRepository
+    public sealed class FootballRepository(FootballContext context) : IFootballRepository
     {
-        private readonly FootballContext context;
-
-        public FootballRepository(FootballContext context)
-        {
-            this.context = context;
-        }
+        private readonly FootballContext context = context;
 
         public void EnsureCreated()
         {

@@ -37,7 +37,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         public List<PlayerRosterPosition>? FullHistoricalRoster { get; set; }
 
         [NotMapped]
-        public IEnumerable<PlayerRosterPosition> ActiveRoster => FullHistoricalRoster?.Where(p => p.CurrentPlayer) ?? Enumerable.Empty<PlayerRosterPosition>();
+        public IEnumerable<PlayerRosterPosition> ActiveRoster => FullHistoricalRoster?.Where(p => p.CurrentPlayer) ?? [];
 
         /// <summary>Serves as the default hash function.</summary>
         /// <returns>A hash code for the current object.</returns>

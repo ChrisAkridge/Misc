@@ -6,22 +6,16 @@ using System.Threading.Tasks;
 
 namespace Celarix.JustForFun.FootballSimulator.Collections
 {
-    public sealed class SymmetricTableRow<T> where T : class?
+    public sealed class SymmetricTableRow<T>(T key, int numberOfCells) where T : class?
     {
-        private readonly T[] cells;
+        private readonly T[] cells = new T[numberOfCells];
 
-        public T Key { get; }
+        public T Key { get; } = key;
 
         public T this[int cellNumber]
         {
             get => cells[cellNumber];
             set => cells[cellNumber] = value;
-        }
-
-        public SymmetricTableRow(T key, int numberOfCells)
-        {
-            Key = key;
-            cells = new T[numberOfCells];
         }
     }
 }

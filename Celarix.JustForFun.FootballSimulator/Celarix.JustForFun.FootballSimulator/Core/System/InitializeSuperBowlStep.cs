@@ -42,7 +42,6 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             // We check above that all teams are non-null, so these warnings are safe to suppress
 #pragma warning disable CS8600
 #pragma warning disable CS8602
-#pragma warning disable CS8604
             var conferenceChampionshipWinners = conferenceChampionships
                 .Select(g =>
                 {
@@ -104,7 +103,6 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             return context.WithNextState(SystemState.LoadGame);
 #pragma warning restore CS8600
 #pragma warning restore CS8602
-#pragma warning restore CS8604
         }
     }
 }

@@ -46,7 +46,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 return priorState.WithNextState(PlayEvaluationState.FumbleOrInterceptionReturnOutcome);
             }
 
-            var teamYard = priorState.InternalYardToTeamYard(priorState.LineOfScrimmage);
+            var teamYard = object.InternalYardToTeamYard(priorState.LineOfScrimmage);
             if (teamYard.Team == priorState.TeamWithPossession.Opponent()
                 || teamYard.TeamYard > 5)
             {

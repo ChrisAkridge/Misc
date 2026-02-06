@@ -18,7 +18,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests
             IReadOnlyList<TeamScheduleDiagnostics> Diagnostics
         );
 
-        private TestSchedule GenerateScheduleForYear(int year)
+        private static TestSchedule GenerateScheduleForYear(int year)
         {
             var context = new FootballContext();
             if (!context.Database.CanConnect())
@@ -27,7 +27,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests
             }
             var teams = context.Teams.ToList();
             var dataTeams = teams.ToDictionary(t => new BasicTeamInfo(t.TeamName, t.Conference, t.Division), t => t);
-            var scheduleGenerator = new ScheduleGenerator3(dataTeams.Keys.ToArray(), new RandomFactory());
+            var scheduleGenerator = new ScheduleGenerator3([.. dataTeams.Keys], new RandomFactory());
             var schedule = scheduleGenerator.GenerateScheduleForYear(year, dataTeams, null, null, out var diagnostics);
             return new(schedule, diagnostics);
         }
@@ -274,7 +274,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests
             var teams = context.Teams.ToList();
 
             // Fetch default previous season rankings
-            var defaultRankings = Helpers.GetDefaultPreviousSeasonDivisionRankings(teams.Select(ToBasicTeamInfo).ToArray());
+            var defaultRankings = Helpers.GetDefaultPreviousSeasonDivisionRankings([.. teams.Select(ToBasicTeamInfo)]);
 
             foreach (var teamEntity in teams)
             {

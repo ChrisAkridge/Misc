@@ -21,7 +21,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 			IEnumerable<GameMatchup> matchups,
 			IRandomFactory randomFactory)
 		{
-			this.teams = teams.ToList();
+			this.teams = [.. teams];
 			random = randomFactory.Create(Helpers.SchedulingRandomSeed);
 
             var matchupsToPair = matchups.ToList();

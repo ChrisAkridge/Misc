@@ -41,8 +41,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                 FootballRepository = mockRepository.Object,
                 PhysicsParams = physicsParams,
                 RandomFactory = new Mock<IRandomFactory>().Object,
-                AwayActiveRoster = Array.Empty<PlayerRosterPosition>(),
-                HomeActiveRoster = Array.Empty<PlayerRosterPosition>(),
+                AwayActiveRoster = [],
+                HomeActiveRoster = [],
                 DebugContextWriter = null!,
                 CurrentPlayContext = TestHelpers.EmptyPlayContext,
                 EventBus = Mock.Of<IEventBus>()

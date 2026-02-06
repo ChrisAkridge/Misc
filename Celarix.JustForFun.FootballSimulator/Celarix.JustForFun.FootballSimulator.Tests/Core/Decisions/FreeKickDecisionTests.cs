@@ -15,24 +15,6 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
         {
             // Arrange
             var priorState = TestHelpers.EmptyPlayContext;
-            var parameters = new GameDecisionParameters
-            {
-                AwayTeamEstimateOfAway = new TeamStrengthSet
-                {
-                    KickDefenseStrength = 60
-                },
-                AwayTeamEstimateOfHome = new TeamStrengthSet
-                {
-                    KickReturnStrength = 50
-                },
-                Random = null!,
-                AwayTeam = null!,
-                HomeTeam = null!,
-                AwayTeamActualStrengths = null!,
-                HomeTeamActualStrengths = null!,
-                HomeTeamEstimateOfAway = null!,
-                HomeTeamEstimateOfHome = null!
-            };
             // Act
             var resultState = FreeKickDecision.Run(priorState);
             // Assert
@@ -44,24 +26,6 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
         {
             // Arrange
             var priorState = TestHelpers.EmptyPlayContext;
-            var parameters = new GameDecisionParameters
-            {
-                AwayTeamEstimateOfAway = new TeamStrengthSet
-                {
-                    KickDefenseStrength = 40
-                },
-                AwayTeamEstimateOfHome = new TeamStrengthSet
-                {
-                    KickReturnStrength = 50
-                },
-                Random = null!,
-                AwayTeam = null!,
-                HomeTeam = null!,
-                AwayTeamActualStrengths = null!,
-                HomeTeamActualStrengths = null!,
-                HomeTeamEstimateOfAway = null!,
-                HomeTeamEstimateOfHome = null!
-            };
             // Act
             var resultState = FreeKickDecision.Run(priorState);
             // Assert

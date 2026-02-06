@@ -34,7 +34,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                 HomeTeamID = 1,
                 AwayTeamID = 2,
                 GameType = gameType,
-                TeamDriveRecords = new List<TeamDriveRecord>()
+                TeamDriveRecords = []
             };
 
             var playContext = TestHelpers.EmptyPlayContext with

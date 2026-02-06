@@ -51,7 +51,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
             offensePlayersOnPlay.AddRange(shuffledOffenseRoster.Take(offensePlayersOnPlayCount));
             defensePlayersOnPlay.AddRange(shuffledDefenseRoster.Take(defensePlayersOnPlayCount));
 
-            var lineOfScrimmageTeamYard = context.Environment.CurrentPlayContext.InternalYardToTeamYard(context.Environment.CurrentPlayContext.LineOfScrimmage);
+            var lineOfScrimmageTeamYard = object.InternalYardToTeamYard(context.Environment.CurrentPlayContext.LineOfScrimmage);
             var teamYardTeamAbbreviation = lineOfScrimmageTeamYard.Team == GameTeam.Home
                 ? context.Environment.CurrentGameRecord!.HomeTeam?.Abbreviation ?? throw new InvalidOperationException("Home team not loaded from database.")
                 : context.Environment.CurrentGameRecord!.AwayTeam?.Abbreviation ?? throw new InvalidOperationException("Away team not loaded from database.");
