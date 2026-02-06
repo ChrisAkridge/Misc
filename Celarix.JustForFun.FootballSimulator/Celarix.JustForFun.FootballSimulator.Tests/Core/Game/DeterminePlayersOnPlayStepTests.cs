@@ -33,8 +33,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
 
             // Assert
             Assert.Equal(GameState.InjuryCheck, result.NextState);
-            Assert.Equal(5, result.OffensePlayersOnPlay.Count);
-            Assert.Equal(4, result.DefensePlayersOnPlay.Count);
+            Assert.Equal(5, result.OffensePlayersOnPlay!.Count);
+            Assert.Equal(4, result.DefensePlayersOnPlay!.Count);
         }
 
         [Fact]
@@ -55,8 +55,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
 
             // Assert
             Assert.Equal(GameState.InjuryCheck, result.NextState);
-            Assert.Equal(3, result.OffensePlayersOnPlay.Count);
-            Assert.Equal(6, result.DefensePlayersOnPlay.Count);
+            Assert.Equal(3, result.OffensePlayersOnPlay!.Count);
+            Assert.Equal(6, result.DefensePlayersOnPlay!.Count);
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var result = DeterminePlayersOnPlayStep.Run(context);
 
             // Assert
-            Assert.Equal(5, result.OffensePlayersOnPlay.Count);
+            Assert.Equal(5, result.OffensePlayersOnPlay!.Count);
             Assert.Contains(result.OffensePlayersOnPlay, p => p.Position == BasicPlayerPosition.Quarterback);
         }
 
@@ -97,7 +97,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var result = DeterminePlayersOnPlayStep.Run(context);
 
             // Assert
-            Assert.Equal(3, result.OffensePlayersOnPlay.Count);
+            Assert.Equal(3, result.OffensePlayersOnPlay!.Count);
             Assert.Contains(result.OffensePlayersOnPlay, p => p.Position == BasicPlayerPosition.Kicker);
         }
 
@@ -118,7 +118,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var result = DeterminePlayersOnPlayStep.Run(context);
 
             // Assert
-            Assert.Equal(5, result.OffensePlayersOnPlay.Count);
+            Assert.Equal(5, result.OffensePlayersOnPlay!.Count);
             Assert.Contains(result.OffensePlayersOnPlay, p => p.Position == BasicPlayerPosition.Quarterback);
             Assert.Contains(result.OffensePlayersOnPlay, p => p.Position == BasicPlayerPosition.Kicker);
         }
@@ -140,7 +140,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var result = DeterminePlayersOnPlayStep.Run(context);
 
             // Assert
-            Assert.Equal(12, result.OffensePlayersOnPlay.Count);
+            Assert.Equal(12, result.OffensePlayersOnPlay!.Count);
         }
 
         [Fact]
@@ -160,7 +160,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var result = DeterminePlayersOnPlayStep.Run(context);
 
             // Assert
-            Assert.Equal(11, result.DefensePlayersOnPlay.Count);
+            Assert.Equal(11, result.DefensePlayersOnPlay!.Count);
         }
 
         [Fact]
@@ -180,8 +180,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var result = DeterminePlayersOnPlayStep.Run(context);
 
             // Assert
-            Assert.Empty(result.OffensePlayersOnPlay);
-            Assert.Empty(result.DefensePlayersOnPlay);
+            Assert.Empty(result.OffensePlayersOnPlay!);
+            Assert.Empty(result.DefensePlayersOnPlay!);
         }
 
         [Fact]
@@ -201,8 +201,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var result = DeterminePlayersOnPlayStep.Run(context);
 
             // Assert
-            Assert.Empty(result.OffensePlayersOnPlay);
-            Assert.Empty(result.DefensePlayersOnPlay);
+            Assert.Empty(result.OffensePlayersOnPlay!);
+            Assert.Empty(result.DefensePlayersOnPlay!);
         }
 
         [Fact]
@@ -222,7 +222,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var result = DeterminePlayersOnPlayStep.Run(context);
 
             // Assert
-            Assert.Equal(12, result.OffensePlayersOnPlay.Count);
+            Assert.Equal(12, result.OffensePlayersOnPlay!.Count);
             Assert.Contains(result.OffensePlayersOnPlay, p => p.Position == BasicPlayerPosition.Quarterback);
         }
 
@@ -247,7 +247,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var result = DeterminePlayersOnPlayStep.Run(context);
 
             // Assert
-            Assert.Equal(expectedPlayers, result.OffensePlayersOnPlay.Count);
+            Assert.Equal(expectedPlayers, result.OffensePlayersOnPlay!.Count);
         }
 
         [Theory]
@@ -270,7 +270,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var result = DeterminePlayersOnPlayStep.Run(context);
 
             // Assert
-            Assert.Equal(expectedPlayers, result.DefensePlayersOnPlay.Count);
+            Assert.Equal(expectedPlayers, result.DefensePlayersOnPlay!.Count);
         }
 
         [Fact]
@@ -339,8 +339,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             var gameRecord = new GameRecord
             {
                 GameID = 1,
-                HomeTeam = new Team { TeamID = 1, TeamName = "Home Team", Abbreviation = "HOM" },
-                AwayTeam = new Team { TeamID = 2, TeamName = "Away Team", Abbreviation = "AWA" }
+                HomeTeam = new Team { TeamID = 1, TeamName = "Home Team", Abbreviation = "HOM", CityName = "City" },
+                AwayTeam = new Team { TeamID = 2, TeamName = "Away Team", Abbreviation = "AWA", CityName = "City" }
             };
 
             var playContext = TestHelpers.EmptyPlayContext with

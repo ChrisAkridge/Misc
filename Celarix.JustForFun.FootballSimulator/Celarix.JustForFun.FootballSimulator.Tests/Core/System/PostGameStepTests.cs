@@ -29,8 +29,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
 
             var injuryRecoveries = new List<InjuryRecovery>
             {
-                new InjuryRecovery { InjuryRecoveryID = 1, Recovered = false },
-                new InjuryRecovery { InjuryRecoveryID = 2, Recovered = false }
+                new InjuryRecovery { InjuryRecoveryID = 1, Recovered = false, Strength = "" },
+                new InjuryRecovery { InjuryRecoveryID = 2, Recovered = false, Strength = "" }
             };
 
             var mockRepository = new Mock<IFootballRepository>();
@@ -76,7 +76,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
 
             var injuryRecoveries = new List<InjuryRecovery>
             {
-                new InjuryRecovery { InjuryRecoveryID = 3, Recovered = false }
+                new InjuryRecovery { InjuryRecoveryID = 3, Recovered = false, Strength = "" }
             };
 
             var mockRepository = new Mock<IFootballRepository>();
@@ -164,10 +164,10 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
 
             var injuryRecoveries = new List<InjuryRecovery>
             {
-                new InjuryRecovery { InjuryRecoveryID = 1, Recovered = false },
-                new InjuryRecovery { InjuryRecoveryID = 2, Recovered = false },
-                new InjuryRecovery { InjuryRecoveryID = 3, Recovered = false },
-                new InjuryRecovery { InjuryRecoveryID = 4, Recovered = false }
+                new InjuryRecovery { InjuryRecoveryID = 1, Recovered = false, Strength = "" },
+                new InjuryRecovery { InjuryRecoveryID = 2, Recovered = false, Strength = "" },
+                new InjuryRecovery { InjuryRecoveryID = 3, Recovered = false, Strength = "" },
+                new InjuryRecovery { InjuryRecoveryID = 4, Recovered = false, Strength = "" }
             };
 
             var mockRepository = new Mock<IFootballRepository>();
@@ -211,9 +211,9 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
 
             var injuryRecoveries = new List<InjuryRecovery>
             {
-                new InjuryRecovery { InjuryRecoveryID = 1, Recovered = false },
-                new InjuryRecovery { InjuryRecoveryID = 2, Recovered = true }, // Already recovered
-                new InjuryRecovery { InjuryRecoveryID = 3, Recovered = false }
+                new InjuryRecovery { InjuryRecoveryID = 1, Recovered = false, Strength = "" },
+                new InjuryRecovery { InjuryRecoveryID = 2, Recovered = true, Strength = "" }, // Already recovered
+                new InjuryRecovery { InjuryRecoveryID = 3, Recovered = false, Strength = "" }
             };
 
             var mockRepository = new Mock<IFootballRepository>();

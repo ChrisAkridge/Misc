@@ -111,7 +111,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             
             // Set up stronger kick defense than kick return
             var homeTeam = context.Environment.CurrentGameRecord!.HomeTeam;
-            homeTeam.KickDefenseStrength = 80.0;
+            homeTeam!.KickDefenseStrength = 80.0;
             homeTeam.KickReturnStrength = 70.0;
 
             // Act
@@ -135,8 +135,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             // Set up stronger kick return than kick defense
             var homeTeam = context.Environment.CurrentGameRecord!.HomeTeam;
             var awayTeam = context.Environment.CurrentGameRecord!.AwayTeam;
-            homeTeam.KickDefenseStrength = 70.0;
-            awayTeam.KickReturnStrength = 80.0;
+            homeTeam!.KickDefenseStrength = 70.0;
+            awayTeam!.KickReturnStrength = 80.0;
             Helpers.RebuildStrengthsInDecisionParameters(context, random.Object);
 
             // Act
@@ -248,7 +248,13 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                     {
                         AwayTeam = CreateTestTeam(1, "AWY"),
                         HomeTeam = CreateTestTeam(2, "HOM"),
-                        Random = Mock.Of<IRandom>()
+                        Random = Mock.Of<IRandom>(),
+                        AwayTeamActualStrengths = null!,
+                        HomeTeamActualStrengths = null!,
+                        HomeTeamEstimateOfAway = null!,
+                        HomeTeamEstimateOfHome = null!,
+                        AwayTeamEstimateOfAway = null!,
+                        AwayTeamEstimateOfHome = null!
                     },
                     PhysicsParams = new Dictionary<string, PhysicsParam>
                     {

@@ -111,7 +111,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests
                 // Sanity check: there should be exactly 3 division opponents
                 Assert.Equal(3, divisionOpponents.Count);
 
-                var diagnostic = schedule.Diagnostics.FirstOrDefault(d => d.Team.Name == teamInfo.Name);
+                var diagnostic = schedule.Diagnostics.FirstOrDefault(d => d.Team!.Name == teamInfo.Name);
                 Assert.NotNull(diagnostic);
                 var intradivisionGames = diagnostic
                     .GetOpponentsByGameType(ScheduledGameType.IntradivisionalFirstSet)
@@ -158,7 +158,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests
                 // Sanity check for three division opponents
                 Assert.Equal(3, divisionOpponents.Count);
 
-                var diagnostic = schedule.Diagnostics.FirstOrDefault(d => d.Team.Name == teamInfo.Name);
+                var diagnostic = schedule.Diagnostics.FirstOrDefault(d => d.Team!.Name == teamInfo.Name);
                 Assert.NotNull(diagnostic);
 
                 var intraconferenceOpponents = diagnostic
@@ -221,7 +221,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests
             foreach (var teamEntity in teams)
             {
                 var teamInfo = ToBasicTeamInfo(teamEntity);
-                var diagnostic = schedule.Diagnostics.FirstOrDefault(d => d.Team.Name == teamInfo.Name);
+                var diagnostic = schedule.Diagnostics.FirstOrDefault(d => d.Team!.Name == teamInfo.Name);
                 Assert.NotNull(diagnostic);
 
                 var interconferenceOpponents = diagnostic
@@ -279,7 +279,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests
             foreach (var teamEntity in teams)
             {
                 var teamInfo = ToBasicTeamInfo(teamEntity);
-                var diagnostic = schedule.Diagnostics.FirstOrDefault(d => d.Team.Name == teamInfo.Name);
+                var diagnostic = schedule.Diagnostics.FirstOrDefault(d => d.Team!.Name == teamInfo.Name);
                 Assert.NotNull(diagnostic);
 
                 // Pull remaining intraconference opponents
@@ -343,7 +343,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests
 
         private static bool TeamPlaysInGame(BasicTeamInfo team, GameRecord game)
         {
-            return game.HomeTeam.TeamName == team.Name || game.AwayTeam.TeamName == team.Name;
+            return game.HomeTeam!.TeamName == team.Name || game.AwayTeam!.TeamName == team.Name;
         }
     }
 }

@@ -11,6 +11,6 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         public int SummaryID { get; set; }
         public int? GameRecordID { get; set; }
         public int? SeasonRecordID { get; set; }
-        public string SummaryText { get; set; }
+        public required string SummaryText { get; set; }
     }
 }

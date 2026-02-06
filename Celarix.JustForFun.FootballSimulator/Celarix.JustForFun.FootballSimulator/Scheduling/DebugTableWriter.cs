@@ -54,7 +54,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 				{
 					var opponent = table[team, i];
 
-					if (opponent == null)
+					if (opponent is null)
 					{
 						htmlBuilder.AppendLine("<td> </td>");
 					}

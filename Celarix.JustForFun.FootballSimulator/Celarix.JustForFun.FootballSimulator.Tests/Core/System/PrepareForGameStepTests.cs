@@ -23,7 +23,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 SeasonRecordID = 1,
                 Year = 2023
             });
-            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary());
+            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary {SummaryText = ""});
             repository.Setup(r => r.GetGameRecordsForSeason(It.IsAny<int>())).Returns(new List<GameRecord>
             {
                 new GameRecord
@@ -168,7 +168,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 SeasonRecordID = 1,
                 Year = 2023
             });
-            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary());
+            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary {SummaryText = ""});
 
             repository.Setup(r => r.GetGameRecordsForSeason(It.IsAny<int>())).Returns(new List<GameRecord>
             {
@@ -220,7 +220,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 SeasonRecordID = 1,
                 Year = 2023
             });
-            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary());
+            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary {SummaryText = ""});
             repository.Setup(r => r.GetGameRecordsForSeason(It.IsAny<int>())).Returns(new List<GameRecord>
             {
                 new GameRecord
@@ -264,7 +264,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 SeasonRecordID = 1,
                 Year = 2023
             });
-            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary());
+            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary {SummaryText = ""});
 
             List<GameRecord> seasonGames = [
                 new GameRecord
@@ -310,7 +310,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 SeasonRecordID = 1,
                 Year = 2023
             });
-            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary());
+            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary {SummaryText = ""});
 
             List<GameRecord> seasonGames = [
                 new GameRecord
@@ -357,7 +357,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 SeasonRecordID = 1,
                 Year = 2023
             });
-            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary());
+            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary {SummaryText = ""});
 
             List<GameRecord> seasonGames = [
                 new GameRecord
@@ -404,7 +404,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 SeasonRecordID = 1,
                 Year = 2023
             });
-            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary());
+            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary {SummaryText = ""});
 
             List<GameRecord> seasonGames = [
                 new GameRecord
@@ -451,7 +451,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 SeasonRecordID = 1,
                 Year = 2023
             });
-            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary());
+            repository.Setup(r => r.GetSummaryForSeason(It.IsAny<int>())).Returns(new Summary {SummaryText = ""});
 
             List<GameRecord> seasonGames = [
                 new GameRecord

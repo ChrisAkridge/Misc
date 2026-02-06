@@ -23,6 +23,16 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
             var defenseStrengthsToAdjust = new List<string>();
             var playInvolvement = context.Environment.CurrentPlayContext.PlayInvolvement;
 
+            if (offenseTeam == null)
+            {
+                throw new InvalidOperationException("Offense team is null in AdjustStrengthStep.");
+            }
+
+            if (defenseTeam == null)
+            {
+                throw new InvalidOperationException("Defense team is null in AdjustStrengthStep.");
+            }
+
             offenseStrengthsToAdjust.Add(nameof(Team.OffensiveLineStrength));
             defenseStrengthsToAdjust.Add(nameof(Team.DefensiveLineStrength));
 

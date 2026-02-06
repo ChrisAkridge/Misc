@@ -82,7 +82,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
             var repository = new Mock<IFootballRepository>();
             var settings = new SimulatorSettings
             {
-                SeedDataInitialized = false
+                SeedDataInitialized = false,
+                StateMachineContextSavePath = ""
             };
             repository.Setup(r => r.GetSimulatorSettings()).Returns(settings);
 

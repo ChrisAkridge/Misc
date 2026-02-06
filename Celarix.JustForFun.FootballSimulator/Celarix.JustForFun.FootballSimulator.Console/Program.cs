@@ -26,7 +26,8 @@ if (settings?.SeedDataInitialized != true)
     {
         context.SimulatorSettings.Add(new SimulatorSettings
         {
-            SeedDataInitialized = true
+            SeedDataInitialized = true,
+            StateMachineContextSavePath = ""
         });
         context.SaveChanges();
     }

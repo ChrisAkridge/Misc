@@ -19,10 +19,10 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
             var firstKickoffTime = DateTimeOffset.Parse("2026-01-29T00:00:00Z");
 
             Team[] teams = [
-                new Team { TeamID = 1, Conference = Conference.AFC, HomeStadiumID = 1 },
-                new Team { TeamID = 2, Conference = Conference.AFC, HomeStadiumID = 2 },
-                new Team { TeamID = 3, Conference = Conference.NFC, HomeStadiumID = 3 },
-                new Team { TeamID = 4, Conference = Conference.NFC, HomeStadiumID = 4 },
+                new Team { TeamID = 1, Conference = Conference.AFC, HomeStadiumID = 1, CityName = "Somecity", TeamName = "Someteam", Abbreviation = "SST" },
+                new Team { TeamID = 2, Conference = Conference.AFC, HomeStadiumID = 2, CityName = "Somecity", TeamName = "Someteam", Abbreviation = "SST" },
+                new Team { TeamID = 3, Conference = Conference.NFC, HomeStadiumID = 3, CityName = "Somecity", TeamName = "Someteam", Abbreviation = "SST" },
+                new Team { TeamID = 4, Conference = Conference.NFC, HomeStadiumID = 4, CityName = "Somecity", TeamName = "Someteam", Abbreviation = "SST" },
             ];
 
             foreach (var team in teams) { TestHelpers.SetRandomStrengths(team); }

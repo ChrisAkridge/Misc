@@ -15,7 +15,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
         
         private readonly List<MatchupDiagnostic> matchupDiagnostics = new();
 
-        public BasicTeamInfo Team { get; internal set; }
+        public BasicTeamInfo? Team { get; internal set; }
         public bool TeamDivisionPlaysSelfForIntraconference { get; internal set; }
         public bool TeamDivisionPlaysSelfForRemainingIntraconference { get; internal set; }
 

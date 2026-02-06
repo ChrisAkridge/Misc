@@ -50,6 +50,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
 
             _awayTeam = new Team
             {
+                CityName = "Greenwich",
                 TeamName = "Greenwich Assertions",
                 Abbreviation = "GAS",
                 Disposition = TeamDisposition.Conservative
@@ -57,6 +58,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
 
             _homeTeam = new Team
             {
+                CityName = "Springfield",
                 TeamName = "Springfield Monads",
                 Abbreviation = "SMD",
                 Disposition = TeamDisposition.Conservative
@@ -146,6 +148,12 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                     Random = random,
                     AwayTeam = awayTeam,
                     HomeTeam = homeTeam,
+                    AwayTeamActualStrengths = null!,
+                    HomeTeamActualStrengths = null!,
+                    HomeTeamEstimateOfAway = null!,
+                    HomeTeamEstimateOfHome = null!,
+                    AwayTeamEstimateOfAway = null!,
+                    AwayTeamEstimateOfHome = null!
                 },
                 PhysicsParams = _physicsParams,
                 EventBus = Mock.Of<IEventBus>()

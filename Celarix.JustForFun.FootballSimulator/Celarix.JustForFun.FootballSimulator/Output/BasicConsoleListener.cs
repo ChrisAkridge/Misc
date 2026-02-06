@@ -35,11 +35,13 @@ namespace Celarix.JustForFun.FootballSimulator.Output
             {
                 Console.Clear();
                 Console.WriteLine($"System state machine to go to {systemContext.NextState}.");
+                return;
             }
             else if (playContext == null)
             {
                 Console.Clear();
                 Console.WriteLine($"Game state machine to go to {gameContext!.NextState}.");
+                return;
             }
 
             var systemEnvironment = systemContext!.Environment;
@@ -49,6 +51,13 @@ namespace Celarix.JustForFun.FootballSimulator.Output
             var currentGameRecord = gameEnvironment!.CurrentGameRecord!;
             var awayTeam = currentGameRecord.AwayTeam;
             var homeTeam = currentGameRecord.HomeTeam;
+
+            if (awayTeam == null || homeTeam == null)
+            {
+                Console.Clear();
+                Console.WriteLine("Away or home team not loaded from database.");
+                return;
+            }
 
             awayTeamAbbreviation = awayTeam.Abbreviation;
             homeTeamAbbreviation = homeTeam.Abbreviation;

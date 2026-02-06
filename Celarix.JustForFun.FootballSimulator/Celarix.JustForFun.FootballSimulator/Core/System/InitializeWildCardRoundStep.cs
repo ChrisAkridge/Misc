@@ -4,7 +4,6 @@ using Celarix.JustForFun.FootballSimulator.Models;
 using Celarix.JustForFun.FootballSimulator.Random;
 using Celarix.JustForFun.FootballSimulator.Scheduling;
 using Celarix.JustForFun.FootballSimulator.Standings;
-using Celarix.JustForFun.FootballSimulator.Tiebreaking;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System;

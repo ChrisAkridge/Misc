@@ -20,9 +20,6 @@ namespace Celarix.JustForFun.FootballSimulator
     {
 	    public static int SchedulingRandomSeed => -1039958483;
 
-		private static readonly Dictionary<(double mean, double standardDeviation), Normal> distributionCache =
-            new Dictionary<(double mean, double standardDeviation), Normal>();
-
         public static Dictionary<BasicTeamInfo, int> GetDefaultPreviousSeasonDivisionRankings(IReadOnlyList<BasicTeamInfo> teams)
         {
             Log.Information("No previous season division rankings available, generating default...");
@@ -97,24 +94,9 @@ namespace Celarix.JustForFun.FootballSimulator
         public static double SampleNormalDistribution(double mean, double standardDeviation, System.Random random)
         {
             standardDeviation = Math.Abs(standardDeviation);
-            
-            if (!distributionCache.ContainsKey((mean, standardDeviation)))
-            {
-                distributionCache.Add((mean, standardDeviation), new Normal(mean, standardDeviation, random));
-            }
-            
-            var normalDistribution = distributionCache[(mean, standardDeviation)];
-
+            var normalDistribution = new Normal(mean, standardDeviation, random);
             return normalDistribution.Sample();
         }
-
-        public static double SampleNormalDistribution(NormalDistributionParameters parameters, double value, System.Random random) =>
-            value < 0d
-                ? SampleNormalDistribution(parameters.MeanAtZero - (parameters.MeanReductionPerUnitValue * Math.Abs(value)),
-                    parameters.StandardDeviationAtZero, random)
-                : SampleNormalDistribution(parameters.MeanAtZero,
-                    parameters.StandardDeviationAtZero + (parameters.StandardDeviationIncreasePerUnitValue * value),
-                    random);
 
         public static string FormatSeconds(int seconds) => $"{seconds / 60}:{seconds % 60:D2}";
 
@@ -141,6 +123,12 @@ namespace Celarix.JustForFun.FootballSimulator
             double startWindSpeedStddev,
             double airTemperature)
         {
+            if (gameRecord.Stadium == null)
+            {
+                throw new InvalidOperationException(
+                    $"Stadium is null for game ID {gameRecord.GameID} when creating initial play context.");
+            }
+
             return new PlayContext(
                 Version: 0L,
                 NextState: PlayEvaluationState.Start,
@@ -185,6 +173,13 @@ namespace Celarix.JustForFun.FootballSimulator
             IRandom random)
         {
             var stadium = gameRecord.Stadium;
+
+            if (stadium == null)
+            {
+                throw new InvalidOperationException(
+                    $"Stadium is null for game ID {gameRecord.GameID} when getting temperature for game.");
+            }
+
             var month = gameRecord.KickoffTime.Month;
             var averageTemperatures = stadium.AverageTemperatures
                 .Split(',')
@@ -339,6 +334,19 @@ namespace Celarix.JustForFun.FootballSimulator
             var homeTeam = context.Environment.CurrentGameRecord.HomeTeam;
             var gameRecord = context.Environment.CurrentGameRecord;
             var physicsParams = context.Environment.PhysicsParams;
+
+            if (awayTeam == null)
+            {
+                throw new InvalidOperationException(
+                    $"Away team is null for game ID {gameRecord.GameID} when rebuilding strengths in decision parameters.");
+            }
+
+            if (homeTeam == null)
+            {
+                throw new InvalidOperationException(
+                    $"Home team is null for game ID {gameRecord.GameID} when rebuilding strengths in decision parameters.");
+            }
+
             decisionParameters.AwayTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(awayTeam, GameTeam.Away);
             decisionParameters.HomeTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(homeTeam, GameTeam.Home);
             decisionParameters.AwayTeamEstimateOfAway = EstimateStrengthSetForTeam(awayTeam, awayTeam, gameRecord, random, physicsParams);

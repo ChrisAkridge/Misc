@@ -13,17 +13,17 @@ namespace Celarix.JustForFun.FootballSimulator.Models
         private int awayTeamFourthDownConversions = 0;
         private int homeTeamFourthDownConversions = 0;
 
-        public IRandom Random { get; init; }
+        public required IRandom Random { get; init; }
 
-        public Team AwayTeam { get; init; }
-        public Team HomeTeam { get; init; }
+        public required Team AwayTeam { get; init; }
+        public required Team HomeTeam { get; init; }
 
-        public TeamStrengthSet AwayTeamActualStrengths { get; set; }
-        public TeamStrengthSet HomeTeamActualStrengths { get; set; }
-        public TeamStrengthSet AwayTeamEstimateOfAway { get; set; }
-        public TeamStrengthSet AwayTeamEstimateOfHome { get; set; }
-        public TeamStrengthSet HomeTeamEstimateOfAway { get; set; }
-        public TeamStrengthSet HomeTeamEstimateOfHome { get; set; }
+        public required TeamStrengthSet AwayTeamActualStrengths { get; set; }
+        public required TeamStrengthSet HomeTeamActualStrengths { get; set; }
+        public required TeamStrengthSet AwayTeamEstimateOfAway { get; set; }
+        public required TeamStrengthSet AwayTeamEstimateOfHome { get; set; }
+        public required TeamStrengthSet HomeTeamEstimateOfAway { get; set; }
+        public required TeamStrengthSet HomeTeamEstimateOfHome { get; set; }
 
         public GameType GameType { get; init; }
 

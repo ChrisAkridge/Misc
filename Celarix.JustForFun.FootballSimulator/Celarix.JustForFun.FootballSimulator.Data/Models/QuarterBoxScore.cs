@@ -12,7 +12,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         [Key]
         public int QuarterBoxScoreID { get; set; }
         public int GameRecordID { get; set; }
-        public GameRecord GameRecord { get; set; }
+        public GameRecord? GameRecord { get; set; }
         
         public int QuarterNumber { get; set; }
         public int Score { get; set; }

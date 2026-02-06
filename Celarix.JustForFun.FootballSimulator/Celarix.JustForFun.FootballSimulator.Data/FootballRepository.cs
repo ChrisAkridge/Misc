@@ -170,11 +170,11 @@ namespace Celarix.JustForFun.FootballSimulator.Data
         public SeasonRecord GetSeasonWithGames(int seasonRecordID)
         {
             return context.SeasonRecords
-                .Include(sr => sr.GameRecords)
+                .Include(sr => sr.GameRecords!)
                     .ThenInclude(gr => gr.HomeTeam)
-                .Include(sr => sr.GameRecords)
+                .Include(sr => sr.GameRecords!)
                     .ThenInclude(gr => gr.AwayTeam)
-                .Include(sr => sr.GameRecords)
+                .Include(sr => sr.GameRecords!)
                     .ThenInclude(gr => gr.QuarterBoxScores)
                 .Single(sr => sr.SeasonRecordID == seasonRecordID);
         }

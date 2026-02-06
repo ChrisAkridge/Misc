@@ -24,6 +24,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 throw new InvalidOperationException("There should be exactly 2 conference championships to proceed to the Super Bowl.");
             }
 
+            if (conferenceChampionships.Any(g => g.AwayTeam == null || g.HomeTeam == null))
+            {
+                throw new InvalidOperationException("Teams for conference championships not loaded from database.");
+            }
+
             if (!conferenceChampionships.All(g => g.GameComplete))
             {
                 throw new InvalidOperationException("All conference championships must be complete to proceed to the Super Bowl.");
@@ -34,6 +39,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 throw new InvalidOperationException("No conference championships can end in a tie to proceed to the Super Bowl.");
             }
 
+            // We check above that all teams are non-null, so these warnings are safe to suppress
+#pragma warning disable CS8600
+#pragma warning disable CS8602
+#pragma warning disable CS8604
             var conferenceChampionshipWinners = conferenceChampionships
                 .Select(g =>
                 {
@@ -93,6 +102,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
 
             Log.Information("InitializeSuperBowlStep: Super Bowl initialized.");
             return context.WithNextState(SystemState.LoadGame);
+#pragma warning restore CS8600
+#pragma warning restore CS8602
+#pragma warning restore CS8604
         }
     }
 }

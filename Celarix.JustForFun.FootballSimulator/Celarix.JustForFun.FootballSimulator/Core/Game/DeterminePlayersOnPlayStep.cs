@@ -15,14 +15,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
 
             var offenseIsHomeTeam = context.Environment.CurrentPlayContext!.TeamWithPossession == GameTeam.Home;
             var offenseTeam = offenseIsHomeTeam
-                ? context.Environment.CurrentGameRecord!.HomeTeam
-                : context.Environment.CurrentGameRecord!.AwayTeam;
+                ? context.Environment.CurrentGameRecord!.HomeTeam ?? throw new InvalidOperationException("Home team not loaded from database.")
+                : context.Environment.CurrentGameRecord!.AwayTeam ?? throw new InvalidOperationException("Away team not loaded from database.");
             var offenseRoster = offenseIsHomeTeam
                 ? context.Environment.HomeActiveRoster
                 : context.Environment.AwayActiveRoster;
             var defenseTeam = offenseIsHomeTeam
-                ? context.Environment.CurrentGameRecord!.AwayTeam
-                : context.Environment.CurrentGameRecord!.HomeTeam;
+                ? context.Environment.CurrentGameRecord!.AwayTeam ?? throw new InvalidOperationException("Away team not loaded from database.")
+                : context.Environment.CurrentGameRecord!.HomeTeam ?? throw new InvalidOperationException("Home team not loaded from database.");
             var defenseRoster = offenseIsHomeTeam
                 ? context.Environment.AwayActiveRoster
                 : context.Environment.HomeActiveRoster;
@@ -53,8 +53,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
 
             var lineOfScrimmageTeamYard = context.Environment.CurrentPlayContext.InternalYardToTeamYard(context.Environment.CurrentPlayContext.LineOfScrimmage);
             var teamYardTeamAbbreviation = lineOfScrimmageTeamYard.Team == GameTeam.Home
-                ? context.Environment.CurrentGameRecord!.HomeTeam.Abbreviation
-                : context.Environment.CurrentGameRecord!.AwayTeam.Abbreviation;
+                ? context.Environment.CurrentGameRecord!.HomeTeam?.Abbreviation ?? throw new InvalidOperationException("Home team not loaded from database.")
+                : context.Environment.CurrentGameRecord!.AwayTeam?.Abbreviation ?? throw new InvalidOperationException("Away team not loaded from database.");
             var lineOfScrimmageDisplay = $"{teamYardTeamAbbreviation} {lineOfScrimmageTeamYard.TeamYard}";
             context.Environment.CurrentPlayContext = context.Environment.CurrentPlayContext with
             {
@@ -83,14 +83,20 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
             string defenseAbbreviation,
             string lineOfScrimmageTeamYard)
         {
+            if (offensePlayersOnPlay.Concat(defensePlayersOnPlay)
+                    .Any(p => p.Player == null))
+            {
+                throw new InvalidOperationException("One or more PlayerRosterPosition instances are missing their Player reference.");
+            }
+
             var description = template;
             for (int i = 0; i < offensePlayersOnPlay.Count; i++)
             {
-                description = description.Replace($"{{OffPlayer{i}}}", offensePlayersOnPlay[i].Player.FullName);
+                description = description.Replace($"{{OffPlayer{i}}}", offensePlayersOnPlay[i].Player!.FullName);
             }
             for (int i = 0; i < defensePlayersOnPlay.Count; i++)
             {
-                description = description.Replace($"{{DefPlayer{i}}}", defensePlayersOnPlay[i].Player.FullName);
+                description = description.Replace($"{{DefPlayer{i}}}", defensePlayersOnPlay[i].Player!.FullName);
             }
 
             description = description.Replace("{OffAbbr}", offenseAbbreviation);

@@ -12,17 +12,17 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         [Key]
         public int GameID { get; set; }
         public int SeasonRecordID { get; set; }
-        public SeasonRecord SeasonRecord { get; set; }
+        public SeasonRecord? SeasonRecord { get; set; }
         public GameType GameType { get; set; }
         public int WeekNumber { get; set; }
         public bool GameComplete { get; set; }
         
         public int HomeTeamID { get; set; }
-        public Team HomeTeam { get; set; }
+        public Team? HomeTeam { get; set; }
         public int AwayTeamID { get; set; }
-        public Team AwayTeam { get; set; }
+        public Team? AwayTeam { get; set; }
         public int StadiumID { get; set; }
-        public Stadium Stadium { get; set; }
+        public Stadium? Stadium { get; set; }
         
         public DateTimeOffset KickoffTime { get; set; }
         public double TemperatureAtKickoff { get; set; }
@@ -49,6 +49,6 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
                 ? WinningTeam.Home
                 : WinningTeam.Tie;
 
-        public override string ToString() => $"{AwayTeam.TeamName} @ {HomeTeam.TeamName} ({GameType})";
+        public override string ToString() => $"{AwayTeam?.TeamName ?? AwayTeamID.ToString()} @ {HomeTeam?.TeamName ?? HomeTeamID.ToString()} ({GameType})";
     }
 }

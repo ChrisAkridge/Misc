@@ -18,8 +18,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
         public void Run_LoadsGame()
         {
             // Arrange
-            var awayTeam = new Team { HomeStadiumID = 1 };
-            var homeTeam = new Team { HomeStadiumID = 2 };
+            var awayTeam = new Team { HomeStadiumID = 1, CityName = "Runford", TeamName = "Runners", Abbreviation = "RUN" };
+            var homeTeam = new Team { HomeStadiumID = 2, CityName = "Runford", TeamName = "Runners", Abbreviation = "RUN" };
             TestHelpers.SetRandomStrengths(awayTeam);
             TestHelpers.SetRandomStrengths(homeTeam);
 
@@ -29,12 +29,16 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
 
             var awayStadium = new Stadium
             {
-                AverageTemperatures = "-90,-80,-70,-60,-50,-40,-30"
+                AverageTemperatures = "-90,-80,-70,-60,-50,-40,-30",
+                Name = "Away Stadium",
+                City = "Away City"
             };
             var homeStadium = new Stadium
             {
                 AverageTemperatures = "90,80,70,60,50,40,30",
                 AverageWindSpeed = 20.0,
+                Name = "Home Stadium",
+                City = "Home City"
             };
 
             var repository = new Mock<IFootballRepository>();

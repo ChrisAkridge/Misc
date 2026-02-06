@@ -13,7 +13,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         public int TeamDriveRecordID { get; set; }
         public int GameRecordID { get; set; }
         public int TeamID { get; set; }
-        public GameRecord GameRecord { get; set; }
+        public GameRecord? GameRecord { get; set; }
         public GameTeam Team { get; set; }
         
         public int QuarterNumber { get; set; }

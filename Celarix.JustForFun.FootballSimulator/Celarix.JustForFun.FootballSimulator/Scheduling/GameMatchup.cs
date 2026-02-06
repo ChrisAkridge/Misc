@@ -6,8 +6,8 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling;
 
 internal sealed class GameMatchup
 {
-    public BasicTeamInfo TeamA { get; set; }
-    public BasicTeamInfo TeamB { get; set; }
+    public required BasicTeamInfo TeamA { get; set; }
+    public required BasicTeamInfo TeamB { get; set; }
     public ScheduledGameType GameType { get; set; }
     public bool? HomeTeamIsTeamA { get; set; }
 

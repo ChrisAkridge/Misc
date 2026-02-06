@@ -45,8 +45,8 @@ namespace Celarix.JustForFun.FootballSimulator.Data
             public IReadOnlyList<Player> GetActivePlayersForTeam(int teamId)
             {
                 return context.Players
-                .Include(p => p.RosterPositions.Where(rp => rp.TeamID == teamId && rp.CurrentPlayer))
-                .Where(p => p.RosterPositions.Any(rp => rp.TeamID == teamId && rp.CurrentPlayer))
+                .Include(p => p.RosterPositions!.Where(rp => rp.TeamID == teamId && rp.CurrentPlayer))
+                .Where(p => p.RosterPositions!.Any(rp => rp.TeamID == teamId && rp.CurrentPlayer))
                 .ToList();
             }
 
@@ -55,7 +55,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data
                 return context.Teams
                     .Include(t => t.HomeStadium)
                     .First(t => t.TeamID == teamID)
-                    .HomeStadium;
+                    .HomeStadium!;
             }
 
             public void HealAllPlayers()
@@ -78,6 +78,10 @@ namespace Celarix.JustForFun.FootballSimulator.Data
         {
             public Player CurrentRosterPositionOnly()
             {
+                if (player.RosterPositions == null)
+                {
+                    throw new InvalidOperationException($"Player {player.PlayerID} has no loaded roster positions from the database.");
+                }
                 player.RosterPositions = [.. player.RosterPositions.Where(rp => rp.CurrentPlayer)];
                 if (player.RosterPositions.Count > 1)
                 {

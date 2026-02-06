@@ -275,7 +275,18 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                 StateHistory: Array.Empty<StateHistoryEntry>(),
                 Environment: new PlayEnvironment
                 {
-                    DecisionParameters = new GameDecisionParameters(),
+                    DecisionParameters = new GameDecisionParameters
+                    {
+                        Random = null!,
+                        AwayTeam = null!,
+                        HomeTeam = null!,
+                        AwayTeamActualStrengths = null!,
+                        HomeTeamActualStrengths = null!,
+                        HomeTeamEstimateOfAway = null!,
+                        HomeTeamEstimateOfHome = null!,
+                        AwayTeamEstimateOfAway = null!,
+                        AwayTeamEstimateOfHome = null!
+                    },
                     PhysicsParams = CreatePhysicsParamsForInjury(),
                     EventBus = Mock.Of<IEventBus>()
                 },

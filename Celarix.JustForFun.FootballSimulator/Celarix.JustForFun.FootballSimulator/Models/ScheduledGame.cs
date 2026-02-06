@@ -10,9 +10,9 @@ namespace Celarix.JustForFun.FootballSimulator.Models
 {
     internal sealed class ScheduledGame
     {
-        public GameRecord GameRecord { get; set; }
+        public required GameRecord GameRecord { get; set; }
         public ScheduledGameType GameType { get; set; }
-        public BasicTeamInfo HomeTeamInfo { get; set; }
-        public BasicTeamInfo AwayTeamInfo { get; set; }
+        public required BasicTeamInfo HomeTeamInfo { get; set; }
+        public required BasicTeamInfo AwayTeamInfo { get; set; }
     }
 }

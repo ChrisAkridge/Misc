@@ -28,7 +28,10 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 {
                     TeamID = i,
                     Conference = (i <= 4) ? Conference.AFC : Conference.NFC,
-                    HomeStadiumID = i
+                    HomeStadiumID = i,
+                    CityName = $"City{i}",
+                    TeamName = $"Team{i}",
+                    Abbreviation = $"T{i}"
                 };
                 TestHelpers.SetRandomStrengths(team);
                 var game = new GameRecord
@@ -136,8 +139,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
             Assert.All(receivedGames, g => Assert.False(g.GameComplete));
 
             var teams = wildCardGames.Select(g => g.AwayTeam).ToArray();
-            Assert.All(receivedGames, g => TestHelpers.AssertStrengthJSON(g.AwayTeamStrengthsAtKickoffJSON, teams.Single(t => t.TeamID == g.AwayTeamID)));
-            Assert.All(receivedGames, g => TestHelpers.AssertStrengthJSON(g.HomeTeamStrengthsAtKickoffJSON, teams.Single(t => t.TeamID == g.HomeTeamID)));
+            Assert.All(receivedGames, g => TestHelpers.AssertStrengthJSON(g.AwayTeamStrengthsAtKickoffJSON, teams.Single(t => t != null && t.TeamID == g.AwayTeamID)!));
+            Assert.All(receivedGames, g => TestHelpers.AssertStrengthJSON(g.HomeTeamStrengthsAtKickoffJSON, teams.Single(t => t != null && t.TeamID == g.HomeTeamID)!));
 
             Assert.Equal(SystemState.LoadGame, step.NextState);
         }

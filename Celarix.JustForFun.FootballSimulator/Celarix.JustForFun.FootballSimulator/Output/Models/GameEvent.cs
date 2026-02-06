@@ -7,7 +7,7 @@ namespace Celarix.JustForFun.FootballSimulator.Output.Models
 {
     public sealed class GameEvent
     {
-        private string[] tags;
+        private string[] tags = [];
 
         public required string EventType { get; init; }
         public required SystemContext SystemContext { get; init; }

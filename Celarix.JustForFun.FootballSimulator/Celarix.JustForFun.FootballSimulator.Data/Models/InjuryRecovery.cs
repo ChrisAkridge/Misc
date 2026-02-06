@@ -10,7 +10,7 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         [Key]
         public int InjuryRecoveryID { get; set; }
         public int TeamID { get; set; }
-        public string Strength { get; set; }
+        public required string Strength { get; set; }
         public double StrengthDelta { get; set; }
         public DateTimeOffset RecoverOn { get; set; }
         public bool Recovered { get; set; }

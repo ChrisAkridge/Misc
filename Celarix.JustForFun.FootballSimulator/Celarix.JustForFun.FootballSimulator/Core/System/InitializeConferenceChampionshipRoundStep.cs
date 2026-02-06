@@ -25,6 +25,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 throw new InvalidOperationException("There should be exactly 4 divisional round games to proceed to the conference championships.");
             }
 
+            if (divisionalRoundGames.Any(g => g.AwayTeam == null || g.HomeTeam == null))
+            {
+                throw new InvalidOperationException("Teams not loaded from database.");
+            }
+
             if (!divisionalRoundGames.All(g => g.GameComplete))
             {
                 throw new InvalidOperationException("All divisional round games must be complete to proceed to the conference championships.");
@@ -35,6 +40,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 throw new InvalidOperationException("No divisional round games can end in a tie to proceed to the conference championships.");
             }
 
+            // We check above that all teams are non-null, so these warnings are safe to suppress
+#pragma warning disable CS8600
+#pragma warning disable CS8602
+#pragma warning disable CS8604
             var divisionalRoundWinners = divisionalRoundGames
                 .Select(g =>
                 {
@@ -84,6 +93,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
 
             Log.Information("InitializeConferenceChampionshipRoundStep: Created Conference Championships.");
             return context.WithNextState(SystemState.LoadGame);
+#pragma warning restore CS8600
+#pragma warning restore CS8602
+#pragma warning restore CS8604
         }
 
         internal static GameRecord MakeConferenceChampionship(Team home, Team away,

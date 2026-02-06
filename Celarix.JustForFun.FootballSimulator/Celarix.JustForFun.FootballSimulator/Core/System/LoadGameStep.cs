@@ -53,8 +53,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                     DecisionParameters = new GameDecisionParameters
                     {
                         Random = random,
-                        AwayTeam = gameRecord.AwayTeam,
-                        HomeTeam = gameRecord.HomeTeam,
+                        AwayTeam = gameRecord.AwayTeam ?? throw new InvalidOperationException("Away team is null."),
+                        HomeTeam = gameRecord.HomeTeam ?? throw new InvalidOperationException("Home team is null."),
                         GameType = gameRecord.GameType,
                         AwayTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(gameRecord.AwayTeam, GameTeam.Away),
                         HomeTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(gameRecord.HomeTeam, GameTeam.Home),
@@ -117,9 +117,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                     recovery.TeamID,
                     recovery.Strength,
                     -recovery.StrengthDelta);
-                var team = recovery.TeamID == gameRecord.HomeTeamID
+                var team = (recovery.TeamID == gameRecord.HomeTeamID
                     ? gameRecord.HomeTeam
-                    : gameRecord.AwayTeam;
+                    : gameRecord.AwayTeam) ?? throw new InvalidOperationException("LoadGameStep: Team not loaded from database.");
                 var property = team.GetType().GetProperty(recovery.Strength);
                 if (property != null)
                 {
@@ -135,8 +135,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
         internal static void SetStrengthsAtKickoff(IFootballRepository repository,
             GameRecord gameRecord)
         {
-            var awayTeamStrengths = TeamStrengthSet.FromTeamDirectly(gameRecord.AwayTeam, GameTeam.Away);
-            var homeTeamStrengths = TeamStrengthSet.FromTeamDirectly(gameRecord.HomeTeam, GameTeam.Home);
+            var awayTeamStrengths = TeamStrengthSet.FromTeamDirectly(gameRecord.AwayTeam ?? throw new InvalidOperationException("Away team is null in LoadGameStep."), GameTeam.Away);
+            var homeTeamStrengths = TeamStrengthSet.FromTeamDirectly(gameRecord.HomeTeam ?? throw new InvalidOperationException("Home team is null in LoadGameStep."), GameTeam.Home);
             var awayTeamStrengthsJson = global::System.Text.Json.JsonSerializer.Serialize(awayTeamStrengths);
             var homeTeamStrengthsJson = global::System.Text.Json.JsonSerializer.Serialize(homeTeamStrengths);
             gameRecord.AwayTeamStrengthsAtKickoffJSON = awayTeamStrengthsJson;

@@ -45,8 +45,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 DecisionParameters = new GameDecisionParameters
                 {
                     Random = random,
-                    AwayTeam = gameRecord.AwayTeam,
-                    HomeTeam = gameRecord.HomeTeam,
+                    AwayTeam = gameRecord.AwayTeam ?? throw new InvalidOperationException("Away team is null."),
+                    HomeTeam = gameRecord.HomeTeam ?? throw new InvalidOperationException("Home team is null."),
                     GameType = gameRecord.GameType,
                     AwayTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(gameRecord.AwayTeam, GameTeam.Away),
                     HomeTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(gameRecord.HomeTeam, GameTeam.Home),
@@ -159,6 +159,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
 
             int homeTeamScore = 0;
             int awayTeamScore = 0;
+
+            if (gameRecord.AwayTeam is null || gameRecord.HomeTeam is null)
+            {
+                throw new InvalidOperationException("ResumePartialGameStep: Teams for partial game not loaded from database.");
+            }
 
             foreach (var drive in gameRecord.TeamDriveRecords.Where(r => scoringDriveResults.Contains(r.Result)))
             {

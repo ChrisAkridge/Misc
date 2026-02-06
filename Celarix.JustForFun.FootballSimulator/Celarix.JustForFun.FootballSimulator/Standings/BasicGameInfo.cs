@@ -32,8 +32,8 @@ namespace Celarix.JustForFun.FootballSimulator.Standings
 
             return new BasicGameInfo
             {
-                HomeTeam = new BasicTeamInfo(game.HomeTeam),
-                AwayTeam = new BasicTeamInfo(game.AwayTeam),
+                HomeTeam = new BasicTeamInfo(game.HomeTeam ?? throw new InvalidOperationException("Home team is null in BasicGameInfo.FromGameRecord.")),
+                AwayTeam = new BasicTeamInfo(game.AwayTeam ?? throw new InvalidOperationException("Away team is null in BasicGameInfo.FromGameRecord.")),
                 HomeScore = game.HomeScore,
                 AwayScore = game.AwayScore,
                 HomeTouchdowns = homeTouchdowns,

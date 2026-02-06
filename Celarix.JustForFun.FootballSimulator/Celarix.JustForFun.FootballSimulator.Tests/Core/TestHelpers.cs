@@ -120,10 +120,11 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
 
         public static void AssertStrengthJSON(string? json, Team team)
         {
+            Assert.NotNull(json);
+
             // Deserialize to JSON object
             var deserialized = global::System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, double>>(json);
 
-            Assert.NotNull(json);
             Assert.NotNull(deserialized);
 
             // Assert each strength value

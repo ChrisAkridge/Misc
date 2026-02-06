@@ -72,6 +72,11 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                                 HomeTeam = homeTeam,
                                 AwayTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(awayTeam, GameTeam.Away),
                                 HomeTeamActualStrengths = TeamStrengthSet.FromTeamDirectly(homeTeam, GameTeam.Home),
+                                Random = null!,
+                                HomeTeamEstimateOfAway = null!,
+                                HomeTeamEstimateOfHome = null!,
+                                AwayTeamEstimateOfAway = null!,
+                                AwayTeamEstimateOfHome = null!
                             },
                             EventBus = Mock.Of<IEventBus>()
                         }
@@ -101,8 +106,8 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             );
 
             var context = CreateGameContextWithTeams(GameTeam.Home, playInvolvement);
-            var originalHomeOffensiveLineStrength = context.Environment.CurrentGameRecord!.HomeTeam.OffensiveLineStrength;
-            var originalAwayDefensiveLineStrength = context.Environment.CurrentGameRecord!.AwayTeam.DefensiveLineStrength;
+            var originalHomeOffensiveLineStrength = context.Environment.CurrentGameRecord!.HomeTeam!.OffensiveLineStrength;
+            var originalAwayDefensiveLineStrength = context.Environment.CurrentGameRecord!.AwayTeam!.DefensiveLineStrength;
 
             // Act
             var result = AdjustStrengthStep.Run(context);
@@ -143,11 +148,11 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
             Assert.Equal(GameState.DeterminePlayersOnPlay, result.NextState);
             
             // Away team (offense) should have adjusted offensive and passing offense strengths
-            Assert.Equal(55.0, context.Environment.CurrentGameRecord!.AwayTeam.OffensiveLineStrength, 1);
+            Assert.Equal(55.0, context.Environment.CurrentGameRecord!.AwayTeam!.OffensiveLineStrength, 1);
             Assert.Equal(55.0, context.Environment.CurrentGameRecord.AwayTeam.PassingOffenseStrength, 1);
             
             // Home team (defense) should have adjusted defensive and passing defense strengths  
-            Assert.Equal(55.0, context.Environment.CurrentGameRecord.HomeTeam.DefensiveLineStrength, 1);
+            Assert.Equal(55.0, context.Environment.CurrentGameRecord.HomeTeam!.DefensiveLineStrength, 1);
             Assert.Equal(55.0, context.Environment.CurrentGameRecord.HomeTeam.PassingDefenseStrength, 1);
         }
 
@@ -171,7 +176,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
 
             // Assert
             // Home team (offense) should have adjusted kicking and field goal strengths
-            Assert.Equal(55.0, context.Environment.CurrentGameRecord!.HomeTeam.KickingStrength, 1);
+            Assert.Equal(55.0, context.Environment.CurrentGameRecord!.HomeTeam!.KickingStrength, 1);
             Assert.Equal(55.0, context.Environment.CurrentGameRecord.HomeTeam.FieldGoalStrength, 1);
         }
 
@@ -195,10 +200,10 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
 
             // Assert
             // Away team (defense) should have adjusted kick return strength
-            Assert.Equal(55.0, context.Environment.CurrentGameRecord!.AwayTeam.KickReturnStrength, 1);
+            Assert.Equal(55.0, context.Environment.CurrentGameRecord!.AwayTeam!.KickReturnStrength, 1);
             
             // Home team (offense) should have adjusted kick defense strength
-            Assert.Equal(55.0, context.Environment.CurrentGameRecord.HomeTeam.KickDefenseStrength, 1);
+            Assert.Equal(55.0, context.Environment.CurrentGameRecord.HomeTeam!.KickDefenseStrength, 1);
         }
 
         [Fact]
@@ -221,10 +226,10 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
 
             // Assert
             // Away team (defense) should have adjusted running offense strength (for return)
-            Assert.Equal(55.0, context.Environment.CurrentGameRecord!.AwayTeam.RunningOffenseStrength, 1);
+            Assert.Equal(55.0, context.Environment.CurrentGameRecord!.AwayTeam!.RunningOffenseStrength, 1);
             
             // Home team (offense) should have adjusted running defense strength
-            Assert.Equal(55.0, context.Environment.CurrentGameRecord.HomeTeam.RunningDefenseStrength, 1);
+            Assert.Equal(55.0, context.Environment.CurrentGameRecord.HomeTeam!.RunningDefenseStrength, 1);
         }
 
         [Fact]
@@ -342,12 +347,12 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
 
             // Assert
             // Home team (offense) should have all offense-related strengths adjusted
-            Assert.Equal(55.0, context.Environment.CurrentGameRecord!.HomeTeam.OffensiveLineStrength, 1);
+            Assert.Equal(55.0, context.Environment.CurrentGameRecord!.HomeTeam!.OffensiveLineStrength, 1);
             Assert.Equal(55.0, context.Environment.CurrentGameRecord.HomeTeam.RunningOffenseStrength, 1);
             Assert.Equal(55.0, context.Environment.CurrentGameRecord.HomeTeam.PassingOffenseStrength, 1);
             
             // Away team (defense) should have all defense-related strengths adjusted
-            Assert.Equal(55.0, context.Environment.CurrentGameRecord.AwayTeam.DefensiveLineStrength, 1);
+            Assert.Equal(55.0, context.Environment.CurrentGameRecord.AwayTeam!.DefensiveLineStrength, 1);
             Assert.Equal(55.0, context.Environment.CurrentGameRecord.AwayTeam.RunningDefenseStrength, 1);
             Assert.Equal(55.0, context.Environment.CurrentGameRecord.AwayTeam.PassingDefenseStrength, 1);
         }

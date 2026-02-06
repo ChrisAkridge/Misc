@@ -24,7 +24,14 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
                 AwayTeamEstimateOfHome = new TeamStrengthSet
                 {
                     KickReturnStrength = 50
-                }
+                },
+                Random = null!,
+                AwayTeam = null!,
+                HomeTeam = null!,
+                AwayTeamActualStrengths = null!,
+                HomeTeamActualStrengths = null!,
+                HomeTeamEstimateOfAway = null!,
+                HomeTeamEstimateOfHome = null!
             };
             // Act
             var resultState = FreeKickDecision.Run(priorState);
@@ -46,7 +53,14 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
                 AwayTeamEstimateOfHome = new TeamStrengthSet
                 {
                     KickReturnStrength = 50
-                }
+                },
+                Random = null!,
+                AwayTeam = null!,
+                HomeTeam = null!,
+                AwayTeamActualStrengths = null!,
+                HomeTeamActualStrengths = null!,
+                HomeTeamEstimateOfAway = null!,
+                HomeTeamEstimateOfHome = null!
             };
             // Act
             var resultState = FreeKickDecision.Run(priorState);

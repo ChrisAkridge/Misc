@@ -23,6 +23,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
             var random = context.Environment.RandomFactory.Create();
             var kickoffTime = context.Environment.CurrentGameRecord!.KickoffTime;
 
+            if (offenseTeam == null || defenseTeam == null)
+            {
+                throw new InvalidOperationException("InjuryCheckStep: One or both teams in current game record are null.");
+            }
+
             var offensivePlayers = context.OffensePlayersOnPlay;
             var defensivePlayers = context.DefensePlayersOnPlay;
             var baseInjuryChancePerPlay = context.Environment.PhysicsParams["BaseInjuryChancePerPlay"].Value;
@@ -50,6 +55,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
 
             foreach (var player in offensivePlayers!)
             {
+                if (player.Player == null)
+                {
+                    throw new InvalidOperationException("InjuryCheckStep: Offensive player on play has null Player property.");
+                }
+
                 var injuryRoll = random.Chance(offenseIsHomeTeam ? homeTeamInjuryChancePerPlay : awayTeamInjuryChancePerPlay);
                 if (injuryRoll)
                 {
@@ -63,6 +73,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
 
             foreach (var player in defensivePlayers!)
             {
+                if (player.Player == null)
+                {
+                    throw new InvalidOperationException("InjuryCheckStep: Offensive player on play has null Player property.");
+                }
+
                 var injuryRoll = random.Chance(offenseIsHomeTeam ? awayTeamInjuryChancePerPlay : homeTeamInjuryChancePerPlay);
                 if (injuryRoll)
                 {

@@ -173,12 +173,14 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core
         {
             var awayTeam = new Team
             {
+                CityName = "Redmond",
                 TeamName = "Redmond Passing Tests",
                 Abbreviation = "RPT",
                 Disposition = GetRandomEnumValue<TeamDisposition>(random)
             };
             var homeTeam = new Team
             {
+                CityName = "London",
                 TeamName = "London Asserters",
                 Abbreviation = "LAS",
                 Disposition = GetRandomEnumValue<TeamDisposition>(random)

@@ -15,8 +15,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
             var repository = context.Environment.FootballRepository;
             repository.CompleteGame(gameRecord.GameID);
 
-            var awayTeam = gameRecord.AwayTeam;
-            var homeTeam = gameRecord.HomeTeam;
+            var awayTeam = gameRecord.AwayTeam ?? throw new InvalidOperationException("Away team is null in EndGameStep.");
+            var homeTeam = gameRecord.HomeTeam ?? throw new InvalidOperationException("Home team is null in EndGameStep.");
 
             // By now, the strengths of these teams are stored in these properties
             // on the GameRecord, so we can just copy them over to the teams.

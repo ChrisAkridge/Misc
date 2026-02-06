@@ -49,8 +49,19 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                                     {
                                         AwayTeam = new Team
                                         {
-                                            Disposition = TeamDisposition.UltraConservative
-                                        }
+                                            Disposition = TeamDisposition.UltraConservative,
+                                            CityName = "Rockford",
+                                            TeamName = "Rocks",
+                                            Abbreviation = "ROC"
+                                        },
+                                        Random = null!,
+                                        HomeTeam = null!,
+                                        AwayTeamActualStrengths = null!,
+                                        HomeTeamActualStrengths = null!,
+                                        AwayTeamEstimateOfAway = null!,
+                                        AwayTeamEstimateOfHome = null!,
+                                        HomeTeamEstimateOfAway = null!,
+                                        HomeTeamEstimateOfHome = null!,
                                     },
                                     PhysicsParams = TestHelpers.EmptyPhysicsParams,
                                     EventBus = Mock.Of<IEventBus>()
@@ -102,10 +113,16 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                                 AwayTeam = new Team
                                 {
                                     TeamID = 1,
+                                    CityName = "Highview",
+                                    TeamName = "Hawks",
+                                    Abbreviation = "HVW"
                                 },
                                 HomeTeam = new Team
                                 {
                                     TeamID = 2,
+                                    CityName = "Lakeside",
+                                    TeamName = "Lions",
+                                    Abbreviation = "LSL"
                                 }
                             },
                             AwayActiveRoster = [],

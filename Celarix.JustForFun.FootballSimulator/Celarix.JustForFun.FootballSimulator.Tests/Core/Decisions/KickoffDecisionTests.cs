@@ -1,5 +1,8 @@
 ﻿using Celarix.JustForFun.FootballSimulator.Core.Decisions;
 using Celarix.JustForFun.FootballSimulator.Data.Models;
+using Celarix.JustForFun.FootballSimulator.Models;
+using Celarix.JustForFun.FootballSimulator.Output;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,14 +21,6 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
                 NextPlay = NextPlayKind.Kickoff,
                 TeamWithPossession = GameTeam.Away,
             };
-            var parameters = new Models.GameDecisionParameters
-            {
-                AwayTeam = new Team
-                {
-                    Disposition = TeamDisposition.UltraConservative
-                },
-            };
-            var physicsParams = TestHelpers.EmptyPhysicsParams;
             // Act
             var newState = KickoffDecision.Run(priorState);
             // Assert
@@ -45,17 +40,6 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
                 HomeScore = 28,
                 SecondsLeftInPeriod = 120, // 2 minutes left
                 PeriodNumber = 4
-            };
-            var parameters = new Models.GameDecisionParameters
-            {
-                AwayTeam = new Team
-                {
-                    Disposition = TeamDisposition.Conservative
-                },
-            };
-            var physicsParams = new Dictionary<string, PhysicsParam>
-            {
-                { "OnsideKickPointsPerMinuteThreshold", new PhysicsParam("OnsideKickPointsPerMinuteThreshold", 7.0, "point", "points") }
             };
             // Act
             var newState = KickoffDecision.Run(priorState);
@@ -77,17 +61,6 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
                 SecondsLeftInPeriod = 300, // 5 minutes left
                 PeriodNumber = 4
             };
-            var parameters = new Models.GameDecisionParameters
-            {
-                AwayTeam = new Team
-                {
-                    Disposition = TeamDisposition.Conservative
-                },
-            };
-            var physicsParams = new Dictionary<string, PhysicsParam>
-            {
-                { "OnsideKickPointsPerMinuteThreshold", new PhysicsParam("OnsideKickPointsPerMinuteThreshold", 7.0, "point", "points") }
-            };
             // Act
             var newState = KickoffDecision.Run(priorState);
             // Assert
@@ -105,15 +78,30 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Decisions
                 NextState = PlayEvaluationState.KickoffDecision,
                 NextPlay = NextPlayKind.Kickoff,
                 TeamWithPossession = GameTeam.Away,
-            };
-            var parameters = new Models.GameDecisionParameters
-            {
-                AwayTeam = new Team
+                Environment = new PlayEnvironment
                 {
-                    Disposition = disposition
-                },
+                    DecisionParameters = new GameDecisionParameters
+                    {
+                        Random = null!,
+                        AwayTeam = new Team
+                        {
+                            CityName = "Topeka",
+                            TeamName = "Kansans",
+                            Disposition = disposition,
+                            Abbreviation = "TKA"
+                        },
+                        HomeTeam = null!,
+                        AwayTeamActualStrengths = null!,
+                        HomeTeamActualStrengths = null!,
+                        AwayTeamEstimateOfAway = null!,
+                        AwayTeamEstimateOfHome = null!,
+                        HomeTeamEstimateOfAway = null!,
+                        HomeTeamEstimateOfHome = null!,
+                    },
+                    PhysicsParams = null!,
+                    EventBus = Mock.Of<IEventBus>()
+                }
             };
-            var physicsParams = TestHelpers.EmptyPhysicsParams;
             // Act
             var newState = KickoffDecision.Run(priorState);
             // Assert

@@ -36,7 +36,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 
             Log.Information("Generating schedule for {Year} (cycle year {CycleYear})", year, cycleYear);
 
-            if (previousSuperBowlWinner == null)
+            if (previousSuperBowlWinner is null)
             {
                 previousSuperBowlWinner = teams[randomFactory.Create(Helpers.SchedulingRandomSeed).Next(0, 40)];
                 Log.Information("No previous Super Bowl winner provided; randomly selected {Team} as winner", previousSuperBowlWinner.Name);
@@ -344,6 +344,10 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 
         private static void SetKickoffTime(GameRecord record, DateTimeOffset kickoffTime)
         {
+            if (record.AwayTeam == null || record.HomeTeam == null)
+            {
+                throw new InvalidOperationException("Team data not loaded from the database.");
+            }
 	        Log.Information("Setting kickoff time for Week {WeekNumber} game {HomeTeam} vs. {AwayTeam} to {KickoffTime}",
 		        record.WeekNumber, record.HomeTeam.TeamName, record.AwayTeam.TeamName, kickoffTime);
 	        record.KickoffTime = kickoffTime;
@@ -365,11 +369,11 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 	            Log.Information("Generating preseason opponents for {Team}", team.Name);
                 for (int i = 0; i < 4; i++)
                 {
-                    if (preseasonOpponents[team, i] != null) { continue; }
+                    if (preseasonOpponents[team, i] is not null) { continue; }
                     var opponent = teams[random.Next(40)];
 
                     while (teamComparer.Equals(team, opponent)
-                           || preseasonOpponents[opponent, i] != null)
+                           || preseasonOpponents[opponent, i] is not null)
                     {
                         opponent = teams[random.Next(40)];
                     }
@@ -390,7 +394,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
 	            Log.Information("Scheduling preseason games for {Team}", team.Name);
                 for (int i = 0; i < 4; i++)
                 {
-                    if (preseasonOpponents[team, i] == null) { continue; }
+                    if (preseasonOpponents[team, i] is null) { continue; }
                     var opponent = preseasonOpponents[team, i]!;
                     var teamIsHomeTeam = i % 2 == 0;
                     var homeTeam = teamIsHomeTeam ? team : opponent;

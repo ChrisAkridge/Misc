@@ -9,8 +9,8 @@ namespace Celarix.JustForFun.FootballSimulator
 {
     public sealed class PlayerFactory
     {
-        private string[] firstNames;
-        private string[] lastNames;
+        private readonly string[] firstNames;
+        private readonly string[] lastNames;
 
         public PlayerFactory(IEnumerable<string> firstNames, IEnumerable<string> lastNames)
         {
@@ -51,6 +51,8 @@ namespace Celarix.JustForFun.FootballSimulator
             BasicPlayerPosition position,
             IRandom random)
         {
+            player.RosterPositions ??= [];
+
             Log.Information("Assigning player {FirstName} {LastName} to team {TeamID} as {Position}",
                 player.FirstName,
                 player.LastName,

@@ -11,9 +11,9 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
     {
         [Key]
         public int StadiumID { get; set; }
-        public string Name { get; set; }
-        public string City { get; set; }
-        public string AverageTemperatures { get; set; }
+        public required string Name { get; set; }
+        public required string City { get; set; }
+        public required string AverageTemperatures { get; set; }
         public double TotalPrecipitationOverSeason { get; set; }
         public double AverageWindSpeed { get; set; }
     }

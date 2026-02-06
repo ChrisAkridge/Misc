@@ -6,7 +6,6 @@ using Celarix.JustForFun.FootballSimulator.Random;
 using Celarix.JustForFun.FootballSimulator.Scheduling;
 using Celarix.JustForFun.FootballSimulator.Standings;
 using Celarix.JustForFun.FootballSimulator.SummaryWriting;
-using Celarix.JustForFun.FootballSimulator.Tiebreaking;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;

@@ -11,7 +11,7 @@ namespace Celarix.JustForFun.FootballSimulator.Scheduling
     {
         public bool Equals(BasicTeamInfo? x, BasicTeamInfo? y)
         {
-            if (x == null && y == null) { return true; }
+            if (x is null && y is null) { return true; }
 
             return x?.CompareTo(y) == 0;
         }

@@ -72,7 +72,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.Game
                 },
             ];
 
-            gameEnvironment.CurrentPlayContext = gameEnvironment.CurrentPlayContext with
+            gameEnvironment.CurrentPlayContext = gameEnvironment.CurrentPlayContext! with
             {
                 AwayScore = awayScore,
                 HomeScore = homeScore

@@ -18,7 +18,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             {
                 repository.AddSimulatorSettings(new SimulatorSettings
                 {
-                    SeedDataInitialized = true
+                    SeedDataInitialized = true,
+                    StateMachineContextSavePath = "",
+                    SaveStateMachineContextsForDebugging = false
                 });
                 repository.SaveChanges();
             }

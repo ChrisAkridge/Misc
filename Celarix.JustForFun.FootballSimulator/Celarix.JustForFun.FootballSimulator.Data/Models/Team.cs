@@ -12,9 +12,9 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
     {
         [Key]
         public int TeamID { get; set; }
-        public string CityName { get; set; }
-        public string TeamName { get; set; }
-        public string Abbreviation { get; set; }
+        public required string CityName { get; set; }
+        public required string TeamName { get; set; }
+        public required string Abbreviation { get; set; }
         public Conference Conference { get; set; }
         public Division Division { get; set; }
         
@@ -33,11 +33,11 @@ namespace Celarix.JustForFun.FootballSimulator.Data.Models
         public TeamDisposition Disposition { get; set; }
         
         public int HomeStadiumID { get; set; }
-        public Stadium HomeStadium { get; set; }
-        public List<PlayerRosterPosition> FullHistoricalRoster { get; set; }
+        public Stadium? HomeStadium { get; set; }
+        public List<PlayerRosterPosition>? FullHistoricalRoster { get; set; }
 
         [NotMapped]
-        public IEnumerable<PlayerRosterPosition> ActiveRoster => FullHistoricalRoster.Where(p => p.CurrentPlayer);
+        public IEnumerable<PlayerRosterPosition> ActiveRoster => FullHistoricalRoster?.Where(p => p.CurrentPlayer) ?? Enumerable.Empty<PlayerRosterPosition>();
 
         /// <summary>Serves as the default hash function.</summary>
         /// <returns>A hash code for the current object.</returns>

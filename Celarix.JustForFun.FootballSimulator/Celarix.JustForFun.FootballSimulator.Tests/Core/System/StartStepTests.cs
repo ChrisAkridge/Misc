@@ -107,7 +107,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
         public void Run_ShouldAlwaysCallEnsureCreatedOnRepository()
         {
             // Arrange
-            var settings = new SimulatorSettings { SeedDataInitialized = true };
+            var settings = new SimulatorSettings { SeedDataInitialized = true, StateMachineContextSavePath = "" };
             _mockRepository.Setup(r => r.EnsureCreated());
             _mockRepository.Setup(r => r.GetSimulatorSettings()).Returns(settings);
 
@@ -122,7 +122,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
         public void Run_ShouldAlwaysCallGetSimulatorSettingsOnRepository()
         {
             // Arrange
-            var settings = new SimulatorSettings { SeedDataInitialized = true };
+            var settings = new SimulatorSettings { SeedDataInitialized = true, StateMachineContextSavePath = "" };
             _mockRepository.Setup(r => r.EnsureCreated());
             _mockRepository.Setup(r => r.GetSimulatorSettings()).Returns(settings);
 
@@ -144,7 +144,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
                 Environment: _environment
             );
 
-            var settings = new SimulatorSettings { SeedDataInitialized = true };
+            var settings = new SimulatorSettings { SeedDataInitialized = true, StateMachineContextSavePath = "" };
             _mockRepository.Setup(r => r.EnsureCreated());
             _mockRepository.Setup(r => r.GetSimulatorSettings()).Returns(settings);
 
@@ -159,7 +159,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
         public void Run_ShouldPreserveEnvironmentFromInputContext()
         {
             // Arrange
-            var settings = new SimulatorSettings { SeedDataInitialized = true };
+            var settings = new SimulatorSettings { SeedDataInitialized = true, StateMachineContextSavePath = "" };
             _mockRepository.Setup(r => r.EnsureCreated());
             _mockRepository.Setup(r => r.GetSimulatorSettings()).Returns(settings);
 
@@ -176,7 +176,7 @@ namespace Celarix.JustForFun.FootballSimulator.Tests.Core.System
         public void Run_ShouldSetCorrectNextStateBasedOnSeedDataInitialized(bool seedDataInitialized, SystemState expectedNextState)
         {
             // Arrange
-            var settings = new SimulatorSettings { SeedDataInitialized = seedDataInitialized };
+            var settings = new SimulatorSettings { SeedDataInitialized = seedDataInitialized, StateMachineContextSavePath = "" };
             _mockRepository.Setup(r => r.EnsureCreated());
             _mockRepository.Setup(r => r.GetSimulatorSettings()).Returns(settings);
 
