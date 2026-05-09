@@ -21,7 +21,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var opposingRushingDefenseStrength = parameters
                 .GetActualStrengthsForTeam(priorState.TeamWithPossession.Opponent())
                 .RunningDefenseStrength;
-            var rushResult = UniversalRushingFunction.Get(priorState.LineOfScrimmage, selfRushingStrength,
+            var rushResult = UniversalRushingFunction.Get(priorState.LineOfScrimmage, priorState.TeamWithPossession, selfRushingStrength,
                 opposingRushingDefenseStrength,
                 physicsParams,
                 parameters.Random);

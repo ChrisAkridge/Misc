@@ -20,21 +20,33 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             {
                 Log.Information("ReturnFumbledOrInterceptedBallDecision: Team with possession is {Disposition}, attempting return.",
                     possessingTeamDisposition);
-                return priorState.WithNextState(PlayEvaluationState.FumbleOrInterceptionReturnOutcome);
+                var newState = priorState.WithNextState(PlayEvaluationState.FumbleOrInterceptionReturnOutcome);
+                if (priorState.NextPlay == NextPlayKind.ConversionAttempt)
+                {
+                    newState = newState.WithAdditionalParameter("IsConversionAttempt", true);
+                }
+                return newState;
             }
             else if (possessingTeamDisposition == TeamDisposition.UltraConservative)
             {
                 Log.Information("ReturnFumbledOrInterceptedBallDecision: Team with possession is UltraConservative, not attempting return.");
-                return priorState.WithFirstDownLineOfScrimmage(priorState.LineOfScrimmage,
+                var newState = priorState.WithFirstDownLineOfScrimmage(priorState.LineOfScrimmage,
                     priorState.TeamWithPossession,
                     "{OffAbbr} fumble recovered by {DefAbbr} at {LoS}, will not return. First down.",
                     startOfDrive: true)
                     .InvolvesAdditionalDefensivePlayer();
+                if (priorState.NextPlay == NextPlayKind.ConversionAttempt)
+                {
+                    newState = newState.WithAdditionalParameter("IsConversionAttempt", true);
+                }
+                return newState;
             }
             else if (priorState.NextPlay == NextPlayKind.ConversionAttempt)
             {
                 Log.Information("ReturnFumbledOrInterceptedBallDecision: On conversion attempt, attempting return.");
-                return priorState.WithNextState(PlayEvaluationState.FumbleOrInterceptionReturnOutcome);
+                return priorState
+                    .WithNextState(PlayEvaluationState.FumbleOrInterceptionReturnOutcome)
+                    .WithAdditionalParameter("IsConversionAttempt", true);
             }
             
             var secondsLeftInGame = priorState.TotalSecondsLeftInGame();
@@ -46,7 +58,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 return priorState.WithNextState(PlayEvaluationState.FumbleOrInterceptionReturnOutcome);
             }
 
-            var teamYard = object.InternalYardToTeamYard(priorState.LineOfScrimmage);
+            var teamYard = priorState.InternalYardToTeamYard(priorState.LineOfScrimmage);
             if (teamYard.Team == priorState.TeamWithPossession.Opponent()
                 || teamYard.TeamYard > 5)
             {

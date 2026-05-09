@@ -12,22 +12,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
         public static SystemContext Run(SystemContext context)
         {
             var repository = context.Environment.FootballRepository;
-            var settings = repository.GetSimulatorSettings();
-
-            if (settings == null)
-            {
-                repository.AddSimulatorSettings(new SimulatorSettings
-                {
-                    SeedDataInitialized = true,
-                    StateMachineContextSavePath = "",
-                    SaveStateMachineContextsForDebugging = false
-                });
-                repository.SaveChanges();
-            }
-            else
-            {
-                settings.SeedDataInitialized = true;
-            }
+            var settings = repository.GetSimulatorSettings() ?? throw new InvalidOperationException("InitializeDatabaseStep: SimulatorSettings not found in database.");
 
             var teamsWithStadiums = SeedData.TeamSeedData();
             Log.Verbose($"InitializeDatabaseStep: Seeding team data for {teamsWithStadiums.Count} teams into database.");
@@ -58,6 +43,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             {
                 repository.AddPhysicsParam(param);
             }
+
+            settings.SeedDataInitialized = true;
             repository.SaveChanges();
 
             Log.Information("InitializeDatabaseStep: Initialized database.");

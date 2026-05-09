@@ -88,7 +88,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
                 return RunCore(priorState, parameters, physicsParams, adjustedPassingEstimate);
             }
 
-            var lineOfScrimmageTeamYard = object.InternalYardToTeamYard(priorState.LineOfScrimmage);
+            var lineOfScrimmageTeamYard = priorState.InternalYardToTeamYard(priorState.LineOfScrimmage);
             var spikeBallYardLoss = physicsParams["SpikeBallYardLoss"].Value;
             if (lineOfScrimmageTeamYard.Team == self && lineOfScrimmageTeamYard.TeamYard <= spikeBallYardLoss)
             {
@@ -281,7 +281,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             }
             else if (priorState.GetScoreDifferenceForTeam(self) > 0)
             {
-                var lineOfScrimmageTeamYard = object.InternalYardToTeamYard(priorState.LineOfScrimmage);
+                var lineOfScrimmageTeamYard = priorState.InternalYardToTeamYard(priorState.LineOfScrimmage);
                 if (lineOfScrimmageTeamYard.Team == self && lineOfScrimmageTeamYard.TeamYard >= fortySecondChunks)
                 {
                     Log.Information("MainGameDecision: Want to take victory formation but too close to own endzone, running play.");
@@ -308,11 +308,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
         {
             var self = priorState.TeamWithPossession;
             var opponent = self.Opponent();
-            var selfStrengths = parameters.GetActualStrengthsForTeam(self);
-            var opponentStrengths = parameters.GetActualStrengthsForTeam(opponent);
             var selfEstimateOfSelf = parameters.GetEstimateOfTeamByTeam(self, self);
             var selfEstimateOfOpponent = parameters.GetEstimateOfTeamByTeam(self, opponent);
-            var lineOfScrimmageTeamYard = object.InternalYardToTeamYard(priorState.LineOfScrimmage);
             var isFakePlay = priorState.GetAdditionalParameterOrDefault<bool?>("IsFakePlay") == true;
 
             var r = Math.Abs(selfEstimateOfSelf.RunningOffenseStrength - selfEstimateOfOpponent.RunningDefenseStrength);
@@ -334,7 +331,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             if (priorState.TotalSecondsLeftInGame() < 10 &&
                                 (priorState.PeriodNumber == 4 || parameters.GameType != GameType.Postseason))
             {
-                return PassingVeryCloseToEndOfGame(priorState, parameters, physicsParams, opponent, isFakePlay);
+                return PassingVeryCloseToEndOfGame(priorState, physicsParams, opponent, isFakePlay);
             }
 
             var selfDisposition = parameters.GetDispositionForTeam(self);
@@ -351,7 +348,6 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
 
             var shortPassChance = physicsParams["ConservativePassShortChance"].Value;
             var mediumPassChance = physicsParams["ConservativePassMediumChance"].Value;
-            var longPassChance = physicsParams["ConservativePassLongChance"].Value;
             var nextDouble = parameters.Random.NextDouble();
 
             if (nextDouble < shortPassChance)
@@ -369,7 +365,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             return priorState.WithNextState(PlayEvaluationState.StandardLongPassingPlayOutcome);
         }
 
-        internal static PlayContext PassingVeryCloseToEndOfGame(PlayContext priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams, GameTeam opponent, bool isFakePlay)
+        internal static PlayContext PassingVeryCloseToEndOfGame(PlayContext priorState, IReadOnlyDictionary<string, PhysicsParam> physicsParams, GameTeam opponent, bool isFakePlay)
         {
             if (!isFakePlay && InFieldGoalRange(priorState, physicsParams, opponent) && CanAttemptFieldGoal(priorState))
             {
@@ -386,7 +382,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
         internal static bool InFieldGoalRange(PlayContext priorState, IReadOnlyDictionary<string, PhysicsParam> physicsParams, GameTeam opponent)
         {
             bool inFieldGoalRange;
-            var lineOfScrimmageTeamYard = object.InternalYardToTeamYard(priorState.LineOfScrimmage);
+            var lineOfScrimmageTeamYard = priorState.InternalYardToTeamYard(priorState.LineOfScrimmage);
             var fieldGoalRangeYard = physicsParams["FieldGoalRangeYard"].Value.Round();
             inFieldGoalRange = lineOfScrimmageTeamYard.Team == opponent
                 && lineOfScrimmageTeamYard.TeamYard <= fieldGoalRangeYard;

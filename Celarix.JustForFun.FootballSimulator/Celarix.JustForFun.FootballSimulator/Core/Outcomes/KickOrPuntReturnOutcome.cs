@@ -19,7 +19,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 .KickingStrength;
             var kickDefenseStrength = parameters.GetActualStrengthsForTeam(priorState.TeamWithPossession.Opponent())
                 .KickDefenseStrength;
-            var rushAttemptResult = UniversalRushingFunction.Get(priorState.LineOfScrimmage, kickingStrength,
+            var rushAttemptResult = UniversalRushingFunction.Get(priorState.LineOfScrimmage, priorState.TeamWithPossession, kickingStrength,
                 kickDefenseStrength,
                 physicsParams,
                 parameters.Random);

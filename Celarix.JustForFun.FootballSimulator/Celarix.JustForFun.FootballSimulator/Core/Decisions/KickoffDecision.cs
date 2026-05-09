@@ -32,7 +32,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             else if (kickingTeamDisposition == TeamDisposition.Conservative)
             {
                 var pointsPerMinuteThreshold = physicsParams["OnsideKickPointsPerMinuteThreshold"].Value;
-                var minutesLeftInGame = priorState.TotalSecondsLeftInGame() / 60;
+                var minutesLeftInGame = priorState.TotalSecondsLeftInGame() / 60d;
+                if (minutesLeftInGame <= 0)
+                {
+                    Log.Information("KickoffDecision: No time left in game, performing normal kickoff.");
+                    return priorState.WithNextState(PlayEvaluationState.NormalKickoffOutcome);
+                }
                 var scoreDifference = priorState.GetScoreDifferenceForTeam(priorState.TeamWithPossession);
                 if (scoreDifference < 0
                     && Math.Abs(scoreDifference) / minutesLeftInGame >= pointsPerMinuteThreshold)

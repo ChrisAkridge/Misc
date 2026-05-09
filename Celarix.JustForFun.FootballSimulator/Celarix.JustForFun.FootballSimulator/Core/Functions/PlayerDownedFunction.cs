@@ -23,9 +23,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
             var possessingTeam = priorState.TeamWithPossession;
             var otherTeam = possessingTeam.Opponent();
             var newLineOfScrimmage = priorState.AddYardsForPossessingTeam(possessionStartYard, yardsGained).ClampWithinField();
-            var gainedTeamYard = object.InternalYardToTeamYard(newLineOfScrimmage.Round());
+            var gainedTeamYard = priorState.InternalYardToTeamYard(newLineOfScrimmage.Round());
 
-            if (gainedTeamYard.TeamYard < 0)
+            if (gainedTeamYard.TeamYard <= 0)
             {
                 if (gainedTeamYard.Team == possessingTeam)
                 {
@@ -36,7 +36,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete) with
                         {
                             NextPlay = NextPlayKind.FirstDown,
-                            LineOfScrimmage = object.TeamYardToInternalYard(possessingTeam, 25),
+                            LineOfScrimmage = priorState.TeamYardToInternalYard(possessingTeam, 25),
                             LineToGain = null,
                             PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
                             ClockRunning = clockRunning ?? false,
@@ -66,7 +66,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         with
                         {
                             NextPlay = NextPlayKind.Kickoff,
-                            LineOfScrimmage = object.TeamYardToInternalYard(possessingTeam, 35),
+                            LineOfScrimmage = priorState.TeamYardToInternalYard(possessingTeam, 35),
                             LineToGain = null,
                             PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
                             ClockRunning = clockRunning ?? false,
@@ -83,9 +83,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         with
                         {
                             NextPlay = NextPlayKind.FreeKick,
-                            LineOfScrimmage = object.TeamYardToInternalYard(possessingTeam, 20),
+                            LineOfScrimmage = priorState.TeamYardToInternalYard(possessingTeam, 20),
                             LineToGain = null,
-                            ClockRunning = !clockRunning.HasValue ? false : clockRunning.Value,
+                            ClockRunning = clockRunning ?? false,
                             LastPlayDescriptionTemplate = "{OffAbbr} suffers a safety, {DefAbbr} awarded 2 point(s).",
                             DriveResult = DriveResult.Safety
                         };
@@ -104,10 +104,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         with
                         {
                             NextPlay = NextPlayKind.ConversionAttempt,
-                            LineOfScrimmage = object.TeamYardToInternalYard(otherTeam, 15),
+                            LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 15),
                             LineToGain = null,
                             PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
-                            ClockRunning = !clockRunning.HasValue ? false : clockRunning.Value,
+                            ClockRunning = clockRunning ?? false,
                             LastPlayDescriptionTemplate = "{OffAbbr} touchdown! Scored by {OffPlayer0}."
                         };
                     }
@@ -121,7 +121,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                         with
                         {
                             NextPlay = NextPlayKind.Kickoff,
-                            LineOfScrimmage = object.TeamYardToInternalYard(otherTeam, 35),
+                            LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 35),
                             LineToGain = null,
                             PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
                             ClockRunning = clockRunning ?? false,
@@ -139,10 +139,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                 return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete) with
                 {
                     NextPlay = NextPlayKind.Kickoff,
-                    LineOfScrimmage = object.TeamYardToInternalYard(otherTeam, 35),
+                    LineOfScrimmage = priorState.TeamYardToInternalYard(otherTeam, 35),
                     LineToGain = null,
                     PossessionOnPlay = possessingTeam.ToPossessionOnPlay(),
-                    ClockRunning = !clockRunning.HasValue ? false : clockRunning.Value,
+                    ClockRunning = clockRunning ?? false,
                     LastPlayDescriptionTemplate =
                         "{OffAbbr} unsuccessful conversion attempt, {OffPlayer0} downed at {LoS}.",
                     DriveResult = DriveResult.TouchdownNoXP
@@ -175,11 +175,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
                 return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, otherTeam,
                     "{OffAbbr} has first down at {LoS}.", clockRunning, startOfDrive: true);
             }
-            else if (priorState.LineToGain == null)
-            {
-                throw new InvalidOperationException("Cannot compute result of player being downed; code reached path where LineToGain is null but it should not be.");
-            }
-            else if (object.CompareYardForTeam(priorState.LineOfScrimmage, priorState.LineToGain.Value, possessingTeam) >= 0)
+            else if (priorState.LineToGain != null
+                && priorState.CompareYardForTeam(newLineOfScrimmage, priorState.LineToGain.Value, possessingTeam) >= 0)
             {
                 Log.Information("PlayerDownedFunction: First down achieved.");
                 priorState.AddTag("first-down");

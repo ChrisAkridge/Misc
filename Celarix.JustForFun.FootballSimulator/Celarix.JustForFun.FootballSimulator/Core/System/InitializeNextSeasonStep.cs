@@ -23,7 +23,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
             BasicTeamInfo[] teamList = [.. basicTeamInfos.Keys];
             var scheduleGenerator = context.Environment.ScheduleGenerator
                 ??= new ScheduleGenerator3(teamList, context.Environment.RandomFactory);
-            var random = context.Environment.RandomFactory.Create();
+            var random = context.Environment.RandomFactory.Create(Helpers.SchedulingRandomSeed);
 
             var mostRecentSeason = repository.GetMostRecentSeason();
             Team? previousSuperBowlWinner = null;
@@ -61,21 +61,32 @@ namespace Celarix.JustForFun.FootballSimulator.Core.System
                 divisionStandings = Helpers.GetDefaultPreviousSeasonDivisionRankings(teamList);
             }
 
+            int seasonRecordID = AddSeasonRecordAndGetID(repository, nextSeasonYear);
             var schedule = scheduleGenerator.GenerateScheduleForYear(nextSeasonYear,
                 basicTeamInfos,
                 divisionStandings,
                 new BasicTeamInfo(previousSuperBowlWinner),
                 out _);
-            repository.AddGameRecords(schedule);
-            repository.AddSeasonRecord(new SeasonRecord
+            foreach (var game in schedule)
             {
-                Year = nextSeasonYear
-            });
-            repository.SaveChanges();
-
+                game.SeasonRecordID = seasonRecordID;
+            }
+            repository.AddGameRecords(schedule);
+            
             Log.Information("InitializeNextSeasonStep: Initialized next season ({NextSeasonYear}) schedule.",
                 nextSeasonYear);
             return context.WithNextState(SystemState.LoadGame);
+        }
+
+        private static int AddSeasonRecordAndGetID(IFootballRepository repository, int seasonYear)
+        {
+            var seasonRecord = new SeasonRecord
+            {
+                Year = seasonYear
+            };
+            repository.AddSeasonRecord(seasonRecord);
+            repository.SaveChanges();
+            return seasonRecord.SeasonRecordID;
         }
     }
 }

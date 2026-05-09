@@ -15,7 +15,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var parameters = priorState.Environment!.DecisionParameters;
             var physicsParams = priorState.Environment.PhysicsParams;
 
-            var desiredTargetYard = object.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 0) switch
+            var desiredTargetYard = priorState.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(), 0) switch
             {
                 0 => 0.1d,
                 100 => 99.9d,
@@ -38,7 +38,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var baseKickSkew = parameters.Random.SampleNormalDistribution(kickSkewMean, kickSkewStdDev);
             if (invertSkew) { baseKickSkew *= -1; }
 
-            var desiredKickDirection = object.GetFacingEndzoneAngle(priorState.TeamWithPossession);
+            var desiredKickDirection = priorState.GetFacingEndzoneAngle(priorState.TeamWithPossession);
 
             // Get current wind conditions
             var currentWindAngle = parameters.Random.SampleNormalDistribution(
@@ -62,13 +62,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var kickActualYard = priorState.AddYardsForPossessingTeam(priorState.LineOfScrimmage,
                 puntActualForwardDistance);
 
-            if (object.CompareYardForTeam(kickActualYard, desiredTargetYard, priorState.TeamWithPossession) < 0)
+            if (priorState.CompareYardForTeam(kickActualYard, desiredTargetYard, priorState.TeamWithPossession) < 0)
             {
                 Log.Information("PuntOutcome: Punt fell short of target yard of 0.01. Skipping accuracy check.");
                 return OutcomeDecision(kickActualYard,
-                    priorState,
-                    parameters,
-                    physicsParams);
+                    priorState);
             }
 
             var ballOnField = kickActualCross >= Constants.LeftSidelineCross
@@ -78,7 +76,11 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (!ballOnField)
             {
                 kickActualYard = priorState.AddYardsForPossessingTeam(priorState.LineOfScrimmage,
-                    ComputeKickOutOfBoundsForwardDistance(priorState.LineOfScrimmage, kickActualYard, kickActualCross));
+                    ComputeKickOutOfBoundsForwardDistance(priorState.LineOfScrimmage, kickActualYard, kickActualCross))
+                    .ClampWithinField();
+                Log.Information("PuntOutcome: Punt went out of bounds, adjusted actual yard to reflect forward distance before going out of bounds.");
+                return OutcomeDecision(kickActualYard,
+                    priorState);
             }
 
             // Compute kick accuracy
@@ -86,22 +88,18 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             var delta = Math.Log2(100);
             var epsilon = gamma - delta;
             var kickAccuracyStddev = Math.Pow(2, epsilon);
-            kickActualYard = object.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(),
+            kickActualYard = priorState.TeamYardToInternalYard(priorState.TeamWithPossession.Opponent(),
                 parameters.Random
                     .SampleNormalDistribution(desiredTargetYard, kickAccuracyStddev)
                     .Clamp(-10, 50)
                     .Round());
             Log.Information("PuntOutcome: Punt had distance to make target yard of 0.01, ran accuracy check.");
             return OutcomeDecision(kickActualYard,
-                priorState,
-                parameters,
-                physicsParams);
+                priorState);
         }
 
         private static PlayContext OutcomeDecision(double kickActualYard,
-            PlayContext priorState,
-            GameDecisionParameters parameters,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+            PlayContext priorState)
         {
             if (kickActualYard >= -10 && kickActualYard <= 110)
             {
@@ -118,7 +116,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 };
             }
 
-            var kickActualTeamYard = object.InternalYardToTeamYard(kickActualYard.Round());
+            var kickActualTeamYard = priorState.InternalYardToTeamYard(kickActualYard.Round());
             if (kickActualTeamYard.Team == priorState.TeamWithPossession)
             {
                 Log.Information("PuntOutcome: Unusual punt resulted in a safety for the kicking team; went out back of own endzone.");
@@ -128,7 +126,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     .InvolvesKick()
                     .InvolvesAdditionalOffensivePlayer() with
                 {
-                    LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
+                    LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
                     PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay(),
                     ClockRunning = false,
                     LastPlayDescriptionTemplate = "{OffAbbr} {{OffPlayer0}} punt from {LoS} out of back of own endzone for a safety.",
@@ -154,6 +152,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 ? Constants.LeftSidelineCross
                 : Constants.RightSidelineCross;
             var crossDistanceBeyondSideline = kickActualCross - kickedOverSidelineCross;
+
             var portionOfKickOutOfBounds = Math.Abs(crossDistanceBeyondSideline) / Math.Abs(kickActualCross);
             var portionOfKickInBounds = 1 - portionOfKickOutOfBounds;
             var kickForwardDistance = kickActualYard - lineOfScrimmage;

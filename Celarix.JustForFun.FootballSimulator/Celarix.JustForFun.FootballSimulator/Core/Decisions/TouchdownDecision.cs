@@ -19,19 +19,19 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             if (possessingTeamDisposition == TeamDisposition.UltraConservative)
             {
                 Log.Information("TouchdownDecision: Team disposition is UltraConservative; opting for an extra point attempt.");
-                return AttemptExtraPoint(priorState, parameters, physicsParams);
+                return AttemptExtraPoint(priorState);
             }
             else if (possessingTeamDisposition is TeamDisposition.Insane or TeamDisposition.UltraInsane)
             {
                 Log.Information("TouchdownDecision: Team disposition is Insane or UltraInsane; opting for a two-point conversion attempt.");
-                return AttemptTwoPointConversion(priorState, parameters, physicsParams);
+                return AttemptTwoPointConversion(priorState);
             }
 
             var automaticTwoPointAttemptChance = physicsParams["AutomaticTwoPointAttemptChance"].Value;
             if (parameters.Random.Chance(automaticTwoPointAttemptChance))
             {
                 Log.Information("TouchdownDecision: Random chance triggered automatic two-point conversion attempt.");
-                return AttemptTwoPointConversion(priorState, parameters, physicsParams);
+                return AttemptTwoPointConversion(priorState);
             }
 
             var minutesLeftInGame = priorState.SecondsLeftInPeriod / 60d;
@@ -40,29 +40,29 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
             if (minutesLeftInGame < 0 && Math.Abs(scoreDifference) / minutesLeftInGame > attemptThreshold)
             {
                 Log.Information("TouchdownDecision: Score difference and time remaining thresholds met for two-point conversion attempt.");
-                return AttemptTwoPointConversion(priorState, parameters, physicsParams);
+                return AttemptTwoPointConversion(priorState);
             }
             Log.Information("TouchdownDecision: Defaulting to extra point attempt.");
-            return AttemptExtraPoint(priorState, parameters, physicsParams);
+            return AttemptExtraPoint(priorState);
         }
 
-        private static PlayContext AttemptTwoPointConversion(PlayContext priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        private static PlayContext AttemptTwoPointConversion(PlayContext priorState)
         {
             priorState.AddTag("two-point-attempt");
             return priorState.WithNextState(PlayEvaluationState.TwoPointConversionAttemptOutcome) with
             {
-                LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession, 2),
+                LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 2),
                 NextPlay = NextPlayKind.ConversionAttempt,
                 LastPlayDescriptionTemplate = "{OffAbbr} attempts a two-point conversion."
             };
         }
 
-        private static PlayContext AttemptExtraPoint(PlayContext priorState, GameDecisionParameters parameters, IReadOnlyDictionary<string, PhysicsParam> physicsParams)
+        private static PlayContext AttemptExtraPoint(PlayContext priorState)
         {
             priorState.AddTag("extra-point-attempt");
             return priorState.WithNextState(PlayEvaluationState.FieldGoalsAndExtraPointAttemptOutcome) with
             {
-                LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession, 15),
+                LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 15),
                 NextPlay = NextPlayKind.ConversionAttempt,
                 LastPlayDescriptionTemplate = "{OffAbbr} attempts an extra point."
             };

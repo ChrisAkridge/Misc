@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../Celarix.VioletFacet.Watchdog/Celarix.VioletFacet.Watchdog.csproj" />
+  <Project Path="Celarix.VioletFacet.ScheduledHibernator.csproj" />
+</Solution>

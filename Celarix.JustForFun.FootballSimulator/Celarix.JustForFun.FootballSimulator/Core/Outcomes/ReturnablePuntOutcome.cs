@@ -53,7 +53,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             if (rollsBackward) { puntRollDistance *= -1; }
 
             var newLineOfScrimmage = priorState.LineOfScrimmage + puntRollDistance;
-            var lineOfScrimmageTeamYard = object.InternalYardToTeamYard(newLineOfScrimmage.Round());
+            var lineOfScrimmageTeamYard = priorState.InternalYardToTeamYard(newLineOfScrimmage.ClampWithinField().Round());
             if (lineOfScrimmageTeamYard.TeamYard < 0)
             {
                 if (lineOfScrimmageTeamYard.Team == priorState.TeamWithPossession)
@@ -61,23 +61,23 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     Log.Information("ReturnablePuntOutcome: Punt landed in bounds but rolled into kicking team's endzone; safety.");
                     var updatedState = priorState.WithScoreChange(lineOfScrimmageTeamYard.Team.Opponent(), 2) with
                     {
-                        LineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
+                        LineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 20),
                         NextPlay = NextPlayKind.FreeKick,
                         PossessionOnPlay = priorState.TeamWithPossession.ToPossessionOnPlay(),
                         ClockRunning = false,
                         LastPlayDescriptionTemplate = "The {OffAbbr} punt rolled into their own endzone for a safety!",
                         DriveResult = DriveResult.Safety
                     };
-                    return updatedState.WithNextState(PlayEvaluationState.FreeKickDecision);
+                    return updatedState.WithNextState(PlayEvaluationState.PlayEvaluationComplete);
                 }
                 
                 Log.Information("ReturnablePuntOutcome: Punt rolled into receiving team's endzone; touchback.");
-                return priorState.WithFirstDownLineOfScrimmage(25d, lineOfScrimmageTeamYard.Team.Opponent(),
+                return priorState.WithFirstDownLineOfScrimmage(25d, priorState.TeamWithPossession.Opponent(),
                     "{DefAbbr} touchback, ball placed at {LoS}.", clockRunning: false, startOfDrive: true);
             }
 
             Log.Information("ReturnablePuntOutcome: Punt landed in bounds and rolled to new line of scrimmage untouched by receiving team.");
-            return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, lineOfScrimmageTeamYard.Team.Opponent(),
+            return priorState.WithFirstDownLineOfScrimmage(newLineOfScrimmage, priorState.TeamWithPossession.Opponent(),
                 "{OffAbbr} punt downed at {LoS}, first down for {DefAbbr}.", clockRunning: false, startOfDrive: true);
         }
     }

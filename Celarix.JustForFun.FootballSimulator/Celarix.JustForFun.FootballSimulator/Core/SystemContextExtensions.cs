@@ -23,12 +23,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core
 
             public IEnumerable<string> CollectTags()
             {
-                var gameContext = context.Environment.CurrentGameContext!;
-                var playContext = gameContext.Environment.CurrentPlayContext!;
-
-                var playTags = playContext.Environment!.GetTagsAndReset();
-                var gameTags = gameContext.Environment!.GetTagsAndReset();
                 var systemTags = context.Environment!.GetTagsAndReset();
+                var gameTags = context.Environment.CurrentGameContext?.Environment?.GetTagsAndReset() ?? [];
+                var playTags = context.Environment.CurrentGameContext?.Environment?.CurrentPlayContext?.Environment?.GetTagsAndReset() ?? [];
 
                 return playTags
                     .Concat(gameTags)

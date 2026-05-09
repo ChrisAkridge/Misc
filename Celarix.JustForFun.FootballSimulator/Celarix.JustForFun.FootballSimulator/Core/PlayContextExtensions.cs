@@ -18,8 +18,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 return state with
                 {
                     NextState = nextState,
-                    StateHistory = ImmutableList.CreateRange(state.StateHistory
-                        .Append(new StateHistoryEntry(state.NextState, state.TeamWithPossession, state.Version)))
+                    StateHistory = [.. state.StateHistory
+                        .Append(new StateHistoryEntry(state.NextState, state.TeamWithPossession, state.Version))]
                 };
             }
 
@@ -27,8 +27,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core
             {
                 return state with
                 {
-                    AdditionalParameters = ImmutableList.CreateRange(state.AdditionalParameters
-                        .Append(new AdditionalParameter<object>(key, value!, state.Version)))
+                    AdditionalParameters = [.. state.AdditionalParameters
+                        .Append(new AdditionalParameter<object>(key, value!, state.Version))]
                 };
             }
 
@@ -90,7 +90,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 }
             }
 
-            public static double GetFacingEndzoneAngle(GameTeam team)
+            public double GetFacingEndzoneAngle(GameTeam team)
             {
                 return team switch
                 {
@@ -115,7 +115,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 {
                     GameTeam.Away => fromYard - toYard,
                     GameTeam.Home => toYard - fromYard,
-                    _ => throw new ArgumentOutOfRangeException(nameof(state.TeamWithPossession), $"Unhandled team value: {state.TeamWithPossession}")
+                    _ => throw new InvalidOperationException( $"Unhandled team value: {state.TeamWithPossession}")
                 };
             }
 
@@ -124,7 +124,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 return state.DistanceForPossessingTeam(state.LineOfScrimmage, state.LineToGain ?? throw new InvalidOperationException("LineToGain must be set to calculate distance for first down."));
             }
 
-            public static int TeamYardToInternalYard(GameTeam team, int teamYard)
+            public int TeamYardToInternalYard(GameTeam team, int teamYard)
             {
                 if (teamYard < -10d || teamYard > 50d)
                 {
@@ -139,7 +139,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 };
             }
 
-            public static (GameTeam Team, int TeamYard) InternalYardToTeamYard(int internalYard)
+            public (GameTeam Team, int TeamYard) InternalYardToTeamYard(int internalYard)
             {
                 if (internalYard < Constants.HomeEndLineYard || internalYard > Constants.AwayEndLineYard)
                 {
@@ -157,12 +157,12 @@ namespace Celarix.JustForFun.FootballSimulator.Core
 
             public string InternalYardToDisplayTeamYardString(int internalYard, GameDecisionParameters parameters)
             {
-                var (team, teamYard) = object.InternalYardToTeamYard(internalYard);
+                var (team, teamYard) = state.InternalYardToTeamYard(internalYard);
                 var teamAbbreviation = team switch
                 {
                     GameTeam.Away => parameters.AwayTeam.Abbreviation,
                     GameTeam.Home => parameters.HomeTeam.Abbreviation,
-                    _ => throw new ArgumentOutOfRangeException(nameof(team), $"Unhandled team value: {team}")
+                    _ => throw new InvalidOperationException($"Unhandled team value: {team}")
                 };
 
                 return $"{teamAbbreviation} {teamYard}";
@@ -174,7 +174,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 {
                     GameTeam.Away => state with { AwayScore = state.AwayScore + points, AwayScoredThisPlay = true },
                     GameTeam.Home => state with { HomeScore = state.HomeScore + points, HomeScoredThisPlay = true },
-                    _ => throw new ArgumentOutOfRangeException(nameof(scoringTeam), $"Unhandled team value: {scoringTeam}")
+                    _ => throw new InvalidOperationException($"Unhandled team value: {scoringTeam}")
                 };
             }
 
@@ -185,7 +185,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 if (teamYard.TeamYard is <= 0 && teamYard.Team == team.Opponent())
                 {
                     // Did not return ball out of opponent's endzone, touchback.
-                    return state.WithFirstDownLineOfScrimmage(object.TeamYardToInternalYard(team, 20), team, lastPlayDescriptionTemplate, clockRunning,
+                    return state.WithFirstDownLineOfScrimmage(state.TeamYardToInternalYard(team, 20), team, lastPlayDescriptionTemplate, clockRunning,
                         startOfDrive: true);
                 }
 
@@ -213,7 +213,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 .StartDrive(startOfDrive);
             }
 
-            public static int CompareYardForTeam(int yardA, int yardB, GameTeam team)
+            public int CompareYardForTeam(int yardA, int yardB, GameTeam team)
             {
                 return team switch
                 {
@@ -223,7 +223,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core
                 };
             }
 
-            public static int CompareYardForTeam(double yardA, double yardB, GameTeam team)
+            public int CompareYardForTeam(double yardA, double yardB, GameTeam team)
             {
                 return team switch
                 {

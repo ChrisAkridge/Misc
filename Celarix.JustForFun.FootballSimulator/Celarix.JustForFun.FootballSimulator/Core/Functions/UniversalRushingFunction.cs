@@ -11,9 +11,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
     internal static class UniversalRushingFunction
     {
         public static RushingResult Get(double lineOfScrimmage,
+            GameTeam teamWithPossession,
             double rushingOffenseStrength,
-            double rushingDefenseStrength,
-            IReadOnlyDictionary<string, PhysicsParam> physicsParams, IRandom random)
+            double rushingDefenseStrength, IReadOnlyDictionary<string, PhysicsParam> physicsParams, IRandom random)
         {
             var standardStrengthStddev = physicsParams["StandardStrengthStddev"].Value;
             var offenseSample = random.SampleNormalDistribution(rushingOffenseStrength, standardStrengthStddev);
@@ -53,7 +53,9 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Functions
             }
 
             // Clamp yards gained so that the new LoS is somewhere on the field, including the endzones
-            var newLineOfScrimmage = lineOfScrimmage + yardsGained;
+            var newLineOfScrimmage = lineOfScrimmage + (teamWithPossession == GameTeam.Home
+                ? yardsGained       // Home team is going from internal yard 0 toward 100, so add yards gained
+                : -yardsGained);    // Away team is going from internal yard 100 toward 0, so subtract yards gained
             if (newLineOfScrimmage < Constants.HomeEndLineYard)
             {
                 // Figure out how far we could go to reach the end line

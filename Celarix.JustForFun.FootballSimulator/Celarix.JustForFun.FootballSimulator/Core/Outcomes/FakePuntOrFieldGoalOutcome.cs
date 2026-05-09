@@ -13,7 +13,10 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
         {
             var priorStateWithSimulatedLineOfScrimmage = priorState with
             {
-                LineOfScrimmage = priorState.AddYardsForPossessingTeam(priorState.LineOfScrimmage, -15).Round()
+                LineOfScrimmage = priorState
+                    .AddYardsForPossessingTeam(priorState.LineOfScrimmage, -15)
+                    .ClampWithinField()
+                    .Round()
             };
 
             // This is one of the few times we call a decision directly instead of letting the GameLoop handle it.

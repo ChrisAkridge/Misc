@@ -22,8 +22,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 // Interception! Check if we're in their endzone already.
                 Log.Information("FumbledLiveBallOutcome: Interception occurred during passing play.");
                 var interceptionInternalYard = priorState.LineOfScrimmage;
-                var interceptionTeamYard = object.InternalYardToTeamYard(interceptionInternalYard);
-                if (interceptionTeamYard.TeamYard is < 0 && interceptionTeamYard.Team == priorState.TeamWithPossession)
+                var interceptionTeamYard = priorState.InternalYardToTeamYard(interceptionInternalYard);
+                if (interceptionTeamYard.TeamYard < 0 && interceptionTeamYard.Team == priorState.TeamWithPossession)
                 {
                     Log.Information("FumbledLiveBallOutcome: Interception occurred inside offense's endzone, either a touchdown or successful two-point conversion for the defense!");
                     return RunPlayerDownedFunction(priorState.InvolvesAdditionalDefensivePlayer() with
@@ -57,7 +57,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 standardStrengthStddev);
             var sampleSum = offensiveLineStrength + defensiveLineStrength;
             var fumbleRecoveryChance = offensiveLineStrength / sampleSum;
-            var fumbleRecoveredByOffense = parameters.Random.Chance(fumbleRecoveryChance);
+            var fumbleRecoveredByOffense = parameters.Random.Chance(fumbleRecoveryChance.Clamp(0d, 1d));
             var fumbleRecoveryTeam = fumbleRecoveredByOffense
                 ? priorState.TeamWithPossession
                 : priorState.TeamWithPossession.Opponent();
@@ -73,12 +73,13 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 
             var downedImmediatelyChance = fumbleRecoveredByOffense
                 ? physicsParams["FumbleRecoveredByOffenseChanceOfBeingDownedImmediately"].Value
-                : physicsParams["FumbleRecoveredByOffenseChanceOfBeingDownedImmediately"].Value;
+                : physicsParams["FumbleRecoveredByDefenseChanceOfBeingDownedImmediately"].Value;
             var fumbleDownedImmediately = parameters.Random.Chance(downedImmediatelyChance);
             // It's okay to just use the + operator here, since the fumble has a 50% chance of going backwards,
             // it's fair for either direction to use + rather than the specialized function.
-            var fumbleRecoveryInternalYard = priorState.LineOfScrimmage + fumbleRecoveryDistance;
-            var fumbleRecoveryTeamYard = object.InternalYardToTeamYard(fumbleRecoveryInternalYard.Round());
+            var fumbleRecoveryInternalYard = (priorState.LineOfScrimmage + fumbleRecoveryDistance)
+                .ClampWithinField();
+            var fumbleRecoveryTeamYard = priorState.InternalYardToTeamYard(fumbleRecoveryInternalYard.Round());
 
             if (fumbleRecoveredByOffense)
             {
@@ -100,6 +101,8 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                 return priorState.WithNextState(PlayEvaluationState.ReturnFumbledOrInterceptedBallDecision) with
                 {
                     LineOfScrimmage = fumbleRecoveryInternalYard.Round(),
+                    TeamWithPossession = fumbleRecoveryTeam,
+                    PossessionOnPlay = PossessionOnPlay.BothTeams,
                     ClockRunning = true,
                     LastPlayDescriptionTemplate = "{OffAbbr} {OffPlayer0} fumbled but {OffPlayer1} recovered at {LoS}."
                 };
@@ -172,7 +175,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
 
             return PlayerDownedFunction.Get(priorState,
                         priorState.LineOfScrimmage,
-                        fumbleRecoveryInternalYard.Round(),
+                        0,
                         endzoneBehavior,
                         (priorState.NextPlay == NextPlayKind.ConversionAttempt)
                             ? priorState.TeamWithPossession

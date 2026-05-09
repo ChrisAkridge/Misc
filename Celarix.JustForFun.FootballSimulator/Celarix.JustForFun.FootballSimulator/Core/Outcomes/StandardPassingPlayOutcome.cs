@@ -200,7 +200,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                     null);
             }
 
-            var yardsAfterCatch = UniversalRushingFunction.Get(priorState.LineOfScrimmage, selfStrengths.RunningOffenseStrength,
+            var yardsAfterCatch = UniversalRushingFunction.Get(priorState.LineOfScrimmage, priorState.TeamWithPossession, selfStrengths.RunningOffenseStrength,
                 opponentStrengths.RunningDefenseStrength,
                 physicsParams,
                 parameters.Random);

@@ -65,36 +65,31 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Decisions
         private static PlayContext FairCatch(PlayContext priorState)
         {
             priorState.AddTag("fair-catch");
-            if (object.InternalYardToTeamYard(priorState.LineOfScrimmage).TeamYard < 0)
+            if (priorState.InternalYardToTeamYard(priorState.LineOfScrimmage).TeamYard < 0)
             {
                 // Touchback
                 priorState.AddTag("touchback");
-                int lineOfScrimmage = object.TeamYardToInternalYard(priorState.TeamWithPossession, 35);
+                int lineOfScrimmage = priorState.TeamYardToInternalYard(priorState.TeamWithPossession, 35);
                 Log.Information("SignalFairCatchDecision: Fair catch in end zone, touchback to {LoS}.",
                     lineOfScrimmage);
-                return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete)
-                    .InvolvesAdditionalDefensivePlayer() with
-                {
-                    TeamWithPossession = priorState.TeamWithPossession.Opponent(),
-                    PossessionOnPlay = priorState.TeamWithPossession.Opponent().ToPossessionOnPlay(),
-                    LineOfScrimmage = lineOfScrimmage,
-                    LineToGain = priorState.AddYardsForPossessingTeam(lineOfScrimmage, 10).Round(),
-                    LastPlayDescriptionTemplate = "{DefAbbr} touchback, ball placed at {LoS}."
-                };
+                return priorState.WithFirstDownLineOfScrimmage(lineOfScrimmage,
+                    priorState.TeamWithPossession.Opponent(),
+                    "{DefAbbr} touchback, ball placed at {LoS}.",
+                    clockRunning: false,
+                    startOfDrive: true)
+                    .InvolvesAdditionalDefensivePlayer(); ;
             }
             else
             {
                 // Fair catch on field
                 Log.Information("SignalFairCatchDecision: Fair catch on field at {LoS}.",
                     priorState.LineOfScrimmage);
-                return priorState.WithNextState(PlayEvaluationState.PlayEvaluationComplete)
-                    .InvolvesAdditionalDefensivePlayer() with
-                {
-                    TeamWithPossession = priorState.TeamWithPossession.Opponent(),
-                    PossessionOnPlay = priorState.TeamWithPossession.Opponent().ToPossessionOnPlay(),
-                    LineToGain = priorState.AddYardsForPossessingTeam(priorState.LineOfScrimmage, 10).Round(),
-                    LastPlayDescriptionTemplate = "{DefAbbr} {DefPlayer0} signals for fair catch at {LoS}."
-                };
+                return priorState.WithFirstDownLineOfScrimmage(priorState.LineOfScrimmage,
+                    priorState.TeamWithPossession.Opponent(),
+                    "{DefAbbr} {DefPlayer0} signals for fair catch at {LoS}.",
+                    clockRunning: false,
+                    startOfDrive: true)
+                    .InvolvesAdditionalDefensivePlayer();
             }
         }
     }

@@ -24,6 +24,9 @@ namespace Celarix.JustForFun.FootballSimulator.Output
         private string lineOfScrimmage = "";
         private string lastPlayDescription = "";
         private string tags = "";
+        private string systemState = "";
+        private string gameState = "";
+        private string playEvaluationState = "";
 
         public void Handle(GameEvent gameEvent)
         {
@@ -89,6 +92,10 @@ namespace Celarix.JustForFun.FootballSimulator.Output
             lineOfScrimmage = playContext.InternalYardToDisplayTeamYardString(playContext.LineOfScrimmage, playEnvironment!.DecisionParameters);
             tags = "Tags: " + string.Join(", ", gameEvent.Tags);
 
+            systemState = $"System State: {systemContext.NextState}";
+            gameState = $"Game State: {gameContext.NextState}";
+            playEvaluationState = $"Play Evaluation State: {playContext.NextState}";
+
             Render();
         }
 
@@ -111,6 +118,7 @@ namespace Celarix.JustForFun.FootballSimulator.Output
             var maxLineWidth = Console.WindowWidth;
             var lastPlayLines = WrapString(lastPlayDescription, maxLineWidth);
             var tagLines = WrapString(tags, maxLineWidth);
+            var stateLines = WrapString(string.Join(" | ", new[] { systemState, gameState, playEvaluationState }), maxLineWidth);
 
             Console.WriteLine(line1);
             Console.WriteLine(line2);
@@ -120,6 +128,11 @@ namespace Celarix.JustForFun.FootballSimulator.Output
             }
             Console.WriteLine();
             foreach (var line in tagLines)
+            {
+                Console.WriteLine(line);
+            }
+            Console.WriteLine();
+            foreach (var line in stateLines)
             {
                 Console.WriteLine(line);
             }

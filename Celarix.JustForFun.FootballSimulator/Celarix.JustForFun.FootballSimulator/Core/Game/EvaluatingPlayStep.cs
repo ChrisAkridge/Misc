@@ -56,13 +56,13 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Game
                 context.Environment.DebugContextWriter.WriteContext(playContext, playContext.Environment!);
                 context.Environment.DebugContextWriter.WriteContext(context, context.Environment!);
 
-                var lineOfScrimmageTeamYard = object.InternalYardToTeamYard(playContext.LineOfScrimmage);
-                var inOpponentTerritory = playContext.TeamWithPossession != lineOfScrimmageTeamYard.Team;
-                if (inOpponentTerritory && lineOfScrimmageTeamYard.TeamYard <= 20)
+                var (team, teamYard) = playContext.InternalYardToTeamYard(playContext.LineOfScrimmage);
+                var inOpponentTerritory = playContext.TeamWithPossession != team;
+                if (inOpponentTerritory && teamYard <= 20)
                 {
                     context.AddTag("red-zone");
                 }
-                else if (!inOpponentTerritory && lineOfScrimmageTeamYard.TeamYard <= 10)
+                else if (!inOpponentTerritory && teamYard <= 10)
                 {
                     context.AddTag("near-own-endzone");
                 }

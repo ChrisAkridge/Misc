@@ -19,7 +19,7 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
                .KickingStrength;
             var kickDefenseStrength = parameters.GetActualStrengthsForTeam(priorState.TeamWithPossession.Opponent())
                 .KickDefenseStrength;
-            var rushAttemptResult = UniversalRushingFunction.Get(priorState.LineOfScrimmage, kickingStrength,
+            var rushAttemptResult = UniversalRushingFunction.Get(priorState.LineOfScrimmage, priorState.TeamWithPossession, kickingStrength,
                 kickDefenseStrength,
                 physicsParams,
                 parameters.Random);
@@ -35,11 +35,14 @@ namespace Celarix.JustForFun.FootballSimulator.Core.Outcomes
             PlayContext newState = priorState.InvolvesDefenseRun()
                 .InvolvesAdditionalDefensivePlayer() with
             {
-                TeamWithPossession = priorState.TeamWithPossession.Opponent(),
+                TeamWithPossession = priorState.TeamWithPossession,
                 LastPlayDescriptionTemplate = "{OffTeam} {OffPlayer0} returned ball to the {LoS}.",
             };
             var newLineOfScrimmage = newState.AddYardsForPossessingTeam(priorState.LineOfScrimmage, yardsGained);
-            return PlayerDownedFunction.Get(newState, priorState.LineOfScrimmage, yardsGained.Round(), EndzoneBehavior.FumbleOrInterceptionReturn, null);
+            var endzoneBehavior = priorState.HasAdditionalParameter("IsConversionAttempt")
+                ? EndzoneBehavior.ConversionAttempt
+                : EndzoneBehavior.FumbleOrInterceptionReturn;
+            return PlayerDownedFunction.Get(newState, priorState.LineOfScrimmage, yardsGained.Round(), endzoneBehavior, null);
         }
     }
 }
